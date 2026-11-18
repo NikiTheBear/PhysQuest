@@ -20,34 +20,45 @@ REPO_URL="https://github.com/NikiTheBear/PhysQuest.git"
 # 1. 找 gh
 # ============================================================
 
-find_gh() {
-  # ① 先看 PATH 里有没有
-  if command -v gh >/dev/null 2>&1; then
-    command -v gh
-    return 0
-  fi
+# 判断一个 gh 是不是真的能用（mise 的 shim 在干净环境里会报错）
+gh_works() {
+  [ -x "$1" ] || return 1
+  # 排除 mise 的 shim 目录 —— 它在双击启动的环境里是坏的
+  case "$1" in
+    */mise/shims/*) return 1 ;;
+  esac
+  env -i HOME="$HOME" PATH="/usr/bin:/bin:/usr/sbin:/sbin" "$1" --version >/dev/null 2>&1
+}
 
-  # ② 常见安装位置
-  local candidates=(
+find_gh() {
+  local candidates=()
+
+  # ① 常见安装位置（Homebrew 优先，最稳）
+  candidates+=(
     "/opt/homebrew/bin/gh"
     "/usr/local/bin/gh"
     "$HOME/.local/bin/gh"
     "$HOME/bin/gh"
-    "/Users/frankzhang/Library/Application Support/CherryStudio/Toolchain/mise/shims/gh"
   )
 
-  # ③ mise 装的一堆版本
+  # ② PATH 里的（但可能是 shim，下面会验证）
+  local from_path
+  from_path="$(command -v gh 2>/dev/null)"
+  [ -n "$from_path" ] && candidates+=("$from_path")
+
+  # ③ mise 装的真二进制（跳过 shims，直接用 installs 里的）
   local mise_dir="/Users/frankzhang/Library/Application Support/CherryStudio/Toolchain/mise/installs/gh"
   if [ -d "$mise_dir" ]; then
     for d in "$mise_dir"/*/; do
       for sub in "$d"*/bin/gh; do
-        [ -x "$sub" ] && candidates+=("$sub")
+        candidates+=("$sub")
       done
     done
   fi
 
+  # 逐个验证，第一个真能跑的就用它
   for c in "${candidates[@]}"; do
-    if [ -x "$c" ]; then
+    if gh_works "$c"; then
       echo "$c"
       return 0
     fi
@@ -81,7 +92,10 @@ if [ -z "$GH" ]; then
   echo ""
   echo "  然后在这个窗口里直接跑："
   echo "     git push -u origin main"
-  echo "  用户名填 NikiTheBear，密码粘贴刚才那串 token。"
+  echo ""
+  echo "  提示输入时："
+  echo "     Username: NikiTheBear"
+  echo "     Password: 粘贴刚才那串 ghp_ 开头的 token（不会显示，正常）"
   echo ""
   read -r -p "  按回车关掉…"
   exit 1
@@ -94,7 +108,7 @@ echo ""
 # 2. 登录
 # ============================================================
 
-if ! "$GH" auth status >/dev/null 2>&1; then
+if ! env -i HOME="$HOME" PATH="/usr/bin:/bin:/usr/sbin:/sbin" "$GH" auth status >/dev/null 2>&1; then
   echo "  还没有登录 GitHub。现在开始，跟着提示走："
   echo ""
   echo "  ① 选 GitHub.com"
@@ -106,9 +120,11 @@ if ! "$GH" auth status >/dev/null 2>&1; then
   read -r -p "  准备好了按回车…"
   echo ""
 
-  "$GH" auth login --hostname github.com --git-protocol https --web
+  # 用干净环境跑，避免被 CherryStudio 的 mise 环境变量干扰
+  env -i HOME="$HOME" PATH="/usr/bin:/bin:/usr/sbin:/sbin" \
+    "$GH" auth login --hostname github.com --git-protocol https --web
 
-  if ! "$GH" auth status >/dev/null 2>&1; then
+  if ! env -i HOME="$HOME" PATH="/usr/bin:/bin:/usr/sbin:/sbin" "$GH" auth status >/dev/null 2>&1; then
     echo ""
     echo "  ✗ 登录没成功。重新双击这个文件再试一次。"
     echo ""
@@ -118,12 +134,12 @@ if ! "$GH" auth status >/dev/null 2>&1; then
   echo ""
 fi
 
-LOGIN="$("$GH" api user --jq .login 2>/dev/null)"
+LOGIN="$(env -i HOME="$HOME" PATH="/usr/bin:/bin:/usr/sbin:/sbin" "$GH" api user --jq .login 2>/dev/null)"
 echo "  ✓ 已登录：$LOGIN"
 echo ""
 
 # 让 git 用 gh 的凭证
-"$GH" auth setup-git 2>/dev/null
+env -i HOME="$HOME" PATH="/usr/bin:/bin:/usr/sbin:/sbin" "$GH" auth setup-git 2>/dev/null
 
 # ============================================================
 # 3. 推送

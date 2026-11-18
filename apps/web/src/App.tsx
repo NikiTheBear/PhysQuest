@@ -18,6 +18,7 @@ import {
 import { solve } from './labs/optics-lens/engine';
 import LabStage from './labs/optics-lens/LabStage';
 import Hub from './components/hub/Hub';
+import KnowledgeMap from './components/knowledge-map/KnowledgeMap';
 import ControlPanel from './components/lab-workspace/ControlPanel';
 import CurveChart from './components/lab-workspace/CurveChart';
 import SatisfactionGate from './components/lab-workspace/SatisfactionGate';
@@ -30,7 +31,7 @@ import KnowledgeCardView, {
 import ReportView from './components/report/ReportView';
 import { CHALLENGES, KNOWLEDGE, quizForChallenge } from './data/content';
 
-type View = 'hub' | 'lab' | 'cards' | 'report';
+type View = 'hub' | 'map' | 'lab' | 'cards' | 'report';
 type Phase = 'predict' | 'explore' | 'gate' | 'compare' | 'quiz' | 'quizResult' | 'done';
 
 export default function App() {
@@ -157,7 +158,7 @@ export default function App() {
             <span className="logo">🔭</span>
             <div>
               <h1>探理实验室</h1>
-              <small>PhysQuest · 凸透镜成像</small>
+              <small>PhysQuest</small>
             </div>
           </div>
 
@@ -171,6 +172,9 @@ export default function App() {
               disabled={view === 'hub' && !challenge}
             >
               实验台
+            </button>
+            <button className={view === 'map' ? 'active' : ''} onClick={() => setView('map')}>
+              知识地图
             </button>
             <button className={view === 'cards' ? 'active' : ''} onClick={() => setView('cards')}>
               知识卡
@@ -190,6 +194,16 @@ export default function App() {
           completed={learner.completed}
           weakMisconceptions={weak}
           onPick={beginChallenge}
+          onOpenMap={() => setView('map')}
+        />
+      )}
+
+      {view === 'map' && (
+        <KnowledgeMap
+          onOpenLab={(cid) => {
+            const c = CHALLENGES.find((x) => x.id === cid);
+            if (c) beginChallenge(c);
+          }}
         />
       )}
 
@@ -197,6 +211,7 @@ export default function App() {
         <>
           <div className="work-head">
             <div>
+              <span className="eyebrow">{challenge.id} · 凸透镜成像</span>
               <h2>{challenge.title}</h2>
               <div className="brief">{challenge.brief}</div>
             </div>

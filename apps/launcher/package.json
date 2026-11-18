@@ -1,0 +1,13 @@
+{
+  "name": "physquest-launcher",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "build:bin": "bun build ./src/server.ts --compile --minify --outfile ./build/physquest"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

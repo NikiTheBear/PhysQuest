@@ -1,0 +1,8 @@
+{
+  "_说明": "把这个文件复制成 config.local.json 就能用。config.local.json 不要提交到仓库。",
+  "_endpoint 说明": "只填到 /v1 就行，启动器只负责原样转发，路径由网页自动补全",
+  "endpoint": "https://api.deepseek.com/v1/chat/completions",
+  "model": "deepseek-chat",
+  "apiKey": "",
+  "timeoutMs": 60000
+}

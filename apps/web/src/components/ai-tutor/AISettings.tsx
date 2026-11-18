@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   clearAIConfig,
   isConfigured,
+  LAUNCHER_BASE,
   loadAIConfig,
+  probeLauncher,
   PROVIDERS,
   saveAIConfig,
   testConnection,
   type AIConfig,
   type AIConnection,
+  type LauncherInfo,
 } from '../../ai/client';
 
 interface Props {
@@ -23,6 +26,20 @@ export default function AISettings({ config, onSave, onClose }: Props) {
   const [provider, setProvider] = useState('deepseek');
   const [test, setTest] = useState<TestState>({ kind: 'idle' });
   const [showKey, setShowKey] = useState(false);
+  const [launcher, setLauncher] = useState<LauncherInfo | null>(null);
+  const [probing, setProbing] = useState(false);
+
+  const checkLauncher = async () => {
+    setProbing(true);
+    const info = await probeLauncher();
+    setLauncher(info);
+    setProbing(false);
+  };
+
+  useEffect(() => {
+    if (c.connection === 'launcher') void checkLauncher();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [c.connection]);
 
   const pickProvider = (id: string) => {
     setProvider(id);
@@ -80,6 +97,38 @@ export default function AISettings({ config, onSave, onClose }: Props) {
                 : '浏览器直接请求厂商接口。只有少数厂商允许这样做，大部分会报「跨域」错误。'}
             </div>
           </div>
+
+          {c.connection === 'launcher' && (
+            <div
+              className={`test-result ${
+                launcher === null ? 'info' : launcher.ok ? 'ok' : 'err'
+              }`}
+              style={{ display: 'flex', alignItems: 'center', gap: 10 }}
+            >
+              <span style={{ flex: 1 }}>
+                {probing && '正在检查启动器…'}
+                {!probing && launcher === null && '还没检查'}
+                {!probing && launcher?.ok && (
+                  <>
+                    <b>启动器在跑</b>
+                    {launcher.hasConfig ? '（已读到 config.local.json 里的 Key）' : '（Key 从下面这个框读）'}
+                  </>
+                )}
+                {!probing && launcher && !launcher.ok && (
+                  <>
+                    <b>启动器没在跑</b>
+                    <div style={{ fontSize: 12, opacity: 0.85, marginTop: 3 }}>
+                      回桌面双击 PhysQuest 启动器（`start.command` / `start.bat`），
+                      然后用它给出的 {LAUNCHER_BASE} 打开网页。
+                    </div>
+                  </>
+                )}
+              </span>
+              <button className="btn-ghost btn-small" onClick={checkLauncher} disabled={probing}>
+                重新检查
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="field">
@@ -147,7 +196,11 @@ export default function AISettings({ config, onSave, onClose }: Props) {
               {showKey ? '隐藏' : '显示'}
             </button>
           </div>
-          <div className="hint">存在 localStorage，清浏览器数据会一起清掉。</div>
+          <div className="hint">
+            {c.connection === 'launcher' && launcher?.hasConfig
+              ? '启动器已经读到 config.local.json 里的 Key，这里可以留空。'
+              : '存在 localStorage，清浏览器数据会一起清掉。'}
+          </div>
         </div>
 
         {test.kind !== 'idle' && (
@@ -183,7 +236,14 @@ export default function AISettings({ config, onSave, onClose }: Props) {
           </button>
 
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn-ghost" onClick={runTest} disabled={!isConfigured(c) || test.kind === 'busy'}>
+            <button
+              className="btn-ghost"
+              onClick={runTest}
+              disabled={
+                (!isConfigured(c) && !(c.connection === 'launcher' && launcher?.hasConfig)) ||
+                test.kind === 'busy'
+              }
+            >
               测试连接
             </button>
             <button
@@ -192,7 +252,7 @@ export default function AISettings({ config, onSave, onClose }: Props) {
                 saveAIConfig(c);
                 onSave(c);
               }}
-              disabled={!isConfigured(c)}
+              disabled={!isConfigured(c) && !(c.connection === 'launcher' && launcher?.hasConfig)}
             >
               保存
             </button>

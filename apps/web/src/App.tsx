@@ -220,14 +220,6 @@ export default function App() {
                 ))}
               </div>
 
-              <button
-                className={`icon-btn ${aiOpen ? 'active' : ''}`}
-                style={{ marginLeft: 4 }}
-                onClick={() => setAiOpen(!aiOpen)}
-                title="AI 助教"
-              >
-                ✦
-              </button>
             </div>
           </div>
         </div>

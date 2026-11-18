@@ -119,10 +119,52 @@ export function clearAIConfig() {
 }
 
 export function isConfigured(c: AIConfig): boolean {
+  // 启动器模式允许 Key 留空（Key 可能在 config.local.json 里）
+  if (c.connection === 'launcher') {
+    return Boolean(c.endpoint.trim() && c.model.trim());
+  }
   return Boolean(c.apiKey.trim() && c.endpoint.trim() && c.model.trim());
 }
 
 /** 把端点规范化成完整的 chat/completions 地址 */
+/* ============================================================
+ * 启动器探测
+ * ========================================================== */
+
+export interface LauncherInfo {
+  ok: boolean;
+  version?: string;
+  model?: string | null;
+  hasConfig?: boolean;
+}
+
+/**
+ * 探测本机启动器在不在。
+ * 用 GET /api/health，2 秒超时 —— 探不到就是没开，不要卡住界面。
+ */
+export async function probeLauncher(timeoutMs = 2000): Promise<LauncherInfo> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(`${LAUNCHER_BASE}/api/health`, {
+      signal: ctrl.signal,
+      cache: 'no-store',
+    });
+    if (!res.ok) return { ok: false };
+    const data = await res.json();
+    return {
+      ok: Boolean(data?.ok),
+      version: data?.version,
+      model: data?.model ?? null,
+      hasConfig: Boolean(data?.hasConfig),
+    };
+  } catch {
+    return { ok: false };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export function resolveUrl(c: AIConfig): string {
   const base = c.endpoint.trim().replace(/\/+$/, '');
   const full = /\/chat\/completions$/i.test(base)
@@ -148,6 +190,7 @@ export type AIErrorKind =
   | 'notfound'
   | 'cors'
   | 'launcher-down'
+  | 'forbidden'
   | 'timeout'
   | 'unknown';
 
@@ -170,6 +213,13 @@ function translateError(status: number, text: string, conn: AIConnection): AIErr
       kind: 'quota',
       message: '账户余额不足，或请求太频繁',
       detail: '去厂商控制台看一下余额；如果余额正常，等一分钟再试。',
+    };
+  }
+  if (status === 403) {
+    return {
+      kind: 'forbidden',
+      message: '启动器拒绝了这次请求',
+      detail: '通常是从 file:// 打开的页面才会被拒。请用启动器给出的那个地址打开网页。',
     };
   }
   if (status === 404) {

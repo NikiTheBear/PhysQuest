@@ -23,10 +23,25 @@
 - ✅ 预测对比：你猜的 vs 引擎算的
 - ✅ 测验 + 错题溯源到知识卡
 - ✅ 报告生成与 `.md` 导出（反思必须手写，AI 不代写）
-- ⬜ AI 助教（M3）
-- ⬜ 本地启动器 / BYOK（M3）
+- ✅ AI 助教 sidebar（BYOK、双连接方式、白名单参数指令、能出题）
+- ✅ 本地启动器（绕开跨域，所有厂商的 Key 都能用）
+- ⬜ AI 演示与评分（M3 后半）
+- ⬜ 离线单文件版（M4）
 
 ## 跑起来
+
+### 只想用（含 AI 功能）
+
+```bash
+cd apps/web && npm install && npm run build   # 先构建一次
+cd ../launcher && bun run src/server.ts       # 起启动器
+```
+
+或者直接双击 `apps/launcher/start.command`（macOS）/ `start.bat`（Windows）。
+
+浏览器会打开 `http://127.0.0.1:8787`。详见 [`docs/LAUNCHER.md`](./docs/LAUNCHER.md)。
+
+### 开发
 
 ```bash
 cd apps/web
@@ -48,6 +63,7 @@ node shared/knowledge-data/schema/validate.mjs
 | [`PLAN.md`](./PLAN.md) | 完整计划书：架构、知识体系、分工、路线图、验收清单 |
 | [`docs/BRIEF-FOR-B.md`](./docs/BRIEF-FOR-B.md) | 给实验室负责人（B）的规格书 |
 | [`docs/HANDOFF-FOR-C.md`](./docs/HANDOFF-FOR-C.md) | 给内容负责人（C）的填空指南 |
+| [`docs/LAUNCHER.md`](./docs/LAUNCHER.md) | 本地启动器：为什么需要、怎么用、两种配 Key 方式 |
 
 ## 架构（三句话）
 

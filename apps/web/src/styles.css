@@ -317,15 +317,6 @@ h4 {
   font-weight: 500;
 }
 
-.topnav .icon-btn {
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  display: grid;
-  place-items: center;
-  font-size: 15px;
-}
-
 .badge {
   display: inline-block;
   font-size: 11px;

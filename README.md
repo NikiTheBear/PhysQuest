@@ -3,6 +3,11 @@
 [![预检](https://github.com/NikiTheBear/PhysQuest/actions/workflows/preflight.yml/badge.svg)](https://github.com/NikiTheBear/PhysQuest/actions/workflows/preflight.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
+**在线试玩** → https://nikithebear.github.io/PhysQuest/
+
+> 在线版只能用「浏览器直连」模式，国内厂商的 Key 在里面用不了。
+> 想用自己的 Key，跑本地启动器，见下面「跑起来」。
+
 > 一个开源的全学段物理探究平台。
 > **先猜，再做，被推翻，然后想明白。**
 

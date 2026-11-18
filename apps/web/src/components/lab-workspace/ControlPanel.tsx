@@ -33,7 +33,7 @@ const Row = ({
 }) => (
   <div className="slider-row">
     <div className="slider-label">
-      <span style={{ color: active ? 'var(--amber)' : undefined, fontWeight: active ? 700 : 400 }}>
+      <span style={{ color: active ? 'var(--accent)' : undefined, fontWeight: active ? 700 : 400 }}>
         {label}
       </span>
       <b>{display}</b>
@@ -76,7 +76,7 @@ export default function ControlPanel({
         </div>
         <div className="formula-box" style={{ fontSize: 13.5 }}>
           放大率 m = {Number.isFinite(metrics.m) ? metrics.m.toFixed(2) : '∞'}
-          <span style={{ color: 'var(--muted)', marginLeft: 8 }}>
+          <span style={{ color: 'var(--label-2)', marginLeft: 8 }}>
             {Number.isFinite(metrics.m) ? (Math.abs(metrics.m) > 1 ? '放大' : '缩小') : '—'}
             {Number.isFinite(metrics.m) ? (metrics.m < 0 ? ' · 倒立' : ' · 正立') : ''}
           </span>
@@ -97,8 +97,8 @@ export default function ControlPanel({
           </div>
         </div>
 
-        <div style={{ marginTop: 12, fontSize: 13, color: 'var(--muted)' }}>
-          <span style={{ color: metrics.real ? 'var(--green)' : '#7dd3fc' }}>
+        <div style={{ marginTop: 12, fontSize: 13, color: 'var(--label-2)' }}>
+          <span style={{ color: metrics.real ? 'var(--green)' : 'var(--img-virtual)' }}>
             {metrics.isParallel ? '不成像（平行光）' : metrics.description}
           </span>
         </div>
@@ -185,7 +185,7 @@ export default function ControlPanel({
               onClick={() => onChange({ maskTop: false })}
               style={
                 !params.maskTop
-                  ? { borderColor: 'var(--amber)', color: 'var(--amber)' }
+                  ? { borderColor: 'var(--accent)', color: 'var(--accent)' }
                   : undefined
               }
             >
@@ -195,7 +195,7 @@ export default function ControlPanel({
               onClick={() => onChange({ maskTop: true })}
               style={
                 params.maskTop
-                  ? { borderColor: 'var(--amber)', color: 'var(--amber)' }
+                  ? { borderColor: 'var(--accent)', color: 'var(--accent)' }
                   : undefined
               }
             >
@@ -221,7 +221,7 @@ export default function ControlPanel({
                 onClick={() => onChange({ objectShape: v })}
                 style={
                   params.objectShape === v
-                    ? { borderColor: 'var(--amber)', color: 'var(--amber)' }
+                    ? { borderColor: 'var(--accent)', color: 'var(--accent)' }
                     : undefined
                 }
               >

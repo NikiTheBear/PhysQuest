@@ -65,7 +65,7 @@ export default function SatisfactionGate({ challenge, metrics, onCancel, onConfi
         )}
 
         <div style={{ marginTop: 18 }}>
-          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>
+          <div style={{ fontSize: 13, color: 'var(--label-2)', marginBottom: 6 }}>
             你给自己这次的探索打几分？
           </div>
           <div className="preset-row" style={{ marginBottom: 14 }}>
@@ -74,7 +74,7 @@ export default function SatisfactionGate({ challenge, metrics, onCancel, onConfi
                 key={n}
                 onClick={() => setScore(n)}
                 style={
-                  score === n ? { borderColor: 'var(--amber)', color: 'var(--amber)' } : undefined
+                  score === n ? { borderColor: 'var(--accent)', color: 'var(--accent)' } : undefined
                 }
               >
                 {'★'.repeat(n)}
@@ -82,7 +82,7 @@ export default function SatisfactionGate({ challenge, metrics, onCancel, onConfi
             ))}
           </div>
 
-          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>
+          <div style={{ fontSize: 13, color: 'var(--label-2)', marginBottom: 6 }}>
             用一句话说说你为什么选这组参数（可以不写，但写了报告里会有）
           </div>
           <textarea
@@ -96,8 +96,8 @@ export default function SatisfactionGate({ challenge, metrics, onCancel, onConfi
         </div>
 
         {cards.length > 0 && (
-          <details style={{ marginTop: 16, fontSize: 13, color: 'var(--muted)' }}>
-            <summary style={{ cursor: 'pointer', color: 'var(--cyan)' }}>
+          <details style={{ marginTop: 16, fontSize: 13, color: 'var(--label-2)' }}>
+            <summary style={{ cursor: 'pointer', color: 'var(--accent)' }}>
               这次挑战涉及 {cards.length} 个知识点 / {mis.length} 个常见误区
             </summary>
             <ul style={{ margin: '10px 0 0 18px' }}>

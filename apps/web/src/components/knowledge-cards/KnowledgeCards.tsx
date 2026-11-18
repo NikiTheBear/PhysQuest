@@ -112,7 +112,7 @@ export function QuizModal({ items, onSubmit, onCancel }: QuizProps) {
               onChange={(e) => setSel(e.target.value as unknown as number)}
               placeholder="用你自己的话说，写错也没关系。"
             />
-            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8 }}>
+            <div style={{ fontSize: 12, color: 'var(--label-2)', marginTop: 8 }}>
               简答题不打分，但会写进报告，AI 也会给反馈。
             </div>
           </>
@@ -166,7 +166,7 @@ export function QuizResult({ items, answers, onGoFix, onFinish }: ResultProps) {
         </p>
 
         {wrong.length === 0 ? (
-          <div className="gate" style={{ borderColor: 'rgba(52,211,153,0.4)', color: '#a7f3d0' }}>
+          <div className="gate" style={{  }}>
             全对。可以去写反思、出报告了。
           </div>
         ) : (
@@ -174,15 +174,14 @@ export function QuizResult({ items, answers, onGoFix, onFinish }: ResultProps) {
             <div
               key={w.id}
               style={{
-                background: 'var(--panel2)',
-                border: '1px solid var(--line)',
+                background: 'var(--surface-2)',
                 borderRadius: 12,
-                padding: '12px 16px',
+                padding: '14px 17px',
                 marginBottom: 10,
               }}
             >
               <div style={{ fontSize: 13.5, marginBottom: 6 }}>{w.question}</div>
-              <div style={{ fontSize: 13, color: '#fecaca', marginBottom: 4 }}>
+              <div style={{ fontSize: 13, color: 'var(--red)', marginBottom: 4 }}>
                 正确理解：{w.explanation}
               </div>
               <button

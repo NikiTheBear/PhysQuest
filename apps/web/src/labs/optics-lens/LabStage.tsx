@@ -72,9 +72,9 @@ export default function LabStage({
             <feGaussianBlur stdDeviation={Math.max(metrics.blurDiameter / 2.6, 0.05)} />
           </filter>
           <linearGradient id="lensGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#bfe3ff" stopOpacity="0.85" />
-            <stop offset="50%" stopColor="#7cc4f5" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#bfe3ff" stopOpacity="0.85" />
+            <stop offset="0%" className="lens-grad-a" stopOpacity="0.85" />
+            <stop offset="50%" className="lens-grad-b" stopOpacity="0.5" />
+            <stop offset="100%" className="lens-grad-a" stopOpacity="0.85" />
           </linearGradient>
         </defs>
 

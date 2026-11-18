@@ -108,7 +108,7 @@ export default function ReportView({ learner, onReflection, reflectionText, chal
     <>
       <div className="panel">
         <h4>我自己的结论</h4>
-        <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10 }}>
+        <p style={{ fontSize: 13, color: 'var(--label-2)', marginBottom: 10 }}>
           这一栏必须你自己写。系统不会提供「帮我写」按钮，AI 也不会。
         </p>
         <textarea
@@ -118,7 +118,7 @@ export default function ReportView({ learner, onReflection, reflectionText, chal
           onChange={(e) => onReflection(e.target.value)}
           placeholder="例如：我发现蜡烛推到两倍焦距的时候，像和物一样大，而且是倒着的。最意外的是遮住透镜一半，像居然还在，只是变暗了……"
         />
-        <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 6 }}>
+        <div style={{ fontSize: 12, color: 'var(--label-2)', marginTop: 6 }}>
           {reflectionText.trim().length} / 至少 10 字
         </div>
       </div>

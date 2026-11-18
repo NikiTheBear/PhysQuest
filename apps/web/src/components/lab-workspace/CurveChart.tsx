@@ -67,7 +67,7 @@ export default function CurveChart({ params, metrics, highlight }: Props) {
             y1={PAD.t + t * (H - PAD.t - PAD.b)}
             x2={W - PAD.r}
             y2={PAD.t + t * (H - PAD.t - PAD.b)}
-            stroke="#1e2b45"
+            className="curve-grid"
             strokeWidth="1"
           />
         ))}
@@ -78,16 +78,16 @@ export default function CurveChart({ params, metrics, highlight }: Props) {
           y={PAD.t}
           width={Math.max(x(f) - PAD.l, 0)}
           height={H - PAD.t - PAD.b}
-          fill="rgba(125, 211, 252, 0.07)"
+          className="curve-zone"
         />
-        <line x1={x(f)} y1={PAD.t} x2={x(f)} y2={H - PAD.b} stroke="#7dd3fc" strokeWidth="1" strokeDasharray="3 3" />
-        <text x={x(f) + 4} y={PAD.t + 11} fontSize="9.5" fill="#7dd3fc">
+        <line x1={x(f)} y1={PAD.t} x2={x(f)} y2={H - PAD.b} className="curve-virtual" strokeWidth="1" strokeDasharray="3 3" />
+        <text x={x(f) + 4} y={PAD.t + 11} className="curve-flabel">
           u = f
         </text>
 
         {/* 曲线 */}
-        <path d={line(realPts)} fill="none" stroke="#fbbf24" strokeWidth="2" />
-        <path d={line(virtPts)} fill="none" stroke="#7dd3fc" strokeWidth="2" strokeDasharray="4 3" />
+        <path d={line(realPts)} fill="none" className="curve-real" strokeWidth="2" />
+        <path d={line(virtPts)} fill="none" className="curve-virtual" strokeWidth="2" strokeDasharray="4 3" />
 
         {/* 当前点 */}
         {curVisible && (
@@ -97,23 +97,22 @@ export default function CurveChart({ params, metrics, highlight }: Props) {
               y1={y(curV)}
               x2={x(curU)}
               y2={H - PAD.b}
-              stroke="#f87171"
+              className="curve-guide"
               strokeWidth="1"
               strokeDasharray="2 3"
-              opacity="0.7"
             />
-            <circle cx={x(curU)} cy={y(curV)} r="4.5" fill="#f87171" stroke="#0b1220" strokeWidth="1.5" />
+            <circle cx={x(curU)} cy={y(curV)} r="4.5" className="curve-dot" stroke="var(--surface)" strokeWidth="1.5" />
           </>
         )}
 
         {/* 轴 */}
-        <line x1={PAD.l} y1={H - PAD.b} x2={W - PAD.r} y2={H - PAD.b} stroke="#3d4d6b" strokeWidth="1" />
-        <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={H - PAD.b} stroke="#3d4d6b" strokeWidth="1" />
+        <line x1={PAD.l} y1={H - PAD.b} x2={W - PAD.r} y2={H - PAD.b} className="curve-axis" strokeWidth="1" />
+        <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={H - PAD.b} className="curve-axis" strokeWidth="1" />
 
-        <text x={W - PAD.r} y={H - 8} fontSize="9.5" fill="#6b7d9c" textAnchor="end">
+        <text x={W - PAD.r} y={H - 8} className="curve-label" textAnchor="end">
           物距 u / cm
         </text>
-        <text x={PAD.l - 6} y={PAD.t + 8} fontSize="9.5" fill="#6b7d9c" textAnchor="end">
+        <text x={PAD.l - 6} y={PAD.t + 8} className="curve-label" textAnchor="end">
           |v|
         </text>
 
@@ -122,8 +121,7 @@ export default function CurveChart({ params, metrics, highlight }: Props) {
             key={t}
             x={PAD.l - 6}
             y={PAD.t + (1 - t) * (H - PAD.t - PAD.b) + 3}
-            fontSize="8.5"
-            fill="#55698d"
+            className="curve-label"
             textAnchor="end"
           >
             {Math.round(t * vCap)}
@@ -132,14 +130,14 @@ export default function CurveChart({ params, metrics, highlight }: Props) {
       </svg>
       <div className="legend">
         <span>
-          <i style={{ background: '#fbbf24' }} />
+          <i style={{ background: 'var(--curve-real)' }} />
           实像 |v|
         </span>
         <span>
-          <i style={{ background: '#7dd3fc' }} />
+          <i style={{ background: 'var(--curve-virtual)' }} />
           虚像 |v|
         </span>
-        <span style={{ color: '#f87171' }}>● 你现在的位置</span>
+        <span style={{ color: 'var(--curve-dot)' }}>● 你现在的位置</span>
       </div>
     </div>
   );

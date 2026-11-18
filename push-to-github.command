@@ -13,6 +13,8 @@ echo ""
 echo "  探理实验室 · 推送到 GitHub"
 echo "  ────────────────────────────────────────"
 echo ""
+echo "  以后每次改完代码，双击这个文件就能把最新版本推上去。"
+echo ""
 
 REPO_URL="https://github.com/NikiTheBear/PhysQuest.git"
 
@@ -162,21 +164,109 @@ if git fetch origin main >/dev/null 2>&1; then
   fi
 fi
 
+# ============================================================
+# 3.5 找出系统代理
+# ============================================================
+# 双击 .command 打开的终端没有 http_proxy / https_proxy 环境变量，
+# git 会直连 github.com。小请求（ls-remote）可能过得去，
+# 但推送要 POST 几百 KB，很容易被半路掐断 —— 报错就是
+#   fatal: unable to access '...': Recv failure: Connection reset by peer
+#
+# 所以这里从 macOS 系统代理设置里把地址读出来，临时交给 git 用。
+
+detect_proxy() {
+  # macOS：从系统设置里读
+  if command -v scutil >/dev/null 2>&1; then
+    local enabled host port
+    enabled=$(scutil --proxy 2>/dev/null | awk '/HTTPSEnable|HTTPEnable/ {gsub(/[^0-9]/, "", $3); if ($3 == 1) print "1"; exit}')
+    if [ "$enabled" = "1" ]; then
+      host=$(scutil --proxy | awk '/HTTPSProxy|HTTPProxy/ {print $3; exit}')
+      port=$(scutil --proxy | awk '/HTTPSPort|HTTPPort/ {print $3; exit}')
+      if [ -n "$host" ] && [ -n "$port" ]; then
+        echo "http://$host:$port"
+        return 0
+      fi
+    fi
+  fi
+
+  # 退而求其次：环境变量里已有的
+  if [ -n "$https_proxy" ]; then echo "$https_proxy"; return 0; fi
+  if [ -n "$HTTPS_PROXY" ]; then echo "$HTTPS_PROXY"; return 0; fi
+
+  # 常见本地代理端口，挨个探一下
+  for p in 7890 7897 1087 10809 8080; do
+    if nc -z -w 1 127.0.0.1 "$p" >/dev/null 2>&1; then
+      echo "http://127.0.0.1:$p"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+PROXY=$(detect_proxy)
+
+if [ -n "$PROXY" ]; then
+  echo "  ✓ 检测到代理：$PROXY"
+  echo "    推送时会走它（GitHub 直连在国内经常被中途掐断）"
+else
+  echo "  ⚠ 没检测到代理，会直接连 GitHub"
+  echo "    如果推送失败并提示 Connection reset，说明需要开代理软件"
+fi
 echo ""
+
+# ============================================================
+# 4. 推送（三次尝试）
+# ============================================================
+
 echo "  正在推送…"
 echo ""
 
-if git push -u origin main --force; then
+push_once() {
+  # HTTP/1.1 更稳（HTTP/2 在大包上更容易被中间设备重置）
+  # postBuffer 放大，避免大文件被拆成很多小请求
+  git -c http.version=HTTP/1.1 -c http.postBuffer=52428800 \
+      push -u origin main --force 2>&1
+}
+
+OK=0
+if [ -n "$PROXY" ]; then
+  # 第一次：走代理
+  if env http_proxy="$PROXY" https_proxy="$PROXY" ALL_PROXY="$PROXY" \
+        GIT_TERMINAL_PROMPT=0 bash -c "$(declare -f push_once); push_once"; then
+    OK=1
+  else
+    echo ""
+    echo "  第一次失败，等 2 秒再试一次…"
+    sleep 2
+    if env http_proxy="$PROXY" https_proxy="$PROXY" ALL_PROXY="$PROXY" \
+          GIT_TERMINAL_PROMPT=0 bash -c "$(declare -f push_once); push_once"; then
+      OK=1
+    fi
+  fi
+else
+  if GIT_TERMINAL_PROMPT=0 bash -c "$(declare -f push_once); push_once"; then
+    OK=1
+  fi
+fi
+
+if [ "$OK" = "1" ]; then
   echo ""
   echo "  ✓ 推送成功"
   echo "    $REPO_URL"
   echo ""
-  echo "  下一步可以去仓库页面："
-  echo "    · 填 About 里的描述和 topics"
-  echo "    · Settings → Collaborators 邀请 B 和 C"
+  echo "  本地 $(git rev-list --count HEAD) 次提交已经全部上去了。"
 else
   echo ""
-  echo "  ✗ 推送失败。把上面的报错发到群里。"
+  echo "  ✗ 推送失败。"
+  echo ""
+  echo "    如果报错是 Connection reset / Recv failure："
+  echo "      大概率是网络问题，不是代码问题。检查："
+  echo "        ① 代理软件开着吗（Clash / Surge / V2Ray 之类）"
+  echo "        ② 代理端口是不是 7890（不是的话改脚本里的 detect_proxy）"
+  echo "        ③ 换个时间段再试"
+  echo ""
+  echo "    如果是别的报错，把上面几行发到群里。"
 fi
 
 echo ""

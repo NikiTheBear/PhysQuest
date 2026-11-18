@@ -158,8 +158,6 @@ export default function App() {
     }
   };
 
-  const readyCount = KNOWLEDGE.filter((k) => k.stage === 'junior' || k.stage === 'senior').length;
-
   return (
     <>
       <div className={`app ${aiOpen ? 'with-dock' : ''}`}>
@@ -228,7 +226,6 @@ export default function App() {
 
         {view === 'map' && (
           <KnowledgeMap
-            readyCount={readyCount}
             onOpenHub={() => setView('hub')}
             onOpenLab={(cid) => {
               const c = CHALLENGES.find((x) => x.id === cid);
@@ -291,13 +288,14 @@ export default function App() {
                 </div>
               </div>
 
-              <div>
+              <div className="lab-column">
                 <LabStage
                   params={params}
                   stage="junior"
                   metrics={metrics}
                   showRays={showRays}
                   showVirtualExtensions={showVirtual}
+                  onParamChange={patchParams}
                 />
                 <div className="panel" style={{ marginTop: 18 }}>
                   <div className="toggle-row" style={{ padding: 0 }}>

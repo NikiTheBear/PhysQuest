@@ -151,7 +151,6 @@ body {
   font-size: 15px;
   line-height: 1.6;
   min-width: 1280px;
-  overflow-x: auto;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   letter-spacing: -0.01em;
@@ -1892,4 +1891,210 @@ textarea.refl:focus {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--label-4);
   background-clip: content-box;
+}
+
+/* ================= 实验台：视图工具条 / 拖动 / 全屏 ================= */
+
+.lab-stage {
+  position: relative;
+}
+
+.lab-tools {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: var(--topbar-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-1);
+  opacity: 0;
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+  transform: translateY(-2px);
+}
+.lab-stage:hover .lab-tools,
+.lab-tools:focus-within,
+.lab-stage.is-full .lab-tools {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.lab-tools button {
+  background: transparent;
+  color: var(--label-2);
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  line-height: 1;
+}
+.lab-tools button:hover:not(:disabled) {
+  background: var(--fill);
+  color: var(--label);
+}
+.lab-tools button:disabled {
+  color: var(--label-4);
+  cursor: default;
+}
+.lab-tools .zoom-val {
+  font-size: 11.5px;
+  color: var(--label-2);
+  font-variant-numeric: tabular-nums;
+  min-width: 38px;
+  text-align: center;
+  font-family: var(--font-mono);
+}
+.lab-tools .tool-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--separator-strong);
+  margin: 0 3px;
+}
+
+.lab-svg {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.lab-svg.dragging {
+  cursor: grabbing;
+}
+.lab-svg text,
+.lab-svg .screen,
+.lab-svg .lens {
+  pointer-events: none;
+}
+
+.lab-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 52px;
+  transform: translateX(-50%);
+  font-size: 11.5px;
+  color: var(--label-3);
+  background: var(--fill);
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* 全屏：fixed 覆盖层 */
+.lab-stage.is-full {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  box-shadow: none;
+  animation: fullIn 0.24s var(--ease);
+}
+@keyframes fullIn {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+.lab-stage.is-full .lab-svg {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* 全屏时整页让位：全屏层是 portal 到 body 的，所以直接藏掉 .app 就行。
+   这比一条条 hide 顶栏/按钮可靠得多。 */
+html.lab-fullscreen .app {
+  display: none;
+}
+html.lab-fullscreen .ai-dock,
+html.lab-fullscreen .ai-fab {
+  display: none;
+}
+.lab-stage.is-full .lab-readout {
+  flex-shrink: 0;
+  font-size: 13px;
+  padding: 16px 28px;
+}
+.lab-stage.is-full .lab-tools {
+  top: 20px;
+  right: 24px;
+  opacity: 1;
+  transform: none;
+}
+.lab-stage.is-full .lab-hint {
+  bottom: 64px;
+}
+
+/* 全屏时实验台内的读数条更醒目一点 */
+.lab-stage.is-full .lab-readout b {
+  font-size: 14px;
+}
+
+/* ================= 实验台吸附 ================= */
+/* 左边是滑块（很长），右边是实验台（很短）。
+   往下拖滑块的时候，实验台得一直看得见，否则就是「闭着眼睛调参数」。 */
+.lab-column {
+  position: sticky;
+  top: 78px;
+  align-self: start;
+}
+
+/* 窗口不够高的时候取消吸附，免得实验台被裁掉 */
+@media (max-height: 760px) {
+  .lab-column {
+    position: static;
+  }
+}
+
+/* 全屏时的底部控制条 */
+.lab-full-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 28px;
+  border-top: var(--hairline);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.lab-full-ctrl label {
+  font-size: 13px;
+  color: var(--label-2);
+  white-space: nowrap;
+}
+.lab-full-ctrl input[type='range'] {
+  flex: 0 1 380px;
+}
+.lab-full-ctrl b {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  min-width: 68px;
+}
+.lab-full-ctrl .spacer {
+  flex: 1;
+}
+.lab-full-ctrl button {
+  background: var(--fill);
+  color: var(--label-2);
+  font-size: 12.5px;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.lab-full-ctrl button:hover {
+  background: var(--fill-2);
+  color: var(--label);
 }

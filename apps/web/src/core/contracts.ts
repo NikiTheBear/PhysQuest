@@ -91,6 +91,11 @@ export interface LabStageProps {
   narration?: string | null;
   /** 是否处于演示播放模式（会禁用内部动画过渡） */
   demoMode?: boolean;
+  /**
+   * 可选：允许实验台反向请求改参数（只用于全屏时补一根滑块）。
+   * 注意这是「请求」，真正改状态的永远是网页层 —— 实验室仍然不持有业务状态。
+   */
+  onParamChange?: (patch: Partial<LensParams>) => void;
 }
 
 /** 实验室内部可被高亮的器材 id */

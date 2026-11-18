@@ -86,16 +86,7 @@ export default function Hub({ completed, weakMisconceptions, onPick, onOpenMap }
         ))}
       </div>
 
-      <div className="map-cta" style={{ marginTop: 28 }} onClick={onOpenMap} role="button" tabIndex={0}>
-        <div>
-          <h3>回头看看知识地图</h3>
-          <p>
-            这五个挑战背后压着 {KNOWLEDGE.length} 个知识点，从小学的「光走直线」到高中的「符号约定」。
-            想按图索骥，或者想看看整条学习线有多长。
-          </p>
-        </div>
-        <span className="go">打开知识地图 →</span>
-      </div>
+
     </div>
   );
 }

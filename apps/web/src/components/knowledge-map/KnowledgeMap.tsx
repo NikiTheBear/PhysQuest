@@ -6,7 +6,6 @@ import PLATFORM_MAP from '@knowledge/PLATFORM-MAP.json';
 interface Props {
   onOpenLab: (challengeId: string) => void;
   onOpenHub: () => void;
-  readyCount: number;
 }
 
 const STAGE_LABEL: Record<Stage, string> = {
@@ -33,7 +32,7 @@ type MapItem = { id: string; title: string };
  * 这一页回答的是「你们这个平台到底有多少内容」，
  * 和首页那张挑战卡片墙回答的「我今天做什么」是两件事。
  */
-export default function KnowledgeMap({ onOpenLab, onOpenHub, readyCount }: Props) {
+export default function KnowledgeMap({ onOpenLab, onOpenHub }: Props) {
   const [detailId, setDetailId] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [onlyReady, setOnlyReady] = useState(false);
@@ -117,23 +116,15 @@ export default function KnowledgeMap({ onOpenLab, onOpenHub, readyCount }: Props
         >
           只看能动手的
         </button>
+        <button className="btn-ghost btn-small" onClick={onOpenHub}>
+          去挑战导览 →
+        </button>
         <span className="map-count">
           {STAGE_LABEL.primary} → {STAGE_LABEL.university}
         </span>
       </div>
 
-      {!onlyReady && (
-        <div className="map-cta" onClick={onOpenHub} role="button" tabIndex={0}>
-          <div>
-            <h3>光学这边有 {readyCount} 个能动手的知识点</h3>
-            <p>
-              它们被整理成了五个小挑战，每个都能真的拖滑块、真的看光路。
-              从第一个开始试，先猜一个答案再动手。
-            </p>
-          </div>
-          <span className="go">去挑战导览 →</span>
-        </div>
-      )}
+
 
       {disciplines.map((d) => {
         const bands = d.stages

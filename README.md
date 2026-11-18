@@ -1,5 +1,8 @@
 # 探理实验室 · PhysQuest
 
+[![预检](https://github.com/NikiTheBear/PhysQuest/actions/workflows/preflight.yml/badge.svg)](https://github.com/NikiTheBear/PhysQuest/actions/workflows/preflight.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
 > 一个开源的全学段物理探究平台。
 > **先猜，再做，被推翻，然后想明白。**
 

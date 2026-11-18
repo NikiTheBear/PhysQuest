@@ -51,16 +51,22 @@ git diff --cached | grep -i "sk-\|api_key\|apikey\|password\|token"
 
 ## 三、怎么提交
 
-### 分支策略（简单版）
+### 分支策略
 
 ```
-main                  永远可用的版本，只有 @NikiTheBear 能合进来
- ├─ b/lab-render      B 的长期分支
- └─ c/content         C 的长期分支
+main                永远可用的版本，只有 @NikiTheBear 能合进来
+ ├─ b/lab           B 的实验台
+ └─ c/content       C 的内容
 ```
 
-> 现在三个人都在主分支上干活，等 B 和 C 上手了再开分支也不迟。
-> 现阶段**最重要的是别丢东西**，不是流程多规范。
+**每人开工时建一次，之后一直在这条分支上干活。**
+
+> ⚠️ **分支保护现在开不了。** GitHub 免费账号的私有仓库不支持。
+> 所以 `main` 的保护**靠约定 + CI**：
+> - 直接推 `main` 在技术上做得到，但不要这么做
+> - 推上去之后 CI 会检查，红了就是不能合
+>
+> 详见 [`docs/BRANCH-PROTECTION.md`](../docs/BRANCH-PROTECTION.md)。
 
 **B 和 C 各自在自己的分支上干活，做完发 PR 到 `main`。**
 
@@ -98,13 +104,19 @@ update
 发 PR 之前，本地跑一遍：
 
 ```bash
-cd apps/web
-npm test            # 12 条物理断言，必须全绿
-npx tsc --noEmit    # 不能有类型错误
-
-cd ../..
-node shared/knowledge-data/schema/validate.mjs   # 内容校验，必须 ✓ 全部通过
+./scripts/preflight.sh
 ```
+
+它会依次检查四件事，全绿才打印 `✓ 可以提交`：
+
+| 检查 | 内容 |
+|---|---|
+| 扫密钥 | 有没有 `sk-` / `ghp_` 之类的东西混进去 |
+| TypeScript | `tsc --noEmit` |
+| 物理断言 | 12 条必须全绿 |
+| 内容校验 | 知识卡 / 题库 / 剧本的 id 引用 |
+
+推上去之后 GitHub Actions 也会自动跑一遍同样的检查（`.github/workflows/preflight.yml`）。
 
 PR 描述里写清三件事：
 

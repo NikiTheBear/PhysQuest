@@ -167,6 +167,18 @@ node shared/knowledge-data/schema/validate.mjs
 - 本地启动器只监听 `127.0.0.1`，不写日志、不落盘
 - 代码里任何"官方中转地址"都算 bug
 
+---
+
+## 开发者
+
+| 角色 | 负责 |
+|---|---|
+| **@NikiTheBear** | 网页主体、物理引擎、AI 接入、启动器、部署 |
+| **B** | 实验室渲染（`<LabStage />`）、AI 演示播放器 |
+| **C** | 知识卡文案、题库、老师手册、第一用户测试 |
+
+想参与的话先读 [贡献指南](./CONTRIBUTING.md)。
+
 ## 授权
 
 [MIT](./LICENSE)

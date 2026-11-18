@@ -143,6 +143,7 @@ node shared/knowledge-data/schema/validate.mjs
 | [`docs/LAUNCHER.md`](./docs/LAUNCHER.md) | 本地启动器：为什么需要、怎么用、两种配 Key 方式 |
 | [`docs/BRIEF-FOR-B.md`](./docs/BRIEF-FOR-B.md) | 给实验室负责人的规格书 |
 | [`docs/HANDOFF-FOR-C.md`](./docs/HANDOFF-FOR-C.md) | 给内容负责人的填空指南 |
+| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | 贡献指南：谁管哪些文件、怎么提交、五条硬规矩 |
 
 ---
 

@@ -924,7 +924,7 @@
     <label>接口地址（OpenAI 兼容，以工作台说明为准，可修改）</label>
     <input type="text" id="setEndpoint">
     <label>模型名称（必填，以工作台可用模型为准）</label>
-    <input type="text" id="setModel" placeholder="例如 deepseek-v4.1-flash">
+    <input type="text" id="setModel" placeholder="例如 deepseek-chat">
     <label>API Key（只保存在本机浏览器 localStorage）</label>
     <input type="password" id="setKey" placeholder="粘贴临时 Key；留空则使用离线模式">
     <p class="hint">安全承诺：Key 不写入代码、不进入 Git 仓库。截图/录屏前请确认 Key 已隐藏。<br><b>推荐：</b>双击「启动在线AI.command」首次绑定 Key，并从 http://127.0.0.1:8787 打开实验室；双击「关闭在线AI.command」停止服务。<br><b>排障：</b>① HTTP 401/403 表示服务器已响应，应核对 Key、地域限制与模型权限；② Failed to fetch 表示浏览器未拿到响应，检查接口地址、网络、VPN 和跨域；③ Base URL 可填到 /v1，页面会自动补全 /chat/completions；④ 在线失败时自动显示本地兜底，不中断实验。</p>
@@ -1429,7 +1429,7 @@ function renderLog(){
 }
 
 /* ---------- AI 导师 ---------- */
-const OFFICIAL_EP='https://api.lingshuai.cc/v1/chat/completions';
+const OFFICIAL_EP='';  /* 已脱敏：原先是团队私人中转地址，开源版本移除 */
 const LOCAL_EP='http://127.0.0.1:8787/chat/completions';
 const IS_LOCAL_PAGE=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)&&location.port==='8787';
 const DEFAULT_EP=IS_LOCAL_PAGE?LOCAL_EP:OFFICIAL_EP;
@@ -1437,7 +1437,7 @@ function normalizeEndpoint(ep){
   let clean=(ep||'').trim().replace(/\/+$/,'');
   if(!clean)return DEFAULT_EP;
   if(/8\.141\.114\.201\/gotc\/v1/i.test(clean))return OFFICIAL_EP;
-  if(/^https?:\/\/api\.lingshuai\.cc$/i.test(clean))clean='https://api.lingshuai.cc/v1';
+  /* 已脱敏 */
   if(/\/v1$/i.test(clean))clean+='/chat/completions';
   else if(/^http:\/\/(localhost|127\.0\.0\.1):8787$/i.test(clean))clean+='/chat/completions';
   return clean;
@@ -1446,7 +1446,7 @@ function endpointCandidates(ep){
   const clean=normalizeEndpoint(ep),list=[clean];
   try{
     const host=new URL(clean).hostname;
-    if(host==='api.lingshuai.cc'||host==='8.141.114.201'){
+    if(false){  /* 已脱敏：原先是团队私人中转地址 */
       if(IS_LOCAL_PAGE)list.unshift(LOCAL_EP);
       if(!list.includes(LOCAL_EP))list.push(LOCAL_EP);
     }
@@ -1461,7 +1461,7 @@ async function fetchWithProxyFallback(ep,options){
   }
   throw lastError||new Error('网络请求失败');
 }
-const DEFAULT_MODEL='deepseek-v4.1-flash';                   // 当前服务商默认模型
+const DEFAULT_MODEL='';  /* 已脱敏：原名不是任何厂商的真实模型 */                   // 当前服务商默认模型
 function normalizeModel(model){
   const clean=(model||'').trim();
   return !clean||/^kimi-/i.test(clean)?DEFAULT_MODEL:clean;

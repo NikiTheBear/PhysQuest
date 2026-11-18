@@ -351,7 +351,7 @@ export function solve(p: LensParams): LensMetrics;
 
 #### 硬约束（不变）
 
-**我们的代码里永远不出现任何公网服务器能接收 Key。** `docs/reference/photonquest-prototype.html` 里硬编码的 `api.lingshuai.cc`、`8.141.114.201`、`deepseek-v4.1-flash` 一律清除，不得带入新代码。官方托管的在线版（GitHub Pages）**只提供直连模式**，明确标注"此处仅支持允许跨域的厂商"。
+**我们的代码里永远不出现任何公网服务器能接收 Key。** 参考原型（`docs/reference/photonquest-prototype.html`）里原先硬编码的私人中转地址和假模型名**已在开源前脱敏处理**，不得带入新代码。官方托管的在线版（GitHub Pages）**只提供直连模式**，明确标注"此处仅支持允许跨域的厂商"。
 
 ---
 

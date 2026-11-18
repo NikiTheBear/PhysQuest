@@ -47,9 +47,7 @@ export default function ObservationPanel({ params, metrics }: Props) {
           <span className="seg-range">u &gt; 2f</span>
           <span className="seg-desc">实像 · 缩小</span>
         </div>
-        <div className="seg-marker" style={{ left: `${markerPos(ratio)}%` }}>
-          <i />
-        </div>
+        <div className="seg-marker" style={{ left: `${markerPos(ratio)}%` }} aria-hidden />
       </div>
 
       {/* ===== 三个读数 ===== */}

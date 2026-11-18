@@ -46,20 +46,48 @@ type Phase = 'predict' | 'explore' | 'gate' | 'compare' | 'quiz' | 'quizResult' 
 
 const LAB_KEY = 'physquest.currentLab.v1';
 
+/** 从 URL 读深链接参数，例如 ?lab=optics-lens&challenge=CH-O2-04&view=lab */
+function readDeepLink() {
+  try {
+    const q = new URLSearchParams(window.location.search);
+    return {
+      lab: q.get('lab'),
+      challenge: q.get('challenge'),
+      view: q.get('view') as 'map' | 'hub' | 'lab' | 'cards' | 'report' | null,
+      clean: q.get('clean') === '1',
+    };
+  } catch {
+    return { lab: null, challenge: null, view: null, clean: false };
+  }
+}
+
+const DEEP = readDeepLink();
+
 export default function App() {
   const [theme, setTheme] = useState<Theme>(() => loadTheme());
   useTheme(theme);
 
   const [learner, setLearner] = useState(() => loadLearner());
-  const [view, setView] = useState<View>('map');
+  const [view, setView] = useState<View>(() => {
+    if (DEEP.view) return DEEP.view;
+    if (DEEP.challenge) return 'lab';
+    return 'map';
+  });
   /** ★ 当前选定的实验模块。null = 还没从知识地图选过，此时一切空状态 */
   const [labId, setLabId] = useState<LabId | null>(() => {
+    // URL 里明确指定了就用它 —— 即使带 clean=1 也一样
+    const fromUrl = labById(DEEP.lab);
+    if (fromUrl) return fromUrl.id;
+    if (DEEP.clean) return null;
     const v = localStorage.getItem(LAB_KEY);
     return labById(v) ? (v as LabId) : null;
   });
   const lab = labById(labId);
   /** ★ 不再默认给第一个挑战，而是 null */
-  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [challenge, setChallenge] = useState<Challenge | null>(() => {
+    if (!DEEP.challenge) return null;
+    return CHALLENGES.find((c) => c.id === DEEP.challenge) ?? null;
+  });
   const [phase, setPhase] = useState<Phase>('explore');
   const [params, setParams] = useState<LensParams>(DEFAULT_LENS_PARAMS);
   const [activeSlider, setActiveSlider] = useState<keyof LensParams | null>(null);
@@ -92,6 +120,20 @@ export default function App() {
     if (labId) localStorage.setItem(LAB_KEY, labId);
     else localStorage.removeItem(LAB_KEY);
   }, [labId]);
+
+  /* clean=1：给演示和截图用，打开就是全新状态。
+     注意只是清存储，URL 参数照样生效 —— 否则没法截「某个特定状态」的图。 */
+  useEffect(() => {
+    if (DEEP.clean) {
+      try {
+        localStorage.clear();
+        if (labId) localStorage.setItem(LAB_KEY, labId);
+      } catch {
+        /* ignore */
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /** 选定模块 → 进挑战导览 */
   const openModule = useCallback((id: string) => {

@@ -22,6 +22,7 @@ import Hub from './components/hub/Hub';
 import KnowledgeMap from './components/knowledge-map/KnowledgeMap';
 import ControlPanel from './components/lab-workspace/ControlPanel';
 import CurveChart from './components/lab-workspace/CurveChart';
+import ObservationPanel from './components/lab-workspace/ObservationPanel';
 import SatisfactionGate from './components/lab-workspace/SatisfactionGate';
 import PredictionPanel from './components/prediction/PredictionPanel';
 import PredictionCompare from './components/prediction/PredictionCompare';
@@ -58,6 +59,10 @@ export default function App() {
   >({});
   const [reflection, setReflectionDraft] = useState('');
   const [aiOpen, setAiOpen] = useState(false);
+  const [aiWidth, setAiWidth] = useState(() => {
+    const v = Number(localStorage.getItem('physquest.ai.width.v1'));
+    return Number.isFinite(v) && v >= 340 && v <= 760 ? v : 420;
+  });
   const [aiConfig, setAiConfig] = useState<AIConfig>(() => loadAIConfig());
 
   const metrics = useMemo(() => solve(params), [params]);
@@ -160,7 +165,10 @@ export default function App() {
 
   return (
     <>
-      <div className={`app ${aiOpen ? 'with-dock' : ''}`}>
+      <div
+        className={`app ${aiOpen ? 'with-dock' : ''}`}
+        style={aiOpen ? ({ '--ai-w': `${aiWidth}px` } as React.CSSProperties) : undefined}
+      >
         <div className="topbar">
           <div className="topbar-inner">
             <div className="brand" onClick={() => setView('map')}>
@@ -296,7 +304,17 @@ export default function App() {
                   showRays={showRays}
                   showVirtualExtensions={showVirtual}
                   onParamChange={patchParams}
+                  fullscreenExtra={
+                    <>
+                      <CurveChart params={params} metrics={metrics} highlight={null} />
+                      <ObservationPanel params={params} metrics={metrics} />
+                    </>
+                  }
                 />
+                <div style={{ marginTop: 18 }}>
+                  <ObservationPanel params={params} metrics={metrics} />
+                </div>
+
                 <div className="panel" style={{ marginTop: 18 }}>
                   <div className="toggle-row" style={{ padding: 0 }}>
                     <label>
@@ -451,6 +469,7 @@ export default function App() {
         }
         onApplyAction={applyAIAction}
         onConfigChange={setAiConfig}
+        onWidthChange={setAiWidth}
       />
 
       {!aiOpen && (

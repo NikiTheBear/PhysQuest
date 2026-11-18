@@ -47,23 +47,30 @@ export default function LabStage({
   narration = null,
   demoMode = false,
   onParamChange,
+  fullscreenExtra,
 }: LabStageProps) {
   const base = useMemo(() => fitView(params, metrics), [params, metrics]);
   const rays = useMemo(() => (showRays ? traceRays(params) : []), [params, showRays]);
 
   /* ---------- 视图：缩放 / 平移 / 全屏 ---------- */
   const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState(0);
+  const [pan, setPan] = useState(0);   // 横向平移（厘米）
+  const [panY, setPanY] = useState(0); // 纵向平移（厘米）
+
   const [isFull, setIsFull] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const drag = useRef<{ startX: number; startPan: number } | null>(null);
+  const drag = useRef<{ startX: number; startY: number; startPan: number; startPanY: number } | null>(
+    null,
+  );
 
   const panLimit = base.spanX * 0.45;
+  const panYLimit = base.halfH * 0.8;
 
   const resetView = useCallback(() => {
     setZoom(1);
     setPan(0);
+    setPanY(0);
   }, []);
 
   const zoomBy = useCallback((k: number) => {
@@ -114,18 +121,24 @@ export default function LabStage({
   /* 拖动平移 */
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (e.button !== 0) return;
-    drag.current = { startX: e.clientX, startPan: pan };
+    drag.current = { startX: e.clientX, startY: e.clientY, startPan: pan, startPanY: panY };
     svgRef.current?.setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
     if (!drag.current) return;
     const rect = svgRef.current?.getBoundingClientRect();
-    if (!rect || rect.width === 0) return;
-    const curSpanX = base.spanX / zoom;
-    const unitsPerPx = curSpanX / rect.width;
-    const dx = (e.clientX - drag.current.startX) * unitsPerPx;
+    if (!rect || rect.width === 0 || rect.height === 0) return;
+
+    // 横向：用画布宽度换算
+    const unitsPerPxX = base.spanX / zoom / rect.width;
+    const dx = (e.clientX - drag.current.startX) * unitsPerPxX;
     setPan(clamp(drag.current.startPan - dx, -panLimit, panLimit));
+
+    // 纵向：用画布高度换算（注意 preserveAspectRatio=meet，取宽度/高度下更小的那个比例）
+    const unitsPerPxY = base.halfH / zoom / rect.height * 2;
+    const dy = (e.clientY - drag.current.startY) * unitsPerPxY;
+    setPanY(clamp(drag.current.startPanY + dy, -panYLimit, panYLimit));
   };
 
   const endDrag = (e: React.PointerEvent<SVGSVGElement>) => {
@@ -138,6 +151,7 @@ export default function LabStage({
   const curHalfH = base.halfH / zoom;
   const centeredXMin = base.xMin + (base.spanX - curSpanX) / 2;
   const xMin = centeredXMin + pan;
+  const yTop = -curHalfH + panY;
 
   const hl = (id: string) => highlightIds.includes(id);
 
@@ -186,7 +200,7 @@ export default function LabStage({
 
       <svg
         ref={svgRef}
-        viewBox={`${xMin} ${-curHalfH} ${curSpanX} ${curHalfH * 2}`}
+        viewBox={`${xMin} ${yTop} ${curSpanX} ${curHalfH * 2}`}
         preserveAspectRatio="xMidYMid meet"
         className={`lab-svg ${drag.current ? 'dragging' : ''}`}
         style={{ aspectRatio: `${curSpanX} / ${curHalfH * 2}` }}
@@ -197,6 +211,11 @@ export default function LabStage({
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         onDoubleClick={resetView}
+        onWheel={(e) => {
+          if (!e.ctrlKey && !e.metaKey && Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+          e.preventDefault();
+          zoomBy(e.deltaY < 0 ? 1.08 : 1 / 1.08);
+        }}
       >
         <defs>
           <filter id="blurSpot" x="-70%" y="-70%" width="240%" height="240%">
@@ -391,7 +410,7 @@ export default function LabStage({
       {/* 提示：只在缩放/平移时出现 */}
       {!isFull && (isZoomed || isPanned) && (
         <div className="lab-hint">
-          拖动可以平移 · 双击复位
+          拖动可以平移 · 滚轮缩放 · 双击复位
         </div>
       )}
 
@@ -401,21 +420,75 @@ export default function LabStage({
         </div>
       )}
 
+      {isFull && fullscreenExtra && <div className="lab-full-extra">{fullscreenExtra}</div>}
+
       {isFull && (
         <div className="lab-full-ctrl">
-          <label>物距 u</label>
-          <input
-            type="range"
-            min={1}
-            max={80}
-            step={0.5}
-            value={params.u}
-            onChange={(e) => onParamChange?.({ u: Number(e.target.value) })}
-          />
-          <b>{params.u.toFixed(1)} cm</b>
-          <span className="spacer" />
-          <button onClick={resetView}>复位视图</button>
-          <button onClick={toggleFull}>退出全屏 (Esc)</button>
+          <div className="lab-full-sliders">
+            <div className="lfs-row">
+              <label>物距 u</label>
+              <input
+                type="range"
+                min={1}
+                max={80}
+                step={0.5}
+                value={params.u}
+                onChange={(e) => onParamChange?.({ u: Number(e.target.value) })}
+              />
+              <b>{params.u.toFixed(1)}</b>
+            </div>
+            <div className="lfs-row">
+              <label>光屏</label>
+              <input
+                type="range"
+                min={1}
+                max={120}
+                step={0.5}
+                value={params.screenX}
+                onChange={(e) => onParamChange?.({ screenX: Number(e.target.value) })}
+              />
+              <b>{params.screenX.toFixed(1)}</b>
+            </div>
+            <div className="lfs-row">
+              <label>焦距 f</label>
+              <input
+                type="range"
+                min={5}
+                max={25}
+                step={1}
+                value={params.f}
+                onChange={(e) => onParamChange?.({ f: Number(e.target.value) })}
+              />
+              <b>{params.f.toFixed(0)}</b>
+            </div>
+          </div>
+
+          <div className="lab-full-metrics">
+            <div>
+              <span>u / f</span>
+              <b>{(params.u / params.f).toFixed(2)}</b>
+            </div>
+            <div>
+              <span>像距 |v|</span>
+              <b>{Number.isFinite(metrics.v) ? Math.abs(metrics.v).toFixed(1) : '∞'}</b>
+            </div>
+            <div>
+              <span>放大率</span>
+              <b>{Number.isFinite(metrics.m) ? Math.abs(metrics.m).toFixed(2) : '∞'}</b>
+            </div>
+            <div>
+              <span>光斑</span>
+              <b className={metrics.blurDiameter < 0.15 ? 'good' : 'warn'}>
+                {metrics.isParallel ? '—' : metrics.blurDiameter.toFixed(2)}
+              </b>
+            </div>
+          </div>
+
+          <div className="lab-full-actions">
+            <span className="lab-full-desc">{metrics.description}</span>
+            <button onClick={resetView}>复位视图</button>
+            <button onClick={toggleFull}>退出全屏 (Esc)</button>
+          </div>
         </div>
       )}
 

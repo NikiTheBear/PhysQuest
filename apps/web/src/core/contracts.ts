@@ -96,6 +96,11 @@ export interface LabStageProps {
    * 注意这是「请求」，真正改状态的永远是网页层 —— 实验室仍然不持有业务状态。
    */
   onParamChange?: (patch: Partial<LensParams>) => void;
+  /**
+   * 全屏时填在光路图下方的补充内容（曲线图 / 观察笔记之类）。
+   * 由网页层传入，实验室只负责摆位置。
+   */
+  fullscreenExtra?: React.ReactNode;
 }
 
 /** 实验室内部可被高亮的器材 id */

@@ -1,16 +1,33 @@
 import { useMemo } from 'react';
 import type { Challenge } from '../../core/contracts';
 import { CHALLENGES, MISCONCEPTIONS, KNOWLEDGE } from '../../data/content';
+import type { LabMeta } from '../../labs/registry';
 
 interface Props {
+  /** 当前选定的实验模块。null = 还没从知识地图选过 */
+  lab: LabMeta;
   completed: Record<string, boolean>;
   weakMisconceptions: string[];
   onPick: (c: Challenge) => void;
-  onOpenMap: () => void;
+  onBackToMap: () => void;
 }
 
-export default function Hub({ completed, weakMisconceptions, onPick, onOpenMap }: Props) {
-  const doneCount = CHALLENGES.filter((c) => completed[c.id]).length;
+export default function Hub({
+  lab,
+  completed,
+  weakMisconceptions,
+  onPick,
+  onBackToMap,
+}: Props) {
+  /** 挑战按模块过滤 —— 换模块时这里自动跟着变 */
+  const challenges = useMemo(
+    () => CHALLENGES.filter((c) => c.knowledgeIds.some((k) => belongsToLab(k, lab))),
+    [lab],
+  );
+
+  const cards = useMemo(() => KNOWLEDGE.filter((k) => lab.stages.includes(k.stage)), [lab]);
+
+  const doneCount = challenges.filter((c) => completed[c.id]).length;
 
   const weakLabels = useMemo(
     () =>
@@ -24,11 +41,15 @@ export default function Hub({ completed, weakMisconceptions, onPick, onOpenMap }
   return (
     <div>
       <div className="hub-head">
-        <span className="eyebrow">Optics · 凸透镜成像</span>
-        <h2>今天想搞清楚什么？</h2>
+        <button className="back-link" onClick={onBackToMap}>
+          ← 知识地图
+        </button>
+        <span className="eyebrow">
+          {lab.subtitle} · {lab.stages.map((s) => (s === 'junior' ? '初中' : s === 'senior' ? '高中' : s === 'primary' ? '小学' : '大学')).join(' / ')}
+        </span>
+        <h2>{lab.title}</h2>
         <p>
-          五张卡，五个小目标。点一张进去，先猜一个答案，再动手试。
-          <br />
+          {challenges.length} 个挑战，{cards.length} 张知识卡。点一张进去，先猜一个答案，再动手试。
           猜错了不要紧——那一下才是真正记住的时候。
         </p>
       </div>
@@ -37,7 +58,7 @@ export default function Hub({ completed, weakMisconceptions, onPick, onOpenMap }
         <div className="stat">
           <div className="v">
             {doneCount}
-            <span style={{ fontSize: 15, color: 'var(--ink-4)' }}> / {CHALLENGES.length}</span>
+            <span style={{ fontSize: 15, color: 'var(--label-4)' }}> / {challenges.length}</span>
           </div>
           <div className="k">已完成的挑战</div>
         </div>
@@ -46,7 +67,7 @@ export default function Hub({ completed, weakMisconceptions, onPick, onOpenMap }
           <div className="k">踩过的坑</div>
         </div>
         <div className="stat">
-          <div className="v">{KNOWLEDGE.length}</div>
+          <div className="v">{cards.length}</div>
           <div className="k">可查的知识点</div>
         </div>
         <div className="stat">
@@ -68,7 +89,7 @@ export default function Hub({ completed, weakMisconceptions, onPick, onOpenMap }
       <div style={{ height: 30 }} />
 
       <div className="challenge-grid">
-        {CHALLENGES.map((c, i) => (
+        {challenges.map((c, i) => (
           <button
             key={c.id}
             className={`challenge-card ${completed[c.id] ? 'done' : ''}`}
@@ -86,7 +107,23 @@ export default function Hub({ completed, weakMisconceptions, onPick, onOpenMap }
         ))}
       </div>
 
-
+      {challenges.length === 0 && (
+        <div className="empty">这个模块还没有挑战，先去看知识点。</div>
+      )}
     </div>
   );
+}
+
+/** 粗判：这个知识点是不是属于这个模块。
+ *  现在只有光学一个模块，用编号前缀区分（K-O* = 光学）。 */
+function belongsToLab(knowledgeId: string, lab: LabMeta): boolean {
+  const domainLetter = knowledgeId.split('-')[1]?.[0];
+  const map: Record<string, string> = {
+    M: 'mechanics',
+    E: 'electromagnetism',
+    O: 'optics',
+    T: 'thermodynamics',
+    N: 'modern',
+  };
+  return domainLetter ? map[domainLetter] === lab.discipline : false;
 }

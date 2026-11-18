@@ -35,9 +35,13 @@ import AITutor from './components/ai-tutor/AITutor';
 import { loadAIConfig, type AIConfig } from './ai/client';
 import type { AIAction } from './ai/prompts';
 import { CHALLENGES, KNOWLEDGE, quizForChallenge } from './data/content';
+import { LABS, labById, type LabId } from './labs/registry';
+import { EmptyPickLab, EmptyPickChallenge } from './components/common/EmptyStates';
 
 type View = 'map' | 'hub' | 'lab' | 'cards' | 'report';
 type Phase = 'predict' | 'explore' | 'gate' | 'compare' | 'quiz' | 'quizResult' | 'done';
+
+const LAB_KEY = 'physquest.currentLab.v1';
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>(() => loadTheme());
@@ -45,7 +49,14 @@ export default function App() {
 
   const [learner, setLearner] = useState(() => loadLearner());
   const [view, setView] = useState<View>('map');
-  const [challenge, setChallenge] = useState<Challenge>(CHALLENGES[0]);
+  /** ★ 当前选定的实验模块。null = 还没从知识地图选过，此时一切空状态 */
+  const [labId, setLabId] = useState<LabId | null>(() => {
+    const v = localStorage.getItem(LAB_KEY);
+    return labById(v) ? (v as LabId) : null;
+  });
+  const lab = labById(labId);
+  /** ★ 不再默认给第一个挑战，而是 null */
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [phase, setPhase] = useState<Phase>('explore');
   const [params, setParams] = useState<LensParams>(DEFAULT_LENS_PARAMS);
   const [activeSlider, setActiveSlider] = useState<keyof LensParams | null>(null);
@@ -73,17 +84,55 @@ export default function App() {
     applyTheme(theme);
   }, [theme]);
 
+  useEffect(() => {
+    if (labId) localStorage.setItem(LAB_KEY, labId);
+    else localStorage.removeItem(LAB_KEY);
+  }, [labId]);
+
+  /** 选定模块 → 进挑战导览 */
+  const openModule = useCallback((id: string) => {
+    const meta = labById(id);
+    if (!meta) return;
+    setLabId(meta.id);
+    setChallenge(null);
+    setPrediction(null);
+    setLocked(null);
+    setParams(meta.defaultParams);
+    setView('hub');
+  }, []);
+
+  /** 从知识点直接进实验台：找到包含这个知识点的挑战，参数跳到卡片给的预设 */
+  const openKnowledge = useCallback(
+    (knowledgeId: string) => {
+      const card = KNOWLEDGE.find((k) => k.id === knowledgeId);
+      const ch = CHALLENGES.find((c) => c.knowledgeIds.includes(knowledgeId));
+      if (!card || !ch) return;
+      const meta = labById('optics-lens');
+      if (!meta) return;
+      setLabId(meta.id);
+      setChallenge(ch);
+      setParams({ ...meta.defaultParams, ...card.labPreset });
+      setPrediction(learner.predictions[ch.id]?.chosenIndex ?? null);
+      setLocked(null);
+      setPhase(learner.predictions[ch.id] ? 'explore' : 'predict');
+      setReflectionDraft(learner.reflections[ch.id]?.text ?? '');
+      setView('lab');
+    },
+    [learner],
+  );
+
   const beginChallenge = useCallback(
     (c: Challenge) => {
+      const meta = labById(labId ?? 'optics-lens');
       setChallenge(c);
-      setParams({ ...DEFAULT_LENS_PARAMS, ...presetFor(c) });
+      setParams({ ...(meta?.defaultParams ?? DEFAULT_LENS_PARAMS), ...presetFor(c) });
       setPrediction(learner.predictions[c.id]?.chosenIndex ?? null);
       setLocked(null);
       setPhase(learner.predictions[c.id] ? 'explore' : 'predict');
       setView('lab');
       setReflectionDraft(learner.reflections[c.id]?.text ?? '');
     },
-    [learner],
+    [learner, labId],
   );
 
   const patchParams = useCallback((patch: Partial<LensParams>) => {
@@ -99,12 +148,14 @@ export default function App() {
   );
 
   const confirmPrediction = (chosen: number) => {
+    if (!challenge) return;
     setPrediction(chosen);
     setLearner((s) => persistPrediction(s, challenge.id, chosen));
     setPhase('explore');
   };
 
   const confirmLock = () => {
+    if (!challenge) return;
     const run: LockedRun = {
       challengeId: challenge.id,
       params,
@@ -136,6 +187,7 @@ export default function App() {
   };
 
   const afterCompare = () => {
+    if (!challenge) return;
     setQuizItems(quizForChallenge(challenge));
     setPhase('quiz');
   };
@@ -183,7 +235,12 @@ export default function App() {
               <button className={view === 'map' ? 'active' : ''} onClick={() => setView('map')}>
                 知识地图
               </button>
-              <button className={view === 'hub' ? 'active' : ''} onClick={() => setView('hub')}>
+              <button
+                className={view === 'hub' ? 'active' : ''}
+                onClick={() => setView('hub')}
+                disabled={!lab}
+                title={!lab ? '先在知识地图里选一个模块' : undefined}
+              >
                 挑战导览
               </button>
               <button
@@ -191,6 +248,8 @@ export default function App() {
                   view === 'lab' || view === 'cards' || view === 'report' ? 'active' : ''
                 }
                 onClick={() => setView('lab')}
+                disabled={!lab || !challenge}
+                title={!lab ? '先在知识地图里选一个模块' : !challenge ? '先选一个挑战' : undefined}
               >
                 实验台
               </button>
@@ -225,25 +284,26 @@ export default function App() {
         </div>
 
         {view === 'map' && (
-          <KnowledgeMap
-            onOpenHub={() => setView('hub')}
-            onOpenLab={(cid) => {
-              const c = CHALLENGES.find((x) => x.id === cid);
-              if (c) beginChallenge(c);
-            }}
-          />
+          <KnowledgeMap onOpenModule={openModule} onOpenKnowledge={openKnowledge} />
         )}
 
-        {view === 'hub' && (
+        {view === 'hub' && lab && (
           <Hub
+            lab={lab}
             completed={learner.completed}
             weakMisconceptions={weak}
             onPick={beginChallenge}
-            onOpenMap={() => setView('map')}
+            onBackToMap={() => setView('map')}
           />
         )}
 
-        {view === 'lab' && (
+        {view === 'hub' && !lab && <EmptyPickLab onGoMap={() => setView('map')} />}
+
+        {view === 'lab' && !challenge && (
+          <EmptyPickChallenge lab={lab} onGoMap={() => setView('map')} onGoHub={() => setView('hub')} />
+        )}
+
+        {view === 'lab' && challenge && (
           <>
             <div className="work-head">
               <div>
@@ -366,10 +426,10 @@ export default function App() {
               <ReportView
                 learner={learner}
                 reflectionText={reflection}
-                challengeTitle={challenge.title}
+                challengeTitle={challenge?.title ?? '（未选择挑战）'}
                 onReflection={(t) => {
                   setReflectionDraft(t);
-                  setLearner((s) => persistReflection(s, challenge.id, t));
+                  if (challenge) setLearner((s) => persistReflection(s, challenge.id, t));
                 }}
               />
               <div className="panel">
@@ -407,11 +467,11 @@ export default function App() {
           </>
         )}
 
-        {phase === 'predict' && (
+        {phase === 'predict' && challenge && (
           <PredictionPanel challenge={challenge} onLock={confirmPrediction} />
         )}
 
-        {phase === 'gate' && (
+        {phase === 'gate' && challenge && (
           <SatisfactionGate
             challenge={challenge}
             metrics={metrics}
@@ -420,7 +480,7 @@ export default function App() {
           />
         )}
 
-        {phase === 'compare' && locked && learner.predictions[challenge.id] && (
+        {phase === 'compare' && locked && challenge && learner.predictions[challenge.id] && (
           <PredictionCompare
             challenge={challenge}
             prediction={learner.predictions[challenge.id]}
@@ -455,7 +515,7 @@ export default function App() {
         params={params}
         metrics={metrics}
         knowledgeTitle={
-          CHALLENGES.find((c) => c.id === challenge.id)
+          challenge
             ? KNOWLEDGE.find((k) => challenge.knowledgeIds.includes(k.id))?.title
             : undefined
         }

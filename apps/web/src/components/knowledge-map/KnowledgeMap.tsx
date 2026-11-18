@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react';
 import type { Stage } from '../../core/contracts';
-import { KNOWLEDGE, CHALLENGES, MISCONCEPTIONS } from '../../data/content';
+import { CHALLENGES, KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
+import { LABS } from '../../labs/registry';
 import PLATFORM_MAP from '@knowledge/PLATFORM-MAP.json';
 
 interface Props {
-  onOpenLab: (challengeId: string) => void;
-  onOpenHub: () => void;
+  /** 选定了一个模块（进入挑战导览） */
+  onOpenModule: (labId: string) => void;
+  /** 直接跳到某个知识点对应的实验台 */
+  onOpenKnowledge: (knowledgeId: string) => void;
 }
 
 const STAGE_LABEL: Record<Stage, string> = {
@@ -21,48 +24,45 @@ const STATUS_LABEL: Record<string, string> = {
   planned: '规划中',
 };
 
-type MapItem = { id: string; title: string };
+interface MapItem {
+  id: string;
+  title: string;
+}
 
 /**
- * 知识地图 · 两层
+ * 知识地图 · 全平台的起点
  *
- *  上层：全平台五大领域 × 四个学段，一眼看清这个平台要讲多少东西、现在做到哪
- *  下层：点开某个「可动手」的知识点，看详情、跳实验台
+ * 这一页是整个应用的**唯一入口**：
+ *   ① 先在这里选模块（大卡片）
+ *   ② 再看这个平台的知识线（领域 × 学段）
+ *   ③ 或者直接点一个知识点，跳到它对应的实验状态
  *
- * 这一页回答的是「你们这个平台到底有多少内容」，
- * 和首页那张挑战卡片墙回答的「我今天做什么」是两件事。
+ * 关键：不在这里选，挑战导览和实验台都是空状态。
+ * 不会像以前那样悄悄给你塞一个默认的挑战。
  */
-export default function KnowledgeMap({ onOpenLab, onOpenHub }: Props) {
-  const [detailId, setDetailId] = useState<string | null>(null);
+export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
   const [q, setQ] = useState('');
   const [onlyReady, setOnlyReady] = useState(false);
-
-  const detail = detailId ? KNOWLEDGE.find((k) => k.id === detailId) : null;
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   const disciplines = PLATFORM_MAP.disciplines as Array<{
     key: string;
     label: string;
     en: string;
     desc: string;
-    stages: Array<{
-      stage: Stage;
-      status: string;
-      items: MapItem[];
-    }>;
+    stages: Array<{ stage: Stage; status: string; items: MapItem[] }>;
   }>;
 
   const totals = useMemo(() => {
     let all = 0;
     let ready = 0;
-    let content = 0;
     disciplines.forEach((d) =>
       d.stages.forEach((s) => {
         all += s.items.length;
         if (s.status === 'ready') ready += s.items.length;
-        if (s.status === 'content') content += s.items.length;
       }),
     );
-    return { all, ready, content };
+    return { all, ready };
   }, [disciplines]);
 
   const matches = (item: MapItem) => {
@@ -71,36 +71,101 @@ export default function KnowledgeMap({ onOpenLab, onOpenHub }: Props) {
     return item.id.toLowerCase().includes(kw) || item.title.toLowerCase().includes(kw);
   };
 
+  const detail = detailId ? KNOWLEDGE.find((k) => k.id === detailId) : null;
   const challengeFor = (kid: string) => CHALLENGES.find((c) => c.knowledgeIds.includes(kid));
 
   return (
     <>
-      <div className="hub-head" style={{ paddingBottom: 16 }}>
-        <span className="eyebrow">Knowledge Map · 全平台知识地图</span>
-        <h2>这个平台，一共要讲 {totals.all} 个知识点</h2>
+      <div className="hub-head" style={{ paddingBottom: 20 }}>
+        <span className="eyebrow">Knowledge Map · 从这里开始</span>
+        <h2>先选一个实验模块</h2>
         <p>
-          五大领域 × 四个学段，从上往下是一条完整的学习线。
-          现在能动手的是光学那 {totals.ready} 条，其余按顺序往后铺。
+          这个平台会把物理学成一条路。现在能动手的是下面这张卡，
+          其余的按顺序往后铺——你也可以往下翻，看看整条线有多长。
         </p>
       </div>
 
-      <div className="hub-stats" style={{ marginBottom: 26 }}>
+      {/* ================= 模块入口 ================= */}
+      <div className="module-grid">
+        {LABS.map((lab) => {
+          const readyItems = disciplines
+            .filter((d) => d.key === lab.discipline)
+            .flatMap((d) => d.stages.filter((s) => s.status === 'ready').flatMap((s) => s.items));
+          const cardCount = KNOWLEDGE.filter((k) => lab.stages.includes(k.stage)).length;
+          const challengeCount = CHALLENGES.length;
+
+          return (
+            <button key={lab.id} className="module-card" onClick={() => onOpenModule(lab.id)}>
+              <div className="module-card-top">
+                <span className="module-icon">◉</span>
+                <span className="badge on">可动手</span>
+              </div>
+              <h3>{lab.title}</h3>
+              <p className="module-sub">{lab.subtitle}</p>
+              <p className="module-intro">{lab.intro}</p>
+              <div className="module-stages">
+                {lab.stages.map((s) => (
+                  <span key={s} className="stage-tag">
+                    {STAGE_LABEL[s]}
+                  </span>
+                ))}
+              </div>
+              <div className="module-meta">
+                <span>{challengeCount} 个挑战</span>
+                <span>{readyItems.length} 个知识点</span>
+                {cardCount > 0 && <span>{cardCount} 张卡</span>}
+                <span className="arrow">→</span>
+              </div>
+            </button>
+          );
+        })}
+
+        {/* 规划中的模块（点了没反应，明确告诉用户为什么） */}
+        {[
+          { label: '闭合电路欧姆定律', sub: '电磁 · 高中', note: '正在设计' },
+          { label: '太阳能电池 S–Q 极限', sub: '近代 · 大学', note: '正在设计' },
+        ].map((m) => (
+          <div key={m.label} className="module-card disabled">
+            <div className="module-card-top">
+              <span className="module-icon">◌</span>
+              <span className="badge off">规划中</span>
+            </div>
+            <h3>{m.label}</h3>
+            <p className="module-sub">{m.sub}</p>
+            <p className="module-intro">
+              光学这块做透之后就轮到它。先把一个模块的每个细节都打磨好，后面的照着做就行。
+            </p>
+            <div className="module-meta">
+              <span>{m.note}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ================= 全平台统计 ================= */}
+      <div className="hub-stats" style={{ margin: '38px 0 30px' }}>
         <div className="stat">
           <div className="v">{totals.all}</div>
-          <div className="k">知识点总数</div>
+          <div className="k">全平台知识点</div>
         </div>
         <div className="stat">
           <div className="v">{totals.ready}</div>
           <div className="k">现在能动手</div>
         </div>
         <div className="stat">
-          <div className="v">{totals.content}</div>
-          <div className="k">有知识卡</div>
+          <div className="v">{KNOWLEDGE.length}</div>
+          <div className="k">凸透镜知识卡</div>
         </div>
         <div className="stat">
-          <div className="v">3</div>
-          <div className="k">规划中的实验</div>
+          <div className="v">{MISCONCEPTIONS.length}</div>
+          <div className="k">常见误区</div>
         </div>
+      </div>
+
+      {/* ================= 知识点全景 ================= */}
+      <div className="section-head">
+        <h3>知识点全景</h3>
+        <span>五大领域 × 四个学段。灰色的还没做，点不动是有意的。</span>
       </div>
 
       <div className="map-toolbar">
@@ -116,22 +181,16 @@ export default function KnowledgeMap({ onOpenLab, onOpenHub }: Props) {
         >
           只看能动手的
         </button>
-        <button className="btn-ghost btn-small" onClick={onOpenHub}>
-          去挑战导览 →
-        </button>
         <span className="map-count">
           {STAGE_LABEL.primary} → {STAGE_LABEL.university}
         </span>
       </div>
-
-
 
       {disciplines.map((d) => {
         const bands = d.stages
           .map((s) => ({ ...s, items: s.items.filter(matches) }))
           .filter((s) => s.items.length > 0)
           .filter((s) => !onlyReady || s.status === 'ready');
-
         if (bands.length === 0) return null;
 
         return (
@@ -147,7 +206,11 @@ export default function KnowledgeMap({ onOpenLab, onOpenHub }: Props) {
                 <div className="map-band-head">
                   <span className="lvl">{STAGE_LABEL[band.stage]}</span>
                   <span className="desc">{band.items.length} 条</span>
-                  <span className={`badge ${band.status === 'ready' ? 'on' : band.status === 'content' ? '' : 'off'}`}>
+                  <span
+                    className={`badge ${
+                      band.status === 'ready' ? 'on' : band.status === 'content' ? '' : 'off'
+                    }`}
+                  >
                     {STATUS_LABEL[band.status]}
                   </span>
                   <span className="n" />
@@ -186,6 +249,7 @@ export default function KnowledgeMap({ onOpenLab, onOpenHub }: Props) {
         );
       })}
 
+      {/* ================= 知识点详情 ================= */}
       {detail && (
         <div className="overlay" onClick={() => setDetailId(null)}>
           <div className="modal kdetail" onClick={(e) => e.stopPropagation()}>
@@ -257,9 +321,9 @@ export default function KnowledgeMap({ onOpenLab, onOpenHub }: Props) {
                 <button
                   className="btn-primary"
                   onClick={() => {
-                    const c = challengeFor(detail.id)!;
+                    const kid = detail.id;
                     setDetailId(null);
-                    onOpenLab(c.id);
+                    onOpenKnowledge(kid);
                   }}
                 >
                   在实验台上看这个 →

@@ -8,12 +8,12 @@ echo   探理实验室
 echo   ----------------------------------------
 echo.
 
-where bun >nul 2>nul
+where node >nul 2>nul
 if errorlevel 1 (
-  echo   x 找不到 bun
+  echo   x 找不到 Node.js
   echo.
-  echo     这个启动器需要 bun 才能跑。装一下：
-  echo       powershell -c "irm bun.sh/install.ps1 ^| iex"
+  echo     这个启动器需要 Node.js 18 以上。装一下：
+  echo       https://nodejs.org  （下载 LTS 版本，一路下一步就行）
   echo.
   echo     装完关掉这个窗口，再双击一次。
   echo.
@@ -21,7 +21,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-if not exist "..\web\dist" (
+if not exist "..\web\dist\index.html" (
   echo   ! 还没构建网页，正在构建（第一次会慢一点）...
   echo.
   pushd ..\web
@@ -30,7 +30,7 @@ if not exist "..\web\dist" (
   popd
 )
 
-bun run src\server.ts
+node src\server.mjs
 
 echo.
 pause

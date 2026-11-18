@@ -39,26 +39,22 @@ Failed to fetch
 
 ## 怎么用（三步）
 
-### 第一步：确认装了 bun
+### 第一步：确认装了 Node.js
 
 打开终端（macOS 按 `Cmd + 空格`，输入 `Terminal`），粘贴：
 
 ```bash
-bun --version
+node --version
 ```
 
-有版本号就跳过这步。没有的话装一下：
+看到 `v18` 或更高的版本号就跳过这步。
 
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
+没有的话去 **https://nodejs.org** 下载 LTS 版本，一路"下一步"就行。
 
-装完**关掉终端重新打开**，再验证一次。
-
-> Windows 上用 PowerShell：
-> ```powershell
-> powershell -c "irm bun.sh/install.ps1 | iex"
-> ```
+> **为什么用 Node 而不是 Bun？**
+> 早期版本用的是 Bun，但 Bun 的安装包在国内下载经常很慢（有时要十几分钟）。
+> Node.js 是绝大多数电脑上本来就有、或者官网直连能秒下的东西，所以换掉了。
+> 现在这个启动器**零依赖**，不需要 `npm install`，不需要任何第三方包。
 
 ### 第二步：双击启动器
 
@@ -133,7 +129,8 @@ curl -fsSL https://bun.sh/install | bash
 | 现象 | 原因 | 怎么办 |
 |---|---|---|
 | 双击没反应 | macOS 拦截了 | 右键 → 打开 |
-| `找不到 bun` | 没装或没重启终端 | 装完关掉终端重新打开 |
+| `找不到 Node.js` | 没装 | 去 nodejs.org 装 LTS 版本 |
+| 端口 8787 被占用 | 开了两个启动器 | 关掉一个，或 `PORT=8788 node src/server.mjs` |
 | 网页打不开 | 启动器窗口关了 | 重新双击启动器 |
 | 设置里显示「启动器没在跑」 | 同上 | 同上，点「重新检查」 |
 | 测试连接报 `401` | Key 错了 | 去厂商控制台重新复制 |
@@ -145,16 +142,14 @@ curl -fsSL https://bun.sh/install | bash
 
 ## 给学校的分发方式（还没做，规划中）
 
-现在的 `start.command` / `start.bat` 需要先装 bun，对老师来说是个门槛。
+现在的 `start.command` / `start.bat` 需要先装 Node，对老师来说是个门槛。
 
 M4 阶段会做一件事：把这个启动器**编译成单个可执行文件**。
 
-```bash
-cd apps/launcher
-npm run build:bin
-```
+用 `node --experimental-sea-config` 之类的方案把启动器 + Node 运行时打成一个可执行文件。
+产出物拷到 U 盘，**双击就能用，不用装任何东西**。
 
-产出物（`build/physquest`，macOS 约 50MB）拷到 U 盘，**双击就能用，不用装任何东西**。
+（这个方案比 Bun 的编译麻烦一些，但不需要用户下载 Bun。）
 
 ---
 

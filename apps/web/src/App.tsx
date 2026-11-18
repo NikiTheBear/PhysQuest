@@ -14,6 +14,8 @@ import {
   setPrediction as persistPrediction,
   setReflection as persistReflection,
   weakMisconceptions,
+  resetEverything,
+  resetProgress,
 } from './core/persistence';
 import { applyTheme, loadTheme, saveTheme, useTheme, type Theme } from './core/theme';
 import { solve } from './labs/optics-lens/engine';
@@ -37,6 +39,7 @@ import type { AIAction } from './ai/prompts';
 import { CHALLENGES, KNOWLEDGE, quizForChallenge } from './data/content';
 import { LABS, labById, type LabId } from './labs/registry';
 import { EmptyPickLab, EmptyPickChallenge } from './components/common/EmptyStates';
+import ResetPanel from './components/common/ResetPanel';
 
 type View = 'map' | 'hub' | 'lab' | 'cards' | 'report';
 type Phase = 'predict' | 'explore' | 'gate' | 'compare' | 'quiz' | 'quizResult' | 'done';
@@ -75,6 +78,7 @@ export default function App() {
     return Number.isFinite(v) && v >= 340 && v <= 760 ? v : 420;
   });
   const [aiConfig, setAiConfig] = useState<AIConfig>(() => loadAIConfig());
+  const [showReset, setShowReset] = useState(false);
 
   const metrics = useMemo(() => solve(params), [params]);
   const weak = useMemo(() => weakMisconceptions(learner), [learner]);
@@ -257,7 +261,16 @@ export default function App() {
                 我的报告
               </button>
 
-              <div className="theme-toggle" style={{ marginLeft: 8 }}>
+              <button
+                className="nav-icon"
+                onClick={() => setShowReset(true)}
+                title="重置"
+                aria-label="重置"
+              >
+                ⟲
+              </button>
+
+              <div className="theme-toggle" style={{ marginLeft: 4 }}>
                 {(
                   [
                     ['light', '☀'],
@@ -508,6 +521,38 @@ export default function App() {
           />
         )}
       </div>
+
+      {showReset && (
+        <ResetPanel
+          stats={{
+            runs: learner.runs.length,
+            predictions: Object.keys(learner.predictions).length,
+            completed: Object.keys(learner.completed).length,
+            misconceptions: Object.keys(learner.misconceptions).length,
+          }}
+          onResetProgress={() => {
+            setLearner(resetProgress());
+            setChallenge(null);
+            setPrediction(null);
+            setLocked(null);
+            setReflectionDraft('');
+            setPhase('explore');
+            setView('map');
+          }}
+          onResetEverything={() => {
+            setLearner(resetEverything());
+            setLabId(null);
+            setChallenge(null);
+            setPrediction(null);
+            setLocked(null);
+            setReflectionDraft('');
+            setPhase('explore');
+            setView('map');
+            setAiConfig(loadAIConfig());
+          }}
+          onClose={() => setShowReset(false)}
+        />
+      )}
 
       <AITutor
         open={aiOpen}

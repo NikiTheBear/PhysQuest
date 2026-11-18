@@ -34,7 +34,7 @@
 
 ```bash
 cd apps/web && npm install && npm run build   # 先构建一次
-cd ../launcher && bun run src/server.ts       # 起启动器
+cd ../launcher && node src/server.mjs         # 起启动器（零依赖，只要 Node 18+）
 ```
 
 或者直接双击 `apps/launcher/start.command`（macOS）/ `start.bat`（Windows）。

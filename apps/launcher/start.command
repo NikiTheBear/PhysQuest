@@ -1,31 +1,30 @@
 #!/bin/bash
-# 探理实验室 · 本地启动器（macOS）
-# 双击这个文件就能启动。
+# 探理实验室 · 本地启动器（macOS / Linux）
+# 双击这个文件就能启动。不需要 bun，不需要 npm install。
 
 cd "$(dirname "$0")" || exit 1
-
 clear
+
 echo ""
 echo "  🔭 探理实验室"
 echo "  ────────────────────────────────────────"
 echo ""
 
-# 1) 检查 bun
-if ! command -v bun >/dev/null 2>&1; then
-  # 常见安装位置兜底
-  for p in "$HOME/.bun/bin/bun" "/opt/homebrew/bin/bun" "/usr/local/bin/bun"; do
-    if [ -x "$p" ]; then
-      export PATH="$(dirname "$p"):$PATH"
-      break
-    fi
-  done
-fi
+# 找 node
+NODE=""
+for p in "$(command -v node 2>/dev/null)" \
+         "/opt/homebrew/bin/node" \
+         "/usr/local/bin/node" \
+         "$HOME/.volta/bin/node" \
+         "$HOME/.nvm/versions/node/$(ls "$HOME/.nvm/versions/node" 2>/dev/null | tail -1)/bin/node"; do
+  if [ -n "$p" ] && [ -x "$p" ]; then NODE="$p"; break; fi
+done
 
-if ! command -v bun >/dev/null 2>&1; then
-  echo "  ✗ 找不到 bun"
+if [ -z "$NODE" ]; then
+  echo "  ✗ 找不到 Node.js"
   echo ""
-  echo "    这个启动器需要 bun 才能跑。装一下："
-  echo "      curl -fsSL https://bun.sh/install | bash"
+  echo "    这个启动器需要 Node.js 18 以上。装一下："
+  echo "      https://nodejs.org   （下载 LTS 版本，一路下一步就行）"
   echo ""
   echo "    装完关掉这个窗口，再双击一次。"
   echo ""
@@ -33,12 +32,12 @@ if ! command -v bun >/dev/null 2>&1; then
   exit 1
 fi
 
-# 2) 检查网页有没有构建
-if [ ! -d "../web/dist" ]; then
+# 检查网页有没有构建
+if [ ! -f "../web/dist/index.html" ]; then
   echo "  ⚠ 还没构建网页，正在构建（第一次会慢一点）…"
   echo ""
   (cd ../web && npm install --silent && npm run build)
-  if [ ! -d "../web/dist" ]; then
+  if [ ! -f "../web/dist/index.html" ]; then
     echo ""
     echo "  ✗ 构建失败。请在终端里手动运行："
     echo "      cd apps/web && npm install && npm run build"
@@ -49,8 +48,7 @@ if [ ! -d "../web/dist" ]; then
   echo ""
 fi
 
-# 3) 起服务
-bun run src/server.ts
+"$NODE" src/server.mjs
 
 echo ""
 read -r -p "  服务已停止。按回车关掉窗口…"

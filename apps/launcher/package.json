@@ -1,13 +1,13 @@
 {
   "name": "physquest-launcher",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
+  "description": "零依赖本地启动器：静态托管 + /api/llm 转发（Node 18+）",
   "scripts": {
-    "start": "bun run src/server.ts",
-    "build:bin": "bun build ./src/server.ts --compile --minify --outfile ./build/physquest"
+    "start": "node src/server.mjs"
   },
-  "devDependencies": {
-    "@types/bun": "latest"
+  "engines": {
+    "node": ">=18"
   }
 }

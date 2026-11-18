@@ -49,14 +49,13 @@ export default function ObservationPanel({ params, metrics }: Props) {
         </div>
         <div className="seg-marker" style={{ left: `${markerPos(ratio)}%` }}>
           <i />
-          <span>u = {u.toFixed(1)}</span>
         </div>
       </div>
 
       {/* ===== 三个读数 ===== */}
       <div className="obs-grid">
         <div className="obs-cell">
-          <span className="k">到现在这个位置是 u / f</span>
+          <span className="k">物距÷焦距 = u / f</span>
           <b>{ratio.toFixed(2)}</b>
         </div>
         <div className="obs-cell">

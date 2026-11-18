@@ -89,3 +89,28 @@ export function weakMisconceptions(s: LearnerState, minHits = 1): string[] {
     .sort((a, b) => b[1] - a[1])
     .map(([id]) => id);
 }
+
+
+/* ============================================================
+ * 重置
+ * ========================================================== */
+
+/** 只清学习进度，保留主题和 AI 设置 */
+export function resetProgress(): LearnerState {
+  const fresh = empty();
+  saveLearner(fresh);
+  return fresh;
+}
+
+/** 清掉所有本地数据（包括 AI Key），回到第一次打开的状态 */
+export function resetEverything(): LearnerState {
+  try {
+    localStorage.removeItem(KEY);
+    localStorage.removeItem('physquest.ai.v1');
+    localStorage.removeItem('physquest.ai.width.v1');
+    localStorage.removeItem('physquest.currentLab.v1');
+  } catch {
+    /* ignore */
+  }
+  return empty();
+}

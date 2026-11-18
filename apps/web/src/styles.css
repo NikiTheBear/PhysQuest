@@ -2208,8 +2208,8 @@ html.lab-fullscreen .ai-fab {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
-  margin-bottom: 26px;
-  padding-bottom: 22px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
 }
 .seg-cell {
   background: var(--surface-2);
@@ -2244,30 +2244,19 @@ html.lab-fullscreen .ai-fab {
 
 .seg-marker {
   position: absolute;
-  bottom: 0;
+  bottom: 4px;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
+  display: block;
   transition: left 0.18s var(--ease);
   pointer-events: none;
 }
 .seg-marker i {
-  width: 2px;
-  height: 12px;
+  width: 3px;
+  height: 14px;
   background: var(--curve-dot);
-  border-radius: 1px;
-  order: 2;
-  margin-top: -18px;
-}
-.seg-marker span {
-  font-size: 10.5px;
-  color: var(--curve-dot);
-  font-family: var(--font-mono);
-  white-space: nowrap;
-  order: 1;
-  margin-top: -6px;
+  border-radius: 2px;
+  margin-top: -16px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--curve-dot) 18%, transparent);
 }
 
 .obs-grid {
@@ -2685,4 +2674,67 @@ html.lab-fullscreen .ai-fab {
 .topnav button:disabled:hover {
   background: transparent;
   color: var(--label-4);
+}
+
+/* ================= 顶栏图标按钮 ================= */
+
+.nav-icon {
+  width: 30px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  color: var(--label-3);
+  border-radius: var(--r-pill);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  margin-left: 4px;
+}
+.nav-icon:hover {
+  background: var(--fill);
+  color: var(--label);
+}
+
+/* ================= 重置面板 ================= */
+
+.reset-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 16px 0;
+  border-top: var(--hairline);
+}
+.reset-option:first-of-type {
+  border-top: none;
+  padding-top: 4px;
+}
+.reset-option > div {
+  flex: 1;
+}
+.reset-option h4 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-bottom: 5px;
+}
+.reset-option p {
+  font-size: 13px;
+  color: var(--label-2);
+  line-height: 1.62;
+}
+.reset-option button {
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.btn-danger {
+  background: var(--red);
+  color: #fff;
+  font-weight: 500;
+  padding: 9px 22px;
+  border-radius: var(--r-pill);
+}
+.btn-danger:hover {
+  filter: brightness(1.08);
 }

@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>逐光实验室 PhotonQuest Lab · AI 驱动太阳能电池虚拟实验室</title>
+<style>
+  :root{
+    --bg:#0b1220; --panel:#131c31; --panel2:#0f1830; --line:#23314f;
+    --text:#e8eefc; --muted:#93a4c3; --amber:#fbbf24; --cyan:#22d3ee;
+    --green:#34d399; --red:#f87171; --blue:#60a5fa; --pink:#f472b6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg); color:var(--text); font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif; line-height:1.65;}
+  h1,h2,h3{font-weight:700; line-height:1.3;}
+  a{color:var(--cyan); text-decoration:none;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
+  section{padding:44px 0;}
+  .sec-title{font-size:24px; margin-bottom:6px;}
+  .sec-sub{color:var(--muted); margin-bottom:22px; font-size:14px;}
+
+  /* 顶栏 */
+  .topbar{position:sticky; top:0; z-index:50; background:rgba(11,18,32,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+  .topbar .wrap{display:flex; align-items:center; justify-content:space-between; padding-top:10px; padding-bottom:10px; gap:12px; flex-wrap:wrap;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand .logo{font-size:26px;}
+  .brand h1{font-size:19px;}
+  .tagline{font-size:12px; color:var(--muted);}
+  nav{display:flex; gap:14px; align-items:center; flex-wrap:wrap;}
+  nav a{color:var(--text); font-size:14px; opacity:.85;}
+  nav a:hover{color:var(--amber);}
+
+  button{cursor:pointer; border:none; border-radius:10px; font-size:14px; padding:8px 16px; transition:.15s;}
+  .btn-primary{background:var(--amber); color:#1a1206; font-weight:700;}
+  .btn-primary:hover{filter:brightness(1.1);}
+  .btn-ghost{background:transparent; border:1px solid var(--line); color:var(--text);}
+  .btn-ghost:hover{border-color:var(--cyan); color:var(--cyan);}
+  .btn-small{padding:5px 12px; font-size:13px;}
+  button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;}
+  a.btn-primary,a.btn-ghost{display:inline-block;border-radius:10px;padding:8px 16px;font-size:14px;}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px;}
+  .grid3{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;}
+  .guide-box{background:#101d33;border:1px solid #2a4667;border-radius:12px;padding:14px 16px;font-size:13.5px;color:#cfe0ff;}
+  .guide-box b,.guide-box strong{color:var(--amber);}
+  .guide-box ol,.guide-box ul{padding-left:20px;}
+  .guide-box li+li{margin-top:5px;}
+  .guide-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .reading-tip{font-size:12.5px;color:var(--muted);margin-top:9px;}
+  .reading-tip b{color:#cfe0ff;}
+
+  /* Hero */
+  #hero{padding:42px 0 24px;}
+  #hero h2{font-size:30px; margin-bottom:10px;}
+  #hero .lead{color:var(--muted); max-width:820px; margin-bottom:20px;}
+  .loop{display:flex; gap:10px; flex-wrap:wrap;}
+  .loop span{background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:6px 14px; font-size:13px; color:var(--muted);}
+  .loop b{color:var(--amber); font-weight:600;}
+  .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px;}
+
+  /* 新手教程 */
+  #tutorial{padding-top:24px;}
+  .tutorial-goal{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:14px 0;}
+  .tutorial-goal div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted);}
+  .tutorial-goal b{display:block;color:var(--text);margin-bottom:3px;}
+  .tutorial-steps{display:grid;gap:12px;margin-top:14px;}
+  .tutorial-step{display:grid;grid-template-columns:42px 1fr;gap:12px;padding:15px 16px;background:var(--panel);border:1px solid var(--line);border-radius:12px;}
+  .step-no{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:var(--amber);color:#1a1206;font-weight:800;}
+  .tutorial-step h3{font-size:15px;margin-bottom:4px;}
+  .tutorial-step p{font-size:13.5px;color:var(--muted);}
+  .tutorial-step .observe{color:#cfe0ff;margin-top:5px;}
+  .step-time{font-size:11px;color:var(--cyan);margin-left:6px;font-weight:400;}
+
+  /* 知识库 */
+  .know-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start;}
+  .know-card h3{font-size:18px;margin-bottom:8px;color:var(--amber);}
+  .know-card p{font-size:14px;color:var(--muted);margin-bottom:12px;}
+  .know-card .goal{color:var(--text);border-left:3px solid var(--amber);padding-left:10px;}
+  .formula-box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:13.5px;color:#dbe8ff;}
+  .formula-box b{color:var(--cyan);}
+  .example-box{background:#17233a;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:13px;color:#d6e4fb;}
+  .example-box b{color:var(--amber);}
+  .misconception{font-size:12.5px;color:#fecaca;background:rgba(248,113,113,.07);border-radius:8px;padding:8px 10px;margin:10px 0;}
+  .know-card details{margin:10px 0 14px;border-top:1px solid var(--line);padding-top:9px;font-size:13px;color:var(--muted);}
+  .know-card summary{cursor:pointer;color:var(--cyan);}
+  .know-card details p{margin:8px 0 0;}
+  @media(max-width:600px){
+    #hero h2{font-size:26px;}
+    .know-grid{grid-template-columns:1fr;}
+    .tutorial-step{grid-template-columns:34px 1fr;padding:13px 12px;}
+    .step-no{width:30px;height:30px;}
+    .chat-input{flex-wrap:wrap;}
+    .chat-input input{min-width:0;width:100%;}
+  }
+
+  /* 实验室 */
+  .lab-grid{display:grid; grid-template-columns:300px 1fr; gap:16px;}
+  @media(max-width:900px){.lab-grid{grid-template-columns:1fr;}}
+  .mat-btn{display:block; width:100%; text-align:left; background:var(--panel2); border:1px solid var(--line); color:var(--text); border-radius:12px; padding:10px 14px; margin-bottom:8px;}
+  .mat-btn.active{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber) inset;}
+  .mat-btn b{font-size:15px;}
+  .mat-btn small{display:block; color:var(--muted); font-size:12px;}
+  .dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:7px;}
+  .slider-row{margin:18px 0 6px;}
+  input[type=range]{width:100%; accent-color:var(--amber); height:28px;}
+  .readout{display:flex; justify-content:space-between; font-size:13px; color:var(--muted);}
+  .readout b{color:var(--text); font-size:15px;}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-top:14px;}
+  .stat{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:10px 12px; text-align:center;}
+  .stat .v{font-size:22px; font-weight:700; color:var(--amber);}
+  .stat .k{font-size:12px; color:var(--muted);}
+  canvas.chart{width:100%; height:300px; background:var(--panel2); border:1px solid var(--line); border-radius:12px; display:block;}
+  canvas.spectrum{width:100%; height:150px; background:var(--panel2); border:1px solid var(--line); border-radius:12px; display:block;}
+  .lossbar{height:12px; border-radius:6px; overflow:hidden; display:flex; margin:8px 0 4px;}
+  .lossbar i{display:block; height:100%;}
+  .loss-legend{font-size:12px; color:var(--muted); display:flex; gap:16px; flex-wrap:wrap;}
+  .badge{display:inline-block; font-size:11px; padding:2px 10px; border-radius:999px; border:1px solid var(--line); color:var(--muted);}
+  .badge.model{border-color:#3b4a6b; color:#9fb3d9;}
+  .explain{font-size:13.5px; margin-top:10px; background:var(--panel2); border-left:3px solid var(--cyan); padding:10px 14px; border-radius:0 10px 10px 0; color:#cfe0ff;}
+  .pred-row{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  .pred-row input{flex:1; min-width:110px; background:var(--panel2); border:1px solid var(--line); color:var(--text); border-radius:10px; padding:8px 12px; font-size:14px;}
+
+  /* AI 导师 */
+  .ctx-strip{font-size:13px; color:var(--muted); background:var(--panel2); border:1px dashed #3b4a6b; border-radius:10px; padding:8px 14px; margin-bottom:12px;}
+  .ctx-strip b{color:var(--cyan);}
+  .chat{height:340px; overflow-y:auto; background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px;}
+  .msg{max-width:82%; padding:9px 13px; border-radius:12px; font-size:14px; white-space:pre-wrap;}
+  .msg.user{align-self:flex-end; background:#1d3a5f; border-bottom-right-radius:4px;}
+  .msg.ai{align-self:flex-start; background:#18243a; border-bottom-left-radius:4px;}
+  .msg .who{font-size:11px; color:var(--muted); display:block; margin-bottom:3px;}
+  .msg .speak{float:right; background:none; border:1px solid var(--line); color:var(--muted); font-size:11px; padding:1px 8px; border-radius:999px; margin-left:8px;}
+  .msg .speak:hover{color:var(--cyan); border-color:var(--cyan);}
+  .presets{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0;}
+  .chip{background:var(--panel2); border:1px solid var(--line); color:var(--text); font-size:12.5px; padding:6px 12px; border-radius:999px;}
+  .chip:hover{border-color:var(--amber); color:var(--amber);}
+  .chat-input{display:flex; gap:8px;}
+  .chat-input input{flex:1; background:var(--panel2); border:1px solid var(--line); color:var(--text); border-radius:10px; padding:10px 14px; font-size:14px;}
+  .mode{font-size:12px;}
+  .mode.on{color:var(--green);} .mode.off{color:var(--amber);}
+
+  /* 挑战 */
+  .scenario{cursor:pointer;text-align:left;color:var(--text);font:inherit;}
+  .scenario.active{border-color:var(--cyan); box-shadow:0 0 0 1px var(--cyan) inset;}
+  .scenario-title{display:block;font-size:16px;font-weight:700;margin-bottom:6px;color:var(--cyan);}
+  .scenario-desc{display:block;font-size:13px;color:var(--muted);}
+  .result-panel{margin-top:16px;}
+  .result-panel .score{font-size:30px; font-weight:800; color:var(--amber);}
+  .verdict{font-weight:700;}
+  .v-good{color:var(--green);} .v-ok{color:var(--amber);} .v-bad{color:var(--red);}
+
+  /* 报告 */
+  table.log{width:100%; border-collapse:collapse; font-size:13px; margin-top:8px;}
+  table.log th,table.log td{border:1px solid var(--line); padding:6px 10px; text-align:left;}
+  table.log th{background:var(--panel2); color:var(--muted); font-weight:600;}
+  pre.report{white-space:pre-wrap; background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:16px; font-size:13px; max-height:420px; overflow:auto; margin-top:14px;}
+  .reflection{width:100%;min-height:96px;resize:vertical;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;margin-top:8px;}
+  .table-scroll{overflow-x:auto;}
+  .btn-row{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
+
+  footer{border-top:1px solid var(--line); padding:26px 0 40px; color:var(--muted); font-size:12.5px;}
+  footer .model-tag{color:#9fb3d9; margin-bottom:8px;}
+
+  /* 设置弹窗 */
+  .modal-mask{position:fixed; inset:0; background:rgba(4,8,18,.7); display:none; align-items:center; justify-content:center; z-index:100;}
+  .modal-mask.show{display:flex;}
+  .modal{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:24px; width:min(480px,92vw);}
+  .modal h3{margin-bottom:14px;}
+  .modal label{display:block; font-size:13px; color:var(--muted); margin:10px 0 4px;}
+  .modal input{width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--text); border-radius:10px; padding:9px 12px; font-size:13.5px;}
+  .modal .hint{font-size:12px; color:var(--muted); margin-top:10px;}
+  .modal .btn-row{justify-content:flex-end;}
+
+  /* ===== 教学工作台：分页内容 + 常驻 AI ===== */
+  .topbar .wrap{max-width:none;flex-wrap:nowrap;padding-top:9px;padding-bottom:9px;}
+  .brand{flex:0 0 auto;}
+  .learner-controls{display:flex;align-items:center;gap:8px;margin-left:auto;}
+  .learner-controls label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+  .learner-controls select{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:6px 9px;font-size:13px;}
+  .topbar nav{display:none;}
+  .app-main{height:calc(100vh - 65px);max-width:1800px;margin:0 auto;display:grid;grid-template-columns:184px minmax(0,1fr) 366px;overflow:hidden;}
+  .sidebar{border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:14px;background:#0d1628;}
+  .side-label{font-size:11px;color:var(--muted);padding:0 9px;letter-spacing:.12em;}
+  .side-nav{display:grid;gap:7px;}
+  .side-nav button{text-align:left;background:transparent;color:var(--muted);border:1px solid transparent;padding:11px 12px;font-size:14px;}
+  .side-nav button:hover{color:var(--text);background:var(--panel2);}
+  .side-nav button.active{background:#1c2b44;color:var(--amber);border-color:#3d4d6b;font-weight:700;}
+  .side-nav small{display:block;font-size:11px;font-weight:400;margin-top:2px;opacity:.75;}
+  .sidebar-note{margin-top:auto;border-top:1px solid var(--line);padding:14px 9px 0;font-size:11.5px;color:var(--muted);}
+  .workspace{min-width:0;overflow-y:auto;padding:22px 24px 42px;scroll-behavior:smooth;}
+  .view{display:none;}
+  .view.active{display:block;animation:viewIn .18s ease-out;}
+  @keyframes viewIn{from{opacity:.3;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .view section{padding:0 0 24px;}
+  .view #hero{padding:0 0 18px;border-bottom:1px solid var(--line);margin-bottom:18px;}
+  .view #hero h2{font-size:25px;max-width:850px;}
+  .view #hero .lead{font-size:13.5px;margin-bottom:12px;}
+  .view .loop span{padding:4px 10px;font-size:12px;}
+  .view .hero-actions{margin-bottom:12px;}
+  .tutorial-steps{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .tutorial-step:last-child{grid-column:1/-1;}
+  .tutorial-step{padding:13px 14px;}
+  .know-grid{grid-template-columns:1fr;}
+  .know-card{padding:18px;}
+  .know-card .advanced-note{border:1px dashed #52658a;border-radius:10px;padding:10px 12px;margin:10px 0;font-size:13px;color:#cfe0ff;}
+  .audience-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(120deg,#17263f,#111d32);border:1px solid #2d4668;border-radius:13px;padding:13px 16px;margin-bottom:14px;}
+  .learn-tabs{display:flex;gap:7px;margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:10px;}
+  .learn-tabs button{background:var(--panel2);color:var(--muted);border:1px solid var(--line);padding:7px 13px;font-size:13px;}
+  .learn-tabs button.active{color:var(--amber);border-color:var(--amber);background:#20263a;}
+  .audience-banner b{color:var(--amber);}
+  .audience-banner p{font-size:13px;color:var(--muted);}
+  .audience-badge{flex:0 0 auto;color:var(--cyan);font-size:12px;border:1px solid #2f6472;border-radius:999px;padding:3px 10px;}
+  .workspace .guide-box{font-size:13px;}
+  .workspace .reading-tip{font-size:12px;}
+  .site-footer{display:none;}
+
+  /* 常驻 AI：观察区、对话区、提问区各自独立滚动 */
+  .ai-dock{min-width:0;border-left:1px solid var(--line);background:#0f1830;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+  .ai-dock-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);}
+  .ai-dock-head b{font-size:14px;}
+  .ai-dock-head small{display:block;color:var(--muted);font-size:11px;}
+  .ai-close{display:none;background:transparent;color:var(--muted);font-size:20px;padding:2px 7px;}
+  #ai-tutor{padding:12px;display:flex;flex-direction:column;gap:9px;min-height:0;flex:1;}
+  #ai-tutor>.sec-title,#ai-tutor>.sec-sub{display:none;}
+  #ai-tutor>.card{display:flex;flex-direction:column;gap:9px;min-height:0;flex:1;padding:0;border:0;background:transparent;border-radius:0;}
+  #ai-tutor .ctx-strip{margin:0;font-size:11.5px;padding:7px 10px;}
+  #ai-tutor .chat{height:auto;min-height:120px;flex:1;padding:11px;}
+  #ai-tutor .msg{max-width:94%;font-size:13px;padding:8px 11px;}
+  #ai-tutor .presets{margin:0;max-height:91px;overflow-y:auto;gap:6px;}
+  #ai-tutor .chip{font-size:11.5px;padding:5px 9px;}
+  #ai-tutor .chat-input input{min-width:0;font-size:13px;padding:9px 11px;}
+  #ai-tutor .chat-input button{padding:8px 12px;}
+  #ai-tutor .ai-privacy{font-size:10.5px!important;line-height:1.45;}
+  .ai-learning-guide{display:none;}
+  .ai-observation{border:1px solid #2a5664;background:#102633;border-radius:11px;padding:9px 11px;font-size:12px;color:#c7edf1;}
+  .ai-observation b{display:block;color:var(--cyan);font-size:11px;margin-bottom:3px;}
+  .ai-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+  .ai-actions button{font-size:12px;padding:6px 8px;}
+  #btnNextStep{grid-column:1/-1;}
+  .ai-action-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .ai-action-btn{border:1px solid #2d8f9f;background:#112f37;color:#9be7ef;border-radius:999px;padding:4px 9px;font-size:11.5px;}
+  .ai-action-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+  .ai-score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:7px;margin-top:10px;}
+  .ai-score-item{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 9px;font-size:11.5px;color:var(--muted);}
+  .ai-score-item b{display:block;color:var(--text);font-size:12px;margin-bottom:4px;}
+  .ai-score-bar{height:5px;border-radius:4px;background:#26344e;overflow:hidden;margin-top:5px;}
+  .ai-score-bar i{display:block;height:100%;background:var(--cyan);}
+  .report-ai-review{margin-top:12px;background:#101f33;border:1px solid #2c5670;border-radius:11px;padding:12px;font-size:13px;color:#cfe0ff;}
+  .report-ai-review h4{color:var(--cyan);font-size:14px;margin-bottom:6px;}
+  .report-ai-review ul{padding-left:18px;margin-top:6px;}
+  .quiz-options{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .quiz-option{text-align:left;background:#20324d;color:var(--text);border:1px solid #3b4e70;padding:7px 9px;font-size:12px;}
+  .quiz-option.correct{border-color:var(--green);color:var(--green);}
+  .quiz-option.wrong{border-color:var(--red);color:var(--red);}
+  .mobile-ai-fab{display:none;position:fixed;right:18px;bottom:18px;z-index:120;box-shadow:0 8px 30px rgba(0,0,0,.4);}
+  .ai-backdrop{display:none;}
+  body.ai-open{overflow:hidden;}
+
+  /* 年龄与程度真正控制信息密度 */
+  body[data-audience="primary"] .junior-up{display:none!important;}
+  body:not([data-audience="senior"]) .senior-only{display:none!important;}
+  body[data-level="beginner"] .advanced-only{display:none!important;}
+
+  @media(max-width:1450px){
+    .app-main{grid-template-columns:160px minmax(0,1fr) 330px;}
+    .workspace{padding:18px;}
+  }
+  @media(max-width:1280px) and (min-width:1101px){.lab-grid{grid-template-columns:1fr;}}
+  @media(max-width:1100px){
+    body{overflow:auto;}
+    .app-main{height:auto;min-height:calc(100vh - 65px);grid-template-columns:160px minmax(0,1fr);overflow:visible;}
+    .workspace{overflow:visible;}
+    .ai-dock{position:fixed;z-index:160;top:0;right:0;width:min(390px,94vw);height:100dvh;transform:translateX(105%);transition:transform .2s ease;box-shadow:-12px 0 40px rgba(0,0,0,.45);}
+    .ai-dock.open{transform:translateX(0);}
+    .ai-close{display:block;}
+    .mobile-ai-fab{display:block;}
+    .ai-backdrop.show{display:block;position:fixed;inset:0;z-index:150;background:rgba(2,7,18,.65);}
+    .lab-grid{grid-template-columns:280px minmax(0,1fr);}
+  }
+  @media(max-width:720px){
+    .topbar .wrap{flex-wrap:wrap;gap:8px;}
+    .brand .tagline{display:none;}
+    .brand h1{font-size:16px;}
+    .brand .logo{font-size:21px;}
+    .learner-controls{width:100%;justify-content:space-between;}
+    .learner-controls label{flex:1;}
+    .learner-controls select{max-width:145px;width:100%;}
+    .app-main{display:block;min-height:0;}
+    .sidebar{position:static;padding:8px;border-right:0;border-bottom:1px solid var(--line);}
+    .side-label,.sidebar-note{display:none;}
+    .side-nav{display:flex;gap:5px;overflow-x:auto;}
+    .side-nav button{flex:1;min-width:74px;text-align:center;padding:7px 8px;font-size:12px;white-space:nowrap;}
+    .side-nav small{display:none;}
+    .workspace{padding:16px 14px 84px;}
+    .tutorial-steps{grid-template-columns:1fr;}
+    .tutorial-step:last-child{grid-column:auto;}
+    .lab-grid{grid-template-columns:1fr;}
+    .audience-banner{align-items:flex-start;}
+    .view #hero h2{font-size:23px;}
+  }
+  @media(prefers-reduced-motion:reduce){.view.active{animation:none}.ai-dock{transition:none}}
+
+  /* ===== 视觉精修与可调整 AI 阅读区 ===== */
+  :root{
+    --bg:#08111f;--panel:#111d30;--panel2:#0c182a;--line:#263a56;
+    --text:#f2f6ff;--muted:#a4b5ce;--amber:#ffd166;--cyan:#55d6e9;
+    --ai-width:400px;
+  }
+  body{
+    background:
+      radial-gradient(1100px 620px at 42% -10%,rgba(41,104,151,.20),transparent 62%),
+      radial-gradient(700px 520px at 100% 10%,rgba(73,53,138,.13),transparent 65%),
+      var(--bg);
+    background-attachment:fixed;
+    letter-spacing:.01em;
+  }
+  ::selection{background:rgba(85,214,233,.28);color:#fff;}
+  *{scrollbar-width:thin;scrollbar-color:#35506f transparent;}
+  *::-webkit-scrollbar{width:7px;height:7px;}
+  *::-webkit-scrollbar-thumb{background:#35506f;border-radius:99px;}
+  *::-webkit-scrollbar-track{background:transparent;}
+  .topbar{
+    background:rgba(8,17,31,.82);border-bottom:1px solid rgba(91,130,167,.24);
+    box-shadow:0 8px 30px rgba(0,0,0,.16);backdrop-filter:blur(18px) saturate(130%);
+  }
+  .brand .logo{
+    width:38px;height:38px;display:grid;place-items:center;font-size:22px;border-radius:12px;
+    background:linear-gradient(145deg,rgba(255,209,102,.22),rgba(255,166,66,.08));
+    border:1px solid rgba(255,209,102,.28);box-shadow:0 5px 20px rgba(255,190,70,.10);
+  }
+  .brand h1{letter-spacing:-.02em;color:#f8fbff;}
+  .brand .tagline{color:#8fa8c5;}
+  .learner-controls select{
+    background:#101f34;border:1px solid #2d4564;border-radius:10px;color:#eaf2ff;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  .learner-controls select:hover{border-color:#4b7197;}
+  button,a.btn-primary,a.btn-ghost,.chip{transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease,color .16s ease;}
+  button:hover,a.btn-primary:hover,a.btn-ghost:hover{transform:translateY(-1px);}
+  button:active,a.btn-primary:active,a.btn-ghost:active{transform:translateY(0);}
+  .btn-primary,a.btn-primary{
+    background:linear-gradient(135deg,#ffd76c,#f5b942);color:#231a05;
+    box-shadow:0 5px 18px rgba(245,185,66,.16),inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .btn-primary:hover,a.btn-primary:hover{box-shadow:0 7px 24px rgba(245,185,66,.24);}
+  .btn-ghost,a.btn-ghost{background:rgba(19,35,56,.58);border-color:#304966;color:#dce8f8;}
+  .btn-ghost:hover,a.btn-ghost:hover{border-color:#55b8c9;background:rgba(27,52,72,.78);color:#8ee8f4;}
+  .card{
+    background:linear-gradient(145deg,rgba(19,33,54,.96),rgba(13,25,43,.96));
+    border:1px solid rgba(67,93,128,.52);border-radius:18px;
+    box-shadow:0 12px 30px rgba(0,0,0,.13),inset 0 1px 0 rgba(255,255,255,.025);
+  }
+  .sidebar{
+    background:rgba(10,22,39,.82);border-right:1px solid rgba(80,112,148,.26);
+    box-shadow:10px 0 34px rgba(0,0,0,.08);
+  }
+  .side-label{color:#6f8cab;font-weight:700;letter-spacing:.16em;}
+  .side-nav button{border-radius:12px;color:#91a8c4;}
+  .side-nav button:hover{background:rgba(27,46,71,.72);color:#e6effc;}
+  .side-nav button.active{
+    background:linear-gradient(110deg,rgba(255,209,102,.14),rgba(73,124,160,.10));
+    border-color:rgba(255,209,102,.34);color:#ffdb7e;
+    box-shadow:inset 3px 0 0 #ffd166,0 6px 18px rgba(0,0,0,.12);
+  }
+  .sidebar-note{color:#7f98b5;line-height:1.8;}
+  .workspace{background:rgba(6,15,28,.14);}
+  .view #hero{border-bottom-color:rgba(76,108,144,.25);}
+  .view #hero h2{letter-spacing:-.025em;color:#f4f8ff;}
+  .sec-title{letter-spacing:-.015em;}
+  .sec-sub{color:#96abc7;}
+  .loop span{background:rgba(17,32,52,.7);border-color:#2a425f;color:#a6b9d1;}
+  .audience-banner{
+    background:linear-gradient(120deg,rgba(26,58,85,.9),rgba(30,36,72,.86));
+    border-color:rgba(77,139,175,.40);box-shadow:0 10px 30px rgba(0,0,0,.12);
+  }
+  .audience-badge{background:rgba(52,173,190,.08);border-color:rgba(85,214,233,.38);color:#8de8f4;}
+  .tutorial-step{background:linear-gradient(145deg,#122139,#0f1b2e);border-color:#2b425f;}
+  .tutorial-step:hover{border-color:#46647f;box-shadow:0 8px 24px rgba(0,0,0,.12);}
+  .step-no{background:linear-gradient(145deg,#ffdc7e,#f4b944);box-shadow:0 4px 14px rgba(255,200,85,.16);}
+  .learn-tabs button{border-radius:10px;background:#101e32;}
+  .learn-tabs button.active{background:rgba(255,209,102,.11);border-color:#a98942;color:#ffda7a;}
+  .guide-box{background:linear-gradient(135deg,#10233a,#101c31);border-color:#2a4d6d;color:#d0e3f7;}
+  .formula-box,.example-box{border-color:#2b435f;background:#0d1a2c;}
+  .know-card h3{color:#ffd778;}
+  .stat{background:linear-gradient(145deg,#0f2035,#0c192b);border-color:#2b425e;border-radius:14px;}
+  .stat .v{letter-spacing:-.02em;}
+  canvas.chart,canvas.spectrum{background:linear-gradient(180deg,#0d1b2e,#0a1627);border-color:#2c4563;box-shadow:inset 0 1px 12px rgba(0,0,0,.16);}
+  .mat-btn{background:#0e1d31;border-color:#2a405d;border-radius:13px;}
+  .mat-btn:hover{border-color:#527493;background:#132840;}
+  .mat-btn.active{border-color:#ffd166;box-shadow:inset 3px 0 0 #ffd166,0 0 0 1px rgba(255,209,102,.25);}
+  .scenario{background:linear-gradient(145deg,#13253d,#0f1d32);}
+  .scenario:hover{border-color:#4a7b91;box-shadow:0 8px 26px rgba(0,0,0,.14);}
+  .scenario.active{border-color:#55d6e9;box-shadow:0 0 0 1px rgba(85,214,233,.25),0 8px 24px rgba(31,144,163,.10);}
+  .modal{background:linear-gradient(150deg,#14253d,#0f1c30);border-color:#3b5675;border-radius:20px;box-shadow:0 30px 90px rgba(0,0,0,.50);}
+  .modal-mask{backdrop-filter:blur(8px);}
+  .modal input,.chat-input input,.reflection{border-color:#304b69;background:#0c1a2c;}
+  .chat-input input:focus,.reflection:focus,.modal input:focus{border-color:#55b9cc;box-shadow:0 0 0 3px rgba(85,214,233,.08);outline:none;}
+  table.log th{background:#0e1e32;color:#a9bdd5;}
+  table.log th,table.log td{border-color:#2a405c;}
+  .ai-dock{
+    background:linear-gradient(180deg,rgba(14,29,48,.98),rgba(9,20,36,.99));
+    border-left:1px solid rgba(85,151,184,.28);box-shadow:-14px 0 42px rgba(0,0,0,.16);
+  }
+  .ai-dock-head{background:linear-gradient(100deg,rgba(32,64,87,.50),rgba(30,39,68,.32));border-bottom-color:#2a425d;}
+  .ai-dock-head b{color:#f4f8ff;font-size:15px;}
+  .ai-head-actions{display:flex;align-items:center;gap:4px;}
+  .ai-head-btn{background:rgba(18,38,59,.6);border:1px solid #35516c;color:#a9c2da;border-radius:8px;padding:3px 8px;font-size:12px;}
+  .ai-head-btn:hover{border-color:#55d6e9;color:#8de8f4;}
+  .ai-observation{background:linear-gradient(135deg,#102e3b,#112639);border-color:#2b6373;box-shadow:inset 3px 0 0 #43b8c9;}
+  #ai-tutor .chat{background:rgba(7,18,32,.72);border-color:#2a425e;border-radius:14px;}
+  #ai-tutor .msg{font-size:14px;line-height:1.75;padding:10px 13px;box-shadow:0 3px 10px rgba(0,0,0,.08);}
+  .msg.user{background:linear-gradient(135deg,#255787,#244a73);border:1px solid #3c6d99;border-bottom-right-radius:5px;}
+  .msg.ai{background:linear-gradient(145deg,#172a42,#13243a);border:1px solid #2b435f;border-bottom-left-radius:5px;}
+  .msg .who{color:#88a5c2;letter-spacing:.06em;margin-bottom:5px;}
+  #ai-tutor .chip{background:#11243a;border-color:#304a67;color:#bfd1e4;}
+  #ai-tutor .chip:hover{background:#1a334b;border-color:#69c7d6;color:#8de8f4;}
+  #ai-tutor .ctx-strip{background:#0e2135;border-color:#355775;color:#a9c0d8;}
+  .ai-action-btn{background:#12333f;border-color:#348598;color:#a0eaf2;}
+  .ai-action-btn:hover{background:#194552;box-shadow:0 4px 12px rgba(40,177,195,.12);}
+  .ai-resizer{position:absolute;z-index:70;top:0;bottom:0;right:var(--ai-width);width:14px;cursor:col-resize;display:grid;place-items:center;touch-action:none;}
+  .ai-resizer::before{content:'';width:3px;height:54px;border-radius:99px;background:#3a5b79;box-shadow:0 0 0 1px rgba(126,181,205,.08);transition:.15s;}
+  .ai-resizer:hover::before,.ai-resizer:focus-visible::before{background:#65d5e6;height:76px;box-shadow:0 0 12px rgba(85,214,233,.35);}
+  body.ai-resizing{user-select:none;cursor:col-resize;}
+  body.ai-resizing .ai-resizer::before{background:#65d5e6;height:90px;}
+  .ai-large-text #ai-tutor .msg{font-size:15px;line-height:1.85;}
+  .ai-large-text #ai-tutor .chip,.ai-large-text #ai-tutor .chat-input input{font-size:13px;}
+
+  .app-main{position:relative;grid-template-columns:184px minmax(0,1fr) var(--ai-width);}
+  @media(max-width:1450px){.app-main{grid-template-columns:160px minmax(0,1fr) var(--ai-width);}}
+  @media(max-width:1100px){
+    .app-main{grid-template-columns:160px minmax(0,1fr);}
+    .ai-resizer,#btnAIWidth{display:none;}
+  }
+  @media(max-width:720px){
+    .ai-dock{border-left:0;}
+    #ai-tutor .msg{font-size:14px;}
+    .learner-controls select{background:#11243a;}
+  }
+
+  /* ===== 日间主题：雾白 + 浅蓝灰 + 柔和青 ===== */
+  :root[data-theme="light"]{
+    --bg:#f2f6fa;--panel:#ffffff;--panel2:#f4f7fb;--line:#d6e1ec;
+    --text:#17273d;--muted:#60758d;--amber:#996000;--cyan:#007f96;
+    --green:#087c5c;--red:#c44d57;--blue:#2c67bd;--pink:#b54883;
+  }
+  :root[data-theme="light"] body{
+    background:
+      radial-gradient(1000px 560px at 38% -10%,rgba(111,190,215,.22),transparent 65%),
+      radial-gradient(720px 480px at 100% 8%,rgba(191,178,230,.16),transparent 65%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  :root[data-theme="light"] ::selection{background:#c9eaf0;color:#102b3a;}
+  :root[data-theme="light"] *{scrollbar-color:#b5c6d6 transparent;}
+  :root[data-theme="light"] *::-webkit-scrollbar-thumb{background:#b5c6d6;}
+  :root[data-theme="light"] .topbar{background:rgba(255,255,255,.84);border-bottom-color:#d8e3ed;box-shadow:0 8px 28px rgba(39,66,94,.07);}
+  :root[data-theme="light"] .brand h1{color:#15273d;}
+  :root[data-theme="light"] .brand .tagline,:root[data-theme="light"] .brand h1 span{color:#6b8098;}
+  :root[data-theme="light"] .brand .logo{background:linear-gradient(145deg,#fff4cf,#fff9e9);border-color:#ecd797;box-shadow:0 5px 18px rgba(196,148,35,.10);}
+  :root[data-theme="light"] .learner-controls select{background:#fff;border-color:#cbd9e6;color:#20344e;box-shadow:0 2px 7px rgba(35,62,87,.04);}
+  :root[data-theme="light"] .btn-ghost,:root[data-theme="light"] a.btn-ghost{background:rgba(255,255,255,.76);border-color:#cbd9e6;color:#294159;}
+  :root[data-theme="light"] .btn-ghost:hover,:root[data-theme="light"] a.btn-ghost:hover{background:#edf8fa;border-color:#71b8c5;color:#00798f;}
+  :root[data-theme="light"] .btn-primary,:root[data-theme="light"] a.btn-primary{background:linear-gradient(135deg,#ffdb7c,#f4bd52);color:#382707;box-shadow:0 5px 16px rgba(181,128,29,.14);}
+  :root[data-theme="light"] .card{background:linear-gradient(145deg,#fff,#f8fbfe);border-color:#d8e3ed;box-shadow:0 10px 26px rgba(40,68,95,.065),inset 0 1px 0 #fff;}
+  :root[data-theme="light"] .sidebar{background:rgba(250,252,254,.90);border-right-color:#d8e3ed;box-shadow:8px 0 28px rgba(49,75,101,.035);}
+  :root[data-theme="light"] .side-label{color:#7b8fa5;}
+  :root[data-theme="light"] .side-nav button{color:#63798f;}
+  :root[data-theme="light"] .side-nav button:hover{background:#edf3f8;color:#1f3852;}
+  :root[data-theme="light"] .side-nav button.active{background:linear-gradient(110deg,#fff4d7,#edf6f8);border-color:#e4c875;color:#815300;box-shadow:inset 3px 0 0 #d69f2f,0 5px 15px rgba(68,83,102,.05);}
+  :root[data-theme="light"] .sidebar-note{color:#7a8da2;}
+  :root[data-theme="light"] .workspace{background:rgba(255,255,255,.08);}
+  :root[data-theme="light"] .view #hero{border-bottom-color:#dce5ee;}
+  :root[data-theme="light"] .view #hero h2{color:#14273e;}
+  :root[data-theme="light"] .sec-sub,:root[data-theme="light"] .reading-tip{color:#687e94;}
+  :root[data-theme="light"] .loop span{background:#fff;border-color:#d5e1eb;color:#61788f;}
+  :root[data-theme="light"] .audience-banner{background:linear-gradient(120deg,#eaf5f9,#f0eff9);border-color:#c5dfe8;box-shadow:0 8px 24px rgba(47,90,117,.055);}
+  :root[data-theme="light"] .audience-badge{background:#e4f4f7;border-color:#9ccbd4;color:#08768b;}
+  :root[data-theme="light"] .tutorial-step{background:linear-gradient(145deg,#fff,#f5f9fc);border-color:#d5e1eb;}
+  :root[data-theme="light"] .tutorial-step:hover{border-color:#a9c2d5;box-shadow:0 8px 22px rgba(41,70,95,.07);}
+  :root[data-theme="light"] .tutorial-step .observe{color:#315b78;}
+  :root[data-theme="light"] .learn-tabs button{background:#f4f7fa;border-color:#d4e0ea;color:#61778e;}
+  :root[data-theme="light"] .learn-tabs button.active{background:#fff4d8;border-color:#d9ba65;color:#805400;}
+  :root[data-theme="light"] .guide-box{background:linear-gradient(135deg,#edf5fa,#f2f5fb);border-color:#cbdde9;color:#35546d;}
+  :root[data-theme="light"] .formula-box,:root[data-theme="light"] .example-box{background:#f1f6fa;border-color:#d5e2ec;color:#2e4b65;}
+  :root[data-theme="light"] .misconception{background:#fff2f2;color:#a33e48;}
+  :root[data-theme="light"] .know-card h3{color:#8c5900;}
+  :root[data-theme="light"] .know-card details{border-top-color:#dbe5ee;}
+  :root[data-theme="light"] .stat{background:linear-gradient(145deg,#fff,#f1f6fa);border-color:#d4e1eb;}
+  :root[data-theme="light"] canvas.chart,:root[data-theme="light"] canvas.spectrum{background:linear-gradient(180deg,#fbfdff,#f0f5f9);border-color:#ccdbe8;box-shadow:inset 0 1px 10px rgba(40,70,95,.04);}
+  :root[data-theme="light"] .mat-btn{background:#f5f8fb;border-color:#d1dfea;color:#263e58;}
+  :root[data-theme="light"] .mat-btn:hover{background:#edf5f8;border-color:#98bcc9;}
+  :root[data-theme="light"] .mat-btn.active{background:#fff7e2;border-color:#d7ad47;box-shadow:inset 3px 0 0 #d7ad47,0 0 0 1px rgba(213,166,57,.12);}
+  :root[data-theme="light"] .pred-row input{background:#fff;border-color:#ccdbe8;color:#213851;}
+  :root[data-theme="light"] .scenario{background:linear-gradient(145deg,#fff,#f3f8fb);border-color:#d2e0ea;}
+  :root[data-theme="light"] .scenario:hover{border-color:#8dbac7;box-shadow:0 8px 24px rgba(38,88,107,.07);}
+  :root[data-theme="light"] .scenario.active{border-color:#3a9db1;box-shadow:0 0 0 1px rgba(58,157,177,.14),0 8px 24px rgba(38,88,107,.07);}
+  :root[data-theme="light"] .modal{background:linear-gradient(150deg,#fff,#f4f8fb);border-color:#ccdbe8;box-shadow:0 28px 80px rgba(28,51,74,.24);}
+  :root[data-theme="light"] .modal-mask{background:rgba(32,48,67,.36);}
+  :root[data-theme="light"] .modal input,:root[data-theme="light"] .chat-input input,:root[data-theme="light"] .reflection{background:#fff;border-color:#cbd9e6;color:#20354d;}
+  :root[data-theme="light"] .chat-input input:focus,:root[data-theme="light"] .reflection:focus,:root[data-theme="light"] .modal input:focus{border-color:#63b4c3;box-shadow:0 0 0 3px rgba(72,160,178,.10);}
+  :root[data-theme="light"] table.log th{background:#edf3f8;color:#5f768e;}
+  :root[data-theme="light"] table.log th,:root[data-theme="light"] table.log td{border-color:#d4e0ea;}
+  :root[data-theme="light"] pre.report{background:#f4f7fa;border-color:#d3e0ea;}
+  :root[data-theme="light"] .ai-dock{background:linear-gradient(180deg,#f7fafc,#eef4f8);border-left-color:#cbdde7;box-shadow:-12px 0 36px rgba(42,72,96,.06);}
+  :root[data-theme="light"] .ai-dock-head{background:linear-gradient(100deg,#eaf4f8,#f0f0f8);border-bottom-color:#d4e1e9;}
+  :root[data-theme="light"] .ai-dock-head b{color:#1b344e;}
+  :root[data-theme="light"] .ai-head-btn{background:#fff;border-color:#c7d8e4;color:#536e86;}
+  :root[data-theme="light"] .ai-head-btn:hover{border-color:#64adbb;color:#007b91;}
+  :root[data-theme="light"] .ai-observation{background:linear-gradient(135deg,#e7f5f7,#edf4f9);border-color:#b5d8df;color:#285468;box-shadow:inset 3px 0 0 #4daab9;}
+  :root[data-theme="light"] #ai-tutor .chat{background:#f3f7fa;border-color:#d0dde7;}
+  :root[data-theme="light"] #ai-tutor .msg{box-shadow:0 3px 10px rgba(37,62,82,.045);}
+  :root[data-theme="light"] .msg.user{background:linear-gradient(135deg,#dcebfb,#d0e2f5);border-color:#b0cde5;color:#193c60;}
+  :root[data-theme="light"] .msg.ai{background:linear-gradient(145deg,#fff,#f4f8fb);border-color:#d4e1ea;color:#213951;}
+  :root[data-theme="light"] .msg .who{color:#6e869d;}
+  :root[data-theme="light"] #ai-tutor .chip{background:#fff;border-color:#cbdbe7;color:#4d677f;}
+  :root[data-theme="light"] #ai-tutor .chip:hover{background:#eaf6f8;border-color:#72b6c3;color:#007b90;}
+  :root[data-theme="light"] #ai-tutor .ctx-strip{background:#edf4f8;border-color:#bfd2df;color:#5d778f;}
+  :root[data-theme="light"] .ai-action-btn{background:#e7f5f7;border-color:#99cbd4;color:#08788c;}
+  :root[data-theme="light"] .ai-action-btn:hover{background:#d9f0f3;box-shadow:0 4px 12px rgba(50,141,157,.09);}
+  :root[data-theme="light"] .quiz-option{background:#fff;border-color:#c9dae7;color:#2a455e;}
+  :root[data-theme="light"] .ai-score-item{background:#f4f8fb;border-color:#d3e0e9;}
+  :root[data-theme="light"] .ai-score-item b{color:#233d56;}
+  :root[data-theme="light"] .ai-score-bar{background:#dfe8f0;}
+  :root[data-theme="light"] .report-ai-review{background:#edf6f9;border-color:#c4dfe6;color:#2d5065;}
+  :root[data-theme="light"] .ai-resizer::before{background:#a9bfd0;}
+  :root[data-theme="light"] .ai-resizer:hover::before,:root[data-theme="light"] .ai-resizer:focus-visible::before{background:#419faf;}
+  :root[data-theme="light"] .explain{background:#edf5f8;color:#31556e;border-left-color:#3295a7;}
+  :root[data-theme="light"] .reading-tip b{color:#365c75;}
+  :root[data-theme="light"] .know-card .advanced-note{border-color:#b9cddd;color:#345874;background:#f2f7fa;}
+  :root[data-theme="light"] .badge.model{border-color:#c2d3df;color:#5d7690;background:#f3f7fa;}
+  :root[data-theme="light"] .tutorial-step p{color:#61778e;}
+  :root[data-theme="light"] .tutorial-step .observe{color:#315875;}
+  :root[data-theme="light"] .guide-actions .btn-small{color:#294b63;}
+  :root[data-theme="light"] .score,.result-panel .score{color:#936000;}
+  :root[data-theme="light"] .ai-observation b{color:#007f96;}
+  :root[data-theme="light"] .msg .speak{border-color:#c8d7e2;color:#617a91;}
+  :root[data-theme="light"] .msg .speak:hover{border-color:#54a6b5;color:#007f96;}
+</style>
+</head>
+<body data-audience="junior" data-level="beginner">
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <span class="logo">☀️</span>
+      <div>
+        <h1>逐光实验室 <span style="font-size:12px;color:var(--muted);font-weight:400">PhotonQuest Lab</span></h1>
+        <p class="tagline">AI 驱动的太阳能电池虚拟实验与材料选择平台</p>
+      </div>
+    </div>
+    <div class="learner-controls">
+      <label>学段
+        <select id="ageSelect" aria-label="选择学习学段">
+          <option value="primary">小学 · 科学启蒙</option>
+          <option value="junior" selected>初中 · 概念探究</option>
+          <option value="senior">高中 · 定量研究</option>
+        </select>
+      </label>
+      <label>基础
+        <select id="levelSelect" aria-label="选择学习基础">
+          <option value="beginner" selected>0 基础</option>
+          <option value="advanced">进阶挑战</option>
+        </select>
+      </label>
+      <button class="btn-ghost btn-small" id="btnTheme" aria-label="切换日间和夜间模式">☀️ 日间</button>
+      <button class="btn-ghost btn-small" id="btnSettings">⚙ AI 设置</button>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+  <aside class="sidebar" aria-label="学习模块导航">
+    <div class="side-label">PHOTONQUEST</div>
+    <nav class="side-nav">
+      <button class="active" data-view-target="learn" aria-current="page">📖 学习与教程<small>分学段知识路径</small></button>
+      <button data-view-target="lab">🔬 虚拟实验<small>调参 · 观察 · 验证</small></button>
+      <button data-view-target="challenge">🎯 场景挑战<small>用证据做选择</small></button>
+      <button data-view-target="report">📋 我的报告<small>记录 · 反思 · 导出</small></button>
+    </nav>
+    <div class="sidebar-note">核心：本地 S–Q 理论模型<br>AI 负责讲解，不负责改数值<br><br>右侧 AI 导师全程陪伴。手机点右下角按钮打开。</div>
+  </aside>
+  <div class="workspace" id="workspace">
+  <section class="view active" id="view-learn">
+
+  <!-- Hero -->
+  <section id="hero">
+    <h2>不是"读"光伏知识，而是亲手"设计"一块太阳能电池</h2>
+    <p class="lead">在这里，你可以调节半导体的<b style="color:var(--amber)">带隙</b>、切换材料，实时观察吸收门槛与理论效率的变化，向 AI 实验导师提问，完成场景挑战，最后导出实验报告。<b>第一次使用，请先按下方教程操作。</b></p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#tutorial">从新手教程开始 →</a>
+      <a class="btn-ghost" href="#lab">我已经会了，直接做实验</a>
+    </div>
+    <div class="loop">
+      <span><b>①</b> 学知识</span><span><b>②</b> 做预测</span><span><b>③</b> 调参观察</span><span><b>④</b> AI 分析</span><span><b>⑤</b> 挑战与报告</span>
+    </div>
+  </section>
+
+  <div class="learn-tabs" aria-label="学习区内部导航">
+    <button class="active" data-learn-tab="path">① 学习路径</button>
+    <button data-learn-tab="knowledge">② 知识详解</button>
+  </div>
+  <!-- 新手教程：正文第一模块 -->
+  <div class="audience-banner" id="audienceBanner">
+    <p><b>初中 · 0 基础</b><br>从生活类比和可见现象开始，再逐渐引入公式。</p>
+    <span class="audience-badge">当前学习路径</span>
+  </div>
+  <section id="tutorial">
+    <h2 class="sec-title" id="tutorialTitle">🧭 第一次使用：8–10 分钟完成一次完整探究</h2>
+    <p class="sec-sub" id="tutorialIntro">不要一上来乱拖滑块。按 ①→⑤ 操作，每一步都告诉你<strong>点哪里、看什么、想什么</strong>。</p>
+    <div class="guide-box">
+      <b>开始前先记住一句话：</b>页面里的效率是 Shockley–Queisser 理想模型的<strong>理论计算值</strong>，不是真实电池的测量值。自由调节带隙时，你操作的是“理想虚拟半导体”；真实材料挑战只使用给定的代表参数。
+    </div>
+    <div class="tutorial-goal" id="tutorialGoals">
+      <div><b>知识目标</b>能解释“为什么带隙太低、太高都会降低效率”</div>
+      <div><b>实验目标</b>完成预测、对照实验，并找到本模型峰值</div>
+      <div><b>应用目标</b>用真实材料代表点完成一次场景选择</div>
+      <div><b>表达目标</b>写下自己的结论并导出学习报告</div>
+    </div>
+    <div class="tutorial-steps" id="tutorialSteps">
+      <article class="tutorial-step">
+        <span class="step-no">1</span>
+        <div><h3>先学四个核心概念 <span class="step-time">约 3 分钟</span></h3>
+          <p>依次阅读下方知识卡①—④。重点不是背公式，而是弄懂：<b>光子怎样产生电子—空穴对、PN 结为什么需要分开电荷、两类损失怎样竞争、四个指标分别代表什么。</b></p>
+          <p class="observe">完成标准：不看答案，能说出“700 nm 与 900 nm 的光子，谁更容易被 1.55 eV 半导体吸收”。</p>
+          <div class="guide-actions"><a class="btn-ghost btn-small" href="#knowledge">去读知识卡①</a></div>
+        </div>
+      </article>
+      <article class="tutorial-step">
+        <span class="step-no">2</span>
+        <div><h3>选择真实材料，先预测再提交 <span class="step-time">约 1 分钟</span></h3>
+          <p>进入实验室，点击“晶硅”。在“先预测”输入框写下你对当前理论效率的估计，再点“提交预测”。系统会把预测与本模型计算值一起记录。</p>
+          <p class="observe">注意：如果你已经看到了结果，就把它当作自测，不要伪装成事前预测。换一个参数后可以重新预测。</p>
+          <div class="guide-actions"><a class="btn-ghost btn-small" href="#lab">去做第一次预测</a></div>
+        </div>
+      </article>
+      <article class="tutorial-step">
+        <span class="step-no">3</span>
+        <div><h3>做三组对照实验，而不是只找最高分 <span class="step-time">约 2 分钟</span></h3>
+          <p>在实验区的“引导实验”中依次点击 <b>0.70、1.26、2.50 eV</b>。每次都按同一顺序观察：带隙 → 吸收门槛 → Jsc/Voc → 损失条 → 效率。</p>
+          <p class="observe">完成标准：能解释低带隙为什么电流较大但电压较低，高带隙为什么透射损失增加，以及 1.26 eV 附近为什么出现峰值。</p>
+          <div class="guide-actions"><a class="btn-ghost btn-small" href="#labGuide">查看对照实验步骤</a></div>
+        </div>
+      </article>
+      <article class="tutorial-step">
+        <span class="step-no">4</span>
+        <div><h3>带着实验现象问 AI <span class="step-time">约 1 分钟</span></h3>
+          <p>先点击预设问题“为什么晶硅没有达到理论最高效率？”，再追问一个你在对照实验中真正不理解的现象。AI 会读取当前参数，但解释仍可能出错，要拿曲线和计算细节核对。</p>
+          <p class="observe">好问题示例：“我把 Eg 从 1.12 调到 2.50 后，Jsc 为什么下降？这与红色透射区有什么关系？”</p>
+          <div class="guide-actions"><a class="btn-ghost btn-small" href="#ai-tutor">学习怎样向 AI 提问</a></div>
+        </div>
+      </article>
+      <article class="tutorial-step">
+        <span class="step-no">5</span>
+        <div><h3>完成挑战，写结论并导出 <span class="step-time">约 2 分钟</span></h3>
+          <p>推荐先做“太空卫星”：回实验室选择“砷化镓”代表点，再回挑战区提交。看懂规则分的三个分项后，到报告区用自己的话写下结论，最后导出 TXT。</p>
+          <p class="observe">结论不能只写“我得了 90 分”，而要写：我改变了什么、观察到什么、为什么会这样、模型还有什么没考虑。</p>
+          <div class="guide-actions"><a class="btn-primary btn-small" href="#challenge">开始场景挑战</a><a class="btn-ghost btn-small" href="#report">去看报告要求</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 模块1：知识详解 -->
+  <section id="knowledge">
+    <h2 class="sec-title">📖 光伏物理知识详解</h2>
+    <p class="sec-sub">每张卡片都按“学习目标 → 具体讲解 → 数字例子 → 常见误区 → 自测 → 实验”组织。建议按顺序阅读。</p>
+    <div class="know-grid" id="knowGrid">
+      <article class="card know-card">
+        <h3>① 光子与带隙：先跨过能量门槛</h3>
+        <p class="goal"><b>你要学会：</b>用光子能量和带隙判断一个光子在理想模型中能否被吸收。</p>
+        <p>光可以看成一个个光子。半导体中，价带里的电子获得足够能量后可以跃迁到导带，留下一个带正电的空穴，形成<b>电子—空穴对</b>。这里的“光电效应”是材料内部的光电激发，不是把电子打出电池表面。</p>
+        <div class="formula-box">光子能量：<b>E = hc/λ</b><br>常用换算：<b>E(eV) ≈ 1240 / λ(nm)</b><br>理想吸收条件：<b>E ≥ Eg</b>，等价于 <b>λ ≤ 1240/Eg</b></div>
+        <div class="example-box"><b>具体例子：Eg = 1.55 eV</b><br>门槛波长 λg ≈ 1240/1.55 = <b>800 nm</b>。<br>700 nm 光子能量约 1.77 eV ≥ 1.55 eV，理想模型中可被吸收；900 nm 光子约 1.38 eV &lt; 1.55 eV，不能被用于跨带隙激发。</div>
+        <div class="misconception"><b>常见误区：</b>“光越强，每个光子能量就越高”是错的。光强主要反映光子数量，光子的能量主要由波长决定。</div>
+        <details><summary>自测：蓝光和红光，哪个单个光子能量更高？</summary><p>蓝光。蓝光波长更短，由 E=hc/λ 可知单个光子能量更高。但这不代表蓝光电池效率一定更高，还要看吸收、热化和其他损失。</p></details>
+        <button class="btn-ghost btn-small" data-goto="1.55">用 1.55 eV 观察 800 nm 门槛 →</button>
+      </article>
+
+      <article class="card know-card">
+        <h3>② 电子—空穴对与 PN 结：分开电荷才能输出</h3>
+        <p class="goal"><b>你要学会：</b>解释“光产生了电子—空穴对，为什么还需要 PN 结”。</p>
+        <p>仅产生电子—空穴对还不够。如果它们很快复合，能量就会重新释放，无法持续输出。P 型与 N 型半导体接触后，交界处形成内建电场；在理想化描述中，它把光生电子推向 N 区、空穴推向 P 区，减少它们直接复合的机会。</p>
+        <div class="formula-box"><b>光照：</b>产生电子—空穴对<br><b>内建电场：</b>分离并收集电荷<br><b>外电路：</b>电子定向运动，对外做功<br><b>能量来源：</b>太阳光，而不是 PN 结凭空供能</div>
+        <div class="example-box"><b>接上负载以后：</b>电池并不是简单地“储存了一盒电子”。光持续提供能量，内建电场持续分离电荷，外电路形成电流。开路时没有持续外电流，但两端仍存在电压，这就是 Voc 讨论的状态。</div>
+        <div class="misconception"><b>模型边界：</b>本页的 S–Q 模型把电荷收集理想化，不能用来模拟掺杂浓度、PN 结深度或内建电场分布。</div>
+        <details><summary>自测：内建电场为什么不等于免费能源？</summary><p>它只负责分离和引导电荷，输出能量来自入射光。撤掉光照后，PN 结本身不能持续向外供电。</p></details>
+        <button class="btn-ghost btn-small" data-material="si" data-goto="1.12">选择晶硅，观察 Voc 与 Jsc →</button>
+      </article>
+
+      <article class="card know-card">
+        <h3>③ 两类损失：带隙为什么不能太低或太高</h3>
+        <p class="goal"><b>你要学会：</b>分别解释透射损失和热化损失，并理解效率峰值来自二者的权衡。</p>
+        <p><b>带隙太高：</b>大量光子因 E&lt;Eg 而无法激发电子，在本模型中直接透射。带隙越高，能利用的光子通常越少，Jsc 下降。<br><b>带隙太低：</b>虽然更多光子能跨过门槛，但高能光子超出的那部分能量会很快转化为热，不能全部变成电输出。</p>
+        <div class="example-box"><b>热化例子：</b>一个 2.00 eV 光子被 Eg=1.12 eV 的材料吸收，超出带隙的约 <b>0.88 eV</b> 首先面临热化损失，不能理解为整个 2.00 eV 都能输出。<br><b>透射例子：</b>Eg=2.50 eV 时，λg≈496 nm；理想模型中，波长长于 496 nm 的光子不能跨带隙激发。</div>
+        <div class="formula-box"><b>低 Eg：</b>吸收光子多 → Jsc 倾向较大；热化和复合限制电压与输出<br><b>高 Eg：</b>Voc 倾向较高；可吸收光子变少 → Jsc 下降<br><b>峰值：</b>是“多吸收”和“少浪费”的权衡，不要求两种损失数值恰好相等</div>
+        <div class="misconception"><b>常见误区：</b>“带隙越接近 0，吸收越多，所以效率越高”忽略了每个光子可输出的能量与电压限制。</div>
+        <details><summary>自测：把 Eg 从 1.12 调到 2.50 eV，红色不可吸收区应怎样变化？</summary><p>应变大。门槛波长从约 1107 nm 缩短到 496 nm，更多较长波长的光子落在不可吸收一侧，Jsc 会显著下降。</p></details>
+        <button class="btn-ghost btn-small" data-goto="0.70">先看低带隙 0.70 eV</button>
+        <button class="btn-ghost btn-small" data-goto="2.50">再看高带隙 2.50 eV</button>
+      </article>
+
+      <article class="card know-card">
+        <h3>④ 读懂实验指标：效率不是“电流越大越好”</h3>
+        <p class="goal"><b>你要学会：</b>看懂 Jsc、Voc、FF、η 的联系，并区分理论值、实际值和“百分点”。</p>
+        <div class="formula-box"><b>Jsc（短路电流密度）：</b>反映光生电流规模，单位 mA/cm²<br><b>Voc（开路电压）：</b>外电路开路时的电压，受带隙和复合影响<br><b>FF（填充因子）：</b>最大功率点接近“理想矩形”的程度<br><b>η（效率）：</b>最大输出电功率 ÷ 入射光功率</div>
+        <p>电池输出功率同时取决于电流和电压，不能只看 Jsc。最大功率点满足 <b>Pmax = Vmp × Jmp</b>，而 FF = Pmax/(Voc×Jsc)。本页计算面板还给出 Vmp、Jmp 和能量损失，供你逐项核对。</p>
+        <div class="example-box"><b>具体读数：</b>本模型中晶硅代表点约为 η=30.0%、Voc=0.88 V、Jsc=53.5 mA/cm²。这里是黑体太阳、300 K、仅辐射复合等假设下的理论极限，不是商业组件实测值。<br><b>单位提醒：</b>从 30.0% 到 28.9% 是下降 <b>1.1 个百分点</b>，不是下降 1.1%。</div>
+        <div class="misconception"><b>常见误区：</b>理论曲线峰值不等于真实产品的效率纪录，也不能单独证明某种材料在所有场景都最好。</div>
+        <details><summary>自测：某方案 Jsc 很大，为什么 η 仍可能很低？</summary><p>如果带隙很低，Voc 和最大功率点电压可能很小，同时热化等损失较大。功率由电压与电流共同决定，因此大电流不必然带来高效率。</p></details>
+        <button class="btn-ghost btn-small" data-goto="1.26">观察本模型峰值与四个指标 →</button>
+      </article>
+    </div>
+  </section>
+  </section><!-- /view-learn -->
+
+  <section class="view" id="view-lab">
+  <!-- 模块2：虚拟实验室 -->
+  <section id="lab">
+    <h2 class="sec-title">🔬 太阳能电池虚拟实验室</h2>
+    <p class="sec-sub">切换材料、拖动带隙滑块，观察曲线、吸收门槛和损失解释如何同步变化。所有效率数字都来自浏览器本地运行的 Shockley–Queisser 物理模型实时计算。</p>
+
+    <div class="guide-box" id="labGuide" style="margin-bottom:16px">
+      <b>引导实验：用三组参数找出两类损失</b>
+      <p id="labAudienceTip" style="margin:6px 0">初中路径：先观察门槛、电流和电压，再用两类损失解释效率峰值。</p>
+      <ol>
+        <li>点击 <b>0.70 eV</b>：记录 Jsc、Voc、理论效率，观察吸收门槛和吸收后未输出损失。</li>
+        <li>点击 <b>1.26 eV</b>：找到本模型峰值附近，比较电流、电压和三类能量占比。</li>
+        <li>点击 <b>2.50 eV</b>：观察 λg 缩短到约 496 nm、红色不可吸收区扩大以及 Jsc 下降。</li>
+        <li>最后回答：<b>为什么“吸收更多光子”和“每个光子输出更多能量”不能同时无限增加？</b>把你的解释写进报告结论。</li>
+      </ol>
+      <div class="guide-actions">
+        <button class="btn-ghost btn-small" data-goto="0.70">实验 A：0.70 eV</button>
+        <button class="btn-primary btn-small" data-goto="1.26">实验 B：1.26 eV</button>
+        <button class="btn-ghost btn-small" data-goto="2.50">实验 C：2.50 eV</button>
+      </div>
+      <p style="margin-top:9px">这三个按钮操作的是<b>理想虚拟半导体</b>。点击晶硅、砷化镓或钙钛矿按钮，可回到真实材料代表点；手动拖滑块会再次进入虚拟半导体模式。</p>
+    </div>
+
+    <div class="lab-grid">
+      <!-- 左：控制 -->
+      <div class="card">
+        <h3 style="font-size:15px;margin-bottom:12px">电池材料</h3>
+        <div id="matList"></div>
+        <div class="slider-row">
+          <div class="readout"><span>带隙 Eg</span><b id="egVal">1.12 eV</b></div>
+          <input type="range" id="egSlider" min="0.5" max="3.0" step="0.01" value="1.12">
+          <div class="readout"><span>0.5 eV</span><span>3.0 eV</span></div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="v" id="stEta">–</div><div class="k">理论效率 η</div></div>
+          <div class="stat junior-up"><div class="v" id="stVoc" style="color:var(--cyan)">–</div><div class="k">开路电压 Voc</div></div>
+          <div class="stat junior-up"><div class="v" id="stJsc" style="color:var(--blue)">–</div><div class="k">短路电流 Jsc (mA/cm²)</div></div>
+          <div class="stat senior-only"><div class="v" id="stFF" style="color:var(--green)">–</div><div class="k">填充因子 FF</div></div>
+        </div>
+        <p style="font-size:12.5px;color:var(--muted);margin-top:12px">与曲线峰值差距：<b id="stGap" style="color:var(--amber)">–</b></p>
+
+        <div class="pred-row">
+          <input type="number" id="predInput" min="0" max="40" step="0.1" placeholder="先预测：效率约 __ %">
+          <button class="btn-primary btn-small" id="btnPred">提交预测</button>
+        </div>
+        <p id="predHint" style="font-size:12.5px;color:var(--muted);margin-top:8px">科学实验从"先猜一猜"开始：拖动滑块前先写下你的预测。</p>
+      </div>
+
+      <!-- 右：可视化 -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <h3 style="font-size:15px;margin-bottom:10px">单结理论效率曲线（Shockley–Queisser 辐射极限）</h3>
+          <canvas class="chart" id="curveCanvas" role="img" aria-label="带隙从0.5到3.0电子伏时，单结太阳能电池理论效率先升后降，当前参数用红点标出"></canvas>
+          <p class="reading-tip"><b>怎么读：</b>横轴 Eg 越大，带隙越高；纵轴是理论效率。黄线是完整模型曲线，红点是当前参数，黄色虚线标出峰值。请同时看左侧 Voc 与 Jsc，不要只追峰值。</p>
+        </div>
+        <div class="card">
+          <h3 style="font-size:15px;margin-bottom:10px">光谱区间与吸收门槛（λ<sub>g</sub> = 1240 / Eg）</h3>
+          <canvas class="spectrum" id="specCanvas" role="img" aria-label="紫外、可见光与红外区间示意，红色区域表示理想模型中低于带隙能量、不能吸收的部分"></canvas>
+          <p class="reading-tip"><b>怎么读：</b>红色竖线是吸收门槛 λg；其右侧表示波长大于 λg、光子能量 E&lt;Eg 的区间。本图是波段与门槛示意，颜色不表示太阳光谱强度；百分比由完整黑体光谱积分得到。</p>
+          <p style="font-size:12.5px;color:var(--muted);margin:10px 0 2px">当前可吸收约 <b id="absPct" style="color:var(--amber)">–</b> 的太阳能量（E ≥ Eg 部分）</p>
+          <div class="lossbar"><i id="barThermal" style="background:var(--red)"></i><i id="barElectric" style="background:var(--green)"></i><i id="barTrans" style="background:#64748b"></i></div>
+          <div class="loss-legend">
+            <span><i class="dot" style="background:var(--red)"></i>热化+复合等损失（吸收后未输出）</span>
+            <span><i class="dot" style="background:var(--green)"></i>可输出电能</span>
+            <span><i class="dot" style="background:#64748b"></i>透射损失（光子没被吸收）</span>
+          </div>
+          <p class="explain" id="lossExplain">拖动滑块观察两种损失如何此消彼长。</p>
+        </div>
+        <div class="card senior-only advanced-only" id="calcPanel">
+          <h3 style="font-size:15px;margin-bottom:10px">🧮 计算细节（本地实时求解 · 可核验）</h3>
+          <div class="stat-grid" id="calcGrid" style="margin-top:0"></div>
+          <details style="margin-top:10px">
+            <summary style="cursor:pointer;color:var(--cyan);font-size:13px">查看所用公式与假设</summary>
+            <pre id="calcFormulas" style="white-space:pre-wrap;font-size:12.5px;color:var(--muted);margin-top:8px;background:var(--panel2);padding:12px;border-radius:10px"></pre>
+          </details>
+          <p style="font-size:12px;color:var(--muted);margin-top:8px">文献对照：AM1.5G 精确光谱下单结 S–Q 极限峰值 ≈ 33.7% @ 1.34 eV（Rühle, Solar Energy 130, 2016，用于交叉核对）；本页采用黑体太阳 5778K 近似的自洽计算，故峰值略低（≈ 30.5% @ 1.26 eV），差异原因见 docs/science-model.md。</p>
+        </div>
+        <p class="senior-only"><span class="badge model">模型：Shockley–Queisser 单结辐射极限 · 黑体太阳 5778K 近似 · 单倍聚光 · 详细平衡 · 本地数值积分</span></p>
+      </div>
+    </div>
+  </section>
+  </section><!-- /view-lab -->
+
+  <!-- 常驻 AI 源节点：初始化时移入右侧 AI 栏 -->
+  <section id="ai-tutor">
+    <h2 class="sec-title">🤖 AI 实验导师</h2>
+    <p class="sec-sub">它会读取你的<b>当前实验状态</b>进行解释。面板数值只由本地物理模型计算；AI 文本仍可能出错，请用曲线、公式和可靠资料核对。</p>
+    <div class="guide-box ai-learning-guide" style="margin-bottom:12px">
+      <b>怎样提问才真正有帮助？</b>
+      <ul>
+        <li><b>先操作，再提问：</b>先把带隙调到 2.50 eV，再问“为什么 Jsc 下降”，比在旧状态下空问更有效。</li>
+        <li><b>问题里带现象：</b>“Eg 从 1.12 调到 2.50 后，红色区域扩大、Jsc 下降，二者有什么关系？”</li>
+        <li><b>要求区分证据：</b>“哪些来自当前模型，哪些是模型外经验？我还需要查什么资料？”</li>
+        <li><b>不要只问答案：</b>少问“最高效材料是什么”，多问“我现在的选择用了哪些假设，在什么情况下会失效”。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ctx-strip" id="ctxStrip">当前实验状态：–</div>
+      <div class="chat" id="chat"></div>
+      <div class="presets" id="presets"></div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="自由提问（在线 AI 优先，失败才本地兜底）">
+        <button class="btn-primary" id="btnSend">发送</button>
+      </div>
+      <p class="ai-privacy" style="font-size:12px;color:var(--muted);margin-top:8px">
+        模式：<span class="mode off" id="modeBadge">离线（内置本地回答）</span> ·
+        离线时回答为内置知识库模板；在线模式会把你输入的问题和当前实验状态发送给你配置的 AI 接口，请勿输入个人敏感信息。密钥只保存在本机浏览器，不进入代码与仓库。<br><span id="aiUsage">所有 AI 功能优先调用在线接口；只有未配置 Key、断网或接口失败才使用本地兜底。</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="view" id="view-challenge">
+  <!-- 模块4：挑战任务 -->
+  <section id="challenge">
+    <h2 class="sec-title">🎯 挑战任务：我是太阳能电池设计师</h2>
+    <p class="sec-sub">先选场景，再回实验室选择真实材料代表点，写下设计理由后提交。户外与太空优先由在线 AI 按五项 rubric 评分，失败才用本地兜底；室内任务只识别模型边界，不给伪精确排名。</p>
+    <div class="guide-box" id="challengeGuide" style="margin-bottom:14px">
+      <b>挑战四步法：</b>① 读场景约束 → ② 选真实材料代表点 → ③ 提交并看懂每个分项 → ④ 让 AI 指出亮点、反例和缺失信息。
+      <br><b>注意：</b>分数用于比较本页规则下的学习方案，不是真实工程招标结果；成本、寿命、温度和抗辐照等只作定性提示，并未被完整仿真。虚拟半导体不能提交材料挑战。
+    </div>
+    <div class="grid3" id="scenarioList"></div>
+    <div class="card" style="margin-top:16px">
+      <p style="font-size:14px">当前方案：<b id="planText" style="color:var(--cyan)">–</b></p>
+      <label for="planReason" style="display:block;font-size:13.5px;margin-top:12px"><b>我的设计理由（AI 评分会检查证据与边界）</b></label>
+      <textarea class="reflection" id="planReason" maxlength="900" placeholder="建议写：我选择___，因为它在当前模型中的效率是___，Jsc/Voc表现是___；真实场景还要考虑___。"></textarea>
+      <div class="btn-row">
+        <button class="btn-primary" id="btnSubmitPlan">提交并让 AI 评分</button>
+        <button class="btn-ghost" id="btnAIComment">AI 反馈与下一步</button>
+      </div>
+      <div class="result-panel" id="resultPanel" style="display:none">
+        <div class="score" id="scoreVal">–</div>
+        <p style="font-size:14px;margin:6px 0"><span class="verdict" id="verdictText"></span></p>
+        <p style="font-size:13.5px;color:var(--muted)" id="reasonText"></p>
+        <div id="scoreBreakdown" class="ai-score-grid"></div>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px">评分方式：优先由<b>在线 AI</b>按公开 rubric 评价物理表现、材料、场景、论证与边界；在线不可用时使用本地兜底，并明确标注。物理数值来自本地模型，室内任务不给伪精确分数。</p>
+      </div>
+    </div>
+  </section>
+  </section><!-- /view-challenge -->
+
+  <section class="view" id="view-report">
+  <!-- 模块5：实验报告 -->
+  <section id="report">
+    <h2 class="sec-title">📋 实验记录与学习报告</h2>
+    <p class="sec-sub">每次提交预测和挑战都会记录在这里，并保存在当前浏览器中。拖动滑块本身不会逐点记录，避免产生上百条无意义数据。</p>
+    <div class="guide-box" id="reportGuide" style="margin-bottom:12px">
+      <b>一份合格结论要回答四个问题：</b>
+      ① 我比较了哪些参数？② 我观察到什么变化？③ 我用哪条物理规律解释？④ 这个模型没有考虑什么？
+      <br><b>推荐句式：</b>“我把 Eg 从 ___ 调到 ___，发现 Jsc ___、Voc ___、效率 ___。我认为这是因为 ___。但真实电池还会受到 ___ 影响，所以我的结论只适用于 ___。”
+    </div>
+    <div class="card">
+      <div class="table-scroll">
+      <table class="log" id="logTable">
+        <thead><tr><th>#</th><th>材料</th><th>带隙(eV)</th><th>理论效率</th><th>你的预测</th><th>结论记录</th></tr></thead>
+        <tbody><tr><td colspan="6" style="color:var(--muted)">还没有记录 —— 去实验室提交一次预测吧</td></tr></tbody>
+      </table>
+      </div>
+      <label for="studentConclusion" style="display:block;font-size:14px;margin-top:16px"><b>我的结论（请用自己的话写，不由 AI 代写）</b></label>
+      <textarea class="reflection" id="studentConclusion" maxlength="1200" placeholder="例如：我对比了 0.70、1.26 和 2.50 eV……"></textarea>
+      <p style="font-size:12px;color:var(--muted);margin-top:5px">输入会自动保存在当前浏览器。生成或导出报告前，请先完成这段反思。</p>
+      <div class="btn-row">
+        <button class="btn-primary" id="btnReport">生成学习报告</button>
+        <button class="btn-ghost" id="btnAIReport">🧠 AI 自评报告</button>
+        <button class="btn-ghost" id="btnExport">导出 TXT</button>
+        <button class="btn-ghost" id="btnCopy">复制报告</button>
+        <button class="btn-ghost" id="btnClearLog">清空记录</button>
+      </div>
+      <pre class="report" id="reportPre" style="display:none"></pre>
+      <div class="report-ai-review" id="reportReview" style="display:none"></div>
+    </div>
+  </section>
+  </section><!-- /view-report -->
+  </div><!-- /workspace -->
+  <div class="ai-resizer" id="aiResizer" role="separator" tabindex="0" aria-label="拖动调整 AI 窗口宽度" aria-orientation="vertical" aria-valuemin="320" aria-valuemax="640" aria-valuenow="400" title="拖动调整 AI 宽度 · 双击复原"></div>
+  <aside class="ai-dock" id="aiDock" aria-label="常驻 AI 实验导师">
+    <div class="ai-dock-head">
+      <div><b>☀️ AI 实验伙伴</b><small>一直在旁边，看你当前的实验</small></div>
+      <div class="ai-head-actions">
+        <button class="ai-head-btn" id="btnAIFont" title="切换大字阅读" aria-label="切换 AI 大字阅读">A+</button>
+        <button class="ai-head-btn" id="btnAIWidth" title="加宽或恢复 AI 窗口" aria-label="加宽或恢复 AI 窗口">↔</button>
+        <button class="ai-close" id="btnCloseAI" aria-label="关闭 AI 面板">×</button>
+      </div>
+    </div>
+    <div style="padding:10px 12px 0">
+      <div class="ai-observation" id="aiObservation"><b>实验观察</b>配置在线 AI 后优先在线观察；失败时显示本地兜底。</div>
+    </div>
+    <div class="ai-actions" style="padding:9px 12px 0">
+      <button class="btn-ghost" id="btnExplainNow">讲解当前实验</button>
+      <button class="btn-ghost" id="btnQuizNow">考我一个问题</button>
+      <button class="btn-ghost" id="btnNextStep">AI 给我下一步</button>
+    </div>
+  </aside>
+</main>
+<button class="btn-primary mobile-ai-fab" id="btnOpenAI">☀️ AI 导师</button>
+<div class="ai-backdrop" id="aiBackdrop"></div>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="model-tag">效率模型：Shockley–Queisser 单结辐射极限（黑体太阳 5778K 近似，单倍聚光，详细平衡，本地数值积分）· 教学演示模型，非制造指标</p>
+    <p>完整模型说明见 <code>docs/science-model.md</code> · 已知局限见 <code>docs/limitations.md</code> · 来源说明见 <code>docs/sources.md</code> · 本项目零密钥入库</p>
+    <p style="margin-top:6px">© 2026 逐光实验室团队 · 代码 MIT License · 文档/图片 CC BY-SA 4.0</p>
+  </div>
+</footer>
+
+<!-- AI 设置弹窗 -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <h3>⚙ AI 接口设置（可选）</h3>
+    <label>接口地址（OpenAI 兼容，以工作台说明为准，可修改）</label>
+    <input type="text" id="setEndpoint">
+    <label>模型名称（必填，以工作台可用模型为准）</label>
+    <input type="text" id="setModel" placeholder="例如 deepseek-v4.1-flash">
+    <label>API Key（只保存在本机浏览器 localStorage）</label>
+    <input type="password" id="setKey" placeholder="粘贴临时 Key；留空则使用离线模式">
+    <p class="hint">安全承诺：Key 不写入代码、不进入 Git 仓库。截图/录屏前请确认 Key 已隐藏。<br><b>推荐：</b>双击「启动在线AI.command」首次绑定 Key，并从 http://127.0.0.1:8787 打开实验室；双击「关闭在线AI.command」停止服务。<br><b>排障：</b>① HTTP 401/403 表示服务器已响应，应核对 Key、地域限制与模型权限；② Failed to fetch 表示浏览器未拿到响应，检查接口地址、网络、VPN 和跨域；③ Base URL 可填到 /v1，页面会自动补全 /chat/completions；④ 在线失败时自动显示本地兜底，不中断实验。</p>
+    <div class="btn-row">
+      <button class="btn-ghost" id="btnTestConn">测试连接</button>
+      <button class="btn-ghost" id="btnClearKey">清除 Key</button>
+      <button class="btn-ghost" id="btnCloseModal">取消</button>
+      <button class="btn-primary" id="btnSaveKey">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ============================================================
+ * 逐光实验室 · 单文件原型
+ * 物理内核：Shockley–Queisser 单结辐射极限（黑体近似）
+ * 与 dev/sq-test.mjs 使用同一套公式与常数（已验证，10 项断言全过）
+ * ============================================================ */
+
+/* ---------- 物理内核 ---------- */
+const PHYS = (() => {
+  const Q=1.602176634e-19, H=6.62607015e-34, C0=299792458, KB=1.380649e-23;
+  const T_SUN=5778, T_CELL=300;
+  const RS=6.957e8, DAU=1.496e11;
+  const OMEGA=Math.PI*(RS/DAU)**2;      // 太阳张角 ≈ 6.79e-5 sr
+  const C2=2/(H**3*C0**2);
+  const C2EV=C2*Q**3;                    // 换算到 eV 空间
+  const KTS=KB*T_SUN/Q, KTC=KB*T_CELL/Q, VT=KTC;
+
+  function integ(E0, kT, pow){           // ∫_{E0}^∞ E^pow / (exp(E/kT)-1) dE，梯形法
+    E0=Math.max(E0,1e-9);
+    const Emax=E0+45*kT, N=4000, dE=(Emax-E0)/N;
+    const f=E=>Math.pow(E,pow)/Math.expm1(E/kT);
+    let s=0.5*(f(E0)+f(Emax));
+    for(let i=1;i<N;i++) s+=f(E0+i*dE);
+    return s*dE;
+  }
+  const PIN = C2EV*OMEGA*Q*(KTS**4)*(Math.PI**4/15);   // ≈1361 W/m²
+
+  function point(Eg){                    // 给定带隙 -> 电池工作点
+    const Jsc=Q*C2EV*OMEGA*integ(Eg,KTS,2);
+    const J0 =Q*C2EV*Math.PI*integ(Eg,KTC,2);
+    const Voc=VT*Math.log(Jsc/J0+1);
+    let Pmax=0, Vmp=0;
+    for(let i=1;i<=400;i++){
+      const v=Voc*i/401;
+      const p=v*(Jsc-J0*Math.expm1(v/VT));
+      if(p>Pmax){Pmax=p;Vmp=v;}
+    }
+    return {Eg, jsc:Jsc/10, voc:Voc, jscSi:Jsc, pmax:Pmax, vmp:Vmp,
+            ff:Pmax/(Jsc*Voc), eta:Pmax/PIN};
+  }
+  function absorbedShare(Eg){ return integ(Eg,KTS,3)/integ(1e-9,KTS,3); }
+  return {point, absorbedShare, PIN, integ, KTS, KTC};
+})();
+
+/* 预计算效率曲线（0.5–3.0 eV） */
+const CURVE=[];
+for(let e=0.5;e<=3.001;e+=0.02) CURVE.push(PHYS.point(+e.toFixed(2)));
+const PEAK=CURVE.reduce((a,b)=>b.eta>a.eta?b:a);
+const etaAt=eg=>PHYS.point(eg).eta;      // 滑块连续取值时实时计算
+
+/* ---------- 数据 ---------- */
+const MATERIALS=[
+  {id:'si',  name:'晶硅',   eg:1.12, color:'#60a5fa', note:'真实材料代表点 · 室温带隙约 1.12 eV · 本页不模拟组分调节'},
+  {id:'gaas',name:'砷化镓', eg:1.42, color:'#f472b6', note:'真实材料代表点 · 室温带隙约 1.42 eV · 航天经验属模型外知识'},
+  {id:'pero',name:'钙钛矿', eg:1.55, color:'#34d399', note:'真实材料代表点 · 实际带隙随组分变化 · 挑战仅使用 1.55 eV'},
+  {id:'virtual',name:'理想虚拟半导体',eg:1.26,color:'#fbbf24',virtual:true,note:'自由探索 0.5–3.0 eV · 不代表真实材料 · 不能提交材料挑战'},
+];
+const SCENARIOS=[
+  {id:'outdoor', title:'A · 户外太阳能路灯', desc:'阳光直射，真实板温可明显高于 300 K。先用代表点比较理论效率，再思考成本与寿命。',
+   good:['si','pero'], ok:['gaas'],
+   why:'教学规则：户外强太阳条件下，接近本模型最优区间的带隙有利；晶硅是经济、成熟方案的对照代表。成本、寿命、温度系数和全年发电量没有被本模型计算，钙钛矿也不能仅凭本曲线宣称效率或寿命占优。'},
+  {id:'indoor', title:'B · 室内弱光：模型边界挑战', desc:'本页使用太阳黑体光谱，不能直接给室内方案排名。思考：还需要哪些数据才能选型？',boundary:true,
+   good:[], ok:['si','gaas','pero'],
+   why:'边界任务：常见室内光源的光谱与太阳不同，弱光下的复合、电阻等也不能忽略。较宽带隙在许多可见室内光源下往往更有利于光谱与电压匹配，但具体最优值必须依据实际光源光谱和器件参数计算。本页不使用“带隙越低越好”的错误规则，也不给室内数值选型分。'},
+  {id:'space', title:'C · 太空卫星电池', desc:'没有大气过滤，且需考虑辐照、温差与重量。先用单结代表点比较，再讨论现实限制。',
+   good:['gaas'], ok:['pero'],
+   why:'教学规则：砷化镓 1.42 eV 接近本模型最优区间，且 Voc 较高。（模型外经验）真实航天选材还看抗辐照、温度特性和单位重量功率，实际常用多结电池；这些并未由本页单结、300 K、太阳光谱模型计算。'},
+];
+
+/* ---------- 全局状态 ---------- */
+const state={material:'si', eg:1.12, prediction:null, log:[], scenario:null, challengeResult:null, conclusion:'',planReason:'',reportReviewOverride:null,audience:'junior',level:'beginner',currentView:'learn',learnTab:'path',quizIndex:0};
+const $=id=>document.getElementById(id);
+const fmt=(x,d=1)=>(+x).toFixed(d);
+function curMat(){return MATERIALS.find(m=>m.id===state.material);}
+function curPoint(){return PHYS.point(state.eg);}
+function isRealMaterial(){return !curMat().virtual;}
+function loadLearningState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('pq_log')||'[]');
+    if(Array.isArray(saved)) state.log=saved.filter(e=>e&&Number.isFinite(+e.eg)&&Number.isFinite(+e.eta)).slice(-100);
+    state.conclusion=localStorage.getItem('pq_conclusion')||'';
+    state.planReason=localStorage.getItem('pq_plan_reason')||'';
+    const age=localStorage.getItem('pq_age'),level=localStorage.getItem('pq_level');
+    if(LEARNING_PATHS[age]) state.audience=age;
+    if(level==='beginner'||level==='advanced') state.level=level;
+  }catch(e){ /* file:// 或隐私模式禁用存储时，仍可使用本次会话 */ }
+}
+function persistLearningState(){
+  try{
+    localStorage.setItem('pq_log',JSON.stringify(state.log.slice(-100)));
+    localStorage.setItem('pq_conclusion',state.conclusion);
+    localStorage.setItem('pq_plan_reason',state.planReason);
+    localStorage.setItem('pq_age',state.audience);
+    localStorage.setItem('pq_level',state.level);
+  }catch(e){ /* 存储不可用时保留内存状态，不阻断实验 */ }
+}
+function setExperiment(eg,materialId='virtual'){
+  const m=MATERIALS.find(x=>x.id===materialId)||MATERIALS.find(x=>x.id==='virtual');
+  state.material=m.id;
+  state.eg=m.virtual?+eg:m.eg;
+  state.prediction=null;                 // 旧预测只属于旧参数，不能冒充当前预测
+  $('egSlider').value=state.eg;
+  $('predHint').textContent='参数已切换。请针对当前状态重新预测，再提交记录。';
+  document.querySelectorAll('.mat-btn').forEach(x=>x.classList.toggle('active',x.dataset.id===state.material));
+  refreshLab();
+}
+
+/* ---------- 分学段教学路径 ---------- */
+const LEARNING_PATHS={
+  primary:{
+    label:'小学',name:'科学启蒙',banner:'把光子想成“能量小包裹”，先观察门槛和两种浪费，再接触简单数字。',
+    title:'🧭 小学科学启蒙：边看边玩，完成第一次光的实验',
+    intro:'不要求先学公式。按五个小任务操作，能用自己的话说出“门槛”和“浪费”就成功了。',
+    goals:[['看一看','知道光子带有能量'],['猜一猜','先猜门槛变高会怎样'],['做一做','比较三种能量门槛'],['说一说','告诉 AI 你看到的现象']],
+    steps:[
+      ['认识光子和能量门槛','先读知识卡①和②。不用背 eV，只要知道：不同颜色的光带着不同能量，半导体有一道能量门槛。','能说出“门槛变高，能跨过去的光子通常会变少”。','learn','去看两张图卡'],
+      ['做一次小小预测','进入实验，选一个参数，猜一猜理论效率会升高还是降低。老师或家长也可以陪你一起猜。','预测没有对错，重要的是观察以后愿不愿意修改想法。','lab','去猜一猜'],
+      ['比较三种门槛','依次点 0.70、1.26、2.50 eV。先看红色区域怎样变化，再看能变成电的部分怎样变化。','不要只找最高分，要说出两次图有什么不一样。','lab','开始观察实验'],
+      ['和 AI 伙伴说一说','点右侧“讲解当前实验”，再点“考我一个问题”。回答错了也没关系，AI 会告诉你怎样观察。','试着问：“为什么红色区域变大了？”','lab','让 AI 陪我观察'],
+      ['画下或写下发现','到报告区，用一句话写“我把门槛调大以后，看到了什么”。可以让家长帮你记录，但结论要是自己的。','完成句式：我发现……，我认为是因为……。','report','写下我的发现']
+    ],
+    advanced:'进阶挑战：在家长或老师帮助下，用 1240÷Eg 算一次门槛波长，看看计算结果是否与图上红线一致。',
+    labTip:'小学路径：先看红色区域和能量条，不必理解 Jsc、Voc。把 Eg 当作“能量门槛”，把效率当作模型中“100 份光能最多有多少份变成电”。',
+    presets:[['为什么有的光会穿过去？',null],['带隙是不是越高越好？',null],['如果我把带隙调整到 2.5 eV，会发生什么？',2.5],['给我下一步实验建议',null]]
+  },
+  junior:{
+    label:'初中',name:'概念探究',banner:'从光子能量和电子—空穴对出发，用对照实验解释两类损失，公式只是帮助你表达证据。',
+    title:'🧭 初中概念探究：用证据解释“为什么不是越高越好”',
+    intro:'按“预测—观察—解释”完成实验。重点看门槛、Jsc、Voc 和两类损失，不需要掌握积分推导。',
+    goals:[['概念目标','说清光子、带隙与电子—空穴对'],['实验目标','完成三组参数对照'],['证据目标','用 Jsc/Voc 支持解释'],['表达目标','写出结论和模型局限']],
+    steps:[
+      ['学习四个核心概念','依次阅读知识卡①—④。重点理解光子能量、PN 结分离电荷、透射与热化，以及效率为什么不能只看电流。','能判断 900 nm 光子能否跨过 1.55 eV 的理想门槛。','learn','去读知识卡'],
+      ['选择材料并预测','进入实验，点击晶硅代表点。先预测当前理论效率，再提交；换参数后可以重新预测。','如果你已经看到了数值，就把它当自测，不要伪装成事前预测。','lab','去做第一次预测'],
+      ['完成三组对照实验','依次比较 0.70、1.26、2.50 eV，每次按“门槛→Jsc/Voc→损失条→效率”的顺序观察。','能解释低带隙与高带隙分别主要带来什么损失。','lab','打开引导实验'],
+      ['让 AI 追问你的证据','点右侧“讲解当前实验”，再问“我的解释还缺什么证据”。可以点“考我一个问题”检查理解。','好问题要包含你刚看到的现象，不只问“答案是什么”。','lab','带现象问 AI'],
+      ['完成挑战并写结论','用真实材料代表点完成一个场景任务，再到报告区写清参数、现象、原因和模型没有考虑的因素。','结论不能只写分数，要写你用什么现象支持判断。','challenge','开始场景挑战']
+    ],
+    advanced:'进阶挑战：比较 1.12、1.26、1.42 eV 的 Voc、Jsc 和效率，解释为什么最高电流、最高电压和最高效率不出现在同一点。',
+    labTip:'初中路径：先观察门槛、Jsc 和 Voc，再用透射与热化解释效率峰值。进阶模式会增加更严格的比较任务。',
+    presets:[['带隙如何决定电池吸收什么光？',null],['为什么晶硅没有达到理论最高效率？',null],['如果我把带隙调整到 2.5 eV，会发生什么？',2.5],['给我下一步实验建议',null]]
+  },
+  senior:{
+    label:'高中',name:'定量研究',banner:'使用完整物理量、S–Q 假设与数值计算，把“看图”升级为可核验的定量研究。',
+    title:'🧭 高中定量研究：从曲线观察到模型证据链',
+    intro:'除理解概念外，还要核对单位、公式、假设和数值。进阶模式开放完整计算细节与研究任务。',
+    goals:[['物理目标','建立光子通量与输出联系'],['定量目标','核对 Jsc/Voc/FF/η'],['模型目标','区分模型内外结论'],['研究目标','形成可复现实验报告']],
+    steps:[
+      ['建立定量概念','阅读四张知识卡并展开自测。重点理解 E=hc/λ、电子—空穴对、两类损失和 Pmax=Vmp×Jmp。','不仅会说结论，还能用波长、能量或单位举例。','learn','打开知识详解'],
+      ['用代表点校准读数','选择晶硅、砷化镓代表点，核对 Eg、理论效率、Voc 与 Jsc，记录预测和模型值。','注意 Jsc 的 mA/cm² 单位，以及效率差异使用“百分点”。','lab','核对真实材料代表点'],
+      ['完成参数扫描','比较 0.70、1.26、2.50 eV，必要时拖滑块加密采样。观察曲线、能量分解和最大值点。','进阶模式可展开计算细节，检查数值积分、J–V 关系和模型假设。','lab','开始定量实验'],
+      ['让 AI 充当质询者','要求 AI 区分模型内结论与模型外经验，追问你的解释还缺哪项证据，或出一个类似问题。','不要让 AI 代替计算；面板数值与公式才是本次实验的数值依据。','lab','接受 AI 质询'],
+      ['形成研究报告','完成场景任务，查看本地 AI 的五项评分与证据建议，再用本人结论生成报告和 AI 自评。','优秀报告应包含可复现参数、证据链、误差来源与模型边界。','report','整理研究报告']
+    ],
+    advanced:'进阶研究：在 1.20–1.35 eV 内以 0.01 eV 为步长寻找峰值，比较离散扫描峰值与 CURVE 的 0.02 eV 峰值，讨论数值分辨率。',
+    labTip:'高中路径：同时核对光子通量、Jsc、Voc、FF 与效率。进阶挑战会开放完整计算面板和数值分辨率研究任务。',
+    presets:[['为什么晶硅没有达到理论最高效率？',null],['开路电压 Voc 是什么？',null],['这个效率模型准吗？边界是什么？',null],['如果我把带隙调整到 2.5 eV，会发生什么？',2.5]]
+  }
+};
+
+const AGE_KNOWLEDGE={
+  primary:[
+    {title:'① 光子：光带来的“能量小包裹”',goal:'你要学会：光不仅亮，还带着一份份能量。',body:'我们可以把光想成许多很小的能量包裹，每个包裹叫一个光子。不同颜色的光，每个包裹的能量不同。光照到太阳能电池上，就像把许多小包裹送进一个工厂。',example:'生活类比：手电筒更亮，通常表示照过来的光子更多；光的颜色改变，才表示每个光子的能量改变。',mistake:'“光越强，每个光子能量就越大”并不正确。光强和单个光子能量是两件事。',q:'太阳很晒和光子能量很高，是同一个意思吗？',a:'不是。“很晒”常与到达的光子数量有关；单个光子能量主要由光的波长决定。',eg:null,advanced:'进阶：红光波长约 700 nm，光子能量约 1.77 eV。波长越短，单个光子能量越高。'},
+    {title:'② 带隙：半导体门口的“能量门槛”',goal:'你要学会：能量太小的光子，不能帮助电子跨过门槛。',body:'半导体里有一道能量门槛，科学家叫它带隙。光子带来的能量足够，电子才能跨过门槛并留下一个空穴；能量不够，在本模型中这部分光就直接穿过去。',example:'把门槛调得更高，能跨过去的光子通常会变少；把门槛调低，能跨过去的光子会增多，但每个光子多出的能量更容易变成热。',mistake:'门槛不是越低越好。太低虽然吸收得多，也会带来更多能量浪费。',q:'门槛变高后，能跨过去的光子会更多还是更少？',a:'通常更少。到实验中看 2.50 eV 时红色区域是不是变大了。',eg:2.5,advanced:'进阶：门槛波长 λg≈1240÷Eg。Eg 越大，λg 越短，更多长波光落在不可吸收一侧。'},
+    {title:'③ PN 结：把两种电荷分开的“分拣队”',goal:'你要学会：产生电子和空穴以后，还要把它们分开。',body:'光让电子跨过门槛后，会留下空穴。如果它们马上又碰到一起，能量就会浪费。PN 结里的内建电场像分拣队，把电子和空穴送往不同方向，外电路才能得到持续的电能。',example:'能量来自阳光，不是分拣队自己创造了能量。没有光照时，PN 结不能一直给外电路供电。',mistake:'本页只显示 PN 结的理想作用，不能模拟它里面电场究竟怎样分布。',q:'为什么只有光生电子—空穴对还不够？',a:'还要把它们分离和收集，否则它们可能复合，无法持续向外输出电能。',eg:1.12,material:'si',advanced:'进阶：电子被收集到 N 区、空穴到 P 区，开路时形成的电压叫 Voc。'},
+    {title:'④ 两种浪费：穿过去与变成热',goal:'你要学会：最好的点是在两种浪费之间找平衡。',body:'门槛太高，许多光子能量不够，直接穿过去；门槛太低，吸收虽然多，高能光子多出的能量却更容易变成热。中间某个位置，两种浪费合起来较小。',example:'实验里的效率可以理解为：在这个理想模型里，100 份入射光能最多约有多少份变成电。它是理论值，不是教室里测到的真实电池效率。',mistake:'最高效率点不要求两种浪费一模一样多，而是调整门槛时，两方面的好处与代价达到平衡。',q:'为什么只追求“吸收更多光子”还不够？',a:'还要看每个被吸收的光子有多少能量最终变成电，吸收多但热浪费大也不一定效率高。',eg:1.26,advanced:'进阶：比较 0.70、1.26、2.50 eV 的效率，找出本模型峰值并说明两类损失怎样变化。'}
+  ],
+  junior:[
+    {title:'① 光子能量与带隙门槛',goal:'你要学会：用 E=hc/λ 和 E≥Eg 判断理想吸收。',body:'光子能量与波长成反比。半导体带隙 Eg 像一道能量门槛，光子能量足够时，价带电子可跃迁到导带并留下空穴，形成电子—空穴对。',example:'Eg=1.55 eV 时 λg≈800 nm。700 nm 光子约 1.77 eV，可以跨过门槛；900 nm 光子约 1.38 eV，不能跨过。',mistake:'光强主要与光子数量有关，不代表每个光子能量更高。',q:'波长变长时，单个光子能量怎样变化？',a:'降低。由 E=hc/λ，λ 增大时 E 减小。',eg:1.55,advanced:'进阶：推导 λ≤1240/Eg 与 E≥Eg 的等价关系，注意 nm 和 eV 的单位组合。'},
+    {title:'② 电子—空穴对为什么要被分离',goal:'你要学会：解释 PN 结在光伏电池中的作用。',body:'光生电子与空穴如果迅速复合，就无法持续输出。PN 结内建电场将电子与空穴分离并收集，外电路才能利用光提供的能量。',example:'开路时没有持续外电流，但两端仍可形成电压 Voc；接上合适负载后，才能同时讨论输出电压、电流与功率。',mistake:'内建电场负责分离电荷，不是凭空提供能量。本页不模拟掺杂浓度与结深。',q:'PN 结为什么不能脱离光照持续供电？',a:'它只负责分离和引导电荷，输出能量来自入射光。',eg:1.12,material:'si',advanced:'进阶：比较开路、短路和最大功率点三种工作状态，说明为什么 Voc×Jsc 不是最大输出功率。'},
+    {title:'③ 透射与热化：效率峰值从哪里来',goal:'你要学会：分别解释带隙过高与过低的代价。',body:'带隙过高时，低能光子无法跨带隙激发，透射损失增加；带隙过低时，更多光子虽被吸收，但高能光子超出的能量面临热化，电压与输出也受限制。',example:'2.00 eV 光子被 Eg=1.12 eV 材料吸收，约 0.88 eV 是超出带隙的部分。Eg=2.50 eV 时，λg≈496 nm，更多长波光无法利用。',mistake:'吸收光子多不等于效率一定高，峰值也不要求两类损失数值相等。',q:'Eg 从 1.12 升到 2.50 eV，Jsc 为什么下降？',a:'门槛升高，能跨带隙激发的光子数量减少，因此光生电流下降。',eg:2.5,advanced:'进阶：在峰值两侧各选一点，用吸收能量、透射能量和输出能量三个数值支持解释。'},
+    {title:'④ Jsc、Voc 与效率：不能只看一个指标',goal:'你要学会：用电流和电压共同解释输出功率。',body:'Jsc 反映光生电流规模，Voc 是开路电压。实际最大功率还取决于工作点，不能简单用 Voc×Jsc 代替。效率 η 是最大输出电功率与入射光功率之比。',example:'低带隙常有较大 Jsc，但 Voc 较低；高带隙可能提高 Voc，却会因透射增加而降低 Jsc。因此效率曲线中间出现峰值。',mistake:'本页 30% 左右是理论极限，不是商业组件实测值；30.0% 到 28.9% 相差 1.1 个百分点。',q:'为什么“电流最大”的点不一定是“效率最高”的点？',a:'功率同时取决于电压和电流，低带隙处的大电流可能被较低电压和热化等损失抵消。',eg:1.26,advanced:'进阶：引入 FF=Pmax/(Voc×Jsc)，解释填充因子与最大功率点的关系。'}
+  ]
+};
+
+let seniorKnowledgeHTML='';
+function learnerPath(){return LEARNING_PATHS[state.audience];}
+function learnerLabel(){const p=learnerPath();return `${p.label}·${p.name}，${state.level==='advanced'?'进阶挑战':'0 基础'}`;}
+function renderTutorial(){
+  const p=learnerPath();
+  $('tutorialTitle').textContent=p.title;
+  $('tutorialIntro').textContent=p.intro;
+  $('audienceBanner').innerHTML=`<p><b>${learnerLabel()}</b><br>${p.banner}</p><span class="audience-badge">当前学习路径</span>`;
+  $('tutorialGoals').innerHTML=p.goals.map(([a,b])=>`<div><b>${a}</b>${b}</div>`).join('');
+  const steps=p.steps.slice();
+  if(state.level==='advanced') steps.push(['进阶研究任务',p.advanced,'完成后，把你的方法、数据和解释写进报告，不只写最终答案。','lab','带着任务做实验']);
+  $('tutorialSteps').innerHTML=steps.map((s,i)=>`<article class="tutorial-step"><span class="step-no">${i+1}</span><div><h3>${s[0]}</h3><p>${s[1]}</p><p class="observe">${s[2]}</p><div class="guide-actions">${i===0?`<button class="btn-ghost btn-small" data-learn-tab="knowledge">${s[4]} →</button>`:`<button class="btn-ghost btn-small" data-view-target="${s[3]}" ${/AI|质询/.test(s[0])?'data-open-ai':''}>${s[4]} →</button>`}</div></div></article>`).join('');
+}
+function renderKnowledge(){
+  if(state.audience==='senior'){
+    $('knowGrid').innerHTML=seniorKnowledgeHTML+(state.level==='advanced'?`<div class="guide-box"><b>高中进阶研究提示：</b>${LEARNING_PATHS.senior.advanced}</div>`:'');
+    return;
+  }
+  const cards=AGE_KNOWLEDGE[state.audience];
+  $('knowGrid').innerHTML=cards.map((c,i)=>`<article class="card know-card"><h3>${c.title}</h3><p class="goal"><b>学习目标：</b>${c.goal}</p><p>${c.body}</p><div class="example-box"><b>具体理解：</b>${c.example}</div><div class="misconception"><b>注意：</b>${c.mistake}</div><details><summary>自测：${c.q}</summary><p>${c.a}</p></details>${state.level==='advanced'?`<div class="advanced-note">${c.advanced}</div>`:''}${c.eg!=null?`<button class="btn-ghost btn-small" data-goto="${c.eg}" ${c.material?`data-material="${c.material}"`:''}>去做对应实验 →</button>`:''}</article>`).join('');
+}
+function renderLearningPath(){
+  document.body.dataset.audience=state.audience;
+  document.body.dataset.level=state.level;
+  $('ageSelect').value=state.audience;
+  $('levelSelect').value=state.level;
+  renderTutorial();renderKnowledge();buildPresets();
+  $('labAudienceTip').textContent=learnerPath().labTip;
+  if(state.audience==='primary'){
+    $('challengeGuide').innerHTML='<b>小学任务：</b>把场景当成一个小故事，重点说出“我为什么这样选”。分数供老师和进阶学生参考，答不出成本、辐照等词也没关系。<br>你可以先在 AI 伙伴那里说一遍理由，再提交。虚拟半导体不能冒充真实材料。';
+    $('reportGuide').innerHTML='<b>小学报告只需要写清三件事：</b>① 我把门槛调大还是调小；② 我看到了什么变化；③ 我认为为什么会这样。<br><b>推荐句式：</b>“我把 ___ 调到 ___，看到 ___。我发现 ___。”';
+  }else if(state.audience==='junior'){
+    $('challengeGuide').innerHTML='<b>初中挑战：</b>① 读场景约束 → ② 选真实材料代表点 → ③ 用效率、Voc 和损失条解释 → ④ 让 AI 质询你的理由。<br>分数是教学规则，不是工程认证；成本、寿命、温度和抗辐照只作定性提示。';
+    $('reportGuide').innerHTML='<b>初中报告回答四个问题：</b>① 比较了哪些参数；② Jsc、Voc、效率怎样变化；③ 用哪条物理规律解释；④ 模型没有考虑什么。<br>结论要用自己的话写，不由 AI 代写。';
+  }else{
+    $('challengeGuide').innerHTML='<b>高中研究任务：</b>除选择方案外，还要拆解效率分、材料匹配和场景分的权重，指出哪些结论来自 SQ 模型、哪些只是人工规则。<br>室内任务用于模型边界论证；户外与太空分数不构成真实工程排名。';
+    $('reportGuide').innerHTML='<b>高中研究报告应包含：</b>可复现参数、预测与模型值、Jsc/Voc/FF 证据、图表观察、单位检查、误差来源与模型边界。进阶模式还应讨论扫描分辨率和人工评分权重。';
+  }
+  updateAIObservation();
+}
+function showLearnTab(tab){
+  state.learnTab=tab;
+  $('tutorial').hidden=tab!=='path';
+  $('knowledge').hidden=tab!=='knowledge';
+  document.querySelectorAll('.learn-tabs [data-learn-tab]').forEach(b=>b.classList.toggle('active',b.dataset.learnTab===tab));
+  $('workspace').scrollTop=0;
+}
+function showView(view,target){
+  state.currentView=view;
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+view));
+  document.querySelectorAll('[data-view-target]').forEach(b=>{
+    if(!b.closest('.side-nav'))return;
+    const active=b.dataset.viewTarget===view;b.classList.toggle('active',active);
+    active?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current');
+  });
+  $('workspace').scrollTop=0;
+  if(view==='lab') requestAnimationFrame(()=>{drawCurve();drawSpectrum();});
+  if(target) requestAnimationFrame(()=>{const el=document.getElementById(target);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});});
+}
+function openAIPanel(){
+  if(window.innerWidth<=1100){$('aiDock').classList.add('open');$('aiBackdrop').classList.add('show');document.body.classList.add('ai-open');}
+  $('chatInput').focus();
+}
+function closeAIPanel(){
+  $('aiDock').classList.remove('open');$('aiBackdrop').classList.remove('show');document.body.classList.remove('ai-open');
+}
+function setupAppShell(){
+  seniorKnowledgeHTML=$('knowGrid').innerHTML;
+  $('aiDock').appendChild($('ai-tutor'));
+  document.addEventListener('click',e=>{
+    const learnButton=e.target.closest('[data-learn-tab]');
+    if(learnButton){e.preventDefault();showView('learn');showLearnTab(learnButton.dataset.learnTab);return;}
+    const viewButton=e.target.closest('[data-view-target]');
+    if(viewButton){e.preventDefault();showView(viewButton.dataset.viewTarget);if(viewButton.hasAttribute('data-open-ai'))openAIPanel();return;}
+    const go=e.target.closest('[data-goto]');
+    if(go){e.preventDefault();setExperiment(+go.dataset.goto,go.dataset.material||'virtual');showView('lab');return;}
+    const anchor=e.target.closest('a[href^="#"]');
+    if(!anchor)return;
+    const id=anchor.getAttribute('href').slice(1);
+    if(id==='ai-tutor'){e.preventDefault();openAIPanel();return;}
+    const map={hero:'learn',tutorial:'learn',knowledge:'learn',lab:'lab',labGuide:'lab',challenge:'challenge',report:'report'};
+    if(map[id]){e.preventDefault();showView(map[id],id==='labGuide'?'labGuide':null);if(id==='tutorial')showLearnTab('path');if(id==='knowledge')showLearnTab('knowledge');}
+  });
+  $('btnOpenAI').onclick=openAIPanel;$('btnCloseAI').onclick=closeAIPanel;$('aiBackdrop').onclick=closeAIPanel;
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAIPanel();});
+}
+
+/* ---------- 画布工具 ---------- */
+function canvasTheme(){
+  const light=document.documentElement.dataset.theme==='light';
+  return {
+    text:light?'#62768a':'#7f93b8',grid:light?'#d6e1ea':'#2a3a5f',
+    accent:light?'#9a6200':'#fbbf24',accentLine:light?'#d4b06a':'#8a6d1f',
+    track:light?'#e9eff4':'#0a0f1e'
+  };
+}
+function setupCanvas(cv){
+  const dpr=window.devicePixelRatio||1;
+  const r=cv.getBoundingClientRect();
+  cv.width=r.width*dpr; cv.height=r.height*dpr;
+  const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  return {ctx, W:r.width, H:r.height};
+}
+
+/* ---------- 效率曲线 ---------- */
+function drawCurve(){
+  const cv=$('curveCanvas'); const {ctx,W,H}=setupCanvas(cv);
+  const colors=canvasTheme();
+  const pad={l:56,r:20,t:24,b:40};
+  const x0=0.5, x1=3.0, y1=Math.max(0.35, PEAK.eta*1.2)*100;
+  const X=e=>pad.l+(e-x0)/(x1-x0)*(W-pad.l-pad.r);
+  const Y=p=>H-pad.b-(p/y1)*(H-pad.t-pad.b);   // p 为百分比值（0–35），此前多除了 100 导致曲线被压成一条直线
+  ctx.clearRect(0,0,W,H);
+  ctx.font='12px system-ui'; ctx.fillStyle=colors.text; ctx.strokeStyle=colors.grid;
+  for(let p=0;p<=y1;p+=5){
+    ctx.beginPath(); ctx.moveTo(pad.l,Y(p)); ctx.lineTo(W-pad.r,Y(p)); ctx.stroke();
+    ctx.textAlign='right'; ctx.fillText(p+'%', pad.l-8, Y(p)+4);
+  }
+  for(let e=0.5;e<=3.01;e+=0.25){
+    ctx.beginPath(); ctx.moveTo(X(e),pad.t); ctx.lineTo(X(e),H-pad.b); ctx.stroke();
+    ctx.textAlign='center'; ctx.fillText(e.toFixed(2), X(e), H-pad.b+18);
+  }
+  ctx.fillText('带隙 Eg (eV)', W/2, H-6);
+  // 曲线
+  ctx.beginPath(); ctx.strokeStyle=colors.accent; ctx.lineWidth=2.5;
+  CURVE.forEach((p,i)=>{const x=X(p.Eg),y=Y(p.eta*100); i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.stroke();
+  // 峰值
+  ctx.fillStyle=colors.accent;
+  ctx.beginPath(); ctx.arc(X(PEAK.Eg),Y(PEAK.eta*100),5,0,7); ctx.fill();
+  ctx.setLineDash([4,4]); ctx.strokeStyle=colors.accentLine;
+  ctx.beginPath(); ctx.moveTo(X(PEAK.Eg),Y(PEAK.eta*100)); ctx.lineTo(X(PEAK.Eg),H-pad.b);
+  ctx.moveTo(pad.l,Y(PEAK.eta*100)); ctx.lineTo(X(PEAK.Eg),Y(PEAK.eta*100)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=colors.accent; ctx.textAlign='left';
+  ctx.fillText(`峰值 ${fmt(PEAK.eta*100)}% @ ${fmt(PEAK.Eg,2)} eV`, X(PEAK.Eg)-118, Y(PEAK.eta*100)-10);
+  // 材料标记
+  MATERIALS.filter(m=>!m.virtual).forEach(m=>{
+    const p=PHYS.point(m.eg);
+    ctx.fillStyle=m.color;
+    ctx.beginPath(); ctx.arc(X(m.eg),Y(p.eta*100),6,0,7); ctx.fill();
+    ctx.strokeStyle='#0b1220'; ctx.stroke();
+    ctx.textAlign='center';
+    ctx.fillText(`${m.name} ${fmt(m.eg,2)}`, X(m.eg), Y(p.eta*100)-12);
+  });
+  // 当前状态
+  const cp=curPoint();
+  ctx.fillStyle='#f87171'; ctx.strokeStyle='#fecaca';
+  ctx.beginPath(); ctx.arc(X(state.eg),Y(cp.eta*100),7,0,7); ctx.fill(); ctx.stroke();
+  ctx.setLineDash([4,4]); ctx.strokeStyle='#f87171';
+  ctx.beginPath(); ctx.moveTo(X(state.eg),Y(cp.eta*100)); ctx.lineTo(X(state.eg),H-pad.b); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.textAlign='left'; ctx.fillStyle='#f87171';
+  ctx.fillText(`当前 ${fmt(cp.eta*100)}%`, Math.min(X(state.eg)+10, W-90), Y(cp.eta*100)+4);
+}
+
+/* ---------- 光谱与损失 ---------- */
+function drawSpectrum(){
+  const cv=$('specCanvas'); const {ctx,W,H}=setupCanvas(cv);
+  const colors=canvasTheme();
+  const pad={l:56,r:20,t:18,b:26};
+  const lamMin=280, lamMax=2500;
+  const X=l=>pad.l+(l-lamMin)/(lamMax-lamMin)*(W-pad.l-pad.r);
+  const barT=pad.t+8, barH=30;
+  ctx.clearRect(0,0,W,H);
+  // 可见光渐变
+  const g=ctx.createLinearGradient(X(380),0,X(750),0);
+  [[380,'#7b2ff2'],[470,'#2f6bff'],[530,'#19c37d'],[580,'#ffd500'],[630,'#ff7a1a'],[750,'#d50000']]
+    .forEach(([l,c])=>g.addColorStop((l-380)/370,c));
+  ctx.fillStyle=colors.track; ctx.fillRect(pad.l,barT,X(lamMax)-X(lamMin),barH);
+  ctx.fillStyle=g; ctx.fillRect(X(380),barT,X(750)-X(380),barH);
+  ctx.fillStyle='rgba(139,92,246,.55)'; ctx.fillRect(X(lamMin),barT,X(380)-X(lamMin),barH);   // UV
+  ctx.fillStyle='rgba(120,53,15,.65)'; ctx.fillRect(X(750),barT,X(lamMax)-X(750),barH);       // IR
+  // 带隙门槛
+  const lamG=1240/state.eg;
+  const gx=Math.max(X(lamMin),Math.min(X(lamMax),X(lamG)));
+  ctx.fillStyle='rgba(248,113,113,.35)'; ctx.fillRect(gx,barT,X(lamMax)-gx,barH);   // 不可吸收区
+  ctx.strokeStyle='#f87171'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(gx,barT-4); ctx.lineTo(gx,barT+barH+4); ctx.stroke();
+  ctx.fillStyle='#f87171'; ctx.font='12px system-ui'; ctx.textAlign='center';
+  ctx.fillText(`λg=${fmt(lamG,0)}nm`, Math.max(pad.l+36,Math.min(W-pad.r-36,gx)), barT+barH+18);
+  ctx.textAlign='left'; ctx.fillStyle=colors.text;
+  ctx.fillText('UV', X(300), barT+barH/2+4);
+  ctx.fillText('可见光', X(500), barT+barH/2+4);
+  ctx.fillText('红外', X(1400), barT+barH/2+4);
+  // 波长刻度：帮助初学者把门槛位置与具体波长对应起来
+  ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillStyle=colors.text;ctx.strokeStyle=colors.grid;
+  [280,380,750,1500,2500].forEach(l=>{
+    ctx.beginPath();ctx.moveTo(X(l),102);ctx.lineTo(X(l),108);ctx.stroke();
+    ctx.textAlign=l===2500?'right':'center';
+    ctx.fillText(l+' nm',X(l),123);
+  });
+  ctx.textAlign='center';
+  ctx.fillText('波长 λ（越往右，单个光子能量越低）',W/2,143);
+}
+
+function updateLossUI(){
+  const cp=curPoint();
+  const abs=PHYS.absorbedShare(state.eg);          // 被吸收能量占比
+  const electric=cp.eta;                            // 输出电能占比(=η)
+  const thermal=Math.max(0,abs-electric);           // 吸收后热化部分
+  const trans=Math.max(0,1-abs);                    // 透射
+  $('absPct').textContent=fmt(abs*100)+'%';
+  $('barThermal').style.width=fmt(thermal*100,2)+'%';
+  $('barElectric').style.width=fmt(electric*100,2)+'%';
+  $('barTrans').style.width=fmt(trans*100,2)+'%';
+  let msg;
+  if(state.eg<PEAK.Eg-0.08) msg=`相对本模型峰值（${fmt(PEAK.Eg,2)} eV），当前带隙偏低：可吸收光子较多，但高能光子超出带隙的能量面临热化，输出电压也受限制。红色部分包含热化、辐射复合等全部吸收后未输出能量，并不全是热化。`;
+  else if(state.eg>PEAK.Eg+0.08) msg=`相对本模型峰值（${fmt(PEAK.Eg,2)} eV），当前带隙偏高：能量低于 ${fmt(state.eg,2)} eV 的光子不能跨带隙激发，灰色透射损失增加，Jsc 下降。降低带隙能吸收更多光子，但热化等损失也会增加。`;
+  else msg=`当前接近本模型峰值（${fmt(PEAK.Eg,2)} eV）：增加带隙会减少部分热化，却同时减少吸收；降低带隙则相反。峰值表示二者的边际权衡，不表示红色与灰色损失必须相等。`;
+  $('lossExplain').textContent=msg;
+}
+
+/* ---------- 学术计算细节面板 ---------- */
+const CALC_FORMULAS=`【模型方程（Shockley–Queisser 详细平衡，黑体近似）】
+1) 光子通量（能量 E 处，黑体温度 T，立体角 Ω）：
+   φ(E,T,Ω) = (2Ω/h³c²)·E²/(e^{E/kT}−1)
+2) 短路电流（光生电流，吸收 E≥Eg 的全部光子）：
+   Jsc = q·∫_{Eg}^{∞} φ(E, T☀=5778K, Ω☀) dE
+3) 暗电流（辐射复合，电池向半球 Ω=π 辐射）：
+   J0 = q·∫_{Eg}^{∞} φ(E, Tc=300K, π) dE
+4) J–V 关系与特征量：
+   J(V)=Jsc−J0·(e^{qV/kTc}−1)
+   Voc=(kTc/q)·ln(Jsc/J0+1)
+   Pmax=max[J(V)·V]，FF=Pmax/(Jsc·Voc)
+5) 入射功率（同模型黑体积分，自洽 ≈1366 W/m²）：
+   Pin = (2Ω☀/h³c²)·∫₀^∞ E³/(e^{E/kT☀}−1)dE
+6) 效率与损失分解：
+   η=Pmax/Pin；吸收后未输出=吸收功率−Pmax（含热化与辐射复合）；透射损失=Pin−吸收功率
+数值方法：梯形积分（每点 4000 步，截断至 E0+45kT）。
+假设：单结、单倍聚光、阶跃吸收边、仅辐射复合、无串联/并联电阻、温度恒定 300K。`;
+function updateCalcPanel(){
+  const cp=curPoint();
+  const abs=PHYS.absorbedShare(state.eg);
+  const absorbed=PHYS.PIN*abs;             // W/m²
+  const electric=cp.pmax;                  // W/m²
+  const thermal=absorbed-electric;
+  const trans=PHYS.PIN-absorbed;
+  const jmp=cp.pmax/cp.vmp;                // A/m²
+  $('calcGrid').innerHTML=`
+    <div class="stat"><div class="v" style="color:var(--amber)">${fmt(cp.jsc,1)}</div><div class="k">Jsc (mA/cm²)</div></div>
+    <div class="stat"><div class="v" style="color:var(--cyan)">${fmt(cp.voc,2)} V</div><div class="k">Voc</div></div>
+    <div class="stat"><div class="v" style="color:var(--green)">${fmt(cp.ff,3)}</div><div class="k">填充因子 FF</div></div>
+    <div class="stat"><div class="v" style="color:var(--amber)">${fmt(cp.pmax,1)}</div><div class="k">Pmax (W/m²)</div></div>
+    <div class="stat"><div class="v" style="color:var(--cyan)">${fmt(cp.vmp,2)} V</div><div class="k">Vmp</div></div>
+    <div class="stat"><div class="v" style="color:var(--blue)">${fmt(jmp,1)}</div><div class="k">Jmp (A/m²)</div></div>
+    <div class="stat"><div class="v" style="color:var(--red)">${fmt(thermal,1)}</div><div class="k">热化等损失 W/m²</div></div>
+    <div class="stat"><div class="v" style="color:var(--green)">${fmt(electric,1)}</div><div class="k">输出 W/m²</div></div>
+    <div class="stat"><div class="v" style="color:#94a3b8">${fmt(trans,1)}</div><div class="k">透射损失 W/m²</div></div>`;
+  $('calcFormulas').textContent=CALC_FORMULAS;
+}
+
+/* ---------- 实验状态刷新 ---------- */
+function refreshLab(){
+  const cp=curPoint();
+  $('egVal').textContent=fmt(state.eg,2)+' eV';
+  $('stEta').textContent=fmt(cp.eta*100)+'%';
+  $('stVoc').textContent=fmt(cp.voc,2)+' V';
+  $('stJsc').textContent=fmt(cp.jsc,1);
+  $('stFF').textContent=fmt(cp.ff,3);
+  $('stGap').textContent=`−${fmt((PEAK.eta-cp.eta)*100,1)} 个百分点（峰值 ${fmt(PEAK.eta*100)}%）`;
+  if(state.currentView==='lab'){drawCurve();drawSpectrum();}
+  updateLossUI(); updateCalcPanel(); updateCtx(); updatePlanText(); updateAIObservation();
+  if(!isRealMaterial()&&state.challengeResult){
+    state.challengeResult=null;             // 虚拟半导体不能继承真实材料的挑战结果
+    $('resultPanel').style.display='none';
+  }
+  if(state.challengeResult && $('resultPanel').style.display!=='none'){
+    const unchanged=state.challengeResult.eg===state.eg&&state.challengeResult.mat===curMat().name&&state.challengeResult.scenario===state.scenario?.title;
+    if(!unchanged){
+      const r=computeScore();
+      r.scoreSource='参数已变·本地预估（请重新提交在线评分）';
+      renderScore(r);
+      state.challengeResult={scenario:r.s.title,score:r.score,mat:r.m.name,eg:state.eg,eta:r.cp.eta*100,reason:state.planReason,aiBreakdown:r.breakdown,scoreSource:r.scoreSource};
+    }
+  }
+}
+
+function updateCtx(){
+  const cp=curPoint(); const m=curMat();
+  const parts=[`${m.name} · Eg=${fmt(state.eg,2)} eV · η≈${fmt(cp.eta*100)}% · Voc=${fmt(cp.voc,2)}V`];
+  if(state.prediction!=null) parts.push(`预测 ${fmt(state.prediction)}%`);
+  parts.push(`已记录 ${state.log.length} 次`);
+  $('ctxStrip').innerHTML='当前实验状态：<b>'+parts.join(' · ')+'</b>';
+}
+
+/* ---------- 预测与记录 ---------- */
+function submitPrediction(){
+  const v=parseFloat($('predInput').value);
+  if(isNaN(v)||v<0||v>40){ $('predHint').textContent='请输入 0–40 之间的数字（百分比）。'; return; }
+  state.prediction=v;
+  const cp=curPoint();
+  const diff=v-cp.eta*100;
+  const note=`模型计算 ${fmt(cp.eta*100)}%：预测${Math.abs(diff)<3?'非常接近！':'偏差 '+fmt(Math.abs(diff),1)+' 个百分点'}。`;
+  addLog({eg:state.eg, mat:curMat().name, pred:v, note});
+  $('predHint').textContent=note+' 已记入实验报告。再试一个带隙，或去挑战任务用这套参数接单。';
+  $('predInput').value='';
+  updateCtx(); renderLog();
+  const feedback=`【本地兜底预测反馈】预测 ${fmt(v)}%，模型值 ${fmt(cp.eta*100)}%。${Math.abs(diff)<3?'猜得很准！再比较另一个带隙点。':'相差 '+fmt(Math.abs(diff),1)+' 个百分点。建议比较峰值或高带隙点，分析差异来自哪里。'}`;
+  if(hasOnlineAI()){
+    askAI(`请作为预测教练评价：学生预测 ${fmt(v)}%，当前 ${curMat().name}，Eg=${fmt(state.eg,2)} eV，本地模型值 ${fmt(cp.eta*100)}%。请简短指出差异、鼓励探究，并给一个 [[ACTION:eg=...]] 实验动作。`,{fallback:feedback});
+  }else addMsg('ai',feedback,true,[{type:'eg',value:Math.abs(state.eg-PEAK.Eg)>0.1?PEAK.Eg:2.5},{type:'quiz'}]);
+}
+function addLog(entry){
+  state.log.push({...entry, eg:state.eg, mat:curMat().name,
+                  eta:curPoint().eta*100, time:new Date().toLocaleString('zh-CN')});
+  state.log=state.log.slice(-100);
+  lastReport='';state.reportReviewOverride=null;
+  persistLearningState();
+}
+function renderLog(){
+  const tb=$('logTable').querySelector('tbody');
+  if(!state.log.length){ tb.innerHTML='<tr><td colspan="6" style="color:var(--muted)">还没有记录 —— 去实验室提交一次预测吧</td></tr>'; return; }
+  tb.innerHTML=state.log.map((e,i)=>`<tr><td>${i+1}</td><td>${e.mat}</td><td>${fmt(e.eg,2)}</td><td>${fmt(e.eta)}%</td><td>${e.pred==null?'—':fmt(e.pred)+'%'}</td><td>${e.note||''}</td></tr>`).join('');
+}
+
+/* ---------- AI 导师 ---------- */
+const OFFICIAL_EP='https://api.lingshuai.cc/v1/chat/completions';
+const LOCAL_EP='http://127.0.0.1:8787/chat/completions';
+const IS_LOCAL_PAGE=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)&&location.port==='8787';
+const DEFAULT_EP=IS_LOCAL_PAGE?LOCAL_EP:OFFICIAL_EP;
+function normalizeEndpoint(ep){
+  let clean=(ep||'').trim().replace(/\/+$/,'');
+  if(!clean)return DEFAULT_EP;
+  if(/8\.141\.114\.201\/gotc\/v1/i.test(clean))return OFFICIAL_EP;
+  if(/^https?:\/\/api\.lingshuai\.cc$/i.test(clean))clean='https://api.lingshuai.cc/v1';
+  if(/\/v1$/i.test(clean))clean+='/chat/completions';
+  else if(/^http:\/\/(localhost|127\.0\.0\.1):8787$/i.test(clean))clean+='/chat/completions';
+  return clean;
+}
+function endpointCandidates(ep){
+  const clean=normalizeEndpoint(ep),list=[clean];
+  try{
+    const host=new URL(clean).hostname;
+    if(host==='api.lingshuai.cc'||host==='8.141.114.201'){
+      if(IS_LOCAL_PAGE)list.unshift(LOCAL_EP);
+      if(!list.includes(LOCAL_EP))list.push(LOCAL_EP);
+    }
+  }catch(e){}
+  return list;
+}
+async function fetchWithProxyFallback(ep,options){
+  let lastError;
+  for(const candidate of endpointCandidates(ep)){
+    try{return {res:await fetch(candidate,options),usedEndpoint:candidate,fellBack:candidate!==normalizeEndpoint(ep)};}
+    catch(e){lastError=e;if(options.signal?.aborted)throw e;}
+  }
+  throw lastError||new Error('网络请求失败');
+}
+const DEFAULT_MODEL='deepseek-v4.1-flash';                   // 当前服务商默认模型
+function normalizeModel(model){
+  const clean=(model||'').trim();
+  return !clean||/^kimi-/i.test(clean)?DEFAULT_MODEL:clean;
+}
+const SYS='你是「逐光实验室」的 AI 实验导师，面向中小学生。严格遵守：1) 效率、电压等数值只能引用"当前实验状态"中给出的，不得自行更改或编造；若缺少目标参数的计算值，就给定性解释并请用户先调参，不得补猜数字；2) 该模型是 Shockley–Queisser 单结辐射极限（黑体太阳5778K近似、单倍聚光、300K），实际商业电池效率更低；3) 模型外的经验知识必须标注"（模型外经验）"，不确定就说不确定并建议查资料；4) 室内任务不能用本模型直接排名；5) 回答通俗、鼓励探究，不超过 220 字；6) 如需建议具体操作，只能在末尾单独输出一个允许动作：[[ACTION:eg=2.50]]、[[ACTION:material=gaas]]、[[ACTION:view=challenge]] 或 [[ACTION:quiz]]，不得输出 HTML、脚本或其它指令。';
+
+const AI_VIEW_LABELS={lab:'去虚拟实验',challenge:'去场景挑战',report:'去我的报告',learn:'回学习路径'};
+function normalizeAIAction(action){
+  if(!action||typeof action!=='object')return null;
+  if(action.type==='eg'){
+    const value=Number(action.value);
+    if(!Number.isFinite(value)||value<0.5||value>3)return null;
+    return {type:'eg',value:+value.toFixed(2),label:`把 Eg 拨到 ${value.toFixed(2)} eV 并观察`};
+  }
+  if(action.type==='material'){
+    const m=MATERIALS.find(x=>x.id===action.value&&!x.virtual);
+    return m?{type:'material',value:m.id,label:`选择${m.name}代表点`}:null;
+  }
+  if(action.type==='view'&&AI_VIEW_LABELS[action.value])return {type:'view',value:action.value,label:AI_VIEW_LABELS[action.value]};
+  if(action.type==='quiz')return {type:'quiz',label:'考我一道互动题'};
+  return null;
+}
+function executeAIAction(action){
+  if(action.type==='eg'){setExperiment(action.value,'virtual');showView('lab');}
+  else if(action.type==='material'){const m=MATERIALS.find(x=>x.id===action.value);if(m)setExperiment(m.eg,m.id);showView('lab');}
+  else if(action.type==='view'){showView(action.value);}
+  else if(action.type==='quiz'){startQuiz();return;}
+  if(window.innerWidth<=1100)closeAIPanel();
+  addMsg('ai',`已执行本地实验动作：${action.label}。数值已由本地模型重新计算。`,true);
+}
+function attachAIActions(messageDiv,actions){
+  const valid=(actions||[]).map(normalizeAIAction).filter(Boolean).slice(0,3);
+  if(!valid.length)return;
+  const row=document.createElement('div');row.className='ai-action-row';
+  valid.forEach(action=>{
+    const b=document.createElement('button');b.type='button';b.className='ai-action-btn';b.textContent=action.label;
+    b.onclick=()=>executeAIAction(action);row.appendChild(b);
+  });
+  messageDiv.appendChild(row);
+}
+function actionContextFor(text){
+  const actions=[];
+  if(/2\.50|2\.5 eV|高带隙/.test(text))actions.push({type:'eg',value:2.5});
+  else if(/峰值|1\.26/.test(text))actions.push({type:'eg',value:1.26});
+  else if(state.currentView==='lab')actions.push({type:'eg',value:Math.abs(state.eg-PEAK.Eg)<0.06?2.5:PEAK.Eg});
+  if(/挑战|场景|选型/.test(text))actions.push({type:'view',value:'challenge'});
+  if(/报告|结论|反思/.test(text))actions.push({type:'view',value:'report'});
+  actions.push({type:'quiz'});
+  return actions;
+}
+function parseAIActionMarkers(text){
+  const actions=[];
+  const clean=String(text).replace(/\[\[ACTION:(eg|material|view|quiz)(?:=([^\]]+))?\]\]/gi,(_m,type,value)=>{
+    if(type==='quiz')actions.push({type:'quiz'});
+    else actions.push({type,value:String(value||'').trim()});
+    return '';
+  }).trim();
+  return {text:clean,actions};
+}
+function addMsg(who,text,speakBtn,actions){
+  const d=document.createElement('div'); d.className='msg '+who;
+  const w=document.createElement('span'); w.className='who';
+  w.textContent=who==='user'?'我':'AI 导师'; d.appendChild(w);
+  const b=document.createElement('span'); b.textContent=text; d.appendChild(b);
+  if(who==='ai'&&speakBtn&&('speechSynthesis' in window)){
+    const s=document.createElement('button'); s.className='speak'; s.textContent='🔊 朗读';
+    s.onclick=()=>{const u=new SpeechSynthesisUtterance(text); u.lang='zh-CN'; speechSynthesis.cancel(); speechSynthesis.speak(u);};
+    d.appendChild(s);
+  }
+  if(who==='ai')attachAIActions(d,actions);
+  $('chat').appendChild(d); $('chat').scrollTop=$('chat').scrollHeight;
+  return d;
+}
+function updateLocalObservation(){
+  if(!$('aiObservation'))return;
+  const cp=curPoint(),eg=state.eg,p=learnerPath();
+  let text;
+  if(state.audience==='primary'){
+    if(eg>PEAK.Eg+0.1) text=`现在能量门槛比较高，门槛波长约 ${fmt(1240/eg,0)} nm。看看红色区域是不是比较大？想一想：为什么穿过去的光变多了？`;
+    else if(eg<PEAK.Eg-0.1) text=`现在能量门槛比较低，能跨过去的光子较多，但变成热的浪费也比较明显。点“讲解当前实验”，我们一起找证据。`;
+    else text=`现在接近本模型的平衡点。你认为门槛再高一点，红色区域会怎样变化？先猜，再拖滑块检查。`;
+  }else if(state.audience==='junior'){
+    text=`当前 Eg=${fmt(eg,2)} eV，Jsc=${fmt(cp.jsc,1)} mA/cm²，Voc=${fmt(cp.voc,2)} V，理论效率=${fmt(cp.eta*100)}%。${eg>PEAK.Eg+0.1?'先观察透射增加为什么会让 Jsc 下降。':eg<PEAK.Eg-0.1?'试着用热化与电压限制解释，而不是只说“吸收更多”。':'比较峰值两侧的电流和电压，哪一项变化更明显？'}`;
+  }else{
+    text=`当前工作点：Eg=${fmt(eg,2)} eV，η=${fmt(cp.eta*100)}%，Vmp=${fmt(cp.vmp,2)} V，Pmax=${fmt(cp.pmax,1)} W/m²。${state.level==='advanced'?'可展开计算细节，核对 J–V 关系、积分假设和峰值分辨率。':'建议比较峰值两侧 Jsc 与 Voc 的变化率，再判断权衡关系。'}`;
+  }
+  $('aiObservation').innerHTML=`<b>本地实验观察 · ${p.label}${state.level==='advanced'?'进阶':''}</b>${text}`;
+}
+let observationTimer,observationRequestId=0;
+function escapeHTML(text){return String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function updateAIObservation(){
+  if(!hasOnlineAI()){updateLocalObservation();return;}
+  clearTimeout(observationTimer);
+  const id=++observationRequestId;
+  $('aiObservation').innerHTML='<b>在线实验观察</b>正在根据最新参数请求 AI…';
+  observationTimer=setTimeout(async()=>{
+    try{
+      const answer=await callOnlineAI(`请作为${learnerLabel()}的实验伙伴，只根据当前状态生成一句不超过 80 字的观察和一个问题。指出当前带隙、Jsc/Voc 或损失趋势，不得引入当前状态之外的数值。`);
+      if(id!==observationRequestId)return;
+      $('aiObservation').innerHTML=`<b>在线实验观察 · ${learnerPath().label}</b>${escapeHTML(answer)}`;
+    }catch(e){
+      if(id!==observationRequestId)return;
+      updateLocalObservation();
+      $('aiObservation').innerHTML=$('aiObservation').innerHTML.replace('本地实验观察','本地兜底观察（在线失败）');
+    }
+  },650);
+}
+const QUIZZES={
+  primary:[
+    {q:'互动题：把半导体的能量门槛调高以后，通常能跨过去的光子会怎样？',options:['变得更多','变得更少','一定不变'],answer:1,explain:'门槛越高，能量不够的光子就越多，所以能跨过去的光子通常变少。你可以用 2.50 eV 再看一次红色区域。'},
+    {q:'互动题：同一盏灯变亮一些，最合理的理解是什么？',options:['到达的光子可能更多','每个光子一定更有能量','光子变成了电子'],answer:0,explain:'变亮通常与到达的光子数量有关，不代表每个光子的能量都变大。'},
+    {q:'进阶题：光的波长变长时，单个光子的能量会怎样？',options:['升高','降低','先升高再降低'],answer:1,explain:'波长越长，单个光子能量越低。老师可以进一步告诉你 E=hc/λ。',advanced:true}
+  ],
+  junior:[
+    {q:'互动题：Eg=1.55 eV 时，900 nm 光子约为 1.38 eV。理想模型中它能否跨带隙激发？',options:['能，因为波长很长','不能，因为 E<Eg','一定能，因为光很强'],answer:1,explain:'1.38 eV<1.55 eV，不能跨过理想带隙门槛。光强增加并不改变单个光子的能量。'},
+    {q:'互动题：带隙过低时，哪一种损失更值得重点检查？',options:['透射损失','热化等吸收后损失','光子数量变成零'],answer:1,explain:'低带隙能吸收更多光子，但高能光子超出的能量面临热化，输出电压也受限制。'},
+    {q:'进阶题：为什么 Voc×Jsc 通常不是最大输出功率？',options:['因为 FF 通常小于 1','因为 Voc 永远为零','因为 Jsc 没有单位'],answer:0,explain:'Voc 与 Jsc 分别来自开路和短路状态，最大功率点的 Vmp、Jmp 不同，FF=Pmax/(Voc×Jsc)。',advanced:true}
+  ],
+  senior:[
+    {q:'互动题：Eg 从 1.12 升至 2.50 eV，Jsc 显著下降的直接模型原因是什么？',options:['透射增加，可吸收光子通量下降','串联电阻突然增大','电池温度自动升高'],answer:0,explain:'本模型没有串联电阻和自动温升。带隙升高使积分下限提高，可吸收光子通量下降。'},
+    {q:'互动题：下列哪项不能由当前 300 K、单倍黑体太阳模型直接预测？',options:['代表点的理论 Voc','代表点的理论效率','60°C 下真实组件的全年发电量'],answer:2,explain:'全年发电量还需要温度系数、真实光谱、气象、系统损耗等数据。'},
+    {q:'进阶题：CURVE 以 0.02 eV 扫描得到峰值 1.26 eV。下一步最严谨的做法是什么？',options:['宣称真实材料峰值必为 1.26','在峰值附近用更细步长复核','把峰值四舍五入成 1 eV'],answer:1,explain:'离散扫描分辨率会影响峰值位置，应在峰值附近加密采样，同时继续区分模型峰值与真实器件。',advanced:true}
+  ]
+};
+function renderQuiz(quiz){
+  const box=addMsg('ai',(quiz.source==='online'?'【在线 AI 出题】':'【本地兜底题】')+quiz.q,true);
+  const options=document.createElement('div');options.className='quiz-options';
+  quiz.options.forEach((text,i)=>{
+    const b=document.createElement('button');b.className='quiz-option';b.textContent=String.fromCharCode(65+i)+'. '+text;
+    b.onclick=()=>{
+      options.querySelectorAll('button').forEach(x=>x.disabled=true);
+      options.children[quiz.answer].classList.add('correct');
+      if(i!==quiz.answer)b.classList.add('wrong');
+      addMsg('user',`我选 ${String.fromCharCode(65+i)}：${text}`);
+      const feedback=(i===quiz.answer?'答对了！':'没关系，再用实验核对一下。')+quiz.explain;
+      addMsg('ai',feedback,true,actionContextFor(feedback));
+    };
+    options.appendChild(b);
+  });
+  box.appendChild(options);$('chat').scrollTop=$('chat').scrollHeight;
+}
+function startLocalQuiz(){
+  const bank=QUIZZES[state.audience].filter(q=>state.level==='advanced'||!q.advanced);
+  const quiz=bank[state.quizIndex++%bank.length];
+  renderQuiz({...quiz,source:'local'});
+}
+function parseAIQuiz(text){
+  const match=String(text).match(/\[\[QUIZ:([^\]]+)\]\]/);
+  if(!match)return null;
+  const parts=match[1].split('|').map(x=>x.trim());
+  if(parts.length!==6)return null;
+  const answer=Number(parts[4]);
+  if(!Number.isInteger(answer)||answer<0||answer>2||parts.slice(0,4).some(x=>!x))return null;
+  return {q:parts[0],options:parts.slice(1,4),answer,explain:parts[5],source:'online'};
+}
+async function startQuiz(){
+  if(hasOnlineAI()){
+    const loading=addMsg('ai','正在让在线 AI 出题…');
+    try{
+      const raw=await callOnlineAI(`请根据当前实验和${learnerLabel()}，出一道单项选择题。必须只输出 [[QUIZ:题干|选项A|选项B|选项C|正确序号0到2|解析]]，不要输出其它文字。选项和解析不要含竖线。`);
+      const quiz=parseAIQuiz(raw);loading.remove();
+      if(!quiz)throw new Error('在线题目格式不符合约定');
+      renderQuiz(quiz);
+    }catch(e){loading.remove();addMsg('ai',`在线出题失败（${e.message}），本次使用本地题库兜底。`,true);startLocalQuiz();}
+  }else startLocalQuiz();
+}
+function explainCurrentExperiment(){
+  askAI(`讲解当前实验：请用${learnerLabel()}学生能理解的话解释当前材料、带隙、吸收门槛、Jsc/Voc 和效率。先引导观察，再给简短解释，最后留一个问题。不要引入当前状态之外的新数值。`);
+}
+function aiNextStep(){
+  if(hasOnlineAI()){
+    askAI(`基于当前学段、实验记录、挑战进度和报告状态，给出下一项最有价值的实验任务。不要直接给长答案，要提出一个可执行动作，并尽量附带一个 [[ACTION:eg=...]] 或 [[ACTION:view=...]]。`);
+  }else localNextStep();
+}
+function localNextStep(){
+  let text,actions=[];
+  if(!state.log.length){
+    text='先做第一组对照实验：把 Eg 调到 0.70 eV，观察红色透射区，再回到峰值附近比较。';
+    actions=[{type:'eg',value:0.70},{type:'quiz'}];
+  }else if(state.log.length<3){
+    text='你已经有一条记录。再做两次不同带隙的对照，才能把“吸收更多”和“每个光子损失更少”分开。';
+    actions=[{type:'eg',value:Math.abs(state.eg-PEAK.Eg)<0.06?2.50:PEAK.Eg},{type:'eg',value:0.70},{type:'quiz'}];
+  }else if(!state.conclusion.trim()){
+    text='实验数据够做比较了。去报告区用自己的话写出“参数—现象—原因—模型边界”，本地 AI 会立即自评。';
+    actions=[{type:'view',value:'report'},{type:'quiz'}];
+  }else if(!state.challengeResult){
+    text='你的实验记录已经有基础。下一步选择真实材料代表点，提交一个有设计理由的场景方案，让本地 AI 评价证据链。';
+    actions=[{type:'view',value:'challenge'},{type:'quiz'}];
+  }else{
+    text='主线已完成。进阶挑战：在 1.20–1.35 eV 内加密采样，比较离散峰值；或者让 AI 出一道进阶题检查模型边界。';
+    actions=[{type:'eg',value:1.20},{type:'eg',value:1.35},{type:'quiz'}];
+  }
+  addMsg('ai',text,true,actions);
+}
+function aiCommentPlan(){
+  if(!state.scenario){alert('请先选择一个挑战场景。');return;}
+  if(!isRealMaterial()){alert('虚拟半导体不能参加材料挑战，请先选择真实材料代表点。');return;}
+  state.planReason=$('planReason').value.trim();persistLearningState();
+  if(state.planReason.length<8){alert('先写一句设计理由，AI 才能评价论证与边界。');$('planReason').focus();return;}
+  if(hasOnlineAI()){
+    askAI(`请点评我的挑战方案，指出最强证据、最弱证据和下一步改进。场景=${state.scenario.title}；材料=${curMat().name}；带隙=${fmt(state.eg,2)} eV；设计理由=${state.planReason}。请按物理表现、材料匹配、场景匹配、论证证据和边界意识五项点评，不重复编造数值。`);
+  }else localCommentPlan();
+}
+function localCommentPlan(){
+  if(!state.scenario){alert('请先选择一个挑战场景。');return;}
+  if(!isRealMaterial()){alert('虚拟半导体不能参加材料挑战，请先选择真实材料代表点。');return;}
+  state.planReason=$('planReason').value.trim();persistLearningState();
+  if(state.planReason.length<8){alert('先写一句设计理由，本地 AI 才能评价论证与边界。');$('planReason').focus();return;}
+  const r=computeScore();renderScore(r);
+  if(r.score==null){addMsg('ai',`${r.vtxt}。请补充实际光源光谱、辐照度、弱光复合和器件参数；当前模型不能给室内方案做数值排名。`,true,[{type:'view',value:'lab',label:'回实验补数据'},{type:'quiz'}]);return;}
+  const weakest=r.dimensions.reduce((a,b)=>(b.score/b.max<a.score/a.max?b:a));
+  addMsg('ai',`本地 AI 评分 ${r.score}/100。当前最强项是“${r.dimensions.reduce((a,b)=>(b.score/b.max>a.score/a.max?b:a)).name}”，最需要补强的是“${weakest.name}”。${weakest.name==='论证证据'?'在理由里加入你观察到的 Jsc、Voc 或损失条变化。':weakest.name==='边界意识'?'补充真实场景中模型没有计算的成本、温度、寿命或弱光数据。':weakest.name==='物理表现'?'回到实验比较不同带隙，不要只用单点数据。':weakest.name==='材料匹配'?'比较三种真实材料代表点及其适用场景。':'比较不同带隙后重新提交场景方案。'}`,true,[{type:'view',value:'lab',label:'回实验补证据'},{type:'quiz'}]);
+}
+function contextForAI(){
+  const cp=curPoint();
+  const challenge=state.challengeResult?(state.challengeResult.score==null?'边界讨论，未评分':(state.challengeResult.scoreSource||'本地兜底')+' '+state.challengeResult.score+'分'):'未提交';
+  const reason=(state.planReason||'').slice(0,180);
+  return `学习者=${learnerLabel()}；请使用该学段能理解的词汇，0基础优先引导观察，进阶挑战可增加证据质询；回答结尾留一个简短思考题。当前实验状态：材料=${curMat().name}，带隙=${fmt(state.eg,2)} eV，理论效率=${fmt(cp.eta*100)}%，Voc=${fmt(cp.voc,2)} V，Jsc=${fmt(cp.jsc,1)} mA/cm²，FF=${fmt(cp.ff,3)}；模型峰值=${fmt(PEAK.eta*100)}% @ ${fmt(PEAK.Eg,2)} eV；用户预测=${state.prediction==null?'无':fmt(state.prediction)+'%'}；实验记录=${state.log.length} 条；当前挑战=${state.scenario?state.scenario.title+'（本地AI评分：'+challenge+'）':'未选择'}；学生设计理由=${reason||'未填写'}。`;
+}
+
+function hasOnlineAI(){
+  return !!(localStorage.getItem('pq_key')&&normalizeModel(localStorage.getItem('pq_model')));
+}
+async function callOnlineAI(userText,options={}){
+  const key=localStorage.getItem('pq_key'),stored=localStorage.getItem('pq_endpoint')||DEFAULT_EP,
+        ep=normalizeEndpoint(stored),model=normalizeModel(localStorage.getItem('pq_model'));
+  if(!key||!model)throw new Error('未配置在线 AI');
+  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),60000);
+  try{
+    onlineRequestCount++;updateAIUsage();
+    const {res,usedEndpoint,fellBack}=await fetchWithProxyFallback(ep,{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model,messages:[{role:'system',content:SYS+'\n'+contextForAI()+'\n'+(options.systemExtra||'')},{role:'user',content:userText}],temperature:options.temperature??0.25})});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const content=data.choices?.[0]?.message?.content;
+    if(!content)throw new Error('空响应');
+    if(fellBack){localStorage.setItem('pq_endpoint',usedEndpoint);if($('setEndpoint'))$('setEndpoint').value=usedEndpoint;}
+    return content;
+  }finally{clearTimeout(timer);}
+}
+
+/* 本地知识库：仅在未配置在线 AI、断网或接口失败时兜底 */
+function localAnswer(q){
+  const cp=curPoint(), t=q.toLowerCase();
+  const has=(...ws)=>ws.some(w=>t.includes(w));
+  if(has('讲解当前实验')){
+    if(state.audience==='primary') return `现在我们把门槛设为 ${fmt(state.eg,2)} eV，门槛波长约 ${fmt(1240/state.eg,0)} nm。先看红色区域，再看绿色输出部分。${state.eg>PEAK.Eg?'现在门槛偏高，更多光子的能量不够，可能直接穿过去。':'现在门槛还不算高，要同时观察吸收和热浪费。'}想一想：如果把门槛再调高一点，红色区域会怎样？`;
+    return `当前 ${curMat().name}，Eg=${fmt(state.eg,2)} eV，理论效率=${fmt(cp.eta*100)}%。先比较 Jsc=${fmt(cp.jsc,1)} mA/cm² 与 Voc=${fmt(cp.voc,2)} V，再看透射和吸收后未输出损失。${state.eg>PEAK.Eg?'当前带隙高于模型峰值，重点解释可吸收光子通量下降。':state.eg<PEAK.Eg?'当前带隙低于模型峰值，重点检查热化与电压限制。':'当前接近模型峰值，建议比较峰值两侧而不是把平衡点理解为损失相等。'}你准备用哪一项图中证据支持解释？`;
+  }
+  if(has('穿过去')||has('透过')) return `在本页理想模型中，光子的能量低于带隙门槛时，就不能让电子跨带隙激发，这部分光会透射。当前门槛波长约为 ${fmt(1240/state.eg,0)} nm。光强更大并不会改变单个光子的能量。`;
+  if(has('越高越好')) return `不是。带隙高会提高跨过门槛所需的能量，虽然 Voc 倾向较高，但可吸收光子减少、透射增加；带隙太低又会增加热化等损失。本模型在 ${fmt(PEAK.Eg,2)} eV 附近出现理论峰值，真实器件还要考虑更多因素。`;
+  if(has('证据')&&has('缺')) return `建议补上三组对照：当前 Eg、较低 Eg、较高 Eg。每组都记录吸收门槛、Jsc、Voc、理论效率和损失条。这样能排除“只凭一个点猜结论”。AI 文本不是数值证据，证据应来自本地模型面板和你亲自观察的变化。`;
+  if(has('2.5')&&(has('调整')||has('调')||has('带隙')||has('怎样')||has('如何')||has('会怎么'))){
+    const p25=etaAt(2.5);
+    return `如果把带隙调到 2.5 eV（当前 ${fmt(state.eg,2)} eV），本地模型算出的理论效率约 ${fmt(p25*100)}%。带隙门槛 1240/2.5≈496nm，大量可见光（496–750nm）能量不够、直接穿过去，透射损失成为主角。想看具体变化，直接把滑块拖过去，观察光谱图里红色"不可吸收区"如何扩大。`;
+  }
+  if(has('砷化镓')&&(has('太空')||has('卫星')||has('为什么'))){
+    return `模型内：砷化镓代表带隙 1.42 eV 接近本模型最优点（${fmt(PEAK.Eg,2)} eV），理论效率约 ${fmt(etaAt(1.42)*100)}%，Voc=${fmt(PHYS.point(1.42).voc,2)} V。（模型外经验）真实航天选材还看抗辐照、温度特性和单位重量功率，实际常用 GaAs 基多结电池，把不同带隙的结叠加起来利用不同波段。本页没有模拟温度、辐照或多结结构。`;
+  }
+  if(has('硅')&&has('为什么')&&(has('最高')||has('极限')||has('没到')||has('没有达到'))){
+    return `好问题！本模型峰值在 ${fmt(PEAK.Eg,2)} eV（约 ${fmt(PEAK.eta*100)}%），而晶硅是 1.12 eV，略偏左：它能吸收几乎所有可见光，但每个光子平均"多付"给热的代价稍高。即便如此，模型里晶硅也有约 ${fmt(etaAt(1.12)*100)}%。注意：这是理论辐射极限，真实晶硅电池还受非辐射复合、光学反射、电阻损耗影响，商业水平约 22–27%（模型外经验值）。`;
+  }
+  if(has('voc')||has('开路电压')){
+    return `开路电压 Voc 是"不接负载时电池两端能达到的最大电压"。模型里它由光子通量和电池自身的辐射复合决定：当前 ${curMat().name}（${fmt(state.eg,2)} eV）的 Voc=${fmt(cp.voc,2)} V。带隙越大 Voc 越高，但电流下降更快，所以效率反而在 1.26 eV 左右封顶。`;
+  }
+  if(has('模型')||has('准吗')||has('准确')||has('可信')){
+    return `本页面效率来自 Shockley–Queisser 单结辐射极限的本地数值计算：黑体太阳近似（5778K）、单倍聚光、只计辐射复合，峰值约 31% @ 1.26 eV。若用标准 AM1.5G 光谱精确计算，文献值约 33.7% @ 1.34 eV。它是"物理天花板"而非产品指标——适合用来理解规律、做相对比较。完整假设见项目 docs/science-model.md。`;
+  }
+  if(has('带隙')&&(has('怎么')||has('如何')||has('决定')||has('吸收'))){
+    return `带隙 Eg 是半导体的"能量门槛"：只有能量 E ≥ Eg 的光子（波长 λ ≤ 1240/Eg nm）能被吸收并打出电子。你当前 ${fmt(state.eg,2)} eV 对应门槛约 ${fmt(1240/state.eg,0)}nm——看光谱图上红色竖线右侧的光，全都浪费掉了。`;
+  }
+  if(has('建议')||has('下一步')||has('干什么')||has('做什么')){
+    if(state.prediction==null) return `建议按学习闭环来：先做一个预测（左侧"先猜一猜"输入框），再拖动带隙滑块观察曲线和吸收门槛变化，然后把模型计算值和预测对比。知识卡片的实验按钮会带你直接体验关键带隙点。`;
+    if(state.log.length<2) return `你已经会预测了！试试把带隙推向两个极端（0.6 eV 和 2.8 eV），亲眼看"热化损失"和"透射损失"轮流当主角，再回头看峰值点，理解会深很多。`;
+    return `基础实验差不多了，去「挑战任务」选择一个场景（路灯/室内边界/卫星），用真实材料代表点完成方案，并在报告中解释你的依据和模型边界。`;
+  }
+  if(has('点评')||has('评价')){
+    if(state.scenario){
+      if(!isRealMaterial()) return '当前操作的是理想虚拟半导体，适合探索带隙规律，但不能冒充真实材料参与挑战。请回实验室选择晶硅、砷化镓或钙钛矿代表点，再提交方案。';
+      const r=computeScore();
+      if(r.s.boundary) return `【本地 AI 边界判断】${r.s.why} 请列出至少三项缺失数据：实际光源光谱功率分布、辐照度、器件温度，以及弱光复合和电阻参数。`;
+      if(!state.planReason.trim()) return '本地 AI 还没看到你的设计理由。请到挑战区写清参数、现象、因果和模型边界，再提交评分。';
+      return `【本地 AI 教学评分】场景「${r.s.title}」当前方案：${r.m.name}（${fmt(state.eg,2)} eV）。${r.breakdown} 结论：${r.vtxt} ${state.scenario.id==='space'?'（模型外经验）真实卫星还要核查抗辐照、温度特性和单位重量功率。':'真实路灯还要核查温度系数、寿命、成本和全年发电量。'} 这是学习反馈，不是工程认证。`;
+    }
+    return `你还没选挑战场景。先去「挑战任务」挑一个（路灯/室内边界/卫星），选择真实材料代表点并提交，再回来点评。`;
+  }
+  if(has('挑战')&&(has('建议')||has('怎么')||has('提示'))){
+    return `挑战思路：路灯比较理论效率后，还要说出成本、温度与寿命等未建模因素；室内任务重点回答“现有模型为什么不能直接排名、还缺哪些数据”；卫星比较效率与 Voc 后，再讨论抗辐照和单位重量功率（模型外经验）。挑战只接受真实材料代表点。`;
+  }
+  if(has('你好')||has('你是谁')||has('hi')||has('hello')){
+    return `我是逐光实验室的 AI 实验导师，能读到你的当前实验状态（材料、带隙、效率），负责解释现象、回答疑问、点评方案。面板数值只由本地物理模型计算，我的解释可能出错，请以计算面板、公式和可靠资料为准。`;
+  }
+  return `这个问题超出了我的离线知识库范围。你可以：① 试试上方预设问题（它们覆盖了本项目最核心的概念）；② 在「⚙ AI 设置」里粘贴 Key 切换在线大模型；③ 把你的问题换成"带隙/效率/Voc/损失/挑战"相关的试试。当前状态：${curMat().name}，${fmt(state.eg,2)} eV，η≈${fmt(cp.eta*100)}%。`;
+}
+
+/* 测试连接：区分鉴权失败 / 地址错误 / 浏览器网络限制 */
+async function testConnection(){
+  const ep=normalizeEndpoint($('setEndpoint').value), model=normalizeModel($('setModel').value), key=$('setKey').value.trim();
+  $('setEndpoint').value=ep;
+  if(!key||!model){ alert('请先填写模型名与 Key'); return; }
+  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),15000);
+  try{
+    const {res,usedEndpoint,fellBack}=await fetchWithProxyFallback(ep,{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model,messages:[{role:'user',content:'ping'}],max_tokens:1,temperature:0})});
+    if(res.ok){
+      if(fellBack)$('setEndpoint').value=usedEndpoint;
+      alert('✅ 在线连接成功！接口、Key、模型名均可用。'+(fellBack?' 已自动使用本地转发，请点击「保存」。':''));
+    }
+    else{
+      let msg='HTTP '+res.status+'：';
+      if(res.status===401||res.status===403) msg+='服务器未接受本次鉴权。请核对 Key、地域限制、模型权限；如果 Key 在其他地方可用，重点检查模型 ID 是否与本次请求完全一致。';
+      else if(res.status===404) msg+='地址或模型名不存在，请核对精确模型 ID。';
+      else if(res.status===429) msg+='请求过于频繁或额度不足。';
+      else msg+=(await res.text().catch(()=>'')).slice(0,150);
+      alert('❌ '+msg);
+    }
+  }catch(e){
+    const reason=e.name==='AbortError'?'请求超时（15 秒）':'网络层失败（Failed to fetch）';
+    alert('❌ '+reason+'：\n请检查接口地址、网络和 VPN 状态。\n\n如果官方接口不允许当前页面跨域，请双击「启动在线AI.command」并从 http://127.0.0.1:8787 打开实验室。转发器只负责传输，所有回答仍由在线 API 生成。若仍失败，会自动使用本地兜底。');
+  }finally{clearTimeout(timer);}
+}
+
+let aiBusy=false,onlineRequestCount=0;
+function updateAIUsage(){
+  if(!$('aiUsage'))return;
+  $('aiUsage').textContent=`本次在线请求 ${onlineRequestCount} 次；所有 AI 功能优先在线，只有未配置 Key、断网或接口失败才使用本地兜底，不使用回答缓存。`;
+}
+async function askAI(text,options={}){
+  if(!text)return;
+  if(aiBusy){addMsg('ai','上一条回答还在生成中，请稍候再问。');return;}
+  aiBusy=true;$('btnSend').disabled=true;addMsg('user',text);
+  const finish=()=>{aiBusy=false;$('btnSend').disabled=false;};
+  if(hasOnlineAI()){
+    $('modeBadge').textContent='在线优先';$('modeBadge').className='mode on';
+    const loadEl=addMsg('ai','（正在请求在线 AI…）');
+    try{
+      const raw=await callOnlineAI(text,{systemExtra:options.systemExtra});
+      const parsed=parseAIActionMarkers(raw),actions=parsed.actions.length?parsed.actions:actionContextFor(parsed.text);
+      loadEl.remove();addMsg('ai',parsed.text,true,actions);
+    }catch(e){
+      loadEl.remove();
+      $('modeBadge').textContent='本地兜底（在线失败）';$('modeBadge').className='mode off';
+      const local=options.fallback||localAnswer(text);
+      addMsg('ai',`在线 AI 暂不可用（${e.message}），本次使用本地兜底：`,true);
+      addMsg('ai',local,true,actionContextFor(local));
+    }finally{finish();}
+    return;
+  }
+  $('modeBadge').textContent='本地兜底（未配置在线 AI）';$('modeBadge').className='mode off';
+  const local=options.fallback||localAnswer(text);
+  addMsg('ai',local,true,actionContextFor(local));
+  finish();
+}
+
+/* ---------- 挑战任务 ---------- */
+function buildScenarios(){
+  $('scenarioList').innerHTML=SCENARIOS.map(s=>`
+    <button class="card scenario" data-id="${s.id}" aria-pressed="false">
+      <span class="scenario-title">${s.title}</span><span class="scenario-desc">${s.desc}</span>
+    </button>`).join('');
+  document.querySelectorAll('.scenario').forEach(el=>{
+    el.onclick=()=>{
+      document.querySelectorAll('.scenario').forEach(x=>{x.classList.remove('active');x.setAttribute('aria-pressed','false');});
+      el.classList.add('active');
+      el.setAttribute('aria-pressed','true');
+      state.scenario=SCENARIOS.find(s=>s.id===el.dataset.id);
+      state.challengeResult=null;              // 切换场景后旧结果作废
+      $('resultPanel').style.display='none';
+    };
+  });
+}
+function updatePlanText(){
+  $('planText').textContent=isRealMaterial()
+    ?`${curMat().name}（真实材料代表点）· 带隙 ${fmt(state.eg,2)} eV · 理论效率 ${fmt(curPoint().eta*100)}%`
+    :`${curMat().name} · 带隙 ${fmt(state.eg,2)} eV · 理论效率 ${fmt(curPoint().eta*100)}% · 仅用于探索，不能提交挑战`;
+}
+/* 本地 AI 教学评分：物理数值由模型算，AI 只根据透明评分单评价设计与论证 */
+function analyzeReason(){
+  const text=(state.planReason||'').trim();
+  const has=(re)=>re.test(text);
+  const checks={
+    length:text.length>=25,
+    physics:has(/带隙|Eg|效率|Jsc|Voc|电流|电压|吸收|光谱|透射|热化/i),
+    compare:has(/比|从|而|但|因为|所以|高于|低于/),
+    numeric:/\d/.test(text),
+    boundary:has(/模型|假设|局限|未考虑|不能|缺少|还需要/),
+    scenario:has(/成本|寿命|温度|辐照|重量|弱光|室内|稳定|光谱/)
+  };
+  const evidence=Math.min(25,(checks.length?5:0)+(checks.physics?6:0)+(checks.compare?4:0)+(checks.numeric?3:0)+(checks.boundary?4:0)+(checks.scenario?3:0));
+  const boundary=Math.min(15,(checks.boundary?6:0)+(checks.scenario?5:0)+(checks.length?2:0)+(checks.compare?2:0));
+  return {checks,evidence,boundary};
+}
+function computeScore(){
+  const s=state.scenario, cp=curPoint(), m=curMat(), analysis=analyzeReason();
+  if(s.boundary){
+    return {score:null,cls:'v-ok',vtxt:'本地 AI 判断：需要更多数据，暂不给室内方案打分',
+      breakdown:'本地兜底已完成边界检查：当前缺少实际室内光源光谱、辐照度、弱光复合和器件参数，因此不出伪精确排名。',analysis,s,cp,m,dimensions:[],scoreSource:'本地兜底'};
+  }
+  const physicsScore=Math.round(35*cp.eta/PEAK.eta);
+  const fitScore=s.good.includes(m.id)?15:(s.ok.includes(m.id)?9:3);
+  const dist=Math.abs(state.eg-PEAK.Eg);
+  let sceneScore,sceneWhy;
+  if(s.id==='space'){sceneScore=Math.max(0,Math.min(10,Math.round((cp.voc-0.8)*10)));sceneWhy='Voc 与太空教学规则';}
+  else{sceneScore=Math.max(0,Math.min(10,Math.round(10-dist*18)));sceneWhy='带隙与户外光谱教学规则';}
+  const score=physicsScore+fitScore+sceneScore+analysis.evidence+analysis.boundary;
+  let cls,vtxt;
+  if(score>=85){cls='v-good';vtxt='证据链完整，方案与场景匹配很好。';}
+  else if(score>=70){cls='v-good';vtxt='方案合理，再补强最弱的一项证据即可。';}
+  else if(score>=60){cls='v-ok';vtxt='物理方案可对照，但设计理由或模型边界还不够充分。';}
+  else{cls='v-bad';vtxt='本地 AI 认为当前论证不足，请补充数据和场景依据。';}
+  const dims=[
+    {name:'物理表现',score:physicsScore,max:35,note:`η=${fmt(cp.eta*100)}%，模型峰值 ${fmt(PEAK.eta*100)}%`},
+    {name:'材料匹配',score:fitScore,max:15,note:s.good.includes(m.id)?'教学优选代表':s.ok.includes(m.id)?'可用对照代表':'弱对照代表'},
+    {name:'场景匹配',score:sceneScore,max:10,note:sceneWhy},
+    {name:'论证证据',score:analysis.evidence,max:25,note:analysis.checks.length?'理由具体':'理由过短或缺少物理证据'},
+    {name:'边界意识',score:analysis.boundary,max:15,note:analysis.checks.boundary?'已提及模型限制':'尚未说明模型外因素'}
+  ];
+  const weakest=dims.reduce((a,b)=>(b.score/b.max<a.score/a.max?b:a));
+  const breakdown=`本地 AI 评分：物理 ${physicsScore}/35 + 材料 ${fitScore}/15 + 场景 ${sceneScore}/10 + 证据 ${analysis.evidence}/25 + 边界 ${analysis.boundary}/15 = ${score} 分。下一步优先补强“${weakest.name}”。`;
+  return {score,cls,vtxt,breakdown,analysis,s,cp,m,dimensions:dims,scoreSource:'本地兜底'};
+}
+function parseAIScore(text){
+  const match=String(text).match(/\[\[SCORE:(\{[\s\S]*\})\]\]/);
+  if(!match)return null;
+  try{
+    const raw=JSON.parse(match[1]),keys=['physics','material','scene','evidence','boundary'],max=[35,15,10,25,15],dims=[];
+    const names=['物理表现','材料匹配','场景匹配','论证证据','边界意识'];
+    keys.forEach((key,i)=>{
+      const value=Number(raw[key]);
+      if(!Number.isInteger(value)||value<0||value>max[i])throw new Error('分数越界');
+      dims.push({name:names[i],score:value,max:max[i],note:'在线 AI 按 rubric 评分'});
+    });
+    const score=dims.reduce((n,d)=>n+d.score,0);
+    const verdict=String(raw.verdict||'在线 AI 已完成五项评分').slice(0,120);
+    return {score,cls:score>=70?'v-good':score>=60?'v-ok':'v-bad',vtxt:verdict,
+      breakdown:`在线 AI 评分：物理 ${dims[0].score}/35 + 材料 ${dims[1].score}/15 + 场景 ${dims[2].score}/10 + 证据 ${dims[3].score}/25 + 边界 ${dims[4].score}/15 = ${score} 分。`,dimensions:dims,scoreSource:'在线 AI'};
+  }catch(e){return null;}
+}
+async function requestOnlineScore(){
+  const cp=curPoint(),m=curMat();
+  const raw=await callOnlineAI(`请按 rubric 给学生方案评分。场景=${state.scenario.title}；材料=${m.name}；Eg=${fmt(state.eg,2)}；模型效率=${fmt(cp.eta*100)}%；Voc=${fmt(cp.voc,2)}；Jsc=${fmt(cp.jsc,1)}；学生理由=${state.planReason}。必须只输出 [[SCORE:{"physics":0到35整数,"material":0到15整数,"scene":0到10整数,"evidence":0到25整数,"boundary":0到15整数,"verdict":"简短结论"}]]。物理数值由上述状态提供，不得自行发明。`);
+  const parsed=parseAIScore(raw);
+  if(!parsed)throw new Error('在线评分格式不正确');
+  return {...parsed,s:state.scenario,cp,m};
+}
+function renderScore(r){
+  $('resultPanel').style.display='block';
+  $('scoreVal').textContent=r.score==null?'暂不打分':r.score+' 分';
+  const vt=$('verdictText'); vt.textContent=r.vtxt; vt.className='verdict '+r.cls;
+  $('reasonText').textContent=`【${r.scoreSource||'本地兜底'}】${r.breakdown} 场景说明：${r.s.why}`;
+  $('scoreBreakdown').innerHTML=r.dimensions.length?r.dimensions.map(d=>`<div class="ai-score-item"><b>${d.name} ${d.score}/${d.max}</b>${d.note}<div class="ai-score-bar"><i style="width:${Math.round(d.score/d.max*100)}%"></i></div></div>`).join(''):'<div class="ai-score-item"><b>模型边界任务</b>本地 AI 不给伪精确分数，重点检查是否列出了缺失数据。</div>';
+}
+async function evaluatePlan(){
+  if(!state.scenario){alert('请先选择一个挑战场景。');return;}
+  if(!isRealMaterial()){alert('虚拟半导体只用于探索规律。请选择真实材料代表点再提交。');return;}
+  state.planReason=$('planReason').value.trim();persistLearningState();
+  if(state.planReason.length<8){alert('请先写下至少一句设计理由，AI 需要依据它评价论证与边界。');$('planReason').focus();return;}
+  const signature=`${state.scenario.id}|${state.material}|${state.eg}|${state.planReason}`;
+  $('btnSubmitPlan').disabled=true;
+  let r;
+  if(hasOnlineAI()&&!state.scenario.boundary){
+    $('resultPanel').style.display='block';$('scoreVal').textContent='在线评分中…';
+    try{r=await requestOnlineScore();}
+    catch(e){r=computeScore();r.scoreSource='本地兜底（在线评分失败）';}
+  }else r=computeScore();
+  $('btnSubmitPlan').disabled=false;
+  if(signature!==`${state.scenario.id}|${state.material}|${state.eg}|${state.planReason}`){alert('参数已改变，请重新提交评分。');return;}
+  renderScore(r);
+  state.challengeResult={scenario:r.s.title,score:r.score,mat:r.m.name,eg:state.eg,eta:r.cp.eta*100,reason:state.planReason,aiBreakdown:r.breakdown,scoreSource:r.scoreSource};
+  addLog({note:r.score==null?`【AI 边界检查】${r.s.title}：缺少室内光谱与弱光器件数据，暂不打分`:`【${r.scoreSource||'本地兜底'}】${r.s.title} → ${r.score}分：${r.vtxt}`});
+  renderLog();updateCtx();
+}
+
+/* ---------- 报告 ---------- */
+let lastReport='';
+function computeReportReview(){
+  if(!state.log.length)return null;
+  const c=state.conclusion.trim(),predCount=state.log.filter(e=>e.pred!=null).length;
+  const has=(re)=>re.test(c);
+  const dataScore=Math.min(25,state.log.length>=3?25:state.log.length*8);
+  const predictionScore=Math.min(20,predCount>=2?20:predCount?12:0);
+  let explanation=0;
+  if(c.length>=20)explanation+=8;if(c.length>=50)explanation+=4;
+  if(has(/带隙|Eg|Jsc|Voc|效率|透射|热化|吸收|光谱/i))explanation+=5;
+  if(has(/因为|所以|比|从|但|说明/))explanation+=4;
+  if(/\d/.test(c))explanation+=4;
+  explanation=Math.min(25,explanation);
+  let boundary=0;
+  if(has(/模型|假设|局限|未考虑|不能|缺少|还需要/))boundary+=8;
+  if(has(/成本|寿命|温度|辐照|重量|弱光|真实器件/))boundary+=7;
+  if(has(/不确定|可能|只适用|边界/))boundary+=5;
+  boundary=Math.min(20,boundary);
+  const challengeScore=state.challengeResult?.score!=null?10:0;
+  const total=dataScore+predictionScore+explanation+boundary+challengeScore;
+  const dims=[
+    {name:'数据完整',score:dataScore,max:25,note:`${state.log.length} 条实验记录`},
+    {name:'预测对照',score:predictionScore,max:20,note:`${predCount} 次数值预测`},
+    {name:'解释质量',score:explanation,max:25,note:c.length?`${c.length} 字结论`:'尚未填写结论'},
+    {name:'边界意识',score:boundary,max:20,note:boundary>=8?'已讨论模型限制':'需要说明模型外因素'},
+    {name:'应用闭环',score:challengeScore,max:10,note:challengeScore?'已完成挑战':'尚未提交挑战'}
+  ];
+  const weakest=dims.reduce((a,b)=>(b.score/b.max<a.score/a.max?b:a));
+  const advice=`下一步优先补强“${weakest.name}”。${weakest.name==='预测对照'?'至少再完成一次数值预测并与模型值比较。':weakest.name==='解释质量'?'结论要写参数变化、物理证据和因果解释。':weakest.name==='边界意识'?'补充模型没有考虑的温度、成本、寿命或弱光数据。':weakest.name==='应用闭环'?'用真实材料代表点完成一次场景挑战。':'增加不同带隙的对照记录，避免单点结论。'}`;
+  return {total,dims,advice,source:'本地兜底'};
+}
+function buildReport(){
+  if(!state.log.length){ alert('还没有实验记录，先去实验室提交预测。'); return ''; }
+  const L=state.log;
+  let r='逐光实验室 · 太阳能电池虚拟实验报告\n';
+  r+='======================================\n';
+  r+=`生成时间：${new Date().toLocaleString('zh-CN')}\n`;
+  r+='模型声明：效率数值来自 Shockley–Queisser 单结辐射极限本地计算（黑体太阳 5778K 近似、单倍聚光），教学演示模型，非制造指标。\n\n';
+  r+='一、实验记录\n';
+  L.forEach((e,i)=>{ r+=`${i+1}. ${e.time}｜${e.mat}｜带隙 ${fmt(e.eg,2)} eV｜理论效率 ${fmt(e.eta)}%｜预测：${e.pred==null?'—':fmt(e.pred)+'%'}\n   记录：${e.note}\n`; });
+  const ch=state.challengeResult;
+  if(ch) r+=`\n二、挑战任务：${ch.scenario}\n   方案：${ch.mat} · ${fmt(ch.eg,2)} eV · 理论效率 ${fmt(ch.eta)}% · ${ch.score==null?'模型边界讨论，暂不打分':'本地 AI 教学评分 '+ch.score+' 分'}\n   设计理由：${ch.reason||'—'}\n   ${ch.aiBreakdown||''}\n`;
+  r+='\n三、我的结论（学生本人填写）\n';
+  r+=state.conclusion.trim()?state.conclusion.trim()+'\n':'尚未填写。请回到报告区，用自己的话完成实验反思。\n';
+  const review=state.reportReviewOverride||(hasOnlineAI()?null:computeReportReview());
+  if(review){
+    r+=`\n四、AI 报告评价：${review.total}/100（${review.source||'本地兜底'}）\n`;
+    review.dims.forEach(d=>{r+=`   · ${d.name}：${d.score}/${d.max}｜${d.note}\n`;});
+    r+=`   AI 建议：${review.advice}\n`;
+  }
+  r+='\n五、科学边界与免责声明\n';
+  r+='   · 本模型为单结辐射极限的理想化计算，未包含非辐射复合、光学反射、串联电阻、温度变化等因素；\n';
+  r+='   · 自由调带隙使用理想虚拟半导体，不代表对应带隙的真实材料可以实际制备；\n';
+  r+='   · 挑战分数由本地 AI 教学评分器依据公开 rubric 生成，物理子分来自本地模型；室内任务不排名；\n';
+  r+='   · AI 教学评分用于学习反馈，不是工程认证；在线 AI 解释仍可能出错，关键数值以本地模型为准；\n';
+  r+='   · 完整假设与验证见项目 docs/science-model.md 与 docs/limitations.md。\n';
+  lastReport=r;
+  $('reportPre').style.display='block'; $('reportPre').textContent=r;
+  $('reportPre').scrollIntoView({behavior:'smooth'});
+  return r;
+}
+function exportReport(){
+  const report=buildReport();             // 每次导出都重建，避免新实验后仍下载旧报告
+  if(!report) return;
+  const blob=new Blob([report],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='逐光实验室_实验报告.txt'; a.click();
+  URL.revokeObjectURL(a.href);
+}
+function parseAIReportReview(text){
+  const match=String(text).match(/\[\[REVIEW:(\{[\s\S]*\})\]\]/);
+  if(!match)return null;
+  try{
+    const raw=JSON.parse(match[1]),keys=['data','prediction','explanation','boundary','challenge'],max=[25,20,25,20,10],names=['数据完整','预测对照','解释质量','边界意识','应用闭环'],dims=[];
+    keys.forEach((key,i)=>{
+      const value=Number(raw[key]);
+      if(!Number.isInteger(value)||value<0||value>max[i])throw new Error('报告分数越界');
+      dims.push({name:names[i],score:value,max:max[i],note:'在线 AI 评价'});
+    });
+    return {total:dims.reduce((n,d)=>n+d.score,0),dims,advice:String(raw.advice||'请继续补充实验证据。').slice(0,220),source:'在线 AI'};
+  }catch(e){return null;}
+}
+async function aiReviewReport(){
+  if(!state.log.length){alert('还没有实验记录，无法进行 AI 自评。');return;}
+  let review;
+  $('btnAIReport').disabled=true;
+  if(hasOnlineAI()){
+    $('reportReview').style.display='block';$('reportReview').textContent='正在请求在线 AI 评价报告…';
+    try{
+      const raw=await callOnlineAI(`请评价学生实验报告。记录数=${state.log.length}；预测数=${state.log.filter(e=>e.pred!=null).length}；最近记录=${JSON.stringify(state.log.slice(-8))}；学生结论=${state.conclusion}；挑战结果=${JSON.stringify(state.challengeResult)}。必须只输出 [[REVIEW:{"data":0到25整数,"prediction":0到20整数,"explanation":0到25整数,"boundary":0到20整数,"challenge":0到10整数,"advice":"不超过80字的具体建议"}]]。`);
+      review=parseAIReportReview(raw);
+      if(!review)throw new Error('在线报告评价格式不正确');
+    }catch(e){review=computeReportReview();review.source='本地兜底（在线评价失败）';}
+  }else review=computeReportReview();
+  $('btnAIReport').disabled=false;
+  state.reportReviewOverride=review;
+  $('reportReview').style.display='block';
+  $('reportReview').innerHTML=`<h4>${review.source||'本地兜底'}报告评价：${review.total}/100</h4><p>评价当前实验记录、预测、结论与边界；也会写入导出的报告。</p><div class="ai-score-grid">${review.dims.map(d=>`<div class="ai-score-item"><b>${d.name} ${d.score}/${d.max}</b>${d.note}<div class="ai-score-bar"><i style="width:${Math.round(d.score/d.max*100)}%"></i></div></div>`).join('')}</div><p style="margin-top:9px"><b>AI 建议：</b>${review.advice}</p>`;
+  addMsg('ai',`${review.source||'本地兜底'}报告评价 ${review.total}/100。${review.advice}`,true,[{type:'view',value:'lab',label:'回实验补证据'},{type:'quiz'}]);
+}
+
+/* ---------- 设置 ---------- */
+function openSettings(){
+  const stored=localStorage.getItem('pq_endpoint')||DEFAULT_EP, ep=normalizeEndpoint(stored);
+  if(ep!==stored)localStorage.setItem('pq_endpoint',ep);
+  $('setEndpoint').value=ep;
+  $('setModel').value=normalizeModel(localStorage.getItem('pq_model'));
+  $('setKey').value=localStorage.getItem('pq_key')||'';
+  $('modalMask').classList.add('show');
+}
+function saveSettings(){
+  const set=(k,v)=>v?localStorage.setItem(k,v):localStorage.removeItem(k);
+  set('pq_endpoint',normalizeEndpoint($('setEndpoint').value));
+  set('pq_model',normalizeModel($('setModel').value));
+  set('pq_key',$('setKey').value.trim());
+  $('modalMask').classList.remove('show');
+  const has=!!localStorage.getItem('pq_key');
+  $('modeBadge').textContent=has?'在线':'离线（内置本地回答）';
+  $('modeBadge').className='mode '+(has?'on':'off');
+  addMsg('ai',has?'设置已保存：当前为在线模式。注意演示录屏前隐藏 Key。':'Key 已清除，当前为离线模式（内置本地回答，断网可演示）。');
+}
+
+/* ---------- 初始化 ---------- */
+function buildMaterials(){
+  $('matList').innerHTML=MATERIALS.map(m=>`
+    <button class="mat-btn ${m.id===state.material?'active':''}" data-id="${m.id}">
+      <b><span class="dot" style="background:${m.color}"></span>${m.name}（${fmt(m.eg,2)} eV）</b>
+      <small>${m.note}</small>
+    </button>`).join('');
+  document.querySelectorAll('.mat-btn').forEach(b=>{
+    b.onclick=()=>setExperiment(MATERIALS.find(m=>m.id===b.dataset.id).eg,b.dataset.id);
+  });
+}
+function buildPresets(){
+  const P=learnerPath().presets;
+  $('presets').innerHTML=P.map(([t])=>`<button class="chip">${t}</button>`).join('');
+  document.querySelectorAll('.chip').forEach((c,i)=>c.onclick=()=>{
+    if(P[i][1]!=null) setExperiment(P[i][1],'virtual');
+    askAI(P[i][0]); // 预设问题同样优先调用在线 AI，失败时才使用本地兜底
+  });
+}
+
+function setupTheme(){
+  const button=$('btnTheme');
+  function apply(theme,save=true){
+    document.documentElement.dataset.theme=theme;
+    button.textContent=theme==='light'?'🌙 夜间':'☀️ 日间';
+    button.setAttribute('aria-pressed',String(theme==='light'));
+    button.title=theme==='light'?'切换到夜间模式':'切换到日间模式';
+    let meta=document.querySelector('meta[name="theme-color"]');
+    if(!meta){meta=document.createElement('meta');meta.name='theme-color';document.head.appendChild(meta);}
+    meta.content=theme==='light'?'#f2f6fa':'#08111f';
+    if(save){try{localStorage.setItem('pq_theme',theme);}catch(e){}}
+    if(state.currentView==='lab')requestAnimationFrame(()=>{drawCurve();drawSpectrum();});
+  }
+  let theme='dark';
+  try{const saved=localStorage.getItem('pq_theme');if(saved==='light'||saved==='dark')theme=saved;}catch(e){}
+  button.onclick=()=>apply(document.documentElement.dataset.theme==='light'?'dark':'light');
+  apply(theme,false);
+}
+function setupAIResizer(){
+  const root=document.documentElement,handle=$('aiResizer'),widthButton=$('btnAIWidth'),fontButton=$('btnAIFont');
+  let width=Number(localStorage.getItem('pq_ai_width'))||400,drag=null;
+  const clamp=w=>Math.round(Math.max(320,Math.min(640,window.innerWidth*.48,w)));
+  const redraw=()=>{if(state.currentView==='lab')requestAnimationFrame(()=>{drawCurve();drawSpectrum();});};
+  function apply(w,save=true,refresh=false){
+    width=clamp(w);root.style.setProperty('--ai-width',width+'px');handle.setAttribute('aria-valuenow',String(width));
+    if(save){try{localStorage.setItem('pq_ai_width',String(width));}catch(e){}}
+    if(refresh)redraw();
+  }
+  handle.addEventListener('pointerdown',e=>{
+    if(window.innerWidth<=1100)return;
+    drag={x:e.clientX,w:width};handle.setPointerCapture(e.pointerId);document.body.classList.add('ai-resizing');e.preventDefault();
+  });
+  handle.addEventListener('pointermove',e=>{if(drag)apply(drag.w+drag.x-e.clientX,false);});
+  const stop=e=>{
+    if(!drag)return;drag=null;document.body.classList.remove('ai-resizing');
+    if(handle.hasPointerCapture(e.pointerId))handle.releasePointerCapture(e.pointerId);
+    apply(width,true,true);
+  };
+  handle.addEventListener('pointerup',stop);handle.addEventListener('pointercancel',stop);
+  handle.addEventListener('dblclick',()=>apply(400,true,true));
+  handle.addEventListener('keydown',e=>{
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+      e.preventDefault();apply(width+(e.key==='ArrowLeft'?24:-24),true,true);
+    }else if(e.key==='Home'){e.preventDefault();apply(400,true,true);}
+  });
+  widthButton.onclick=()=>apply(width>=520?400:560,true,true);
+  let large=localStorage.getItem('pq_ai_large')==='1';
+  const applyFont=()=>{
+    document.body.classList.toggle('ai-large-text',large);fontButton.textContent=large?'A':'A+';
+    fontButton.setAttribute('aria-pressed',String(large));
+  };
+  fontButton.onclick=()=>{large=!large;try{localStorage.setItem('pq_ai_large',large?'1':'0');}catch(e){}applyFont();};
+  window.addEventListener('resize',()=>apply(width,false,true));
+  apply(width,false);applyFont();
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  setupTheme();
+  setupAppShell();
+  setupAIResizer();
+  loadLearningState();
+  buildMaterials(); buildScenarios(); renderLearningPath(); renderLog();
+  showView('learn');
+  showLearnTab('path');
+  $('ageSelect').addEventListener('change',e=>{
+    state.audience=e.target.value;state.quizIndex=0;persistLearningState();renderLearningPath();
+    addMsg('ai',`已切换为${learnerLabel()}。知识卡、教程、实验提示和问题都会按这个程度调整。你可以先点“讲解当前实验”。`,true);
+  });
+  $('levelSelect').addEventListener('change',e=>{
+    state.level=e.target.value;state.quizIndex=0;persistLearningState();renderLearningPath();
+    addMsg('ai',state.level==='advanced'?'已进入进阶挑战：会增加研究任务、证据质询和更难的互动题。':'已回到 0 基础：我们会先观察现象，再逐步引入公式。',true);
+  });
+  $('btnExplainNow').onclick=explainCurrentExperiment;
+  $('btnQuizNow').onclick=startQuiz;
+  $('btnNextStep').onclick=aiNextStep;
+  updateAIUsage();
+  $('studentConclusion').value=state.conclusion;
+  $('studentConclusion').addEventListener('input',e=>{
+    state.conclusion=e.target.value;
+    lastReport='';state.reportReviewOverride=null;
+    persistLearningState();
+  });
+  $('planReason').value=state.planReason;
+  $('planReason').addEventListener('input',e=>{
+    state.planReason=e.target.value;
+    lastReport='';state.reportReviewOverride=null;
+    persistLearningState();
+  });
+  $('egSlider').addEventListener('input',e=>setExperiment(+e.target.value,'virtual'));
+  $('btnPred').onclick=submitPrediction;
+  $('predInput').addEventListener('keydown',e=>{ if(e.key==='Enter') submitPrediction(); });
+  $('btnSend').onclick=()=>{ const v=$('chatInput').value.trim(); if(v){ askAI(v); $('chatInput').value=''; } };
+  $('chatInput').addEventListener('keydown',e=>{ if(e.key==='Enter') $('btnSend').click(); });
+  $('btnSubmitPlan').onclick=evaluatePlan;
+  $('btnAIComment').onclick=aiCommentPlan;
+  $('btnReport').onclick=buildReport;
+  $('btnAIReport').onclick=aiReviewReport;
+  $('btnExport').onclick=exportReport;
+  $('btnCopy').onclick=async()=>{ const report=buildReport(); if(report){ try{ await navigator.clipboard.writeText(report); alert('报告已复制到剪贴板'); }catch(e){ prompt('自动复制失败，请手动全选复制（Cmd+C）：', report); } } };
+  $('btnClearLog').onclick=()=>{ if(confirm('确定清空全部实验记录和“我的结论”？')){ state.log=[]; state.prediction=null; state.challengeResult=null; state.conclusion=''; state.planReason=''; state.reportReviewOverride=null; $('studentConclusion').value=''; $('planReason').value=''; lastReport=''; $('reportPre').style.display='none'; $('reportReview').style.display='none'; $('resultPanel').style.display='none'; persistLearningState(); renderLog(); updateCtx(); } };
+  $('btnSettings').onclick=openSettings;
+  $('btnTestConn').onclick=testConnection;
+  $('btnSaveKey').onclick=saveSettings;
+  $('btnCloseModal').onclick=()=>$('modalMask').classList.remove('show');
+  $('btnClearKey').onclick=()=>{ $('setKey').value=''; };
+  $('modalMask').addEventListener('click',e=>{ if(e.target.id==='modalMask') $('modalMask').classList.remove('show'); });
+  window.addEventListener('resize',()=>{ if(state.currentView==='lab'){drawCurve();drawSpectrum();} });
+  refreshLab();
+  addMsg('ai',`你好，我是你的 AI 实验伙伴 ☀️ 当前是${learnerLabel()}。讲解、出题、观察、预测、评分和报告都优先调用在线 AI；只有未配置 Key、断网或接口失败时才使用本地兜底。我会明确标注回答来源。`,true,[{type:'view',value:'lab'},{type:'quiz'}]);
+});
+</script>
+</body>
+</html>

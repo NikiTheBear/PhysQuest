@@ -1,0 +1,124 @@
+import { useMemo, useState } from 'react';
+import type { Challenge, LensMetrics } from '../../core/contracts';
+import { KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
+
+interface Props {
+  challenge: Challenge;
+  metrics: LensMetrics;
+  onCancel: () => void;
+  onConfirm: () => void;
+}
+
+/** 满意度闸门：学生必须自己调到满意才能提交，提交后才解锁 AI 演示。 */
+export default function SatisfactionGate({ challenge, metrics, onCancel, onConfirm }: Props) {
+  const [score, setScore] = useState(3);
+  const [reason, setReason] = useState('');
+
+  /** 本地判定：这组参数离挑战目标有多近 —— 客观分由引擎锁死 */
+  const objective = useMemo(() => {
+    const w = challenge.winCondition;
+    if (w.op === '≈' && typeof w.value === 'number') {
+      const actual = metrics[w.metric] as number;
+      const diff = Math.abs(actual - w.value);
+      const tol = w.tolerance ?? 0.1;
+      return diff <= tol ? 1 : Math.max(0, 1 - diff / (tol * 6));
+    }
+    if (w.op === 'false') return metrics[w.metric] === false ? 1 : 0;
+    if (w.op === 'true') return metrics[w.metric] === true ? 1 : 0;
+    if (w.op === '<' && typeof w.value === 'number')
+      return (metrics[w.metric] as number) < w.value ? 1 : 0;
+    if (w.op === '>' && typeof w.value === 'number')
+      return (metrics[w.metric] as number) > w.value ? 1 : 0;
+    return 0;
+  }, [challenge, metrics]);
+
+  const cards = challenge.knowledgeIds
+    .map((id) => KNOWLEDGE.find((k) => k.id === id))
+    .filter(Boolean);
+  const mis = challenge.misconceptionIds
+    .map((id) => MISCONCEPTIONS.find((m) => m.id === id))
+    .filter(Boolean);
+
+  return (
+    <div className="overlay">
+      <div className="modal">
+        <h3>这组参数，你自己满意吗？</h3>
+        <p className="sub">
+          锁定之后才算完成这次探索。锁定后系统会对比你的预测和实际结果，并解锁 AI 讲解。
+        </p>
+
+        <div className="compare">
+          <div className={`box ${objective >= 0.99 ? 'hit' : 'miss'}`}>
+            <div className="k">目标达成度（本地引擎算，不打折）</div>
+            <div className="v">{Math.round(objective * 100)}%</div>
+          </div>
+          <div className="box">
+            <div className="k">当前结果</div>
+            <div className="v">{metrics.description}</div>
+          </div>
+        </div>
+
+        {objective < 0.99 && (
+          <div className="gate">
+            还没达到「{challenge.title}」的目标。你可以直接提交，但这样学到的东西会少一些。
+          </div>
+        )}
+
+        <div style={{ marginTop: 18 }}>
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>
+            你给自己这次的探索打几分？
+          </div>
+          <div className="preset-row" style={{ marginBottom: 14 }}>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button
+                key={n}
+                onClick={() => setScore(n)}
+                style={
+                  score === n ? { borderColor: 'var(--amber)', color: 'var(--amber)' } : undefined
+                }
+              >
+                {'★'.repeat(n)}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>
+            用一句话说说你为什么选这组参数（可以不写，但写了报告里会有）
+          </div>
+          <textarea
+            className="refl"
+            style={{ minHeight: 82 }}
+            value={reason}
+            maxLength={300}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="例如：我把蜡烛推到两倍焦距，因为想让像和物一样大，方便观察倒立。"
+          />
+        </div>
+
+        {cards.length > 0 && (
+          <details style={{ marginTop: 16, fontSize: 13, color: 'var(--muted)' }}>
+            <summary style={{ cursor: 'pointer', color: 'var(--cyan)' }}>
+              这次挑战涉及 {cards.length} 个知识点 / {mis.length} 个常见误区
+            </summary>
+            <ul style={{ margin: '10px 0 0 18px' }}>
+              {cards.map((c) => (
+                <li key={c!.id} style={{ marginBottom: 4 }}>
+                  <b style={{ color: '#cfe0ff' }}>{c!.title}</b> —— {c!.oneLine}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+
+        <div className="modal-actions">
+          <button className="btn-ghost" onClick={onCancel}>
+            再调调
+          </button>
+          <button className="btn-primary" onClick={onConfirm}>
+            锁定这组参数
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

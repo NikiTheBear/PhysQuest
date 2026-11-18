@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Challenge } from '../../core/contracts';
+import { KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
 
 interface Props {
   challenge: Challenge;
@@ -9,7 +10,12 @@ interface Props {
 /** 预测面板：提交后锁定，不可改。这是全篇最重要的一个设计。 */
 export default function PredictionPanel({ challenge, onLock }: Props) {
   const [sel, setSel] = useState<number | null>(null);
+  const [showCards, setShowCards] = useState(false);
   const q = challenge.prediction;
+
+  const cards = challenge.knowledgeIds
+    .map((id) => KNOWLEDGE.find((k) => k.id === id))
+    .filter(Boolean);
 
   return (
     <div className="overlay">
@@ -31,6 +37,47 @@ export default function PredictionPanel({ challenge, onLock }: Props) {
             {opt}
           </button>
         ))}
+
+        {/* 学生想先看知识卡再看的话，这里给个入口。不强制，因为先猜后学才是这个产品的设计 */}
+        {cards.length > 0 && (
+          <div style={{ marginTop: 18 }}>
+            <button
+              className="btn-ghost btn-small"
+              onClick={() => setShowCards(!showCards)}
+              style={{ width: '100%', textAlign: 'left' }}
+            >
+              {showCards ? '▾' : '▸'} 没把握？先看看相关的 {cards.length} 张知识卡
+            </button>
+
+            {showCards && (
+              <div style={{ marginTop: 12 }}>
+                {cards.map((c) => (
+                  <div key={c!.id} className="pred-mini-card">
+                    <div className="kid">{c!.id}</div>
+                    <b>{c!.title}</b>
+                    <p>{c!.oneLine}</p>
+                    <details>
+                      <summary>为什么</summary>
+                      <p>{c!.why}</p>
+                    </details>
+                    {c!.misconceptions.length > 0 && (
+                      <p className="mis">
+                        易错：
+                        {c!.misconceptions
+                          .map((id) => MISCONCEPTIONS.find((m) => m.id === id)?.belief)
+                          .filter(Boolean)
+                          .join(' / ')}
+                      </p>
+                    )}
+                  </div>
+                ))}
+                <p style={{ fontSize: 12, color: 'var(--label-3)', marginTop: 10, lineHeight: 1.6 }}>
+                  看完再猜也没关系——但猜完就锁死了，改不了。
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="modal-actions">
           <button className="btn-primary" disabled={sel === null} onClick={() => sel !== null && onLock(sel)}>

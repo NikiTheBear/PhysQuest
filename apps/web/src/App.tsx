@@ -32,6 +32,8 @@ import KnowledgeCards from './components/knowledge-cards/KnowledgeCards';
 import { QuizModal, QuizResult } from './components/knowledge-cards/Quiz';
 import ReportView from './components/report/ReportView';
 import AITutor from './components/ai-tutor/AITutor';
+import AISettings from './components/ai-tutor/AISettings';
+import HelpGuide from './components/common/HelpGuide';
 import FreeBuildLab, {
   type CaptureSnapshot,
 } from './components/free-build/FreeBuildLab';
@@ -111,6 +113,17 @@ export default function App() {
   });
   const [aiConfig, setAiConfig] = useState<AIConfig>(() => loadAIConfig());
   const [showReset, setShowReset] = useState(false);
+  /** 全站唯一的 AI 设置入口（顶栏齿轮打开） */
+  const [showAISettings, setShowAISettings] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  /** 第一次进入时是否显示提示条 */
+  const [firstVisit, setFirstVisit] = useState(() => {
+    try {
+      return !localStorage.getItem('physquest.visited.v1');
+    } catch {
+      return false;
+    }
+  });
   /** 实验台 → 自由搭建：一键搬过去的实验数据 */
   const [importedExp, setImportedExp] = useState<unknown | null>(null);
   /** 自由搭建：想用哪个知识点的提示词去搭 */
@@ -387,6 +400,24 @@ export default function App() {
 
               <button
                 className="nav-icon"
+                onClick={() => setShowHelp(true)}
+                title="帮助（五分钟上手）"
+                aria-label="帮助"
+              >
+                ?
+              </button>
+
+              <button
+                className="nav-icon"
+                onClick={() => setShowAISettings(true)}
+                title="AI 设置（Key、端点、模型、用量）"
+                aria-label="AI 设置"
+              >
+                ⚙
+              </button>
+
+              <button
+                className="nav-icon"
                 onClick={() => setShowReset(true)}
                 title="重置"
                 aria-label="重置"
@@ -421,7 +452,44 @@ export default function App() {
         </div>
 
         {view === 'map' && (
-          <KnowledgeMap onOpenModule={openModule} onOpenKnowledge={openKnowledge} />
+          <>
+            {firstVisit && (
+              <div className="first-visit-hint">
+                <span className="fv-icon">✦</span>
+                <span className="fv-text">
+                  <b>第一次来？</b> 先看三分钟怎么用，或者直接从下面挑一个模块开始也行。
+                </span>
+                <button
+                  className="btn-primary btn-small"
+                  onClick={() => {
+                    setShowHelp(true);
+                    setFirstVisit(false);
+                    try {
+                      localStorage.setItem('physquest.visited.v1', '1');
+                    } catch {
+                      /* ignore */
+                    }
+                  }}
+                >
+                  怎么看
+                </button>
+                <button
+                  className="btn-ghost btn-small"
+                  onClick={() => {
+                    setFirstVisit(false);
+                    try {
+                      localStorage.setItem('physquest.visited.v1', '1');
+                    } catch {
+                      /* ignore */
+                    }
+                  }}
+                >
+                  直接开始
+                </button>
+              </div>
+            )}
+            <KnowledgeMap onOpenModule={openModule} onOpenKnowledge={openKnowledge} />
+          </>
         )}
 
         {view === 'hub' && lab && (
@@ -430,6 +498,12 @@ export default function App() {
             completed={learner.completed}
             weakMisconceptions={weak}
             onPick={beginChallenge}
+            onPickAuto={(c) => {
+              setLabId('fieldlab');
+              setView('free');
+              setBuildRequest({ knowledgeId: c.knowledgeIds[0], title: c.title, prompt: c.build.prompt });
+              setTimeout(() => setBuildRequest(null), 100);
+            }}
             onBackToMap={() => setView('map')}
           />
         )}
@@ -459,20 +533,6 @@ export default function App() {
                     还没有预测
                   </button>
                 )}
-                <button
-                  className="btn-ghost btn-small"
-                  onClick={() => {
-                    const data = buildPqexp(params, challenge.title, challenge.brief);
-                    setLabId('fieldlab');
-                    setView('free');
-                    setImportedExp(data);
-                    // 只让 effect 读一次
-                    setTimeout(() => setImportedExp(null), 200);
-                  }}
-                  title="带着这组参数直接进自由搭建工作台"
-                >
-                  搬到自由搭建 →
-                </button>
                 <button className="btn-primary" onClick={() => setPhase('gate')}>
                   我满意了
                 </button>
@@ -553,6 +613,7 @@ export default function App() {
             buildRequest={buildRequest}
             onMessage={setToast}
             importExperiment={importedExp}
+            aiConfig={aiConfig}
           />
         )}
 
@@ -639,6 +700,13 @@ export default function App() {
             metrics={metrics}
             onCancel={() => setPhase('explore')}
             onConfirm={confirmLock}
+            onSendToLab={() => {
+              const data = buildPqexp(params, challenge.title, challenge.brief);
+              setLabId('fieldlab');
+              setView('free');
+              setImportedExp(data);
+              setTimeout(() => setImportedExp(null), 200);
+            }}
           />
         )}
 
@@ -683,6 +751,19 @@ export default function App() {
         <div className="pq-toast" role="status">
           {toast}
         </div>
+      )}
+
+      {showHelp && <HelpGuide onClose={() => setShowHelp(false)} />}
+
+      {showAISettings && (
+        <AISettings
+          config={aiConfig}
+          onSave={(c) => {
+            setAiConfig(c);
+            setShowAISettings(false);
+          }}
+          onClose={() => setShowAISettings(false)}
+        />
       )}
 
       {showReset && (
@@ -730,6 +811,7 @@ export default function App() {
         onApplyAction={applyAIAction}
         onConfigChange={setAiConfig}
         onWidthChange={setAiWidth}
+        config={aiConfig}
       />
 
       {!aiOpen && (

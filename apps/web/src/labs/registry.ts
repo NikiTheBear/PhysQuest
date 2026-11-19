@@ -8,7 +8,7 @@ import { DEFAULT_LENS_PARAMS } from '../core/contracts';
  * 加第三个模块时只需在这里加一条 + 提供对应的实验台组件。
  */
 
-export type LabId = 'optics-lens' | 'fieldlab';
+export type LabId = 'optics-lens' | 'mechanics' | 'circuits' | 'acoustics' | 'fieldlab';
 
 export interface LabMeta {
   id: LabId;
@@ -43,7 +43,31 @@ export const LABS: LabMeta[] = [
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
-    stats: ['5 个挑战', '21 个知识点', '166 张卡'],
+    stats: ['5 个挑战', '21 个知识点', '26 张卡'],
+  },
+  {
+    id: 'mechanics',
+    title: '力与运动',
+    subtitle: '力学 · 从推小车到能量守恒',
+    discipline: 'mechanics',
+    stages: ['junior', 'senior'],
+    intro: '刚体、弹簧、斜面、音叉与麦穗——从推小车到声波叠加，能真算的都在这儿。',
+    badge: '有引导',
+    mode: 'guided',
+    defaultParams: DEFAULT_LENS_PARAMS,
+    stats: ['29 个挑战', '46 个知识点', '46 张卡'],
+  },
+  {
+    id: 'circuits',
+    title: '电路与电流',
+    subtitle: '电磁 · 从欧姆定律到电功率',
+    discipline: 'electromagnetism',
+    stages: ['junior', 'senior'],
+    intro: '12 种电路器具，电压表电流表实时读数。串并联、欧姆定律、电功率都能动手。',
+    badge: '有引导',
+    mode: 'guided',
+    defaultParams: DEFAULT_LENS_PARAMS,
+    stats: ['21 个挑战', '42 个知识点', '42 张卡'],
   },
   {
     id: 'fieldlab',

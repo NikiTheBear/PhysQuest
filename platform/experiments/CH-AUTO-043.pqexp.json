@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "title": "R = r 时输出功率最大",
+    "description": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-043",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-043",
+    "title": "R = r 时输出功率最大",
+    "goal": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "resistor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "外电阻 R",
+        "内阻 r",
+        "电动势 ε"
+      ],
+      "steps": [
+        "外电阻功率",
+        "匹配点两侧功率",
+        "匹配时的端电压"
+      ],
+      "limitations": "只适用于固定电动势和正线性内阻的直流戴维南模型；最大功率不等于最高效率。"
+    }
+  }
+}

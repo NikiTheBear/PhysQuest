@@ -1,0 +1,108 @@
+{
+  "metadata": {
+    "title": "阻尼振动",
+    "description": "比较弱阻尼、临界附近与强阻尼弹簧振子的衰减行为。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-026",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-026",
+    "title": "阻尼振动",
+    "goal": "比较弱阻尼、临界附近与强阻尼弹簧振子的衰减行为。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "anchor-1",
+        "kind": "anchor",
+        "name": "anchor",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "body-2",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "spring-3",
+        "kind": "spring",
+        "name": "spring",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "damper-4",
+        "kind": "damper",
+        "name": "damper",
+        "position": [
+          4,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-5",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          6,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "阻尼器系数",
+        "质量",
+        "刚度"
+      ],
+      "steps": [
+        "位移衰减包络",
+        "是否越过平衡位置",
+        "机械能下降"
+      ],
+      "limitations": "阻尼器只沿连接轴作用；参数改变后重置初始伸长以公平比较，临界判定适用于该一维线性系统。"
+    }
+  }
+}

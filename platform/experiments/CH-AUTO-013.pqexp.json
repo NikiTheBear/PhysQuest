@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "title": "匀变速直线运动",
+    "description": "用恒定合力验证直线匀加速运动的位置与速度关系。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-013",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-013",
+    "title": "匀变速直线运动",
+    "goal": "用恒定合力验证直线匀加速运动的位置与速度关系。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "force-2",
+        "kind": "force",
+        "name": "force",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "初速度",
+        "力与质量",
+        "观察时间"
+      ],
+      "steps": [
+        "v−t 线性关系",
+        "x−t 二次关系"
+      ],
+      "limitations": "只在力恒定、没有接触与阻尼时使用匀变速公式；数值积分会产生小误差。"
+    }
+  }
+}

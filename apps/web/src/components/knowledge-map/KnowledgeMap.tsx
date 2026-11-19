@@ -124,26 +124,6 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
           );
         })}
 
-        {/* 规划中的模块（点了没反应，明确告诉用户为什么） */}
-        {[
-          { label: '闭合电路欧姆定律', sub: '电磁 · 高中', note: '正在设计' },
-          { label: '太阳能电池 S–Q 极限', sub: '近代 · 大学', note: '正在设计' },
-        ].map((m) => (
-          <div key={m.label} className="module-card disabled">
-            <div className="module-card-top">
-              <span className="module-icon">◌</span>
-              <span className="badge off">规划中</span>
-            </div>
-            <h3>{m.label}</h3>
-            <p className="module-sub">{m.sub}</p>
-            <p className="module-intro">
-              光学这块做透之后就轮到它。先把一个模块的每个细节都打磨好，后面的照着做就行。
-            </p>
-            <div className="module-meta">
-              <span>{m.note}</span>
-            </div>
-          </div>
-        ))}
       </div>
 
       {/* ================= 全平台统计 ================= */}

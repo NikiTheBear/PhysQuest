@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "title": "牛顿第三定律",
+    "description": "用两自由物体之间的弹簧作用说明作用力与反作用力成对出现。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-016",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-016",
+    "title": "牛顿第三定律",
+    "goal": "用两自由物体之间的弹簧作用说明作用力与反作用力成对出现。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "dynamometer-2",
+        "kind": "dynamometer",
+        "name": "dynamometer",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "两物体质量",
+        "初始伸长",
+        "弹簧刚度"
+      ],
+      "steps": [
+        "测力计轴向力",
+        "两球加速度和速度增量"
+      ],
+      "limitations": "连接两端受到等大反向力，作用在不同物体上；测力计只有一个带符号轴向读数，另一端力由方向取反得出。"
+    }
+  }
+}

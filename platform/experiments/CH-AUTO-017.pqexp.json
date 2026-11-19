@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "title": "平抛运动",
+    "description": "将平抛运动分解为水平方向匀速和竖直方向下落。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-017",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-017",
+    "title": "平抛运动",
+    "goal": "将平抛运动分解为水平方向匀速和竖直方向下落。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "水平初速度",
+        "释放高度",
+        "重力"
+      ],
+      "steps": [
+        "vx 保持",
+        "vy 的线性变化",
+        "抛物线形轨迹"
+      ],
+      "limitations": "不含空气阻力，不能在长时间穿过地面后继续解释真实落地运动。"
+    }
+  }
+}

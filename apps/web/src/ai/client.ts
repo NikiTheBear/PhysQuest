@@ -11,6 +11,8 @@
  *  - launcher：走本机 127.0.0.1:8787 的小代理，绕开跨域，所有厂商都能用
  */
 
+import { estimateTokens, recordUsage } from './usage';
+
 export type AIConnection = 'direct' | 'launcher';
 
 export interface AIConfig {
@@ -285,6 +287,14 @@ export async function chat(
 
     const data = await res.json();
     const text: string = data?.choices?.[0]?.message?.content ?? '';
+
+    // 记用量：优先用厂商返回的 usage，没有就按字符估算
+    const promptChars = messages.reduce((n, m) => n + m.content.length, 0);
+    const tok =
+      Number(data?.usage?.total_tokens) ||
+      estimateTokens(messages.map((m) => m.content).join('')) + estimateTokens(text);
+    recordUsage(tok || estimateTokens(String(promptChars)), c.model);
+
     return { ok: true, text: text.trim() };
   } catch (e) {
     const aborted = (e as Error)?.name === 'AbortError';

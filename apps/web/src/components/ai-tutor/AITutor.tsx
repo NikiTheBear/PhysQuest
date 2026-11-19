@@ -12,7 +12,6 @@ import {
   TASK_QUIZ,
   type AIAction,
 } from '../../ai/prompts';
-import AISettings from './AISettings';
 
 interface Props {
   open: boolean;
@@ -23,6 +22,8 @@ interface Props {
   onApplyAction: (a: AIAction) => void;
   onConfigChange: (c: AIConfig) => void;
   onWidthChange?: (w: number) => void;
+  /** 由 App 统一持有，顶栏齿轮改成什么样这里就是什么样 */
+  config: AIConfig;
 }
 
 interface Msg {
@@ -64,9 +65,10 @@ export default function AITutor({
   onApplyAction,
   onConfigChange,
   onWidthChange,
+  config: configProp,
 }: Props) {
-  const [config, setConfig] = useState<AIConfig>(() => loadAIConfig());
-  const [showSettings, setShowSettings] = useState(false);
+  // 配置由 App 统一持有（顶栏齿轮是唯一入口），这里只读
+  const [config, setConfig] = useState<AIConfig>(configProp);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
@@ -83,8 +85,8 @@ export default function AITutor({
   const ready = isConfigured(config);
 
   useEffect(() => {
-    onConfigChange(config);
-  }, [config, onConfigChange]);
+    setConfig(configProp);
+  }, [configProp]);
 
   useEffect(() => {
     try {
@@ -301,25 +303,12 @@ export default function AITutor({
           <span className="t">AI 助教</span>
           <span className={`badge ${ready ? 'on' : 'off'}`}>{ready ? '已连接' : '离线兜底'}</span>
           <span className="spacer" />
-          <button onClick={() => setShowSettings(true)} title="AI 设置">
-            ⚙
-          </button>
           <button onClick={() => setFullscreen(false)} title="退出全屏（Esc）">
             ⤡ 退出全屏
           </button>
         </div>
         <div className="ai-full-body">{chatBody('full')}</div>
 
-        {showSettings && (
-          <AISettings
-            config={config}
-            onSave={(c) => {
-              setConfig(c);
-              setShowSettings(false);
-            }}
-            onClose={() => setShowSettings(false)}
-          />
-        )}
       </div>,
       document.body,
     );
@@ -348,9 +337,6 @@ export default function AITutor({
           <span className="t">AI 助教</span>
           <span className={`badge ${ready ? 'on' : 'off'}`}>{ready ? '已连接' : '离线兜底'}</span>
           <span className="spacer" />
-          <button onClick={() => setShowSettings(true)} title="AI 设置">
-            ⚙
-          </button>
           <button onClick={() => setFullscreen(true)} title="全屏">
             ⤢
           </button>
@@ -362,16 +348,6 @@ export default function AITutor({
         {chatBody('dock')}
       </aside>
 
-      {showSettings && (
-        <AISettings
-          config={config}
-          onSave={(c) => {
-            setConfig(c);
-            setShowSettings(false);
-          }}
-          onClose={() => setShowSettings(false)}
-        />
-      )}
     </>
   );
 }

@@ -373,6 +373,14 @@ window.addEventListener('message',async event=>{
     await showAI();assistant.prepareCard(event.data);return;
   }
   if(action==='build-knowledge'){try{await showAI();assistant.startKnowledgeBuild({knowledgeId:event.data.knowledgeId,prompt:event.data.prompt});}catch(e){toast(e.message);}return;}
+  // 顶栏配的 Key 同步过来（用户不用在工作台里再填一遍）
+  if(action==='set-credentials'){
+    const keyInput=$('deepseek-key');
+    if(keyInput&&event.data.apiKey){keyInput.value=event.data.apiKey;keyInput.oninput?.();}
+    const modelSel=$('deepseek-model');
+    if(modelSel&&event.data.model){const opt=[...modelSel.options].find(o=>o.value===event.data.model);if(opt)modelSel.value=event.data.model;}
+    return;
+  }
   if(action==='spaces')spacesModal();if(action==='help')helpModal();if(action==='open-ai')showAI();
   if(action==='visibility'){workbenchVisible=value!=='hidden';if(audioContext){if(workbenchVisible&&audioEnabled)audioContext.resume().catch(()=>{});else audioContext.suspend().catch(()=>{});}if(workbenchVisible)scene.resize();}
   if(action==='capture'&&typeof requestId==='string'){await queue;sim.measure();bridgePost('capture',{requestId,snapshot:{experiment:structuredClone(doc()),time:sim.time,readings:structuredClone(sim.readings),circuitError:sim.circuit.error||null}});}

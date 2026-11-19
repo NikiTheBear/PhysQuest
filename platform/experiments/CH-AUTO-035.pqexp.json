@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "title": "串联电路",
+    "description": "验证串联电路电流相等、总电压等于各电阻电压之和。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-035",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-035",
+    "title": "串联电路",
+    "goal": "验证串联电路电流相等、总电压等于各电阻电压之和。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "resistor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-3",
+        "kind": "voltmeter",
+        "name": "voltmeter",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "两个电阻的阻值",
+        "电源电压"
+      ],
+      "steps": [
+        "两电阻支路电流",
+        "各端电压之和",
+        "分压比例"
+      ],
+      "limitations": "导线理想，电源内阻和仪表负载需单独计入；元件为线性电阻。"
+    }
+  }
+}

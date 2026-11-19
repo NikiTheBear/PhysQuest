@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "title": "角动量守恒",
+    "description": "观察无外力矩长方体绕主轴旋转时角动量是否保持。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-025",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-025",
+    "title": "角动量守恒",
+    "goal": "观察无外力矩长方体绕主轴旋转时角动量是否保持。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "box-1",
+        "kind": "box",
+        "name": "box",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "force-2",
+        "kind": "force",
+        "name": "force",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "初始角速度",
+        "质量与尺寸",
+        "外加 Z 力矩"
+      ],
+      "steps": [
+        "角速度",
+        "公式计算的 Lz",
+        "有无外力矩的差别"
+      ],
+      "limitations": "此实验不模拟旋转中收臂或实时改变惯量；修改参数会重置运动，不能把两个独立配置当成同一守恒过程。"
+    }
+  }
+}

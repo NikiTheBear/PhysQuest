@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "title": "电流",
+    "description": "通过串联测量理解电流表示单位时间通过截面的电荷量。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-031",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-031",
+    "title": "电流",
+    "goal": "通过串联测量理解电流表示单位时间通过截面的电荷量。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "resistor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ammeter-3",
+        "kind": "ammeter",
+        "name": "ammeter",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "电源电压",
+        "负载电阻"
+      ],
+      "steps": [
+        "电流表读数",
+        "各串联支路电流"
+      ],
+      "limitations": "电流表内阻 1 mΩ，电源有内阻；没有逐个电子的运动模型。"
+    }
+  }
+}

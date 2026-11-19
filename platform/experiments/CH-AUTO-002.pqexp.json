@@ -1,0 +1,68 @@
+{
+  "metadata": {
+    "title": "物体为什么会往下掉",
+    "description": "比较不同质量的小球从相同高度释放时的下落过程。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-002",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-002",
+    "title": "物体为什么会往下掉",
+    "goal": "比较不同质量的小球从相同高度释放时的下落过程。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "球的质量",
+        "释放高度",
+        "重力大小"
+      ],
+      "steps": [
+        "高度随时间变化",
+        "落地前同一时刻的速度"
+      ],
+      "limitations": "这是无空气阻力的重力下落；相同半径用于避免接触时刻的几何差异。"
+    }
+  }
+}

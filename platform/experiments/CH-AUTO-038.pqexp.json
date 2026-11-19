@@ -1,0 +1,68 @@
+{
+  "metadata": {
+    "title": "磁场与磁感线",
+    "description": "用场强探针比较磁铁附近不同位置的磁场强弱。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-038",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-038",
+    "title": "磁场与磁感线",
+    "goal": "用场强探针比较磁铁附近不同位置的磁场强弱。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "bar_magnet-1",
+        "kind": "bar_magnet",
+        "name": "bar_magnet",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "probe-2",
+        "kind": "probe",
+        "name": "probe",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "探针位置",
+        "磁偶极矩",
+        "磁铁软化半径"
+      ],
+      "steps": [
+        "磁场幅值",
+        "轴向与侧向分布趋势"
+      ],
+      "limitations": "使用软化磁偶极子场，近磁芯不是真实条形磁铁内部场；probe 返回幅值，无法单凭数值恢复方向。"
+    }
+  }
+}

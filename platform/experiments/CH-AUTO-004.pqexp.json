@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "title": "斜面",
+    "description": "比较不同倾斜程度对物体沿斜面滑动的影响。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-004",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-004",
+    "title": "斜面",
+    "goal": "比较不同倾斜程度对物体沿斜面滑动的影响。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "ramp-1",
+        "kind": "ramp",
+        "name": "ramp",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "box-2",
+        "kind": "box",
+        "name": "box",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "斜面倾角",
+        "摩擦系数"
+      ],
+      "steps": [
+        "滑块速度与位置",
+        "同一时段滑动距离"
+      ],
+      "limitations": "斜面是固定刚体，边缘掉落属于另一运动阶段；理想无摩擦公式只用于仍接触斜面的时段。"
+    }
+  }
+}

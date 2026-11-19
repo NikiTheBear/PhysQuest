@@ -1,0 +1,68 @@
+{
+  "metadata": {
+    "title": "看见声波的传播",
+    "description": "一个点声源、一个麦克风。改变频率和距离，看声压怎么变。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-050",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-050",
+    "title": "看见声波的传播",
+    "goal": "一个点声源、一个麦克风。改变频率和距离，看声压怎么变。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
+        "position": [
+          -1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "microphone",
+        "position": [
+          1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "频率",
+        "声压幅值",
+        "麦克风距离"
+      ],
+      "steps": [
+        "声压随时间的变化",
+        "不同距离下的幅值"
+      ],
+      "limitations": "声波用线性声场叠加，不含反射与吸收。"
+    }
+  }
+}

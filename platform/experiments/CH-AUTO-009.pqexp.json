@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "title": "功率",
+    "description": "比较相同恒力在不同速度下做功快慢。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-009",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-009",
+    "title": "功率",
+    "goal": "比较相同恒力在不同速度下做功快慢。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "force-2",
+        "kind": "force",
+        "name": "force",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "力大小",
+        "初速度",
+        "观测区间"
+      ],
+      "steps": [
+        "速度随时间",
+        "公式计算的瞬时与平均功率"
+      ],
+      "limitations": "机械功率由力和速度推算，平台电路功率通道不能当成机械功率表。"
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "title": "牛顿第一定律",
+    "description": "检验合外力为零时静止或匀速直线运动的保持。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-014",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-014",
+    "title": "牛顿第一定律",
+    "goal": "检验合外力为零时静止或匀速直线运动的保持。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "force-3",
+        "kind": "force",
+        "name": "force",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "初速度",
+        "是否施加外力"
+      ],
+      "steps": [
+        "速度是否恒定",
+        "无外力时的直线轨迹"
+      ],
+      "limitations": "这里主动移除了环境阻力；不能用现实中物体自然停下来否定无合力条件下的惯性定律。"
+    }
+  }
+}

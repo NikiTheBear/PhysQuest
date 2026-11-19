@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "title": "弹性",
+    "description": "探究弹簧越拉长，弹性作用是否越大。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-005",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-005",
+    "title": "弹性",
+    "goal": "探究弹簧越拉长，弹性作用是否越大。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "anchor-1",
+        "kind": "anchor",
+        "name": "anchor",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "body-2",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "dynamometer-3",
+        "kind": "dynamometer",
+        "name": "dynamometer",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "伸长量",
+        "劲度系数"
+      ],
+      "steps": [
+        "测力计轴向读数",
+        "长度与原长之差"
+      ],
+      "limitations": "线性理想弹簧不模拟塑性变形、断裂或材料弹性极限；固定端用于避免振动干扰。"
+    }
+  }
+}

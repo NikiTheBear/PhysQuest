@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "title": "洛伦兹力",
+    "description": "检验运动电荷在磁场中的洛伦兹力方向与速度垂直关系。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-045",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-045",
+    "title": "洛伦兹力",
+    "goal": "检验运动电荷在磁场中的洛伦兹力方向与速度垂直关系。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "charge-1",
+        "kind": "charge",
+        "name": "charge",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "field-2",
+        "kind": "field",
+        "name": "field",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "电荷量符号",
+        "磁场强度与符号",
+        "初速度"
+      ],
+      "steps": [
+        "初始偏转方向",
+        "加速度与速度的垂直关系",
+        "速度大小"
+      ],
+      "limitations": "使用非相对论宏观带电粒子，电荷单位 μC、质量单位 kg；不能套用电子质量等超出范围的值，也不含辐射损失。"
+    }
+  }
+}

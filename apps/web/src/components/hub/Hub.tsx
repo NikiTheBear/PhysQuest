@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { Challenge } from '../../core/contracts';
-import { CHALLENGES, MISCONCEPTIONS, KNOWLEDGE } from '../../data/content';
+import { AUTO_CHALLENGES, CHALLENGES, MISCONCEPTIONS, KNOWLEDGE, autoChallengesFor } from '../../data/content';
 import type { LabMeta } from '../../labs/registry';
 
 interface Props {
@@ -9,6 +9,8 @@ interface Props {
   completed: Record<string, boolean>;
   weakMisconceptions: string[];
   onPick: (c: Challenge) => void;
+  /** 自动生成挑战的点击（走另一条路：直接进自由搭建） */
+  onPickAuto?: (c: { id: string; title: string; brief: string; build: { prompt: string }; knowledgeIds: string[] }) => void;
   onBackToMap: () => void;
 }
 
@@ -17,13 +19,16 @@ export default function Hub({
   completed,
   weakMisconceptions,
   onPick,
+  onPickAuto,
   onBackToMap,
 }: Props) {
-  /** 挑战按模块过滤 —— 换模块时这里自动跟着变 */
+  /** 手写挑战：按模块过滤 */
   const challenges = useMemo(
     () => CHALLENGES.filter((c) => c.knowledgeIds.some((k) => belongsToLab(k, lab))),
     [lab],
   );
+  /** 自动挑战：从提示词生成的 */
+  const autoOnes = useMemo(() => autoChallengesFor(lab.id), [lab]);
 
   const cards = useMemo(() => KNOWLEDGE.filter((k) => lab.stages.includes(k.stage)), [lab]);
 
@@ -49,7 +54,7 @@ export default function Hub({
         </span>
         <h2>{lab.title}</h2>
         <p>
-          {challenges.length} 个挑战，{cards.length} 张知识卡。点一张进去，先猜一个答案，再动手试。
+          {challenges.length + autoOnes.length} 个挑战，{cards.length} 张知识卡。点一张进去，先猜一个答案，再动手试。
           猜错了不要紧——那一下才是真正记住的时候。
         </p>
       </div>
@@ -58,7 +63,10 @@ export default function Hub({
         <div className="stat">
           <div className="v">
             {doneCount}
-            <span style={{ fontSize: 15, color: 'var(--label-4)' }}> / {challenges.length}</span>
+            <span style={{ fontSize: 15, color: 'var(--label-4)' }}>
+              {' '}
+              / {challenges.length + autoOnes.length}
+            </span>
           </div>
           <div className="k">已完成的挑战</div>
         </div>
@@ -107,7 +115,35 @@ export default function Hub({
         ))}
       </div>
 
-      {challenges.length === 0 && (
+      {autoOnes.length > 0 && (
+        <>
+          <div className="section-head" style={{ marginTop: 34 }}>
+            <h3>按知识点动手</h3>
+            <span>
+              这些挑战是照着知识点的搭建方案自动排的——每一条都对应一个能真算的实验。
+            </span>
+          </div>
+          <div className="challenge-grid">
+            {autoOnes.map((c, i) => (
+              <button
+                key={c.id}
+                className={`challenge-card ${completed[c.id] ? 'done' : ''}`}
+                onClick={() => onPickAuto?.(c)}
+              >
+                <span className="idx">知识点关 {String(i + 1).padStart(2, '0')}</span>
+                <h3>{c.title}</h3>
+                <span className="brief">{c.brief}</span>
+                <span className="meta">
+                  <span className="badge">可计算</span>
+                  <span className="badge">{c.build.models.length} 种器具</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {challenges.length === 0 && autoOnes.length === 0 && (
         <div className="empty">这个模块还没有挑战，先去看知识点。</div>
       )}
     </div>

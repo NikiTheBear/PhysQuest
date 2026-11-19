@@ -1,0 +1,1049 @@
+{
+  "labId": "circuits",
+  "auto": true,
+  "challenges": [
+    {
+      "id": "CH-AUTO-028",
+      "labId": "circuits",
+      "title": "电路的通与断",
+      "brief": "比较开关闭合与断开时闭合回路的电流变化。",
+      "hint": "用 battery、switch、lamp 串联成完整回路，灯泡两端可并联 voltmeter。先断开再闭合开关，比较同一负载的两种状态。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E1-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "比较开关闭合与断开时闭合回路的电流变化。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "switch",
+          "lamp",
+          "voltmeter"
+        ],
+        "variables": [
+          "开关 closed=0/1",
+          "电源电压"
+        ],
+        "observations": [
+          "支路电流",
+          "灯泡电功率与亮度"
+        ],
+        "construction": "用 battery、switch、lamp 串联成完整回路，灯泡两端可并联 voltmeter。先断开再闭合开关，比较同一负载的两种状态。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「电路的通与断」的可编辑实验空间。\n知识点：K-E1-01；领域：电磁；学段：小学。\n模型级别：可计算实验。\n\n探索目标\n比较开关闭合与断开时闭合回路的电流变化。\n\n搭建方案\n用 battery、switch、lamp 串联成完整回路，灯泡两端可并联 voltmeter。先断开再闭合开关，比较同一负载的两种状态。\n建议器具模型：battery、switch、lamp、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 开关 closed=0/1\n• 电源电压\n\n观测与比较\n• 支路电流\n• 灯泡电功率与亮度\n理论参考：闭合回路中 I≈ε/(R+r)。\n\n模型边界\n开关以高低电阻近似，断开仍有极小漏电流；不模拟接触火花。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E1-01\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“电路的通与断 · 小学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-029",
+      "labId": "circuits",
+      "title": "让小灯泡亮起来",
+      "brief": "探索电源、灯泡与完整导线回路怎样共同决定灯泡是否发光。",
+      "hint": "放置 battery、lamp、switch，用 wire 从电源 a 经开关和灯泡回到电源 b。先用 3 V 和适当额定功率，比较断路与闭路。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E1-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "探索电源、灯泡与完整导线回路怎样共同决定灯泡是否发光。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "lamp",
+          "switch"
+        ],
+        "variables": [
+          "开关状态",
+          "电源电压",
+          "灯泡工作电阻"
+        ],
+        "observations": [
+          "灯泡功率",
+          "灯泡亮度",
+          "电路电流"
+        ],
+        "construction": "放置 battery、lamp、switch，用 wire 从电源 a 经开关和灯泡回到电源 b。先用 3 V 和适当额定功率，比较断路与闭路。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「让小灯泡亮起来」的可编辑实验空间。\n知识点：K-E1-03；领域：电磁；学段：小学。\n模型级别：可计算实验。\n\n探索目标\n探索电源、灯泡与完整导线回路怎样共同决定灯泡是否发光。\n\n搭建方案\n放置 battery、lamp、switch，用 wire 从电源 a 经开关和灯泡回到电源 b。先用 3 V 和适当额定功率，比较断路与闭路。\n建议器具模型：battery、lamp、switch。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 开关状态\n• 电源电压\n• 灯泡工作电阻\n\n观测与比较\n• 灯泡功率\n• 灯泡亮度\n• 电路电流\n理论参考：P=UI=U²/R。\n\n模型边界\n灯泡是定值电阻，亮度按功率映射，不模拟灯丝升温、熔断及真实光谱。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E1-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“让小灯泡亮起来 · 小学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-030",
+      "labId": "circuits",
+      "title": "电池的正负",
+      "brief": "识别电池极性反转时电压和约定电流方向的改变。",
+      "hint": "把 battery、resistor、ammeter 串联，voltmeter 跨接电阻并固定测量端子方向。保持布线，分别设置正、负电动势。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E1-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "识别电池极性反转时电压和约定电流方向的改变。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor",
+          "ammeter",
+          "voltmeter"
+        ],
+        "variables": [
+          "电源电动势符号",
+          "负载电阻"
+        ],
+        "observations": [
+          "有符号电压",
+          "有符号支路电流",
+          "负载功率"
+        ],
+        "construction": "把 battery、resistor、ammeter 串联，voltmeter 跨接电阻并固定测量端子方向。保持布线，分别设置正、负电动势。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「电池的正负」的可编辑实验空间。\n知识点：K-E1-04；领域：电磁；学段：小学。\n模型级别：可计算实验。\n\n探索目标\n识别电池极性反转时电压和约定电流方向的改变。\n\n搭建方案\n把 battery、resistor、ammeter 串联，voltmeter 跨接电阻并固定测量端子方向。保持布线，分别设置正、负电动势。\n建议器具模型：battery、resistor、ammeter、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 电源电动势符号\n• 负载电阻\n\n观测与比较\n• 有符号电压\n• 有符号支路电流\n• 负载功率\n理论参考：电源反向使 I、U 反号，电阻耗散功率仍为正。\n\n模型边界\n显示的是约定电流方向；不模拟导线中电子的微观迁移。电源含内阻。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E1-04\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“电池的正负 · 小学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-031",
+      "labId": "circuits",
+      "title": "电流",
+      "brief": "通过串联测量理解电流表示单位时间通过截面的电荷量。",
+      "hint": "建立 battery、resistor、ammeter 串联回路，电流表必须串入支路。先固定电阻改变电压，再固定电压改变电阻。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E2-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "通过串联测量理解电流表示单位时间通过截面的电荷量。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor",
+          "ammeter"
+        ],
+        "variables": [
+          "电源电压",
+          "负载电阻"
+        ],
+        "observations": [
+          "电流表读数",
+          "各串联支路电流"
+        ],
+        "construction": "建立 battery、resistor、ammeter 串联回路，电流表必须串入支路。先固定电阻改变电压，再固定电压改变电阻。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「电流」的可编辑实验空间。\n知识点：K-E2-01；领域：电磁；学段：初中。\n模型级别：可计算实验。\n\n探索目标\n通过串联测量理解电流表示单位时间通过截面的电荷量。\n\n搭建方案\n建立 battery、resistor、ammeter 串联回路，电流表必须串入支路。先固定电阻改变电压，再固定电压改变电阻。\n建议器具模型：battery、resistor、ammeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 电源电压\n• 负载电阻\n\n观测与比较\n• 电流表读数\n• 各串联支路电流\n理论参考：I=ΔQ/Δt；稳态电阻支路 I=U/R。\n\n模型边界\n电流表内阻 1 mΩ，电源有内阻；没有逐个电子的运动模型。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E2-01\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“电流 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-032",
+      "labId": "circuits",
+      "title": "电压",
+      "brief": "理解电压是两点之间的电势差，并比较并联测量与错误接法。",
+      "hint": "把 battery 与 resistor 闭合连接，voltmeter 并联在电阻两端；再交换电压表 a、b 两端记录符号变化。保留正确接法作为最终配置。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E2-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "理解电压是两点之间的电势差，并比较并联测量与错误接法。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor",
+          "voltmeter"
+        ],
+        "variables": [
+          "电源电压",
+          "电压表接线方向"
+        ],
+        "observations": [
+          "端电压及符号",
+          "电源电动势与路端电压差"
+        ],
+        "construction": "把 battery 与 resistor 闭合连接，voltmeter 并联在电阻两端；再交换电压表 a、b 两端记录符号变化。保留正确接法作为最终配置。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「电压」的可编辑实验空间。\n知识点：K-E2-02；领域：电磁；学段：初中。\n模型级别：可计算实验。\n\n探索目标\n理解电压是两点之间的电势差，并比较并联测量与错误接法。\n\n搭建方案\n把 battery 与 resistor 闭合连接，voltmeter 并联在电阻两端；再交换电压表 a、b 两端记录符号变化。保留正确接法作为最终配置。\n建议器具模型：battery、resistor、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 电源电压\n• 电压表接线方向\n\n观测与比较\n• 端电压及符号\n• 电源电动势与路端电压差\n理论参考：Uab=Va−Vb，Uba=−Uab。\n\n模型边界\n电压表内阻为 10 MΩ，读数有负载影响；这里是电路节点电压，不是空间电势场图。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E2-02\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“电压 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-033",
+      "labId": "circuits",
+      "title": "电阻",
+      "brief": "研究电阻改变时电压与电流的关系，以及滑动变阻器的调节作用。",
+      "hint": "构成 battery、rheostat、ammeter 串联回路，在 rheostat 两端并联 voltmeter。固定电源，逐步调整 ratio，记录实际有效电阻与电流。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E2-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "研究电阻改变时电压与电流的关系，以及滑动变阻器的调节作用。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "rheostat",
+          "ammeter",
+          "voltmeter"
+        ],
+        "variables": [
+          "最大阻值 resistance",
+          "滑片比例 ratio"
+        ],
+        "observations": [
+          "电流",
+          "变阻器端电压",
+          "有效电阻"
+        ],
+        "construction": "构成 battery、rheostat、ammeter 串联回路，在 rheostat 两端并联 voltmeter。固定电源，逐步调整 ratio，记录实际有效电阻与电流。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「电阻」的可编辑实验空间。\n知识点：K-E2-03；领域：电磁；学段：初中。\n模型级别：可计算实验。\n\n探索目标\n研究电阻改变时电压与电流的关系，以及滑动变阻器的调节作用。\n\n搭建方案\n构成 battery、rheostat、ammeter 串联回路，在 rheostat 两端并联 voltmeter。固定电源，逐步调整 ratio，记录实际有效电阻与电流。\n建议器具模型：battery、rheostat、ammeter、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 最大阻值 resistance\n• 滑片比例 ratio\n\n观测与比较\n• 电流\n• 变阻器端电压\n• 有效电阻\n理论参考：R有效=R最大·ratio。\n\n模型边界\n变阻器只有两个端子，有效阻值等于最大阻值乘比例；没有实际电阻丝几何或温度效应。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E2-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“电阻 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-034",
+      "labId": "circuits",
+      "title": "欧姆定律",
+      "brief": "用控制变量法验证欧姆元件的电流与端电压成正比。",
+      "hint": "建立低压电源与 resistor 回路，串 ammeter、并 voltmeter。固定电阻改变电源电压，使用电阻实际端电压计算 U/I。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E2-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "用控制变量法验证欧姆元件的电流与端电压成正比。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor",
+          "ammeter",
+          "voltmeter"
+        ],
+        "variables": [
+          "电源电压",
+          "负载电阻"
+        ],
+        "observations": [
+          "成对 U、I 数据",
+          "U/I 与设定阻值的比较"
+        ],
+        "construction": "建立低压电源与 resistor 回路，串 ammeter、并 voltmeter。固定电阻改变电源电压，使用电阻实际端电压计算 U/I。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「欧姆定律」的可编辑实验空间。\n知识点：K-E2-04；领域：电磁；学段：初中。\n模型级别：可计算实验。\n\n探索目标\n用控制变量法验证欧姆元件的电流与端电压成正比。\n\n搭建方案\n建立低压电源与 resistor 回路，串 ammeter、并 voltmeter。固定电阻改变电源电压，使用电阻实际端电压计算 U/I。\n建议器具模型：battery、resistor、ammeter、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 电源电压\n• 负载电阻\n\n观测与比较\n• 成对 U、I 数据\n• U/I 与设定阻值的比较\n理论参考：I=U/R。\n\n模型边界\n需考虑电源内阻和仪表内阻；只验证线性欧姆电阻，不外推至灯丝温变或半导体。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E2-04\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“欧姆定律 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-035",
+      "labId": "circuits",
+      "title": "串联电路",
+      "brief": "验证串联电路电流相等、总电压等于各电阻电压之和。",
+      "hint": "用 battery 与两个不同阻值的 resistor 串联闭合。读取每个电阻支路的电流与端电压，可加 voltmeter 跨接两电阻整体。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E2-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "验证串联电路电流相等、总电压等于各电阻电压之和。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor",
+          "voltmeter"
+        ],
+        "variables": [
+          "两个电阻的阻值",
+          "电源电压"
+        ],
+        "observations": [
+          "两电阻支路电流",
+          "各端电压之和",
+          "分压比例"
+        ],
+        "construction": "用 battery 与两个不同阻值的 resistor 串联闭合。读取每个电阻支路的电流与端电压，可加 voltmeter 跨接两电阻整体。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「串联电路」的可编辑实验空间。\n知识点：K-E2-05；领域：电磁；学段：初中。\n模型级别：可计算实验。\n\n探索目标\n验证串联电路电流相等、总电压等于各电阻电压之和。\n\n搭建方案\n用 battery 与两个不同阻值的 resistor 串联闭合。读取每个电阻支路的电流与端电压，可加 voltmeter 跨接两电阻整体。\n建议器具模型：battery、resistor、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 两个电阻的阻值\n• 电源电压\n\n观测与比较\n• 两电阻支路电流\n• 各端电压之和\n• 分压比例\n理论参考：R总=R1+R2，I1=I2，U1/U2=R1/R2。\n\n模型边界\n导线理想，电源内阻和仪表负载需单独计入；元件为线性电阻。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E2-05\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“串联电路 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-036",
+      "labId": "circuits",
+      "title": "并联电路",
+      "brief": "验证并联支路电压相同及总电流等于各支路电流之和。",
+      "hint": "将两个 resistor 的 a 端同接 battery a，b 端同接 battery b；电流表串在电源总支路。改变其中一个支路电阻。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E2-06"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "验证并联支路电压相同及总电流等于各支路电流之和。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor",
+          "ammeter"
+        ],
+        "variables": [
+          "支路电阻 R1、R2",
+          "电源电压"
+        ],
+        "observations": [
+          "支路电压",
+          "支路电流之和",
+          "总电流"
+        ],
+        "construction": "将两个 resistor 的 a 端同接 battery a，b 端同接 battery b；电流表串在电源总支路。改变其中一个支路电阻。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「并联电路」的可编辑实验空间。\n知识点：K-E2-06；领域：电磁；学段：初中。\n模型级别：可计算实验。\n\n探索目标\n验证并联支路电压相同及总电流等于各支路电流之和。\n\n搭建方案\n将两个 resistor 的 a 端同接 battery a，b 端同接 battery b；电流表串在电源总支路。改变其中一个支路电阻。\n建议器具模型：battery、resistor、ammeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 支路电阻 R1、R2\n• 电源电压\n\n观测与比较\n• 支路电压\n• 支路电流之和\n• 总电流\n理论参考：1/R总=1/R1+1/R2，I总=I1+I2。\n\n模型边界\n电源有内阻，因此改变负载会轻微改变路端电压；并联关系以实际端电压比较。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E2-06\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“并联电路 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-037",
+      "labId": "circuits",
+      "title": "电功与电功率",
+      "brief": "区分电功率与一段时间内转化的电能。",
+      "hint": "建立 battery、resistor 回路，用 voltmeter、ammeter 测量实际负载 U、I。取恒定条件比较不同持续时间，用 P·t 计算理论电能并与瞬时功率分开记录。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E2-07"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "区分电功率与一段时间内转化的电能。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor",
+          "voltmeter",
+          "ammeter"
+        ],
+        "variables": [
+          "负载电阻",
+          "电源电压",
+          "理论计时长度"
+        ],
+        "observations": [
+          "负载功率",
+          "U·I 交叉核对",
+          "由功率推算的电能"
+        ],
+        "construction": "建立 battery、resistor 回路，用 voltmeter、ammeter 测量实际负载 U、I。取恒定条件比较不同持续时间，用 P·t 计算理论电能并与瞬时功率分开记录。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「电功与电功率」的可编辑实验空间。\n知识点：K-E2-07；领域：电磁；学段：初中。\n模型级别：可计算实验。\n\n探索目标\n区分电功率与一段时间内转化的电能。\n\n搭建方案\n建立 battery、resistor 回路，用 voltmeter、ammeter 测量实际负载 U、I。取恒定条件比较不同持续时间，用 P·t 计算理论电能并与瞬时功率分开记录。\n建议器具模型：battery、resistor、voltmeter、ammeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 负载电阻\n• 电源电压\n• 理论计时长度\n\n观测与比较\n• 负载功率\n• U·I 交叉核对\n• 由功率推算的电能\n理论参考：P=UI，稳态 W=Pt。\n\n模型边界\n求解器直接返回瞬时功率；电能积算属于明确注明的公式后处理，不是温度或热量传感器读数。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E2-07\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“电功与电功率 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-038",
+      "labId": "circuits",
+      "title": "磁场与磁感线",
+      "brief": "用场强探针比较磁铁附近不同位置的磁场强弱。",
+      "hint": "固定 bar_magnet，在其轴向与侧向放置 probe，逐个移动探针记录磁场幅值；比较距离增大后的趋势。磁感线作为方向结构说明，不当成实体线。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E2-11"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "用场强探针比较磁铁附近不同位置的磁场强弱。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "bar_magnet",
+          "probe"
+        ],
+        "variables": [
+          "探针位置",
+          "磁偶极矩",
+          "磁铁软化半径"
+        ],
+        "observations": [
+          "磁场幅值",
+          "轴向与侧向分布趋势"
+        ],
+        "construction": "固定 bar_magnet，在其轴向与侧向放置 probe，逐个移动探针记录磁场幅值；比较距离增大后的趋势。磁感线作为方向结构说明，不当成实体线。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「磁场与磁感线」的可编辑实验空间。\n知识点：K-E2-11；领域：电磁；学段：初中。\n模型级别：可计算实验。\n\n探索目标\n用场强探针比较磁铁附近不同位置的磁场强弱。\n\n搭建方案\n固定 bar_magnet，在其轴向与侧向放置 probe，逐个移动探针记录磁场幅值；比较距离增大后的趋势。磁感线作为方向结构说明，不当成实体线。\n建议器具模型：bar_magnet、probe。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 探针位置\n• 磁偶极矩\n• 磁铁软化半径\n\n观测与比较\n• 磁场幅值\n• 轴向与侧向分布趋势\n理论参考：远离软化半径时，偶极子磁场量级随 r⁻³ 衰减。\n\n模型边界\n使用软化磁偶极子场，近磁芯不是真实条形磁铁内部场；probe 返回幅值，无法单凭数值恢复方向。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E2-11\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“磁场与磁感线 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-039",
+      "labId": "circuits",
+      "title": "电场强度",
+      "brief": "通过试探电荷受力与场强读数理解电场强度的定义。",
+      "hint": "固定一个 charge 作为场源，在远离其软化半径的位置放置 probe 与小电量 charge；关闭重力与碰撞。也可用 electric_field 对比匀强场下 F/q 的恒定性。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E3-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "通过试探电荷受力与场强读数理解电场强度的定义。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "charge",
+          "probe",
+          "electric_field"
+        ],
+        "variables": [
+          "源电荷量",
+          "试探电荷量",
+          "探针与场源距离"
+        ],
+        "observations": [
+          "probe 电场幅值",
+          "试探粒子外力加速度",
+          "F/q 与场强比较"
+        ],
+        "construction": "固定一个 charge 作为场源，在远离其软化半径的位置放置 probe 与小电量 charge；关闭重力与碰撞。也可用 electric_field 对比匀强场下 F/q 的恒定性。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「电场强度」的可编辑实验空间。\n知识点：K-E3-01；领域：电磁；学段：高中。\n模型级别：可计算实验。\n\n探索目标\n通过试探电荷受力与场强读数理解电场强度的定义。\n\n搭建方案\n固定一个 charge 作为场源，在远离其软化半径的位置放置 probe 与小电量 charge；关闭重力与碰撞。也可用 electric_field 对比匀强场下 F/q 的恒定性。\n建议器具模型：charge、probe、electric_field。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 源电荷量\n• 试探电荷量\n• 探针与场源距离\n\n观测与比较\n• probe 电场幅值\n• 试探粒子外力加速度\n• F/q 与场强比较\n理论参考：E=F/q；远场 E≈k|Q|/r²。\n\n模型边界\n点电荷场使用 0.04 m 软化半径，近距离偏离理想库仑场；试探电荷也会参与相互作用，应固定源并选较小试探量。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E3-01\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“电场强度 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-040",
+      "labId": "circuits",
+      "title": "电容",
+      "brief": "研究电容储能以及 RC 充电过程中电压与电流的变化。",
+      "hint": "把 battery、resistor、capacitor 串联闭合，voltmeter 并联电容。选 R≈10 Ω、C≈100000 μF，初始电压为零，使秒级暂态可观测。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E3-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "研究电容储能以及 RC 充电过程中电压与电流的变化。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor",
+          "capacitor",
+          "voltmeter"
+        ],
+        "variables": [
+          "电容量",
+          "串联电阻",
+          "电源电压",
+          "初始电容电压"
+        ],
+        "observations": [
+          "电容电压随时间变化",
+          "充电电流衰减",
+          "理论储能"
+        ],
+        "construction": "把 battery、resistor、capacitor 串联闭合，voltmeter 并联电容。选 R≈10 Ω、C≈100000 μF，初始电压为零，使秒级暂态可观测。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「电容」的可编辑实验空间。\n知识点：K-E3-03；领域：电磁；学段：高中。\n模型级别：可计算实验。\n\n探索目标\n研究电容储能以及 RC 充电过程中电压与电流的变化。\n\n搭建方案\n把 battery、resistor、capacitor 串联闭合，voltmeter 并联电容。选 R≈10 Ω、C≈100000 μF，初始电压为零，使秒级暂态可观测。\n建议器具模型：battery、resistor、capacitor、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 电容量\n• 串联电阻\n• 电源电压\n• 初始电容电压\n\n观测与比较\n• 电容电压随时间变化\n• 充电电流衰减\n• 理论储能\n理论参考：Q=CU，W=½CU²，τ≈(R+r)C。\n\n模型边界\n模型为线性理想电容，后向 Euler 积分有数值耗散；没有漏电、击穿、介质非线性或极板空间场。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E3-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“电容 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-041",
+      "labId": "circuits",
+      "title": "闭合电路欧姆定律",
+      "brief": "检验带内阻电源的闭合电路欧姆定律。",
+      "hint": "用 battery 与 resistor 构成闭合回路，明确设置非零电源内阻 r；串联 ammeter、并联 voltmeter。比较测得电流与考虑全部串联电阻的理论值。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E3-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "检验带内阻电源的闭合电路欧姆定律。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor",
+          "ammeter",
+          "voltmeter"
+        ],
+        "variables": [
+          "电动势 ε",
+          "内阻 r",
+          "外电阻 R"
+        ],
+        "observations": [
+          "回路电流",
+          "路端电压",
+          "内外电压降"
+        ],
+        "construction": "用 battery 与 resistor 构成闭合回路，明确设置非零电源内阻 r；串联 ammeter、并联 voltmeter。比较测得电流与考虑全部串联电阻的理论值。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「闭合电路欧姆定律」的可编辑实验空间。\n知识点：K-E3-04；领域：电磁；学段：高中。\n模型级别：可计算实验。\n\n探索目标\n检验带内阻电源的闭合电路欧姆定律。\n\n搭建方案\n用 battery 与 resistor 构成闭合回路，明确设置非零电源内阻 r；串联 ammeter、并联 voltmeter。比较测得电流与考虑全部串联电阻的理论值。\n建议器具模型：battery、resistor、ammeter、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 电动势 ε\n• 内阻 r\n• 外电阻 R\n\n观测与比较\n• 回路电流\n• 路端电压\n• 内外电压降\n理论参考：I≈ε/(R+r)，U=ε−Ir。\n\n模型边界\n源内阻线性恒定；需把电流表 1 mΩ 及电压表分流计入高精度比较，不模拟电池化学。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E3-04\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“闭合电路欧姆定律 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-042",
+      "labId": "circuits",
+      "title": "路端电压随外阻变化",
+      "brief": "绘制外电阻变化时路端电压与电流的关系。",
+      "hint": "给 battery 设置明显内阻，例如 ε=6 V、r=5 Ω，外接 rheostat 与 voltmeter。逐步改变有效外阻，记录 U、I 并保留一个中间阻值。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E3-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "绘制外电阻变化时路端电压与电流的关系。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "rheostat",
+          "voltmeter"
+        ],
+        "variables": [
+          "变阻器有效外阻",
+          "电源内阻"
+        ],
+        "observations": [
+          "路端电压 U",
+          "电流 I",
+          "U−I 变化趋势"
+        ],
+        "construction": "给 battery 设置明显内阻，例如 ε=6 V、r=5 Ω，外接 rheostat 与 voltmeter。逐步改变有效外阻，记录 U、I 并保留一个中间阻值。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「路端电压随外阻变化」的可编辑实验空间。\n知识点：K-E3-05；领域：电磁；学段：高中。\n模型级别：可计算实验。\n\n探索目标\n绘制外电阻变化时路端电压与电流的关系。\n\n搭建方案\n给 battery 设置明显内阻，例如 ε=6 V、r=5 Ω，外接 rheostat 与 voltmeter。逐步改变有效外阻，记录 U、I 并保留一个中间阻值。\n建议器具模型：battery、rheostat、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 变阻器有效外阻\n• 电源内阻\n\n观测与比较\n• 路端电压 U\n• 电流 I\n• U−I 变化趋势\n理论参考：U=εR/(R+r)，U=ε−Ir。\n\n模型边界\n理想电源加固定串联内阻模型，不包含电量下降、温度、极化和短路保护行为。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E3-05\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“路端电压随外阻变化 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-043",
+      "labId": "circuits",
+      "title": "R = r 时输出功率最大",
+      "brief": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
+      "hint": "设置 battery 的 ε=6 V、r=10 Ω，外接可调 resistor。分别比较 R=5、10、20 Ω 等配置的负载功率，明确读取负载而非电源带符号功率。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E3-06"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor"
+        ],
+        "variables": [
+          "外电阻 R",
+          "内阻 r",
+          "电动势 ε"
+        ],
+        "observations": [
+          "外电阻功率",
+          "匹配点两侧功率",
+          "匹配时的端电压"
+        ],
+        "construction": "设置 battery 的 ε=6 V、r=10 Ω，外接可调 resistor。分别比较 R=5、10、20 Ω 等配置的负载功率，明确读取负载而非电源带符号功率。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「R = r 时输出功率最大」的可编辑实验空间。\n知识点：K-E3-06；领域：电磁；学段：高中。\n模型级别：可计算实验。\n\n探索目标\n比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。\n\n搭建方案\n设置 battery 的 ε=6 V、r=10 Ω，外接可调 resistor。分别比较 R=5、10、20 Ω 等配置的负载功率，明确读取负载而非电源带符号功率。\n建议器具模型：battery、resistor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 外电阻 R\n• 内阻 r\n• 电动势 ε\n\n观测与比较\n• 外电阻功率\n• 匹配点两侧功率\n• 匹配时的端电压\n理论参考：P_R=ε²R/(R+r)²，R=r 时达到 ε²/(4r)。\n\n模型边界\n只适用于固定电动势和正线性内阻的直流戴维南模型；最大功率不等于最高效率。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E3-06\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“R = r 时输出功率最大 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-044",
+      "labId": "circuits",
+      "title": "电源效率",
+      "brief": "研究电源输出功率与效率随负载改变的不同趋势。",
+      "hint": "用 battery 和 resistor 构成回路，设已知内阻。改变负载，读取电流与负载功率，并将 P负载/(ε|I电源|) 作为理论效率后处理。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E3-07"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "研究电源输出功率与效率随负载改变的不同趋势。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "battery",
+          "resistor"
+        ],
+        "variables": [
+          "负载电阻",
+          "电源内阻"
+        ],
+        "observations": [
+          "负载功率",
+          "电源提供的理论总功率",
+          "效率与电流的权衡"
+        ],
+        "construction": "用 battery 和 resistor 构成回路，设已知内阻。改变负载，读取电流与负载功率，并将 P负载/(ε|I电源|) 作为理论效率后处理。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「电源效率」的可编辑实验空间。\n知识点：K-E3-07；领域：电磁；学段：高中。\n模型级别：可计算实验。\n\n探索目标\n研究电源输出功率与效率随负载改变的不同趋势。\n\n搭建方案\n用 battery 和 resistor 构成回路，设已知内阻。改变负载，读取电流与负载功率，并将 P负载/(ε|I电源|) 作为理论效率后处理。\n建议器具模型：battery、resistor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 负载电阻\n• 电源内阻\n\n观测与比较\n• 负载功率\n• 电源提供的理论总功率\n• 效率与电流的权衡\n理论参考：η=R/(R+r)；R=r 时 η=50%。\n\n模型边界\n这是电阻内耗下的电路效率，不代表电池化学或电机系统效率；避免用电源端口净功率代替 εI。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E3-07\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“电源效率 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-045",
+      "labId": "circuits",
+      "title": "洛伦兹力",
+      "brief": "检验运动电荷在磁场中的洛伦兹力方向与速度垂直关系。",
+      "hint": "在足够大的 Z 向 field 内放置单个 charge，初速度沿 X，关闭重力、阻尼和碰撞。用 motion_sensor 跟踪速度和加速度，比较电荷符号或 B 符号反转。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E3-09"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "检验运动电荷在磁场中的洛伦兹力方向与速度垂直关系。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "charge",
+          "field",
+          "motion_sensor"
+        ],
+        "variables": [
+          "电荷量符号",
+          "磁场强度与符号",
+          "初速度"
+        ],
+        "observations": [
+          "初始偏转方向",
+          "加速度与速度的垂直关系",
+          "速度大小"
+        ],
+        "construction": "在足够大的 Z 向 field 内放置单个 charge，初速度沿 X，关闭重力、阻尼和碰撞。用 motion_sensor 跟踪速度和加速度，比较电荷符号或 B 符号反转。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「洛伦兹力」的可编辑实验空间。\n知识点：K-E3-09；领域：电磁；学段：高中。\n模型级别：可计算实验。\n\n探索目标\n检验运动电荷在磁场中的洛伦兹力方向与速度垂直关系。\n\n搭建方案\n在足够大的 Z 向 field 内放置单个 charge，初速度沿 X，关闭重力、阻尼和碰撞。用 motion_sensor 跟踪速度和加速度，比较电荷符号或 B 符号反转。\n建议器具模型：charge、field、motion_sensor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 电荷量符号\n• 磁场强度与符号\n• 初速度\n\n观测与比较\n• 初始偏转方向\n• 加速度与速度的垂直关系\n• 速度大小\n理论参考：F=q(v×B)，B 沿 +Z、q>0、v 沿 +X 时 F 沿 −Y。\n\n模型边界\n使用非相对论宏观带电粒子，电荷单位 μC、质量单位 kg；不能套用电子质量等超出范围的值，也不含辐射损失。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E3-09\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“洛伦兹力 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-046",
+      "labId": "circuits",
+      "title": "带电粒子在磁场中的运动",
+      "brief": "观察匀强磁场内带电粒子的弯曲轨迹并比较回旋尺度。",
+      "hint": "使用 Z 向 field 和单个 charge，关闭重力、阻尼、碰撞；可选 q=50 μC、m=0.01 kg、B=10 T、vx=0.02 m/s，保持粒子位于场区。短时校验后运行更长时间查看轨迹。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E3-10"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "观察匀强磁场内带电粒子的弯曲轨迹并比较回旋尺度。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "charge",
+          "field",
+          "motion_sensor"
+        ],
+        "variables": [
+          "电荷量",
+          "质量",
+          "磁场强度",
+          "初速度大小"
+        ],
+        "observations": [
+          "轨迹弯曲",
+          "速度大小",
+          "理论半径和周期"
+        ],
+        "construction": "使用 Z 向 field 和单个 charge，关闭重力、阻尼、碰撞；可选 q=50 μC、m=0.01 kg、B=10 T、vx=0.02 m/s，保持粒子位于场区。短时校验后运行更长时间查看轨迹。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「带电粒子在磁场中的运动」的可编辑实验空间。\n知识点：K-E3-10；领域：电磁；学段：高中。\n模型级别：可计算实验。\n\n探索目标\n观察匀强磁场内带电粒子的弯曲轨迹并比较回旋尺度。\n\n搭建方案\n使用 Z 向 field 和单个 charge，关闭重力、阻尼、碰撞；可选 q=50 μC、m=0.01 kg、B=10 T、vx=0.02 m/s，保持粒子位于场区。短时校验后运行更长时间查看轨迹。\n建议器具模型：charge、field、motion_sensor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 电荷量\n• 质量\n• 磁场强度\n• 初速度大小\n\n观测与比较\n• 轨迹弯曲\n• 速度大小\n• 理论半径和周期\n理论参考：r=mv⊥/(|q|B)，T=2πm/(|q|B)。\n\n模型边界\n参数范围对应教学宏观粒子，示例周期约 126 s；单次 MCP 最长 20 s 只能看到部分圆弧。球形场外磁场直接归零，不模拟边缘场。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E3-10\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“带电粒子在磁场中的运动 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-047",
+      "labId": "circuits",
+      "title": "交流电与有效值",
+      "brief": "区分正弦交流的瞬时值、峰值和有效值。",
+      "hint": "使用零偏置 ac_source 与 resistor 闭合，串 ammeter、并 voltmeter。频率取约 1 Hz，以足够采样率覆盖整数周期，对实际瞬时读数计算 RMS。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E3-14"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "区分正弦交流的瞬时值、峰值和有效值。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "ac_source",
+          "resistor",
+          "ammeter",
+          "voltmeter"
+        ],
+        "variables": [
+          "交流幅值",
+          "频率",
+          "负载电阻"
+        ],
+        "observations": [
+          "瞬时电压和电流",
+          "整数周期的 RMS 后处理",
+          "理论峰值与有效值关系"
+        ],
+        "construction": "使用零偏置 ac_source 与 resistor 闭合，串 ammeter、并 voltmeter。频率取约 1 Hz，以足够采样率覆盖整数周期，对实际瞬时读数计算 RMS。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「交流电与有效值」的可编辑实验空间。\n知识点：K-E3-14；领域：电磁；学段：高中。\n模型级别：可计算实验。\n\n探索目标\n区分正弦交流的瞬时值、峰值和有效值。\n\n搭建方案\n使用零偏置 ac_source 与 resistor 闭合，串 ammeter、并 voltmeter。频率取约 1 Hz，以足够采样率覆盖整数周期，对实际瞬时读数计算 RMS。\n建议器具模型：ac_source、resistor、ammeter、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 交流幅值\n• 频率\n• 负载电阻\n\n观测与比较\n• 瞬时电压和电流\n• 整数周期的 RMS 后处理\n• 理论峰值与有效值关系\n理论参考：纯正弦 U有效=U峰/√2；离散 RMS=√(Σu_i²/n)。\n\n模型边界\n仪表显示瞬时值，不是内置真有效值仪表；RMS 需另算，受采样率、源内阻和采样区间影响。不要用低采样率证明高频波形。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E3-14\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“交流电与有效值 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "电磁"
+      }
+    },
+    {
+      "id": "CH-AUTO-048",
+      "labId": "circuits",
+      "title": "电磁振荡",
+      "brief": "研究预充电电容与电感之间的能量交换及电阻造成的振荡衰减。",
+      "hint": "把 capacitor、inductor、resistor 串联成无外源闭环，电容设初始电压，电感初始电流设零。选 L=10000 mH、C=100000 μF、R=1 Ω，使振荡在秒级可见。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-E3-16"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "研究预充电电容与电感之间的能量交换及电阻造成的振荡衰减。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "capacitor",
+          "inductor",
+          "resistor"
+        ],
+        "variables": [
+          "电容 C",
+          "电感 L",
+          "串联电阻 R",
+          "初始电容电压"
+        ],
+        "observations": [
+          "电容电压与电感电流",
+          "衰减振荡趋势",
+          "理论电场和磁场储能"
+        ],
+        "construction": "把 capacitor、inductor、resistor 串联成无外源闭环，电容设初始电压，电感初始电流设零。选 L=10000 mH、C=100000 μF、R=1 Ω，使振荡在秒级可见。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「电磁振荡」的可编辑实验空间。\n知识点：K-E3-16；领域：电磁；学段：高中。\n模型级别：可计算实验。\n\n探索目标\n研究预充电电容与电感之间的能量交换及电阻造成的振荡衰减。\n\n搭建方案\n把 capacitor、inductor、resistor 串联成无外源闭环，电容设初始电压，电感初始电流设零。选 L=10000 mH、C=100000 μF、R=1 Ω，使振荡在秒级可见。\n建议器具模型：capacitor、inductor、resistor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 电容 C\n• 电感 L\n• 串联电阻 R\n• 初始电容电压\n\n观测与比较\n• 电容电压与电感电流\n• 衰减振荡趋势\n• 理论电场和磁场储能\n理论参考：ω0=1/√(LC)，欠阻尼条件 R<2√(L/C)，W=½CU²+½LI²。\n\n模型边界\n后向 Euler 有额外数值耗散，不能声称无阻电路严格守恒；无电磁辐射、互感和分布参数。观察完整周期需要较长运行。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-E3-16\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“电磁振荡 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "电磁"
+      }
+    }
+  ]
+}

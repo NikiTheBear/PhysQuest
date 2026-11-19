@@ -12,6 +12,7 @@ import {
   type AIConnection,
   type LauncherInfo,
 } from '../../ai/client';
+import { getUsage, resetUsage, type UsageSummary } from '../../ai/usage';
 
 interface Props {
   config: AIConfig;
@@ -19,8 +20,19 @@ interface Props {
   onClose: () => void;
 }
 
-type TestState = { kind: 'idle' } | { kind: 'busy' } | { kind: 'ok' } | { kind: 'err'; msg: string; detail?: string };
+type TestState =
+  | { kind: 'idle' }
+  | { kind: 'busy' }
+  | { kind: 'ok' }
+  | { kind: 'err'; msg: string; detail?: string };
 
+/**
+ * AI 设置（全站唯一入口）
+ *
+ * 从顶栏齿轮打开。这里配的 Key 同时供两处使用：
+ *   ① 我们自己的 AI 助教
+ *   ② Fieldlab 自由搭建工作台里的实验助手（通过 workspace 同步）
+ */
 export default function AISettings({ config, onSave, onClose }: Props) {
   const [c, setC] = useState<AIConfig>(config);
   const [provider, setProvider] = useState('deepseek');
@@ -28,6 +40,7 @@ export default function AISettings({ config, onSave, onClose }: Props) {
   const [showKey, setShowKey] = useState(false);
   const [launcher, setLauncher] = useState<LauncherInfo | null>(null);
   const [probing, setProbing] = useState(false);
+  const [usage, setUsage] = useState<UsageSummary>(() => getUsage());
 
   const checkLauncher = async () => {
     setProbing(true);
@@ -40,6 +53,10 @@ export default function AISettings({ config, onSave, onClose }: Props) {
     if (c.connection === 'launcher') void checkLauncher();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [c.connection]);
+
+  useEffect(() => {
+    setUsage(getUsage());
+  }, [test, c]);
 
   const pickProvider = (id: string) => {
     setProvider(id);
@@ -59,16 +76,25 @@ export default function AISettings({ config, onSave, onClose }: Props) {
     const res = await testConnection(c);
     if (res.ok) setTest({ kind: 'ok' });
     else setTest({ kind: 'err', msg: res.error.message, detail: res.error.detail });
+    setUsage(getUsage());
   };
+
+  const canSave = isConfigured(c) || (c.connection === 'launcher' && launcher?.hasConfig);
 
   return (
     <div className="overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()} style={{ width: 'min(620px,100%)' }}>
+      <div
+        className="modal ai-settings-modal"
+        onClick={(e) => e.stopPropagation()}
+        style={{ width: 'min(660px,100%)' }}
+      >
         <h3>AI 设置</h3>
         <p className="sub">
-          密钥只保存在你这台电脑的浏览器里。我们的服务器不接收、不转发、不存储任何 Key。
+          这里的配置**同时用于**左边这个 AI 助教，和自由搭建工作台里的实验助手。
+          Key 只保存在你这台电脑的浏览器里，我们的服务器不接收、不转发、不存储任何 Key。
         </p>
 
+        {/* ============ 连接方式 ============ */}
         <div className="field">
           <label>连接方式</label>
           <div className="segmented">
@@ -90,20 +116,16 @@ export default function AISettings({ config, onSave, onClose }: Props) {
               </button>
             ))}
           </div>
-          <div className="field" style={{ marginTop: 8, marginBottom: 0 }}>
-            <div className="hint" style={{ marginTop: 0 }}>
-              {c.connection === 'launcher'
-                ? '走本机 127.0.0.1:8787 转发，绕开跨域，所有厂商都能用。需要先双击启动器。'
-                : '浏览器直接请求厂商接口。只有少数厂商允许这样做，大部分会报「跨域」错误。'}
-            </div>
+          <div className="hint" style={{ marginTop: 6 }}>
+            {c.connection === 'launcher'
+              ? '走本机 127.0.0.1:8787 转发，绕开跨域，所有厂商都能用。'
+              : '浏览器直接请求厂商接口。只有少数厂商允许，大部分会报「跨域」错误。'}
           </div>
 
           {c.connection === 'launcher' && (
             <div
-              className={`test-result ${
-                launcher === null ? 'info' : launcher.ok ? 'ok' : 'err'
-              }`}
-              style={{ display: 'flex', alignItems: 'center', gap: 10 }}
+              className={`test-result ${launcher === null ? 'info' : launcher.ok ? 'ok' : 'err'}`}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}
             >
               <span style={{ flex: 1 }}>
                 {probing && '正在检查启动器…'}
@@ -111,15 +133,14 @@ export default function AISettings({ config, onSave, onClose }: Props) {
                 {!probing && launcher?.ok && (
                   <>
                     <b>启动器在跑</b>
-                    {launcher.hasConfig ? '（已读到 config.local.json 里的 Key）' : '（Key 从下面这个框读）'}
+                    {launcher.hasConfig ? '（已读到 config.local.json 里的 Key）' : ''}
                   </>
                 )}
                 {!probing && launcher && !launcher.ok && (
                   <>
                     <b>启动器没在跑</b>
                     <div style={{ fontSize: 12, opacity: 0.85, marginTop: 3 }}>
-                      回桌面双击 PhysQuest 启动器（`start.command` / `start.bat`），
-                      然后用它给出的 {LAUNCHER_BASE} 打开网页。
+                      回桌面双击 start.command，然后用 {LAUNCHER_BASE} 打开网页。
                     </div>
                   </>
                 )}
@@ -131,6 +152,7 @@ export default function AISettings({ config, onSave, onClose }: Props) {
           )}
         </div>
 
+        {/* ============ 厂商 ============ */}
         <div className="field">
           <label>厂商</label>
           <div className="chips">
@@ -139,11 +161,7 @@ export default function AISettings({ config, onSave, onClose }: Props) {
                 key={p.id}
                 className="chip"
                 onClick={() => pickProvider(p.id)}
-                style={
-                  provider === p.id
-                    ? { background: 'var(--accent)', color: '#fff' }
-                    : undefined
-                }
+                style={provider === p.id ? { background: 'var(--accent)', color: '#fff' } : undefined}
               >
                 {p.name}
               </span>
@@ -151,31 +169,32 @@ export default function AISettings({ config, onSave, onClose }: Props) {
           </div>
         </div>
 
-        <div className="field">
-          <label>端点地址</label>
-          <input
-            value={c.endpoint}
-            onChange={(e) => {
-              setC({ ...c, endpoint: e.target.value });
-              setTest({ kind: 'idle' });
-            }}
-            placeholder="https://api.deepseek.com/v1"
-            spellCheck={false}
-          />
-          <div className="hint">只填到 /v1 就行，后面的路径会自动补上。</div>
-        </div>
-
-        <div className="field">
-          <label>模型名称</label>
-          <input
-            value={c.model}
-            onChange={(e) => {
-              setC({ ...c, model: e.target.value });
-              setTest({ kind: 'idle' });
-            }}
-            placeholder="deepseek-chat"
-            spellCheck={false}
-          />
+        <div className="field-row">
+          <div className="field">
+            <label>端点地址</label>
+            <input
+              value={c.endpoint}
+              onChange={(e) => {
+                setC({ ...c, endpoint: e.target.value });
+                setTest({ kind: 'idle' });
+              }}
+              placeholder="https://api.deepseek.com/v1"
+              spellCheck={false}
+            />
+            <div className="hint">只填到 /v1，后面的路径自动补。</div>
+          </div>
+          <div className="field">
+            <label>模型名称</label>
+            <input
+              value={c.model}
+              onChange={(e) => {
+                setC({ ...c, model: e.target.value });
+                setTest({ kind: 'idle' });
+              }}
+              placeholder="deepseek-chat"
+              spellCheck={false}
+            />
+          </div>
         </div>
 
         <div className="field">
@@ -198,7 +217,7 @@ export default function AISettings({ config, onSave, onClose }: Props) {
           </div>
           <div className="hint">
             {c.connection === 'launcher' && launcher?.hasConfig
-              ? '启动器已经读到 config.local.json 里的 Key，这里可以留空。'
+              ? '启动器已读到 config.local.json 里的 Key，这里可以留空。'
               : '存在 localStorage，清浏览器数据会一起清掉。'}
           </div>
         </div>
@@ -210,7 +229,7 @@ export default function AISettings({ config, onSave, onClose }: Props) {
             }`}
           >
             {test.kind === 'busy' && '正在测试连接…'}
-            {test.kind === 'ok' && '✓ 连上了。可以开始用 AI 助教了。'}
+            {test.kind === 'ok' && '✓ 连上了。AI 助教和实验助手都能用了。'}
             {test.kind === 'err' && (
               <>
                 <b>{test.msg}</b>
@@ -221,6 +240,44 @@ export default function AISettings({ config, onSave, onClose }: Props) {
             )}
           </div>
         )}
+
+        {/* ============ 用量与计费 ============ */}
+        <div className="usage-box">
+          <div className="usage-head">
+            <span>本机用量</span>
+            <button
+              className="btn-ghost btn-small"
+              onClick={() => {
+                resetUsage();
+                setUsage(getUsage());
+              }}
+            >
+              清零
+            </button>
+          </div>
+          <div className="usage-grid">
+            <div>
+              <b>{usage.totalTokens.toLocaleString()}</b>
+              <span>累计 token</span>
+            </div>
+            <div>
+              <b>{usage.calls}</b>
+              <span>调用次数</span>
+            </div>
+            <div>
+              <b>${usage.costUsd.toFixed(4)}</b>
+              <span>按 $0.15 / 1M 折算</span>
+            </div>
+            <div>
+              <b>¥{usage.costCny.toFixed(4)}</b>
+              <span>按 ¥1 / 1M 折算</span>
+            </div>
+          </div>
+          <p className="usage-note">
+            这是**本机统计**，数据只存在浏览器里，用于将来按用量计费时的预估。
+            实际上游费用由你的厂商账户扣，我们不经手。
+          </p>
+        </div>
 
         <div className="modal-actions" style={{ justifyContent: 'space-between' }}>
           <button
@@ -234,16 +291,8 @@ export default function AISettings({ config, onSave, onClose }: Props) {
           >
             清除
           </button>
-
           <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              className="btn-ghost"
-              onClick={runTest}
-              disabled={
-                (!isConfigured(c) && !(c.connection === 'launcher' && launcher?.hasConfig)) ||
-                test.kind === 'busy'
-              }
-            >
+            <button className="btn-ghost" onClick={runTest} disabled={!canSave || test.kind === 'busy'}>
               测试连接
             </button>
             <button
@@ -252,7 +301,7 @@ export default function AISettings({ config, onSave, onClose }: Props) {
                 saveAIConfig(c);
                 onSave(c);
               }}
-              disabled={!isConfigured(c) && !(c.connection === 'launcher' && launcher?.hasConfig)}
+              disabled={!canSave}
             >
               保存
             </button>

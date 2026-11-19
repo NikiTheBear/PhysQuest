@@ -3268,3 +3268,307 @@ html[data-theme='dark'] .pq-toast {
   margin: 0;
   white-space: pre-wrap;
 }
+
+/* ================= AI 设置：两列 + 用量 ================= */
+
+.ai-settings-modal .sub b,
+.ai-settings-modal .sub strong {
+  color: var(--label);
+  font-weight: 600;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 12px;
+}
+.field-row .field {
+  margin-bottom: 0;
+}
+
+.usage-box {
+  background: var(--surface-2);
+  border-radius: var(--r-ctrl);
+  padding: 14px 16px;
+  margin: 4px 0 16px;
+}
+.usage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--label-2);
+  margin-bottom: 10px;
+}
+.usage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.usage-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.usage-grid b {
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--label);
+}
+.usage-grid span {
+  font-size: 11px;
+  color: var(--label-3);
+  line-height: 1.4;
+}
+.usage-note {
+  font-size: 11.5px;
+  color: var(--label-3);
+  line-height: 1.6;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: var(--hairline);
+}
+
+/* ================= 闸门里的「搬到自由搭建」 ================= */
+
+.gate-send {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+  background: var(--surface-2);
+  border-radius: var(--r-ctrl);
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+.gate-send b {
+  font-size: 13.5px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 3px;
+}
+.gate-send p {
+  font-size: 12.5px;
+  color: var(--label-2);
+  line-height: 1.6;
+  margin: 0;
+}
+.gate-send button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ================= 帮助 / 首次引导 ================= */
+
+.help-modal {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.help-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 26px 30px 18px;
+  border-bottom: var(--hairline);
+  flex-shrink: 0;
+}
+.help-head .eyebrow {
+  margin-bottom: 6px;
+}
+.help-head h3 {
+  font-size: 25px;
+  letter-spacing: -0.025em;
+}
+
+.help-modal > *:not(.help-head) {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+.help-modal > .modal-actions {
+  padding: 18px 30px 22px;
+  border-top: var(--hairline);
+  flex-shrink: 0;
+}
+
+.help-lead {
+  padding-top: 20px;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--label-2);
+  overflow-y: auto;
+}
+.help-lead strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+.help-lead b {
+  color: var(--label);
+}
+
+/* ---- 三步 ---- */
+.help-steps {
+  padding-top: 22px;
+  display: grid;
+  gap: 18px;
+}
+.help-step {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 14px;
+}
+.hs-no {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 1px;
+}
+.help-step h4 {
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-bottom: 5px;
+}
+.help-step p {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--label-2);
+  margin-bottom: 4px;
+}
+.help-step p b {
+  color: var(--label);
+  font-weight: 600;
+}
+.hs-note {
+  font-size: 12.5px !important;
+  color: var(--label-3) !important;
+  background: var(--fill);
+  border-radius: 8px;
+  padding: 8px 11px;
+  margin-top: 6px !important;
+}
+
+/* ---- 两种模式对比 ---- */
+.help-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 22px 30px 0;
+  padding: 0 !important;
+}
+.help-compare > div {
+  background: var(--surface-2);
+  border-radius: var(--r-ctrl);
+  padding: 14px 16px;
+}
+.hc-label {
+  display: inline-block;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 5px;
+}
+.help-compare b {
+  display: block;
+  font-size: 14.5px;
+  margin-bottom: 4px;
+}
+.help-compare p {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--label-2);
+}
+
+/* ---- FAQ ---- */
+.help-faq {
+  padding-top: 22px;
+  padding-bottom: 4px;
+  overflow-y: auto;
+}
+.help-faq h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--label-2);
+}
+.help-faq details {
+  border-top: var(--hairline);
+  padding: 10px 0;
+  font-size: 13px;
+}
+.help-faq details:first-of-type {
+  border-top: none;
+}
+.help-faq summary {
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--label);
+  list-style: none;
+}
+.help-faq summary::-webkit-details-marker {
+  display: none;
+}
+.help-faq summary::before {
+  content: '▸ ';
+  font-size: 10px;
+  color: var(--accent);
+}
+.help-faq details[open] summary::before {
+  content: '▾ ';
+}
+.help-faq p {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--label-2);
+}
+.help-faq p b {
+  color: var(--label);
+}
+.help-faq code {
+  font-family: var(--font-mono);
+  background: var(--fill);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* ---- 首次进入的提示条 ---- */
+.first-visit-hint {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--accent-soft);
+  border-radius: var(--r-card);
+  padding: 14px 20px;
+  margin-bottom: 22px;
+  font-size: 13.5px;
+  color: var(--label);
+}
+.first-visit-hint .fv-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.first-visit-hint .fv-text {
+  flex: 1;
+  line-height: 1.6;
+}
+.first-visit-hint .fv-text b {
+  font-weight: 600;
+}
+.first-visit-hint button {
+  flex-shrink: 0;
+}

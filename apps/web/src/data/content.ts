@@ -63,6 +63,55 @@ export const allCardById = (id: string) => ALL_CARDS.find((c) => c.id === id);
 export const knowledgeById = (id: string) => KNOWLEDGE.find((k) => k.id === id);
 export const misconceptionById = (id: string) => MISCONCEPTIONS.find((m) => m.id === id);
 export const challengeById = (id: string) => CHALLENGES.find((c) => c.id === id);
+
+/* ============================================================
+ * 自动生成的挑战（力学 / 电路 / 光学额外）
+ *
+ * 这些是从 knowledge-prompts.json 派生的：
+ *   一个「可计算」的知识点 → 一个挑战 + 一个 .pqexp 实验文件
+ * 所以「有搭建方案的知识点」全都能真的动手。
+ * ========================================================== */
+
+import mechAuto from '@knowledge/labs/mechanics-challenges.json';
+import circAuto from '@knowledge/labs/circuits-challenges.json';
+import opticsAuto from '@knowledge/labs/optics-lens-challenges.json';
+
+export interface AutoChallenge {
+  id: string;
+  labId: string;
+  title: string;
+  brief: string;
+  hint: string;
+  auto: true;
+  multiAnswer: boolean;
+  knowledgeIds: string[];
+  misconceptionIds: string[];
+  difficulty: string;
+  prediction: { prompt: string; options: string[]; answerIndex: number };
+  build: {
+    models: string[];
+    variables: string[];
+    observations: string[];
+    construction: string;
+    prompt: string;
+    stage: string;
+    domain: string;
+  };
+}
+
+export const AUTO_CHALLENGES: AutoChallenge[] = [
+  ...((mechAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
+  ...((circAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
+  ...((opticsAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
+];
+
+/** 某个模块下自动生成的挑战 */
+export const autoChallengesFor = (labId: string) =>
+  AUTO_CHALLENGES.filter((c) => c.labId === labId);
+
+/** 某个知识点有没有对应的自动挑战 */
+export const autoChallengeForKnowledge = (knowledgeId: string) =>
+  AUTO_CHALLENGES.find((c) => c.knowledgeIds.includes(knowledgeId));
 export const quizForChallenge = (challenge: Challenge): QuizItem[] => {
   // 优先取这个挑战考的知识点对应的题
   const hit = QUIZ.filter((q) => challenge.knowledgeIds.includes(q.knowledgeId));

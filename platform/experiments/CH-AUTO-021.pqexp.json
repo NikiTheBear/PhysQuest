@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "title": "动量定理",
+    "description": "用恒力作用时间检验冲量与动量改变量。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-021",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-021",
+    "title": "动量定理",
+    "goal": "用恒力作用时间检验冲量与动量改变量。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "force-2",
+        "kind": "force",
+        "name": "force",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "恒力",
+        "作用时长",
+        "质量"
+      ],
+      "steps": [
+        "速度增量",
+        "理论冲量",
+        "动量变化"
+      ],
+      "limitations": "恒力持续作用，改变模拟结束时刻代表不同作用时长；不把接触碰撞的瞬时力从传感器外力通道中反推。"
+    }
+  }
+}

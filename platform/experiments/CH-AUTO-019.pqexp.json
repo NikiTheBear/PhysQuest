@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "title": "动能定理",
+    "description": "比较恒力做功和质点动能的增量。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-019",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-019",
+    "title": "动能定理",
+    "goal": "比较恒力做功和质点动能的增量。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "force-2",
+        "kind": "force",
+        "name": "force",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "恒力",
+        "质量",
+        "初速度"
+      ],
+      "steps": [
+        "位移",
+        "速度",
+        "功与动能增量的误差"
+      ],
+      "limitations": "仅比较平动且无其他做功机制的球；公式计算应与求解器采样区间一致。"
+    }
+  }
+}

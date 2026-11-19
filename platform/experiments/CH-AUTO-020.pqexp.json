@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "title": "机械能守恒",
+    "description": "检查保守弹性系统的机械能守恒及数值误差。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-020",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-020",
+    "title": "机械能守恒",
+    "goal": "检查保守弹性系统的机械能守恒及数值误差。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "anchor-1",
+        "kind": "anchor",
+        "name": "anchor",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "spring-2",
+        "kind": "spring",
+        "name": "spring",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "body-3",
+        "kind": "body",
+        "name": "body",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-4",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          4,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "劲度系数",
+        "质量",
+        "初始伸长"
+      ],
+      "steps": [
+        "机械能随时间",
+        "动能与弹性势能互换"
+      ],
+      "limitations": "不加入周期驱动或耗散；有限步长产生能量误差，不能要求每个浮点采样值绝对相等。"
+    }
+  }
+}

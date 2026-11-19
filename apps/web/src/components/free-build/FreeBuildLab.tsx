@@ -58,6 +58,8 @@ interface Props {
   onGoalReached?: () => void;
   /** 从实验台一键搬过来的实验数据（.pqexp） */
   importExperiment?: unknown | null;
+  /** 顶栏配的 AI 配置，传给工作台用 */
+  aiConfig?: { apiKey: string; model: string; endpoint: string; connection: string } | null;
 }
 
 const workbenchUrl = (staticMode: boolean) =>
@@ -73,6 +75,7 @@ export default function FreeBuildLab({
   goal,
   onGoalReached,
   importExperiment,
+  aiConfig,
 }: Props) {
   const [goalState, setGoalState] = useState<{ ok: boolean; detail: string } | null>(null);
   const [ready, setReady] = useState(false);
@@ -167,6 +170,16 @@ export default function FreeBuildLab({
     if (ready) send('build-knowledge', data);
     else pending.current = { action: 'build-knowledge', data };
   }, [buildRequest, ready, send]);
+
+  /* ---------- 把 Key 同步给工作台 ---------- */
+  useEffect(() => {
+    if (!ready || !aiConfig?.apiKey) return;
+    send('set-credentials', {
+      apiKey: aiConfig.apiKey,
+      model: aiConfig.model,
+      endpoint: aiConfig.endpoint,
+    });
+  }, [ready, aiConfig, send]);
 
   /* ---------- 从实验台导入 ---------- */
   useEffect(() => {

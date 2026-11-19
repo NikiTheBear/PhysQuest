@@ -1,0 +1,10 @@
+dist/
+site.tar.gz
+node_modules/
+.local/
+.generated/
+standalone/
+*.log
+*.tsbuildinfo
+
+.openai/hosting.json

@@ -1,0 +1,156 @@
+{
+  "labId": "optics-lens",
+  "items": [
+    {
+      "id": "Q-O2-001",
+      "type": "single_choice",
+      "question": "某凸透镜焦距 f = 10 cm，把蜡烛放在距透镜 30 cm 处。光屏上成的像是什么样子？",
+      "options": ["倒立、缩小的实像", "倒立、放大的实像", "正立、放大的虚像"],
+      "answerIndex": 0,
+      "knowledgeId": "K-O2-05",
+      "misconceptionId": "MIS-O2-05",
+      "explanation": "u = 30 cm > 2f = 20 cm，属于「物距大于二倍焦距」，成倒立缩小的实像。相机就是这个原理。"
+    },
+    {
+      "id": "Q-O2-002",
+      "type": "single_choice",
+      "question": "焦距 f = 10 cm，蜡烛放在 8 cm 处。移动光屏，会看到什么？",
+      "options": ["倒立放大的实像", "正立放大的虚像", "光屏上始终找不到清晰的像"],
+      "answerIndex": 2,
+      "knowledgeId": "K-O2-09",
+      "misconceptionId": "MIS-O2-01",
+      "explanation": "u = 8 cm < f = 10 cm，成的是虚像。虚像不能被光屏承接，所以怎么挪光屏都找不到。"
+    },
+    {
+      "id": "Q-O2-003",
+      "type": "single_choice",
+      "question": "把蜡烛正好放在焦点上（u = f），光屏上会看到什么？",
+      "options": ["一个特别大的像", "什么都没有", "一个特别小的像"],
+      "answerIndex": 1,
+      "knowledgeId": "K-O2-08",
+      "misconceptionId": "MIS-O2-02",
+      "explanation": "u = f 时出射光线互相平行，交点趋于无穷远，光屏上接不到任何像。"
+    },
+    {
+      "id": "Q-O2-004",
+      "type": "single_choice",
+      "question": "已经调出清晰的像，现在用一张纸遮住透镜的上半部分。像会怎样？",
+      "options": ["只剩上面一半", "只剩下面一半", "像完整，但比以前暗"],
+      "answerIndex": 2,
+      "knowledgeId": "K-O2-13",
+      "misconceptionId": "MIS-O2-04",
+      "explanation": "像的位置和大小只由物距和焦距决定。遮住一半只是减少进光量，像会完整保留并变暗。"
+    },
+    {
+      "id": "Q-O2-005",
+      "type": "single_choice",
+      "question": "成实像时，把蜡烛从远处慢慢移近透镜（仍在焦距以外），光屏该怎么配合？",
+      "options": ["往透镜方向挪", "往远离透镜的方向挪", "不用挪"],
+      "answerIndex": 1,
+      "knowledgeId": "K-O2-11",
+      "misconceptionId": "MIS-O2-06",
+      "explanation": "物近像远。物距变小，像距变大，光屏要往远处挪。"
+    },
+    {
+      "id": "Q-O2-006",
+      "type": "single_choice",
+      "question": "下面哪一句是错的？",
+      "options": [
+        "实像可以是放大的，也可以是缩小的",
+        "虚像一定不能被光屏承接",
+        "虚像是假的，实际上并不存在"
+      ],
+      "answerIndex": 2,
+      "knowledgeId": "K-O2-10",
+      "misconceptionId": "MIS-O2-03",
+      "explanation": "虚像真实存在，眼睛看得到、相机拍得到。它只是不能被光屏承接，因为光线并没有在那里真的相交。"
+    },
+    {
+      "id": "Q-O2-007",
+      "type": "single_choice",
+      "question": "光屏上没找到像，下面哪种解释最可能？",
+      "options": ["透镜坏了", "光屏放的位置不对", "蜡烛没有点亮"],
+      "answerIndex": 1,
+      "knowledgeId": "K-O2-13",
+      "misconceptionId": "MIS-O2-07",
+      "explanation": "最常见的原因是光屏没放到像的位置上。前后挪一挪，像就会出来。"
+    },
+    {
+      "id": "Q-O2-008",
+      "type": "single_choice",
+      "question": "焦距 f = 10 cm，把物体放在 15 cm 处。像的性质是什么？",
+      "options": ["倒立放大的实像", "倒立缩小的实像", "正立放大的虚像"],
+      "answerIndex": 0,
+      "knowledgeId": "K-O2-07",
+      "misconceptionId": "MIS-O2-09",
+      "explanation": "f < u = 15 cm < 2f = 20 cm，属于「一倍到二倍焦距之间」，成倒立放大的实像。投影仪就是这个原理。"
+    },
+    {
+      "id": "Q-O2-009",
+      "type": "single_choice",
+      "question": "照相机、投影仪、放大镜，三个用的都是凸透镜。它们的区别在哪？",
+      "options": ["镜片材料不同", "物体放在不同的物距区间", "透镜大小不同"],
+      "answerIndex": 1,
+      "knowledgeId": "K-O2-15",
+      "misconceptionId": "MIS-O2-08",
+      "explanation": "镜片本身没变，变的是物体放在哪一段：u>2f 是相机，f<u<2f 是投影仪，u<f 是放大镜。"
+    },
+    {
+      "id": "Q-O2-010",
+      "type": "single_choice",
+      "question": "物距等于两倍焦距时，像是什么样？",
+      "options": ["倒立、等大的实像", "倒立、缩小的实像", "正立、等大的虚像"],
+      "answerIndex": 0,
+      "knowledgeId": "K-O2-06",
+      "misconceptionId": "MIS-O2-05",
+      "explanation": "u = 2f 时 v = 2f，放大率恰好是 −1，成倒立等大的实像。这是「大」和「小」的分界线。"
+    },
+    {
+      "id": "Q-O2-011",
+      "type": "single_choice",
+      "question": "凹透镜能不能在光屏上成出像？",
+      "options": ["能，物距够大时能", "不能，永远只能成缩小正立的虚像", "能，但像是倒立的"],
+      "answerIndex": 1,
+      "knowledgeId": "K-O2-02",
+      "misconceptionId": "MIS-O2-10",
+      "explanation": "凹透镜对任何物距都只成缩小、正立的虚像，永远无法被光屏承接。"
+    },
+    {
+      "id": "Q-O2-012",
+      "type": "single_choice",
+      "question": "近视眼需要戴什么透镜矫正？",
+      "options": ["凸透镜", "凹透镜", "不用戴，靠调节就行"],
+      "answerIndex": 1,
+      "knowledgeId": "K-O2-14",
+      "misconceptionId": "",
+      "explanation": "近视是晶状体会聚太猛，像落在视网膜前面。凹透镜先让光散一散，把它推回视网膜上。"
+    },
+    {
+      "id": "Q-O2-013",
+      "type": "short_answer",
+      "question": "用你自己的话说说：为什么物距小于焦距时，光屏上接不到像？",
+      "answerKey": "因为折射后的光线仍然是发散的，不会在透镜后面相交；只有把它们反向延长才会交于一点，这个交点就是虚像。光线并没有真的在那里会合，所以光屏接不住。",
+      "knowledgeId": "K-O2-09",
+      "misconceptionId": "MIS-O2-03",
+      "explanation": "关键要说到「光线没有真的相交」和「反向延长」两件事。"
+    },
+    {
+      "id": "Q-O2-014",
+      "type": "short_answer",
+      "question": "你已经调出了清晰的像。现在遮住透镜上半部分。请说出像会怎么变、为什么。",
+      "answerKey": "像完整保留，只是整体变暗。因为像的位置和大小由物距和焦距决定；遮住一半只减少了通过透镜的光，不影响成像的位置和形状。",
+      "knowledgeId": "K-O2-13",
+      "misconceptionId": "MIS-O2-04",
+      "explanation": "关键要区分「像的位置大小」和「进光量」两件事。"
+    },
+    {
+      "id": "Q-O2-015",
+      "type": "short_answer",
+      "question": "用 1/f = 1/u + 1/v 算出：f = 10 cm，u = 15 cm 时的像距，并说明像是实是虚。",
+      "answerKey": "1/10 = 1/15 + 1/v → 1/v = 1/10 − 1/15 = 1/30 → v = 30 cm。v > 0 所以是实像，且放大率 m = −30/15 = −2，倒立放大。",
+      "knowledgeId": "K-O3-01",
+      "misconceptionId": "",
+      "explanation": "v 正负号是关键：v > 0 实像，v < 0 虚像。"
+    }
+  ]
+}

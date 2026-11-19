@@ -1,192 +1,70 @@
-# 探理实验室 · PhysQuest
+# PhysQuest · 自由搭建物理实验室
 
-[![预检](https://github.com/NikiTheBear/PhysQuest/actions/workflows/preflight.yml/badge.svg)](https://github.com/NikiTheBear/PhysQuest/actions/workflows/preflight.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+保留 PhysQuest 知识地图与知识卡，将实验台升级为 Fieldlab 自由仿真平台。人和 AI 可以编辑同一份实验文档、制作器具、连接不同物理过程，并调用数值求解器验证。
 
-**在线试玩** → https://nikithebear.github.io/PhysQuest/
+![侧边聊天栏与自由实验台](docs/screenshots/free-build-chat.jpg)
 
-> 在线版只能用「浏览器直连」模式，国内厂商的 Key 在里面用不了。
-> 想用自己的 Key，跑本地启动器，见下面「跑起来」。
+## 启动完整平台
 
-> 一个开源的全学段物理探究平台。
-> **先猜，再做，被推翻，然后想明白。**
+需要 **Node.js 22 或更新版本**。克隆本分支后，在仓库根目录运行：
 
-学生拖动滑块，看着光屏上的像变大变小。在动手之前他得先猜，猜完就被锁死；
-猜错的时候，他记住了一辈子。
-
-这不是"AI 生成一份漂亮的物理报告"，是**"先押注、被推翻、再想明白"**。
-
-![知识地图](docs/screenshots/01-map.png)
-
----
-
-## 为什么做这个
-
-市面上大多数物理模拟器是这样：拖滑块 → 看动画 → 关掉。
-
-问题在于**看完就忘**。没有悬念、没有押注、没有被打脸，就没有记忆。
-
-所以这个产品的核心不是那个光路图（虽然它确实很准），而是**猜错的那一下**：
-
-| | 你的猜测 | 物理引擎算出的 |
-|---|---|---|
-| | 倒立、和蜡烛一样大 | **倒立、缩小的实像** |
-
-这一下跟 AI 完全无关。断网、没配 Key、离线用 U 盘，这一下照样工作。
-
-## 三个反直觉现象
-
-每个物理模拟器都应该有让人"咦？"的时刻。凸透镜这块我们做了三个：
-
-| 现象 | 学生 100% 会猜错的地方 |
-|---|---|
-| **遮住透镜上半** | 以为像会只剩一半 → 实际**像完整，只是变暗** |
-| **u = f** | 以为会成一个巨大的像 → 实际**不成像**，出射光平行 |
-| **u < f** | 以为光屏上能接住 → 实际**永远接不住**，但眼睛能看到 |
-
-![遮住透镜一半](docs/screenshots/04-mask.png)
-
-## 现在能做什么
-
-**物理**
-
-- ✅ 薄透镜近轴模型，`1/f = 1/u + 1/v` 全部真算，**12 条测试锁死**
-- ✅ 手动对焦：光屏不在像的位置时是**模糊光斑**，不是"没像"
-- ✅ 弥散圆、遮光后的相对亮度，都是算出来的
-- ✅ 三条特殊光线是**真实几何作图**，不是示意图
-
-**学习流程**
-
-- ✅ 知识地图 → 选模块 → 挑战 → **先猜（锁死）** → 调参 → 满意度闸门 → 预测对比 → 测验 → 报告
-- ✅ 26 个知识点 / 10 条常见误区 / 15 道题 / 5 个挑战
-- ✅ 报告导出 `.md`，**反思必须手写，AI 不代写**
-
-**界面**
-
-- ✅ Apple 风格，日间 / 夜间 / 跟随系统三档
-- ✅ 实验台可缩放、可拖动、可全屏（全屏里还有一片曲线 + 观察笔记）
-- ✅ 右侧 AI 助教：可拖宽、可全屏问答
-
-**AI（BYOK）**
-
-- ✅ 学生在网页里填自己的 Key，**我们的服务器永远不碰**
-- ✅ 双连接方式：浏览器直连 / 本地启动器（绕开跨域）
-- ✅ 本地启动器**零依赖**，Node 18+ 双击即用
-- ✅ AI 只能下发参数指令，学生点了才动 —— **AI 没有任何特权**
-- ⬜ AI 演示剧本与实验评分（M3 后半）
-
----
-
-## 跑起来
-
-### 只想用（含 AI 功能）
-
-```bash
-cd apps/web && npm install && npm run build   # 先构建一次
-cd ../launcher && node src/server.mjs         # 起启动器（零依赖）
+```sh
+node scripts/run-platform.mjs
 ```
 
-或者直接双击 `apps/launcher/start.command`（macOS）/ `start.bat`（Windows）。
+macOS 也可双击根目录 `start.command`。首次启动自动安装依赖并构建，随后打开终端显示的地址（默认 `http://127.0.0.1:4317/`）。全部平台源代码已包含在 `platform/`，不再需要同级目录。
 
-浏览器会打开 `http://127.0.0.1:8787`。详见 [`docs/LAUNCHER.md`](./docs/LAUNCHER.md)。
+开发时也可手动运行：
 
-**为什么需要启动器？** 因为浏览器的跨域限制不允许网页直接调大部分大模型接口。
-这个启动器只监听 `127.0.0.1`，跑在你自己的电脑上，**不是我们的服务器**。
-
-### 开发
-
-```bash
-cd apps/web
-npm install
-npm run dev        # → http://localhost:5180
-npm test           # 12 条物理断言
+```sh
+cd platform
+npm run sync:physquest
+npm run install:ci
+npm run build
+npm run dev
 ```
 
-### 校验内容
+`apps/web/` 是 PhysQuest 外壳的主源码，`platform/physquest/` 是构建时使用的快照；修改外壳后先执行同步命令。实验文档存于本机 `platform/.local/`，不会进入 Git。
 
-```bash
-node shared/knowledge-data/schema/validate.mjs
+## 功能
+
+- 白色工作台，2D / 3D 切换；点击器具显示坐标轴，可拖动、吸附、复制、撤销与重做。
+- 44 类器具，覆盖力学、声、光、电、磁、电路和测量；支持可复用的单件与组合器具。
+- 滑块拖动实时渲染；碰撞范围可显示、编辑，运行时参与实际机械阻挡。
+- 原版 5 个实验以 `.pqexp.json` 保存，首次自动载入，之后恢复已有编辑；新建空间为空白。
+- 140 个规划知识点的可编辑提示词：49 个可直接计算、22 个近似或类比、69 个概念示意。完整说明见 [提示词文档](platform/prompts/README.md)。
+- 右侧聊天栏内置 DeepSeek，通过与 MCP 共用的 23 个工具搭建实验、制作器具、修改参数与模式。消息失败时保留草稿，AI 一轮操作可整体撤销。
+- JSON 实验文件与器具设计导入/导出，CSV 采样导出，探索记录与观察笔记。
+
+## DeepSeek 与 MCP
+
+在实验台右侧的「AI 对话 → 连接设置」填写自己的 DeepSeek API Key。密钥仅保留当前页面会话，不写入实验文件或仓库；请求经过本地服务或已配置鉴权的 Worker 转发到 DeepSeek 官方 API，费用由相应账户承担。AI 的工作区操作经过与网页相同的参数校验，整轮成功后才提交。
+
+本地 MCP 端点为 `http://127.0.0.1:4317/mcp`。完整工具和物理模型范围见 [平台说明](platform/README.md)。本地开发服务使用固定开发身份，仅监听回环地址；在线部署需要单独配置身份认证与 `BUCKET` 存储。
+
+## GitHub Pages 与离线版
+
+Pages 使用自包含的静态工作台，支持仿真、器具编辑和浏览器本地保存。**静态托管没有 DeepSeek 代理或远程 MCP 服务**；需要 AI 时运行完整平台。
+
+```sh
+cd platform
+VITE_BASE=/PhysQuest/ npm run build:pages
 ```
 
----
+Pages 产物位于 `platform/dist/pages/`；构建也会生成单文件 `platform/standalone/fieldlab.html`，可离线打开。GitHub Actions 在 `main` 部署 Pages，在功能分支和 PR 中执行检查。
 
-## 架构（三句话）
+## 验证
 
-1. **物理由本地确定性引擎计算，AI 只解释不算数。** 滑块拖到哪，光路就是哪。
-2. **实验室是纯参数驱动的渲染器。** 给它一组数字，它画一张图，没有内部状态。
-3. **没有服务器。** 学习记录存浏览器，密钥存浏览器，零后端 = 零学生数据风险。
-
-```
-网页层（控件 / 状态 / 路由）
-    │  params
-    ▼
-<LabStage />（纯渲染，B 负责）
-    │  import
-    ▲
-物理引擎（纯函数，12 条测试）
+```sh
+bash scripts/preflight.sh
+cd platform
+npm run build
+npm test
+npm run validate
 ```
 
----
+原版光学引擎 12 项断言与平台 87 项物理、实验文件、MCP、DeepSeek 模拟上游测试。真实付费模型调用不属于自动化测试。
 
-## 分学段 = 换交互方式
+## 许可与来源
 
-不是换文案，是换交互：
-
-| 学段 | 交互 |
-|---|---|
-| 小学 | 拖一个放大镜看手指，**一个数字都没有** |
-| 初中 | 光具座 + 刻度 + 手动对焦 |
-| 高中 | 公式面板 + `u–v` 曲线 + 作图网格 |
-
-（当前版本实现了初中和高中，小学版在路线图里。）
-
----
-
-## 文档
-
-| 文件 | 内容 |
-|---|---|
-| [`PLAN.md`](./PLAN.md) | 完整计划书：架构、知识体系、分工、路线图、验收清单 |
-| [`docs/STUDENT-FLOW.md`](./docs/STUDENT-FLOW.md) | **学生从打开网页到导出报告的九步**，知识点在哪儿学 |
-| [`docs/LAUNCHER.md`](./docs/LAUNCHER.md) | 本地启动器：为什么需要、怎么用、两种配 Key 方式 |
-| [`docs/BRIEF-FOR-B.md`](./docs/BRIEF-FOR-B.md) | 给实验室负责人的规格书 |
-| [`docs/HANDOFF-FOR-C.md`](./docs/HANDOFF-FOR-C.md) | 给内容负责人的填空指南 |
-| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | 贡献指南：谁管哪些文件、怎么提交、五条硬规矩 |
-
----
-
-## 路线图
-
-| | 内容 | 状态 |
-|---|---|---|
-| M1 | 物理引擎 + 双屏实验台 | ✅ |
-| M2 | 完整学习闭环（导览→卡片→预测→实验→测验→报告） | ✅ |
-| M3 | AI：助教 / 启动器 / 演示 / 评分 | 🚧 助教与启动器已完成 |
-| M4 | 开源发布 + 离线单文件版 | 🚧 |
-| M5 | 小学「光的折射」微实验 + 第二个模块 | ⬜ |
-
----
-
-## 一条硬红线
-
-**我们永远不会写一行能接收学生 API Key 的服务端代码。**
-
-- 密钥只存在学生自己的浏览器里
-- 本地启动器只监听 `127.0.0.1`，不写日志、不落盘
-- 代码里任何"官方中转地址"都算 bug
-
----
-
-## 开发者
-
-| 角色 | 负责 |
-|---|---|
-| **@NikiTheBear** | 网页主体、物理引擎、AI 接入、启动器、部署 |
-| **B** | 实验室渲染（`<LabStage />`）、AI 演示播放器 |
-| **C** | 知识卡文案、题库、老师手册、第一用户测试 |
-
-想参与的话先读 [贡献指南](./CONTRIBUTING.md)。
-
-## 授权
-
-[MIT](./LICENSE)
+基于 [NikiTheBear/PhysQuest](https://github.com/NikiTheBear/PhysQuest)，保留 [MIT 许可](LICENSE)、原版知识数据和光学引擎。原始项目介绍存于 [上游 README](docs/README-UPSTREAM.md)，自由探索版变更见 [FREE-BUILD.md](FREE-BUILD.md)。

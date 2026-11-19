@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react';
 import type { Stage } from '../../core/contracts';
-import { CHALLENGES, KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
-import { LABS } from '../../labs/registry';
+import { KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
+import { KNOWLEDGE_PROMPTS, promptById } from '../../data/knowledge-prompts';
+import PromptDialog from '../knowledge-prompts/PromptDialog';
 import PLATFORM_MAP from '@knowledge/PLATFORM-MAP.json';
 
 interface Props {
-  /** 选定了一个模块（进入挑战导览） */
+  /** 打开自由实验台，只筛选器具，不装入预设。 */
   onOpenModule: (labId: string) => void;
   /** 直接跳到某个知识点对应的实验台 */
   onOpenKnowledge: (knowledgeId: string) => void;
+  onBuildKnowledge: (id:string,title:string,prompt:string) => void;
 }
 
 const STAGE_LABEL: Record<Stage, string> = {
@@ -19,9 +21,9 @@ const STAGE_LABEL: Record<Stage, string> = {
 };
 
 const STATUS_LABEL: Record<string, string> = {
-  ready: '可动手',
-  content: '有卡片',
-  planned: '规划中',
+  ready: '有知识卡',
+  content: '内容整理中',
+  planned: 'AI 搭建提示词',
 };
 
 interface MapItem {
@@ -29,20 +31,9 @@ interface MapItem {
   title: string;
 }
 
-/**
- * 知识地图 · 全平台的起点
- *
- * 这一页是整个应用的**唯一入口**：
- *   ① 先在这里选模块（大卡片）
- *   ② 再看这个平台的知识线（领域 × 学段）
- *   ③ 或者直接点一个知识点，跳到它对应的实验状态
- *
- * 关键：不在这里选，挑战导览和实验台都是空状态。
- * 不会像以前那样悄悄给你塞一个默认的挑战。
- */
-export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
+export default function KnowledgeMap({ onOpenModule, onOpenKnowledge, onBuildKnowledge }: Props) {
   const [q, setQ] = useState('');
-  const [onlyReady, setOnlyReady] = useState(false);
+  const [filter, setFilter] = useState('all');
   const [detailId, setDetailId] = useState<string | null>(null);
 
   const disciplines = PLATFORM_MAP.disciplines as Array<{
@@ -72,76 +63,29 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
   };
 
   const detail = detailId ? KNOWLEDGE.find((k) => k.id === detailId) : null;
-  const challengeFor = (kid: string) => CHALLENGES.find((c) => c.knowledgeIds.includes(kid));
+  const promptDetail=detailId?promptById(detailId):null;
+  const accepts=(item:MapItem)=>matches(item)&&(filter==='all'||filter==='cards'&&KNOWLEDGE.some(c=>c.id===item.id)||filter==='prompts'&&!!promptById(item.id)||promptById(item.id)?.support===filter);
+  const visibleCount=disciplines.reduce((count,d)=>count+d.stages.reduce((n,s)=>n+s.items.filter(accepts).length,0),0);
 
   return (
     <>
-      <div className="hub-head" style={{ paddingBottom: 20 }}>
-        <span className="eyebrow">Knowledge Map · 从这里开始</span>
-        <h2>先选一个实验模块</h2>
-        <p>
-          这个平台会把物理学成一条路。现在能动手的是下面这张卡，
-          其余的按顺序往后铺——你也可以往下翻，看看整条线有多长。
-        </p>
+      <div className="pq-map-hero">
+        <div className="pq-hero-copy"><span className="eyebrow">PHYSQUEST / 探理实验室</span>
+          <h2>让问题，<br />在实验中有答案。</h2>
+          <p>从知识出发，用器具验证。自由搭建声、光、电、磁与力学实验，在二维与三维之间探索物理规律。</p>
+          <button className="btn-primary" onClick={() => onOpenModule('all')}>进入自由实验台</button>
+          <span className="pq-hero-note">自由组合 · 实验文件 · AI 协作</span>
+        </div>
+        <div className="pq-orbit" aria-hidden="true"><span className="pq-orbit-ring r1" /><span className="pq-orbit-ring r2" /><span className="pq-orbit-ring r3" /><span className="pq-nucleus">p<span>q</span></span><span className="pq-orbit-dot d1" /><span className="pq-orbit-dot d2" /><span className="pq-orbit-dot d3" /><span className="pq-orbit-label">OBSERVE · BUILD · DISCOVER</span></div>
       </div>
-
-      {/* ================= 模块入口 ================= */}
-      <div className="module-grid">
-        {LABS.map((lab) => {
-          const readyItems = disciplines
-            .filter((d) => d.key === lab.discipline)
-            .flatMap((d) => d.stages.filter((s) => s.status === 'ready').flatMap((s) => s.items));
-          const cardCount = KNOWLEDGE.filter((k) => lab.stages.includes(k.stage)).length;
-          const challengeCount = CHALLENGES.length;
-
-          return (
-            <button key={lab.id} className="module-card" onClick={() => onOpenModule(lab.id)}>
-              <div className="module-card-top">
-                <span className="module-icon">◉</span>
-                <span className="badge on">可动手</span>
-              </div>
-              <h3>{lab.title}</h3>
-              <p className="module-sub">{lab.subtitle}</p>
-              <p className="module-intro">{lab.intro}</p>
-              <div className="module-stages">
-                {lab.stages.map((s) => (
-                  <span key={s} className="stage-tag">
-                    {STAGE_LABEL[s]}
-                  </span>
-                ))}
-              </div>
-              <div className="module-meta">
-                <span>{challengeCount} 个挑战</span>
-                <span>{readyItems.length} 个知识点</span>
-                {cardCount > 0 && <span>{cardCount} 张卡</span>}
-                <span className="arrow">→</span>
-              </div>
-            </button>
-          );
-        })}
-
-        {/* 规划中的模块（点了没反应，明确告诉用户为什么） */}
+      <div className="pq-domain-grid" aria-label="按领域查看器具">
         {[
-          { label: '闭合电路欧姆定律', sub: '电磁 · 高中', note: '正在设计' },
-          { label: '太阳能电池 S–Q 极限', sub: '近代 · 大学', note: '正在设计' },
-        ].map((m) => (
-          <div key={m.label} className="module-card disabled">
-            <div className="module-card-top">
-              <span className="module-icon">◌</span>
-              <span className="badge off">规划中</span>
-            </div>
-            <h3>{m.label}</h3>
-            <p className="module-sub">{m.sub}</p>
-            <p className="module-intro">
-              光学这块做透之后就轮到它。先把一个模块的每个细节都打磨好，后面的照着做就行。
-            </p>
-            <div className="module-meta">
-              <span>{m.note}</span>
-            </div>
-          </div>
-        ))}
+          {id: 'mechanics', label: '力学', en: 'MECHANICS', text: '刚体、弹簧、绳索与力', mark: 'F = ma'},
+          {id: 'optics', label: '光学', en: 'OPTICS', text: '光源、透镜与光线传播', mark: '1/f'},
+          {id: 'circuit', label: '电与磁', en: 'ELECTROMAGNETISM', text: '电路元件、电荷与磁场', mark: 'U = IR'},
+          {id: 'acoustics', label: '声学', en: 'ACOUSTICS', text: '声源、传播与干涉', mark: 'f · λ'},
+        ].map(d => <button key={d.id} className="pq-domain" onClick={() => onOpenModule(d.id)}><span className="pq-domain-top"><span>{d.en}</span><b>{d.mark}</b></span><h3>{d.label}</h3><p>{d.text}</p><span className="pq-domain-action">查看器具</span></button>)}
       </div>
-
       {/* ================= 全平台统计 ================= */}
       <div className="hub-stats" style={{ margin: '38px 0 30px' }}>
         <div className="stat">
@@ -149,8 +93,8 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
           <div className="k">全平台知识点</div>
         </div>
         <div className="stat">
-          <div className="v">{totals.ready}</div>
-          <div className="k">现在能动手</div>
+          <div className="v">{KNOWLEDGE_PROMPTS.length}</div>
+          <div className="k">AI 实验搭建提示词</div>
         </div>
         <div className="stat">
           <div className="v">{KNOWLEDGE.length}</div>
@@ -165,32 +109,29 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
       {/* ================= 知识点全景 ================= */}
       <div className="section-head">
         <h3>知识点全景</h3>
-        <span>五大领域 × 四个学段。灰色的还没做，点不动是有意的。</span>
+        <span>规划中的知识点现已提供实验搭建提示词。选择知识点，让 DeepSeek 调用 MCP 组装器具；每条均标明可计算、类比或概念示意。</span>
       </div>
 
       <div className="map-toolbar">
         <input
           className="map-search"
+          aria-label="搜索知识点"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="搜知识点或编号，例如「折射」「K-O2-05」"
         />
-        <button
-          className={onlyReady ? 'btn-primary btn-small' : 'btn-ghost btn-small'}
-          onClick={() => setOnlyReady(!onlyReady)}
-        >
-          只看能动手的
-        </button>
+        <select aria-label="知识点类型" className="pq-map-filter" value={filter} onChange={e=>setFilter(e.target.value)}><option value="all">全部知识点</option><option value="prompts">AI 搭建提示词</option><option value="direct">可计算实验</option><option value="approximation">近似 / 类比实验</option><option value="conceptual">概念示意</option><option value="cards">已有知识卡</option></select>
+        <a className="pq-download-prompts" href={import.meta.env.BASE_URL + 'prompts/knowledge-prompts.json'} download="PhysQuest-知识点搭建提示词.json">下载全部提示词</a>
         <span className="map-count">
-          {STAGE_LABEL.primary} → {STAGE_LABEL.university}
+          {visibleCount} 条结果
         </span>
       </div>
+      {visibleCount===0&&<p role="status" className="pq-map-empty">没有匹配的知识点。试试更短的关键词，或切换为“全部知识点”。</p>}
 
       {disciplines.map((d) => {
         const bands = d.stages
-          .map((s) => ({ ...s, items: s.items.filter(matches) }))
-          .filter((s) => s.items.length > 0)
-          .filter((s) => !onlyReady || s.status === 'ready');
+          .map((s) => ({ ...s, items: s.items.filter(accepts) }))
+          .filter((s) => s.items.length > 0);
         if (bands.length === 0) return null;
 
         return (
@@ -208,7 +149,7 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
                   <span className="desc">{band.items.length} 条</span>
                   <span
                     className={`badge ${
-                      band.status === 'ready' ? 'on' : band.status === 'content' ? '' : 'off'
+                      band.status === 'ready' || band.status === 'planned' ? 'on' : band.status === 'content' ? '' : 'off'
                     }`}
                   >
                     {STATUS_LABEL[band.status]}
@@ -218,22 +159,23 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
                 <div className="map-grid">
                   {band.items.map((item) => {
                     const card = KNOWLEDGE.find((k) => k.id === item.id);
-                    const clickable = band.status === 'ready' && !!card;
+                    const prompt=promptById(item.id);
+                    const clickable = !!card || !!prompt;
                     const Tag = clickable ? 'button' : 'div';
                     return (
                       <Tag
                         key={item.id}
-                        className={`know-pin ${clickable ? '' : 'static'}`}
+                        className={`know-pin ${clickable ? '' : 'static'} ${prompt?'has-prompt':''}`}
                         {...(clickable ? { onClick: () => setDetailId(item.id) } : {})}
                       >
                         <span className="kid">{item.id}</span>
                         <h4>{item.title}</h4>
-                        {card && <span className="oneline">{card.oneLine}</span>}
+                        {card && <span className="oneline">{card.oneLine}</span>}{prompt&&<span className="oneline">{prompt.objective}</span>}
                         <span className="pin-foot">
                           {clickable ? (
                             <>
-                              <span className="dep">点开看详情</span>
-                              <span className="arrow">→</span>
+                              <span className="dep">{prompt?prompt.supportLabel:'点开看详情'}</span>{prompt&&<span className="pq-prompt-action">查看提示词</span>}
+
                             </>
                           ) : (
                             <span className="dep">{STATUS_LABEL[band.status]}</span>
@@ -249,6 +191,7 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
         );
       })}
 
+      {promptDetail&&<PromptDialog key={promptDetail.id} entry={promptDetail} onClose={()=>setDetailId(null)} onBuild={(id,title,prompt)=>{setDetailId(null);onBuildKnowledge(id,title,prompt);}} />}
       {/* ================= 知识点详情 ================= */}
       {detail && (
         <div className="overlay" onClick={() => setDetailId(null)}>
@@ -317,7 +260,7 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
             )}
 
             <div className="modal-actions">
-              {challengeFor(detail.id) && (
+              {(
                 <button
                   className="btn-primary"
                   onClick={() => {
@@ -326,7 +269,7 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
                     onOpenKnowledge(kid);
                   }}
                 >
-                  在实验台上看这个 →
+                  带着问题去搭建
                 </button>
               )}
               <button className="btn-ghost" onClick={() => setDetailId(null)}>

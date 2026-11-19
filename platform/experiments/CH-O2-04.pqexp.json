@@ -1,0 +1,91 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "遮住透镜上半部分",
+    "description": "先用纸片遮住透镜的上半部分，再猜光屏上的像会变成什么样。",
+    "source": {
+      "project": "PhysQuest",
+      "commit": "d1e6abd934ec0d43b90bfccad145f2778056f8b1",
+      "license": "MIT",
+      "challengeId": "CH-O2-04"
+    }
+  },
+  "experiment": {
+    "id": "CH-O2-04",
+    "title": "遮住透镜上半部分",
+    "goal": "先用纸片遮住透镜的上半部分，再猜光屏上的像会变成什么样。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.81,
+      "damping": 0.02,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "lens-bench",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 30,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 15,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "id": "CH-O2-04",
+      "labId": "optics-lens",
+      "title": "遮住透镜上半部分",
+      "brief": "先用纸片遮住透镜的上半部分，再猜光屏上的像会变成什么样。",
+      "hint": "想想：像的位置是谁决定的？",
+      "winCondition": {
+        "metric": "relativeIlluminance",
+        "op": "<",
+        "value": 0.75
+      },
+      "multiAnswer": false,
+      "knowledgeIds": [
+        "K-O2-04",
+        "K-O2-13"
+      ],
+      "misconceptionIds": [
+        "MIS-O2-04"
+      ],
+      "demoScriptId": "demo-mask-half",
+      "difficulty": "advanced",
+      "prediction": {
+        "prompt": "把透镜的上半部分用纸片遮住，光屏上的像会怎样？",
+        "options": [
+          "只剩下一半的像",
+          "像完整，只是变暗",
+          "像会挪到上面去"
+        ],
+        "answerIndex": 1
+      }
+    },
+    "source": {
+      "project": "PhysQuest",
+      "commit": "d1e6abd934ec0d43b90bfccad145f2778056f8b1",
+      "license": "MIT",
+      "challengeId": "CH-O2-04"
+    }
+  }
+}

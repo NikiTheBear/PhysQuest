@@ -22,26 +22,32 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-          cache-dependency-path: apps/web/package-lock.json
+          cache-dependency-path: |
+            platform/package-lock.json
+            platform/physquest/apps/web/package-lock.json
+
+      - name: 同步网页快照
+        working-directory: platform
+        run: npm run sync:physquest
 
       - name: 安装依赖
-        working-directory: apps/web
-        run: npm ci
+        working-directory: platform
+        run: npm run install:ci
 
       - name: 构建
-        working-directory: apps/web
+        working-directory: platform
         env:
           # GitHub Pages 部署在 /PhysQuest/ 子路径下，必须告诉 Vite
           VITE_BASE: /PhysQuest/
-        run: npm run build
+        run: npm run build:pages
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/web/dist
+          path: platform/dist/pages
 
   deploy:
     needs: build

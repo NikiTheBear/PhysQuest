@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import type { KnowledgeCard, LensParams, QuizItem } from '../../core/contracts';
+import type { KnowledgeCard, QuizItem } from '../../core/contracts';
 import { MISCONCEPTIONS } from '../../data/content';
 
 interface Props {
   cards: KnowledgeCard[];
-  onJump: (preset: Partial<LensParams>) => void;
+  onJump: (card: KnowledgeCard) => void;
 }
 
 export default function KnowledgeCardView({ cards, onJump }: Props) {
@@ -47,9 +47,9 @@ export default function KnowledgeCardView({ cards, onJump }: Props) {
               <button
                 className="btn-ghost btn-small"
                 style={{ alignSelf: 'flex-start' }}
-                onClick={() => onJump(c.labPreset)}
+                onClick={() => onJump(c)}
               >
-                在实验台上看这个 ⤴
+                带着问题去搭建
               </button>
             )}
           </div>

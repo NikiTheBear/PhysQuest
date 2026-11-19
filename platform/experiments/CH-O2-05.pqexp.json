@@ -1,0 +1,92 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "看到那个接不住的像",
+    "description": "不用光屏，想办法看到一正立、放大的像。",
+    "source": {
+      "project": "PhysQuest",
+      "commit": "d1e6abd934ec0d43b90bfccad145f2778056f8b1",
+      "license": "MIT",
+      "challengeId": "CH-O2-05"
+    }
+  },
+  "experiment": {
+    "id": "CH-O2-05",
+    "title": "看到那个接不住的像",
+    "goal": "不用光屏，想办法看到一正立、放大的像。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.81,
+      "damping": 0.02,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "lens-bench",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 30,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 15,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "id": "CH-O2-05",
+      "labId": "optics-lens",
+      "title": "看到那个接不住的像",
+      "brief": "不用光屏，想办法看到一正立、放大的像。",
+      "hint": "放大镜怎么用，这里就怎么用。",
+      "winCondition": {
+        "metric": "real",
+        "op": "false"
+      },
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O2-09",
+        "K-O2-10",
+        "K-O2-15"
+      ],
+      "misconceptionIds": [
+        "MIS-O2-03",
+        "MIS-O2-10"
+      ],
+      "demoScriptId": "demo-virtual-image",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "把蜡烛挪到焦距以内，光屏上还能接到像吗？",
+        "options": [
+          "能，只是更模糊",
+          "不能，但如果从透镜里看出去能看到像",
+          "不能，而且根本没有任何像"
+        ],
+        "answerIndex": 1
+      }
+    },
+    "source": {
+      "project": "PhysQuest",
+      "commit": "d1e6abd934ec0d43b90bfccad145f2778056f8b1",
+      "license": "MIT",
+      "challengeId": "CH-O2-05"
+    }
+  }
+}

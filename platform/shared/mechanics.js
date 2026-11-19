@@ -6,7 +6,7 @@ export class Mechanics {
   constructor(doc,bodies){
     this.doc=doc;this.world=new CANNON.World({gravity:new CANNON.Vec3(0,0,0)});this.world.solver.iterations=30;this.world.solver.tolerance=1e-9;this.map=new Map();const materials=[];
     const makeMaterial=(friction,restitution)=>{const m=new CANNON.Material();for(const old of materials)this.world.addContactMaterial(new CANNON.ContactMaterial(m,old.m,{friction:Math.min(friction,old.friction),restitution:Math.min(restitution,old.restitution),contactEquationStiffness:1e8,contactEquationRelaxation:50}));this.world.addContactMaterial(new CANNON.ContactMaterial(m,m,{friction,restitution,contactEquationStiffness:1e8,contactEquationRelaxation:50}));materials.push({m,friction,restitution});return m;};
-    if(doc.environment.collisions){const ground=new CANNON.Body({mass:0,shape:new CANNON.Plane(),material:makeMaterial(1,1)});ground.quaternion.setFromEuler(-Math.PI/2,0,0);this.world.addBody(ground);}
+    if(doc.environment.collisions&&!doc.components.some(c=>c.kind==='floor_slab')){const ground=new CANNON.Body({mass:0,shape:new CANNON.Plane(),material:makeMaterial(1,1)});ground.quaternion.setFromEuler(-Math.PI/2,0,0);this.world.addBody(ground);}
     for(const c of doc.components.filter(c=>[...RIGID_KINDS,'anchor','ramp'].includes(c.kind)||colliderOf(c).enabled)){
       const p=c.params,state=bodies.get(c.id),fixed=c.fixed||!RIGID_KINDS.includes(c.kind),collider=colliderOf(c);let shape;
       if(c.kind==='anchor'&&!collider.enabled)shape=new CANNON.Particle();

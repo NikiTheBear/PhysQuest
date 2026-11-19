@@ -20,3 +20,11 @@ test('expression and drag forces act on the bound mass through the solver',()=>{
     assert.ok(Math.abs(sim.bodies.get(box.id).velocity[0]-1)<.005);
   }
 });
+
+test('explicit ground supports bodies on the slab and allows a fall beyond its edge',()=>{
+  const ground=component('floor_slab'),box=component('box',{position:[0,1,0]}),outside=component('box',{position:[6,1,0]});
+  const d=scene(ground,box,outside);d.environment.collisions=true;d.environment.gravity=9.81;
+  const sim=new Simulation(d);sim.advance(1);
+  assert.ok(Math.abs(sim.bodies.get(box.id).position[1]-box.params.height/2)<.02);
+  assert.ok(sim.bodies.get(outside.id).position[1]<-1);
+});

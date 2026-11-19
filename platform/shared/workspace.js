@@ -37,7 +37,7 @@ export function validateExperiment(doc) {
   if(!Array.isArray(doc.connections)||doc.connections.length>128)throw new Error('最多支持 128 个连接');
   const linkIds=new Set();
   for(const l of doc.connections){const k=COUPLINGS[l.kind],a=doc.components.find(c=>c.id===l.source),b=doc.components.find(c=>c.id===l.target);if(!k||!a||!b||!k.from.includes(a.kind)||!k.to.includes(b.kind))throw new Error('连接的源或目标类型不兼容');text(l.id,100,'连接 ID');if(linkIds.has(l.id))throw new Error('连接 ID 重复');linkIds.add(l.id);number(l.gain,-20,20,'连接增益');if(l.kind==='wire'){if(!CATALOG[a.kind].terminals.includes(l.sourcePort)||!CATALOG[b.kind].terminals.includes(l.targetPort))throw new Error('必须指定有效接线端子 a / b');if(a.id===b.id&&l.sourcePort===l.targetPort)throw new Error('不能将同一端子连接到自身');}}
-  const env=doc.environment;if(!env)throw new Error('缺少环境参数');number(env.gravity,0,25,'重力加速度');number(env.damping,0,5,'环境阻尼');number(env.speed,.1,4,'时间倍率');if(typeof env.collisions!=='boolean')throw new Error('collisions 必须为布尔值');
+  const env=doc.environment;if(!env)throw new Error('缺少环境参数');number(env.gravity,0,25,'重力加速度');number(env.damping,0,5,'环境阻尼');number(env.speed,.05,4,'时间倍率');if(typeof env.collisions!=='boolean')throw new Error('collisions 必须为布尔值');
   if(!doc.control||typeof doc.control.running!=='boolean')throw new Error('缺少运行状态');number(doc.control.reset,0,1e9,'重置序号');
   for(const key of ['learning','source'])if(doc[key]!==undefined){if(!doc[key]||typeof doc[key]!=='object'||Array.isArray(doc[key])||JSON.stringify(doc[key]).length>12000)throw new Error(key+' 必须是 12 KB 以内的对象');}
   if(doc.learning?.prediction?.options!==undefined&&(!Array.isArray(doc.learning.prediction.options)||doc.learning.prediction.options.some(o=>typeof o!=='string')))throw new Error('预测选项必须为文本数组');
@@ -103,7 +103,7 @@ export function mutate(workspace,name,args) {
       const l={id:uid(),kind:args.kind,source:args.source,target:args.target,gain:args.gain??1,...(args.kind==='wire'?{sourcePort:args.sourcePort||'a',targetPort:args.targetPort||'a'}:{})};if(doc.connections.some(x=>x.kind===l.kind&&((x.source===l.source&&x.target===l.target&&(l.kind!=='wire'||x.sourcePort===l.sourcePort&&x.targetPort===l.targetPort))||(l.kind==='wire'&&x.source===l.target&&x.target===l.source&&x.sourcePort===l.targetPort&&x.targetPort===l.sourcePort))))throw new Error('此连接已经存在');doc.connections.push(l);validateExperiment(doc);result=l;break;
     }
     case 'disconnect_components': { if(!doc.connections.some(l=>l.id===args.connectionId))throw new Error('连接不存在');doc.connections=doc.connections.filter(l=>l.id!==args.connectionId);result={removed:args.connectionId};break; }
-    case 'control_simulation': { if(args.running!==undefined)doc.control.running=args.running;if(args.reset)doc.control.reset++;validateExperiment(doc);result=doc.control;break; }
+    case 'control_simulation': { if(args.speed!==undefined)doc.environment.speed=args.speed;if(args.running!==undefined)doc.control.running=args.running;if(args.reset)doc.control.reset++;validateExperiment(doc);result=doc.control;break; }
     case 'design_component':
     case 'design_assembly': {
       if(w.designs.length>=50)throw new Error('最多保存 50 个自定义器具');

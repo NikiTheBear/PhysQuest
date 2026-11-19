@@ -28,6 +28,7 @@ export const CATALOG = {
 };
 Object.assign(CATALOG, {
   box:{name:'长方体',domain:'mechanics',icon:'cube',description:'可碰撞、转动与摩擦的刚体',params:{...motion,width:p('宽度 X',.7,.1,5,.1,'m'),height:p('高度 Y',.7,.1,5,.1,'m'),depth:p('深度 Z',.7,.1,5,.1,'m'),angle:p('初始转角 Z',0,-180,180,1,'°'),spin:p('初始角速度 Z',0,-20,20,.1,'rad/s'),friction:p('摩擦系数',.3,0,1,.01),restitution:p('恢复系数',.2,0,1,.01)}},
+  floor_slab:{name:'地面',domain:'mechanics',icon:'ramp',description:'固定水平承托面。长宽有限，厚 0.16 m，位置为板中心；放置后替代默认无限地面。',params:{length:p('长度',8,.2,30,.1,'m'),width:p('宽度',6,.2,30,.1,'m'),friction:p('摩擦系数',.6,0,1,.01),restitution:p('恢复系数',.4,0,1,.01)}},
   ramp:{name:'可调斜面',domain:'mechanics',icon:'ramp',description:'有摩擦的固定碰撞斜面',params:{length:p('长度',4,.5,10,.1,'m'),width:p('宽度',2,.2,6,.1,'m'),angle:p('倾角',20,-75,75,1,'°'),friction:p('摩擦系数',.3,0,1,.01)}},
   rope:{name:'柔性绳索',domain:'mechanics',icon:'rope',description:'仅承受拉力的弹性绳索',refs:['a','b'],params:{restLength:p('绳长',2,.1,10,.05,'m'),stiffness:p('拉伸刚度',100,1,500,1,'N/m'),damping:p('拉伸阻尼',.5,0,5,.1,'N·s/m')}},
   rod:{name:'刚性连杆',domain:'mechanics',icon:'rod',description:'约束两端距离，可构建摆和联动',refs:['a','b'],params:{restLength:p('杆长',2,.1,10,.05,'m')}},
@@ -78,7 +79,7 @@ export const uid = () => globalThis.crypto.randomUUID();
 export function component(kind, overrides = {}) {
   const def = Object.hasOwn(CATALOG,kind) && CATALOG[kind];
   if (!def) throw new Error('未知器具类型：' + kind);
-  return { id: uid(), kind, name: def.name, position: [0, 1, 0], fixed: false, params: Object.fromEntries(Object.entries(def.params).map(([k, v]) => [k, v.value])), refs: {}, ...overrides };
+  return { id: uid(), kind, name: def.name, position: [0, kind==='floor_slab'?-.08:1, 0], fixed: kind==='floor_slab', params: Object.fromEntries(Object.entries(def.params).map(([k, v]) => [k, v.value])), refs: {}, ...overrides };
 }
 export function blankExperiment(title = '未命名实验') {
   return { id: uid(), title, goal: '', mode: '3d', components: [], connections: [], control: { running: false, reset: 0 }, environment: { gravity: 0, damping: 0, speed: 1, collisions: true }, createdAt: new Date().toISOString() };

@@ -21,7 +21,7 @@ export const TOOLS=[
   tool('export_experiment','把当前或指定空间导出为 physquest.experiment v1 JSON 文件对象，保留器具、参数、目标、连接与原版教学信息。',id,[],true),
   tool('create_experiment','创建并打开一个空白实验空间。不会添加任何器具。',{title:str,goal:str,mode:{type:'string',enum:['2d','3d']}},['title']),
   tool('activate_experiment','打开已有实验空间，网页会自动同步。',id,['experimentId']),
-  tool('update_experiment','修改实验名称、目标、2D/3D 模式和环境参数。重力单位 m/s²，damping 单位 kg/s，speed 为时间倍率。',{...id,title:str,goal:str,learning:{type:'object',description:'可编辑教学说明、预测问题与参考条件；只作为说明，不锁定操作。'},mode:{type:'string',enum:['2d','3d']},environment:{type:'object',properties:{gravity:{type:'number',minimum:0,maximum:25},damping:{type:'number',minimum:0,maximum:5},speed:{type:'number',minimum:.1,maximum:4},collisions:bool},additionalProperties:false}}),
+  tool('update_experiment','修改实验名称、目标、2D/3D 模式和环境参数。重力单位 m/s²，damping 单位 kg/s，speed 为播放倍率（0.05–4），慢放可选 0.25。',{...id,title:str,goal:str,learning:{type:'object',description:'可编辑教学说明、预测问题与参考条件；只作为说明，不锁定操作。'},mode:{type:'string',enum:['2d','3d']},environment:{type:'object',properties:{gravity:{type:'number',minimum:0,maximum:25},damping:{type:'number',minimum:0,maximum:5},speed:{type:'number',minimum:.1,maximum:4},collisions:bool},additionalProperties:false}}),
   tool('add_component','添加一个真实参与计算的器具。参数名与取值范围先查 list_instruments；返回组件 ID。spring/rope/rod/damper 的 refs.a,b 连接 body/charge/box/cylinder/anchor；expression_force 使用 params.fx/fy/fz 字符串（如 -0.3*vx），drag 使用 linear/quadratic 阻力系数；force/drag/expression_force/harmonic_force/motion_sensor 的 refs.target 连接运动刚体。',{...id,kind:kinds,name:str,position:pos,params:obj,fixed:bool,refs:obj,appearance,collider},['kind']),
   tool('update_component','修改器具参数、名称、固定状态、位置或弹簧端点。未给出的参数保持不变；网页重新开始计时。',{...id,componentId:str,name:str,position:pos,params:obj,fixed:bool,refs:obj,appearance,collider},['componentId']),
   tool('remove_component','移除指定器具，并清除引用它的连接和弹簧端点。',{...id,componentId:str},['componentId']),
@@ -32,6 +32,6 @@ export const TOOLS=[
   tool('instantiate_design','把自定义器具放入目标空间，自动重建内部连接和 ID。position 为放置原点；parameters 覆盖单器具参数或组合器具 bindings 中的公开参数。返回部件 ID 和 ports，可继续与外部电路接线。',{...id,designId:str,position:pos,name:str,parameters:obj},['designId']),
   tool('update_design','更新器具库中的设计。已有场景中的副本不变；组合器具修改结构时提交完整 components/connections/ports/bindings。',{designId:str,name:str,description:str,params:obj,fixed:bool,appearance,collider,...assembly},['designId']),
   tool('remove_design','从器具库移除自定义设计，已放入空间的副本仍然保留。',{designId:str},['designId']),
-  tool('control_simulation','控制网页运行/暂停，或 reset=true 重置计时与初始条件。',{...id,running:bool,reset:bool}),
+  tool('control_simulation','控制网页运行/暂停，或 reset=true 重置计时与初始条件。',{...id,running:bool,reset:bool,speed:{type:'number',minimum:.05,maximum:4}}),
   tool('simulate_experiment','从初始条件进行数值计算，返回真实测量值、采样数据、物体位置及模型局限。独立于网页动画，最长 20 秒，最多 1200 样本。',{...id,duration:{type:'number',minimum:.02,maximum:20},sampleRate:{type:'number',minimum:1,maximum:60}},[],true)
 ];

@@ -3,7 +3,7 @@ import {CATALOG} from './catalog.js';
 const environment={
   gravity:{label:'重力加速度',min:0,max:25,step:.01,unit:'m/s²'},
   damping:{label:'环境阻尼',min:0,max:5,step:.01,unit:'kg/s'},
-  speed:{label:'时间倍率',min:.1,max:4,step:.1,unit:'×'}
+  speed:{label:'时间倍率',min:.05,max:4,step:.05,unit:'×'}
 };
 export function sliderTarget(doc,{componentId,parameter}){
   const component=componentId==null?null:doc.components.find(c=>c.id===componentId);

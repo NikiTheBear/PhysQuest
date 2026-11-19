@@ -81,3 +81,7 @@ body.embedded input:not([type=range]),body.embedded textarea,body.embedded selec
 .chat-table-scroll table{width:max-content;min-width:100%;background:white;color:#203545}
 .chat-table-scroll td,.chat-table-scroll th{max-width:24ch;padding:.4em .65em;vertical-align:top}
 .chat-table-scroll th{background:#eff5f7;font-weight:650}
+
+.archive-row{display:flex;align-items:center;gap:8px;border-top:1px solid #e2e8ed;padding:8px 0}
+.archive-row span{flex:1;min-width:0;overflow-wrap:anywhere}.archive-row small{display:block;color:#516572}
+#archive-save{margin-top:8px}

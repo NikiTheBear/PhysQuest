@@ -1,3 +1,4 @@
+import {saveArchive,listArchives,loadArchive,deleteArchive} from './archives.js';
 import { CATALOG, DOMAINS, COUPLINGS, blankWorkspace, activeExperiment, uid, RIGID_KINDS, ENDPOINT_KINDS, LINK_KINDS, CIRCUIT_KINDS, SOUND_KINDS } from '../shared/catalog.js';
 import { runTool } from '../worker/operations.js';
 import { EXPERIMENT_FILES } from '../shared/experiment-library.js';
@@ -159,9 +160,42 @@ function renderChannels(){
 function showModal(title,body,footer=''){const modal=$('modal');$('modal-content').innerHTML=`<div class="modal-header"><h2>${title}</h2><button data-close class="icon-button" aria-label="关闭">${icon('close')}</button></div><div class="modal-body">${body}<div id="modal-error" class="modal-error"></div></div>${footer?'<div class="modal-footer">'+footer+'</div>':''}`;if(!modal.open)modal.showModal();$('modal-content').querySelector('[data-close]').onclick=()=>modal.close();}
 function errorInModal(error){$('modal-error').textContent=error.message||error;}
 function editTitle(){showModal('命名你的实验空间','<p>一个问题，也可以成为一个实验的名字。</p><label for="new-title">名称</label><input id="new-title" maxlength="100" value="'+esc(doc().title)+'">','<button class="primary-button" id="title-save">保存名称</button>');$('title-save').onclick=async()=>{const value=$('new-title').value.trim();if(!value)return errorInModal('请输入名称');await command('update_experiment',{title:value});$('modal').close();};$('new-title').focus();$('new-title').select();}
+function archiveModal(){
+  showModal('实验存档','<label for="archive-name">存档名称</label><input id="archive-name" maxlength="100"><button class="primary-button" id="archive-save">保存当前实验</button><p>存档保存在此浏览器，包含器具、参数、连线、滑块和图表。加载后会从初始条件打开一个独立副本。</p><h3>我的存档</h3><div id="archive-list"></div>','<button id="archive-import">从 JSON 文件加载</button>');
+  $('archive-name').value=doc().title;
+  function refresh(){
+    const entries=listArchives(localStorage);
+    $('archive-list').innerHTML=entries.map(({id,name,savedAt})=>`<div class="archive-row"><span><strong>${esc(name)}</strong><small>${esc(new Date(savedAt).toLocaleString())}</small></span><button data-load="${esc(id)}">加载</button><button data-download="${esc(id)}">下载</button><button data-delete="${esc(id)}" aria-label="删除存档 ${esc(name)}">删除</button></div>`).join('')||'<p>尚无存档</p>';
+  }
+  try{refresh();}catch{errorInModal('浏览器存储不可用，可使用工具栏的导出实验。');}
+  $('archive-save').onclick=async e=>{
+    const button=e.currentTarget;button.disabled=true;
+    try{await queue;saveArchive(localStorage,$('archive-name').value,doc());refresh();errorInModal('');toast('实验已存档');}
+    catch(err){errorInModal(err.name==='QuotaExceededError'?'浏览器空间不足，请下载或移除旧存档。':err.message);}
+    finally{button.disabled=false;}
+  };
+  $('archive-import').onclick=()=>$('import-file').click();
+  $('archive-list').onclick=async e=>{
+    const button=e.target.closest('button');if(!button)return;
+    button.disabled=true;
+    try{
+      if(button.dataset.load){
+        await command('import_experiment',{file:loadArchive(localStorage,button.dataset.load)},{throw:true,selectNone:true});
+        $('modal').close();scene.fit();toast('已加载存档副本');
+      }else if(button.dataset.download){
+        const file=loadArchive(localStorage,button.dataset.download);
+        download(file.experiment.title+'.pqexp.json',JSON.stringify(file));toast('存档已下载');
+      }else if(button.dataset.delete&&confirm('删除这份本机存档？')){
+        deleteArchive(localStorage,button.dataset.delete);refresh();
+      }
+    }catch(err){errorInModal(err.message);}finally{button.disabled=false;}
+  };
+}
+$('archives-btn').onclick=archiveModal;
 function spacesModal(){
-  showModal('实验文件与我的空间','<p>原版实验以 .pqexp.json 保存。点击即载入可编辑副本；现有空间会保留。</p><h3>PhysQuest 原版实验</h3>'+EXPERIMENT_FILES.map(f=>`<div class="experiment-file-row"><button class="space-card" data-load-file="${f.experiment.source.challengeId}"><span><strong>${esc(f.experiment.title)}</strong><small>${esc(f.experiment.goal)}</small></span></button><button class="text-button" data-download-file="${f.experiment.source.challengeId}" aria-label="下载 ${esc(f.experiment.title)}">JSON</button></div>`).join('')+'<h3>我的空间</h3>'+workspace.experiments.map(e=>`<button class="space-card ${e.id===workspace.activeId?'active':''}" data-open-space="${e.id}"><span><strong>${esc(e.title)}</strong><small>${e.mode.toUpperCase()} · ${e.components.length} 个器具 · ${e.connections.length} 个连接</small></span>${icon('chevron')}</button>`).join(''),'<button class="primary-button" id="modal-new-space">新建空白空间</button>');
+  showModal('实验文件与我的空间','<button id="open-archives" class="outline-button">存档与加载</button><p>原版实验以 .pqexp.json 保存。点击即载入可编辑副本；现有空间会保留。</p><h3>PhysQuest 原版实验</h3>'+EXPERIMENT_FILES.map(f=>`<div class="experiment-file-row"><button class="space-card" data-load-file="${f.experiment.source.challengeId}"><span><strong>${esc(f.experiment.title)}</strong><small>${esc(f.experiment.goal)}</small></span></button><button class="text-button" data-download-file="${f.experiment.source.challengeId}" aria-label="下载 ${esc(f.experiment.title)}">JSON</button></div>`).join('')+'<h3>我的空间</h3>'+workspace.experiments.map(e=>`<button class="space-card ${e.id===workspace.activeId?'active':''}" data-open-space="${e.id}"><span><strong>${esc(e.title)}</strong><small>${e.mode.toUpperCase()} · ${e.components.length} 个器具 · ${e.connections.length} 个连接</small></span>${icon('chevron')}</button>`).join(''),'<button class="primary-button" id="modal-new-space">新建空白空间</button>');
   document.querySelectorAll('[data-download-file]').forEach(b=>b.onclick=()=>{const file=EXPERIMENT_FILES.find(f=>f.experiment.source.challengeId===b.dataset.downloadFile);download(b.dataset.downloadFile+'.pqexp.json',JSON.stringify(file,null,2));});
+  $('open-archives').onclick=archiveModal;
   document.querySelectorAll('[data-open-space]').forEach(b=>b.onclick=async()=>{const result=await command('activate_experiment',{experimentId:b.dataset.openSpace},{selectNone:true});if(result){$('modal').close();scene.fit();}});
   document.querySelectorAll('[data-load-file]').forEach(b=>b.onclick=async()=>{b.disabled=true;const result=await command('load_experiment_file',{fileId:b.dataset.loadFile},{selectNone:true});if(result){$('modal').close();scene.fit();toast('已载入可编辑副本');}else b.disabled=false;});
   $('modal-new-space').onclick=async()=>{const result=await command('create_experiment',{title:'未命名实验'},{selectNone:true});if(result){$('modal').close();scene.fit();}};
@@ -246,7 +280,7 @@ $('title-btn').onclick=editTitle;$('my-experiments').onclick=spacesModal;$('work
 $('new-btn').onclick=async()=>{await command('create_experiment',{title:'未命名实验'},{selectNone:true});scene.fit();toast('已创建空白实验空间');};
 $('export-btn').onclick=()=>{download(doc().title+'.pqexp.json',JSON.stringify(exportExperimentFile(doc()),null,2));toast('实验配置已导出');};
 $('import-btn').onclick=()=>$('import-file').click();
-$('import-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>512000)throw new Error('实验文件不能超过 500 KB');await command('import_experiment',{file:JSON.parse(await file.text())},{throw:true,selectNone:true});toast('已导入到新的可编辑空间');scene.fit();}catch(error){toast('导入失败：'+error.message);}e.target.value='';};
+$('import-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>512000)throw new Error('实验文件不能超过 500 KB');await command('import_experiment',{file:JSON.parse(await file.text())},{throw:true,selectNone:true});if($('modal').open&&$('archive-list'))$('modal').close();toast('已导入到新的可编辑空间');scene.fit();}catch(error){toast('导入失败：'+error.message);}e.target.value='';};
 $('design-btn').onclick=()=>designModal();
 document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>command('update_experiment',{mode:b.dataset.mode}));
 for(const [id,key]of[['grid-btn','showGrid'],['fields-btn','showFields'],['trails-btn','showTrails'],['colliders-btn','showColliders']])$(id).onclick=()=>{scene[key]=!scene[key];$(id).classList.toggle('active',scene[key]);};

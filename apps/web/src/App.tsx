@@ -34,6 +34,7 @@ import ReportView from './components/report/ReportView';
 import AITutor from './components/ai-tutor/AITutor';
 import AISettings from './components/ai-tutor/AISettings';
 import HelpGuide from './components/common/HelpGuide';
+import QuizBank from './components/quiz-bank/QuizBank';
 import MechanicsLab from './labs/mechanics/MechanicsLab';
 import CircuitsLab from './labs/circuits/CircuitsLab';
 import AcousticsLab from './labs/acoustics/AcousticsLab';
@@ -59,7 +60,7 @@ import { LABS, labById, type LabId } from './labs/registry';
 import { EmptyPickLab, EmptyPickChallenge, EmptyReport } from './components/common/EmptyStates';
 import ResetPanel from './components/common/ResetPanel';
 
-type View = 'map' | 'hub' | 'lab' | 'free' | 'cards' | 'report';
+type View = 'map' | 'hub' | 'lab' | 'free' | 'cards' | 'quiz-bank' | 'report';
 type Phase = 'predict' | 'explore' | 'gate' | 'compare' | 'quiz' | 'quizResult' | 'done';
 
 const LAB_KEY = 'physquest.currentLab.v1';
@@ -150,6 +151,12 @@ export default function App() {
   /** 全站唯一的 AI 设置入口（顶栏齿轮打开） */
   const [showAISettings, setShowAISettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  /** 题库完成情况，报告闸门要用 */
+  const [quizCompleted, setQuizCompleted] = useState<{
+    answered: number;
+    correct: number;
+    wrongIds: string[];
+  } | null>(null);
   /** 第一次进入时是否显示提示条 */
   const [firstVisit, setFirstVisit] = useState(() => {
     try {
@@ -451,6 +458,12 @@ export default function App() {
               >
                 自由搭建
               </button>
+              <button
+                className={view === 'quiz-bank' ? 'active' : ''}
+                onClick={() => setView('quiz-bank')}
+              >
+                题库
+              </button>
               <button className={view === 'report' ? 'active' : ''} onClick={() => setView('report')}>
                 我的报告
               </button>
@@ -574,7 +587,7 @@ export default function App() {
                 difficulty: 'beginner',
                 prediction: c.prediction,
               });
-              setPhase('explore');
+              setPhase(c.prediction ? 'predict' : 'explore');
               setView('lab');
             }}
             onBackToMap={() => setView('map')}
@@ -613,7 +626,7 @@ export default function App() {
                 difficulty: 'beginner',
                 prediction: auto.prediction,
               });
-              setPhase('explore');
+              setPhase(auto.prediction ? 'predict' : 'explore');
               setView('lab');
             }}
           />
@@ -771,6 +784,17 @@ export default function App() {
           </>
         )}
 
+        {view === 'quiz-bank' && (
+          <QuizBank
+            focusKnowledgeIds={challenge?.knowledgeIds}
+            onBack={() => setView('cards')}
+            onDone={(r) => {
+              setQuizCompleted(r);
+              setView('report');
+            }}
+          />
+        )}
+
         {view === 'report' && learner.runs.length === 0 && (
           <>
             <div className="hub-head" style={{ paddingBottom: 18 }}>
@@ -794,6 +818,9 @@ export default function App() {
                 learner={learner}
                 reflectionText={reflection}
                 challengeTitle={challenge?.title ?? '（未选择挑战）'}
+                quizDone={quizCompleted !== null}
+                quizResult={quizCompleted}
+                onGoQuiz={() => setView('quiz-bank')}
                 onReflection={(t) => {
                   setReflectionDraft(t);
                   if (challenge) setLearner((s) => persistReflection(s, challenge.id, t));

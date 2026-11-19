@@ -6,6 +6,12 @@ interface Props {
   learner: LearnerState;
   onReflection: (text: string) => void;
   reflectionText: string;
+  /** 题库做完了吗 */
+  quizDone?: boolean;
+  /** 题库结果 */
+  quizResult?: { answered: number; correct: number } | null;
+  /** 去题库 */
+  onGoQuiz?: () => void;
 }
 
 export function buildReport(
@@ -84,16 +90,24 @@ export function buildReport(
   return lines.join('\n');
 }
 
-export default function ReportView({ learner, onReflection, reflectionText, challengeTitle }: Props & { challengeTitle: string }) {
+export default function ReportView({
+  learner,
+  onReflection,
+  reflectionText,
+  challengeTitle,
+  quizDone = true,
+  quizResult = null,
+  onGoQuiz,
+}: Props & { challengeTitle: string }) {
   const [show, setShow] = useState(false);
   const report = useMemo(
     () => buildReport(learner, reflectionText, challengeTitle),
     [learner, reflectionText, challengeTitle],
   );
 
-  const quizDone = Object.keys(learner.reflections).length > 0;
   const hasReflection = reflectionText.trim().length >= 10;
-  const canGenerate = hasReflection;
+  // 报告闸门：题库做完 + 反思写完，两个都要
+  const canGenerate = hasReflection && quizDone;
 
   const download = () => {
     const blob = new Blob([report], { type: 'text/markdown;charset=utf-8' });
@@ -126,7 +140,22 @@ export default function ReportView({ learner, onReflection, reflectionText, chal
       <div className="panel">
         <h4>报告</h4>
         {!canGenerate && (
-          <div className="gate">写一句反思（至少 10 个字），报告才能生成。这是这个产品的底线。</div>
+          <div className="gate">
+            {!quizDone && <div>① 还没做题库。报告前要先做一遍题，看看哪些没掌握。</div>}
+            {!hasReflection && <div>② 写一句反思（至少 10 个字）。这一栏必须你自己写，AI 不会替你。</div>}
+          </div>
+        )}
+
+        {quizResult && (
+          <div className="report-quiz-note">
+            题库：答对 {quizResult.correct} / {quizResult.answered}
+          </div>
+        )}
+
+        {!quizDone && onGoQuiz && (
+          <button className="btn-ghost btn-small" onClick={onGoQuiz} style={{ marginTop: 10 }}>
+            去做题库 →
+          </button>
         )}
         <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
           <button className="btn-primary" disabled={!canGenerate} onClick={() => setShow(true)}>

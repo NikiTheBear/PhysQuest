@@ -85,3 +85,7 @@ body.embedded input:not([type=range]),body.embedded textarea,body.embedded selec
 .archive-row{display:flex;align-items:center;gap:8px;border-top:1px solid #e2e8ed;padding:8px 0}
 .archive-row span{flex:1;min-width:0;overflow-wrap:anywhere}.archive-row small{display:block;color:#516572}
 #archive-save{margin-top:8px}
+
+.experiment-objective{background:white;color:#213747;padding:6px 14px;border-bottom:1px solid #dce5eb;max-height:clamp(75px,15vh,145px);overflow:auto;flex-shrink:0}
+.experiment-objective header{display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.experiment-objective p{white-space:pre-line;overflow-wrap:anywhere;margin:3px 0;font-size:12px;line-height:1.45}

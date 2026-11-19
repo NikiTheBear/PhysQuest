@@ -1,3 +1,4 @@
+import {activeExperiment} from '../shared/catalog.js';
 import {readDeepSeekKey} from '../shared/api-key.js';
 import { renderMarkdown } from './markdown.js';
 import { getKnowledgePrompt } from '../shared/knowledge-prompts.js';
@@ -91,6 +92,10 @@ export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeReques
         div.append(next);
       }
       if(result.build){const summary=document.createElement('div');summary.className='chat-build-result';summary.textContent='已搭建：'+result.build.title+' · '+result.build.supportLabel+'。'+result.build.limitations;div.prepend(summary);knowledgeTask=null;showTask();}
+      const finished=activeExperiment(result.workspace),previous=before.experiments.find(d=>d.id===finished.id);
+      if(!result.paused&&finished.observation&&(result.build||previous?.observation!==finished.observation)&&!result.message.includes(finished.observation)){
+        const note=document.createElement('p');note.textContent='观察指引：'+finished.observation;div.append(note);
+      }
       if(result.actions.length){const details=document.createElement('details');details.className='chat-trace';const summary=document.createElement('summary');summary.textContent=result.actions.length+' 次 MCP 工具调用 · '+(result.changed?'已整体保存':'只读查询');details.append(summary);for(const a of result.actions){const row=document.createElement('div');row.textContent=(a.ok?'✓ ':'× ')+a.tool+(a.error?' · '+a.error:'');details.append(row);}div.append(details);}
       const meta=document.createElement('small');meta.textContent=result.model+' · '+result.totalTokens.toLocaleString()+' tokens';div.append(meta);scrollMessages();status(result.changed?'本轮修改已保存，可使用工作台的「撤销」恢复。':'本轮未修改工作区。');
     }catch(error){if(pendingMessage){pendingMessage.classList.remove('pending');pendingMessage.querySelector('.chat-content').textContent='本次执行记录';}pendingMessage=null;if(sent)append('assistant',error.message,true);else toast(error.message);draft(prompt);status('未确认保存成功；消息已保留，可检查工作区后重试。');}

@@ -24,7 +24,7 @@ export function validateComponent(c) {
 export function validateExperiment(doc) {
   validateSliders(doc);
   if(doc.chart!==undefined)validateChart(doc.chart);
-  text(doc.id,100,'实验 ID');text(doc.title,100,'实验名称');text(doc.goal,2000,'实验目标');
+  text(doc.id,100,'实验 ID');text(doc.title,100,'实验名称');text(doc.goal,2000,'实验目标');if(doc.observation!==undefined)text(doc.observation,1200,'观察指引');
   if(!['2d','3d'].includes(doc.mode))throw new Error('模式只能是 2d 或 3d');
   if(!Array.isArray(doc.components)||doc.components.length>64)throw new Error('最多支持 64 个器具');
   const ids=new Set();for(const c of doc.components){validateComponent(c);if(ids.has(c.id))throw new Error('器具 ID 重复');ids.add(c.id);}
@@ -77,11 +77,11 @@ export function mutate(workspace,name,args) {
     }
     case 'create_experiment': {
       if(w.experiments.length>=30)throw new Error('最多保存 30 个实验空间');
-      const e=blankExperiment(args.title||'未命名实验');e.goal=args.goal||'';e.mode=args.mode||'3d';validateExperiment(e);w.experiments.push(e);w.activeId=e.id;result=e;break;
+      const e=blankExperiment(args.title||'未命名实验');e.goal=args.goal||'';if(args.observation!==undefined)e.observation=args.observation;e.mode=args.mode||'3d';validateExperiment(e);w.experiments.push(e);w.activeId=e.id;result=e;break;
     }
     case 'activate_experiment': w.activeId=doc.id;result=doc;break;
     case 'update_experiment': {
-      for(const key of ['title','goal','mode','learning'])if(args[key]!==undefined)doc[key]=args[key];
+      for(const key of ['title','goal','observation','mode','learning'])if(args[key]!==undefined)doc[key]=args[key];
       if(args.environment)Object.assign(doc.environment,args.environment);validateExperiment(doc);result=doc;break;
     }
     case 'replace_experiment': {

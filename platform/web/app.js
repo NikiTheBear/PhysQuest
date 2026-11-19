@@ -66,6 +66,9 @@ function applySliderPreview(){
 }
 function render(){
   const d=doc();if(selected&&!d.components.some(c=>c.id===selected))selected=null;
+  $('objective-text').textContent=d.goal||'尚未设置目标';
+  $('observation-text').textContent=d.observation?'观察指引：'+d.observation:'';
+  $('observation-text').hidden=!d.observation;
   if(!applySliderPreview())syncSimulation(d);
   $('title-btn').innerHTML=esc(d.title)+' '+icon('chevron');$('space-count').textContent=String(workspace.experiments.length).padStart(2,'0');$('empty-scene').hidden=d.components.length>0;$('object-count').textContent=d.components.length+' 个器具';$('connection-count').textContent=d.connections.length;
   $('mode-2d').classList.toggle('selected',d.mode==='2d');$('mode-3d').classList.toggle('selected',d.mode==='3d');$('speed').value=d.environment.speed;
@@ -192,6 +195,15 @@ function archiveModal(){
   };
 }
 $('archives-btn').onclick=archiveModal;
+$('edit-objective').onclick=()=>{
+  const d=doc();
+  showModal('实验目标','<label for="objective-edit">研究问题</label><textarea id="objective-edit" maxlength="2000"></textarea><label for="observation-edit">观察指引</label><textarea id="observation-edit" maxlength="1200" placeholder="改变什么变量？观察哪个物体或仪表？"></textarea>','<button class="primary-button" id="objective-save">保存</button>');
+  $('objective-edit').value=d.goal;$('observation-edit').value=d.observation||'';
+  $('objective-save').onclick=async()=>{
+    const saved=await command('update_experiment',{experimentId:d.id,goal:$('objective-edit').value.trim(),observation:$('observation-edit').value.trim()});
+    if(saved)$('modal').close();
+  };
+};
 function spacesModal(){
   showModal('实验文件与我的空间','<button id="open-archives" class="outline-button">存档与加载</button><p>原版实验以 .pqexp.json 保存。点击即载入可编辑副本；现有空间会保留。</p><h3>PhysQuest 原版实验</h3>'+EXPERIMENT_FILES.map(f=>`<div class="experiment-file-row"><button class="space-card" data-load-file="${f.experiment.source.challengeId}"><span><strong>${esc(f.experiment.title)}</strong><small>${esc(f.experiment.goal)}</small></span></button><button class="text-button" data-download-file="${f.experiment.source.challengeId}" aria-label="下载 ${esc(f.experiment.title)}">JSON</button></div>`).join('')+'<h3>我的空间</h3>'+workspace.experiments.map(e=>`<button class="space-card ${e.id===workspace.activeId?'active':''}" data-open-space="${e.id}"><span><strong>${esc(e.title)}</strong><small>${e.mode.toUpperCase()} · ${e.components.length} 个器具 · ${e.connections.length} 个连接</small></span>${icon('chevron')}</button>`).join(''),'<button class="primary-button" id="modal-new-space">新建空白空间</button>');
   document.querySelectorAll('[data-download-file]').forEach(b=>b.onclick=()=>{const file=EXPERIMENT_FILES.find(f=>f.experiment.source.challengeId===b.dataset.downloadFile);download(b.dataset.downloadFile+'.pqexp.json',JSON.stringify(file,null,2));});

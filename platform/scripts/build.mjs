@@ -7,7 +7,7 @@ import { readFile, writeFile, mkdir, rm, copyFile } from 'node:fs/promises';
 await mkdir('.generated',{recursive:true});
 const browser=await build({entryPoints:['web/app.js'],bundle:true,minify:true,format:'esm',target:'es2022',write:false});
 const assets={'/app.js':{body:browser.outputFiles[0].text,type:'text/javascript; charset=utf-8'}};
-for(const [file,type] of [['index.html','text/html; charset=utf-8'],['style.css','text/css; charset=utf-8'],['light.css','text/css; charset=utf-8'],['favicon.svg','image/svg+xml']])assets['/'+file]={body:await readFile('web/'+file,'utf8'),type};
+for(const [file,type] of [['index.html','text/html; charset=utf-8'],['style.css','text/css; charset=utf-8'],['light.css','text/css; charset=utf-8'],['embedded.css','text/css; charset=utf-8'],['favicon.svg','image/svg+xml']])assets['/'+file]={body:await readFile('web/'+file,'utf8'),type};
 assets['/physquest.html']={body:await readFile('physquest/apps/web/dist/index.html','utf8'),type:'text/html; charset=utf-8'};
 for(const file of await readdir('physquest/apps/web/dist/physquest-assets'))assets['/physquest-assets/'+file]={body:await readFile('physquest/apps/web/dist/physquest-assets/'+file,'utf8'),type:file.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8'};
 for(const file of await readdir('experiments'))if(file.endsWith('.json'))assets['/experiments/'+file]={body:await readFile('experiments/'+file,'utf8'),type:'application/json; charset=utf-8'};

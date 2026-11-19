@@ -52,6 +52,7 @@ const FIELDLAB_FILES = new Set([
   '/app.js',
   '/style.css',
   '/light.css',
+  '/embedded.css',
   '/favicon.svg',
   '/markdown.js',
 ]);

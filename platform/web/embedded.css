@@ -1,0 +1,321 @@
+/* ============================================================
+   PhysQuest 嵌入式工作台 · 排版优化
+   ============================================================
+   目标：不那么挤。具体做了什么：
+     1. 字号回到 12–13px（原来 embedded 覆盖成 14–15px，把所有格子撑爆了）
+     2. 器具卡片改成三列而不是两列（两列会让每个卡片很大很空）
+     3. 左侧器具库 / 右侧 AI 栏加宽，中间场景留白
+     4. 面板圆角与间距统一
+   ========================================================== */
+
+/* ---------- 1. 字号：回到紧凑但可读 ---------- */
+body.embedded .panel-heading h2,
+body.embedded .category-list button,
+body.embedded .instrument-card strong,
+body.embedded .section-label,
+body.embedded .text-button,
+body.embedded .outline-button,
+body.embedded .primary-button,
+body.embedded .inspector-tabs button,
+body.embedded .measurement-tabs button,
+body.embedded .library-tools button {
+  font-size: 12.5px;
+}
+
+body.embedded input:not([type=range]),
+body.embedded textarea,
+body.embedded select {
+  font-size: 13px;
+}
+
+body.embedded .input-hint,
+body.embedded .inspector-hero p {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* ---------- 2. 器具卡片：三列 ---------- */
+body.embedded .instrument-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+body.embedded .instrument-card {
+  min-height: 62px;
+  padding: 8px 6px;
+  border-radius: 7px;
+}
+
+body.embedded .instrument-card strong {
+  line-height: 1.35;
+  font-size: 12px;
+}
+
+body.embedded .instrument-card .instrument-glyph {
+  height: 22px;
+}
+
+@media (max-width: 700px) {
+  body.embedded .instrument-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- 3. 三栏宽度：左窄中宽右适中 ---------- */
+@media (min-width: 861px) {
+  body.embedded .workbench {
+    grid-template-columns: 232px minmax(380px, 1fr) 340px;
+    gap: 10px;
+    padding: 10px;
+  }
+}
+
+@media (min-width: 1500px) {
+  body.embedded .workbench {
+    grid-template-columns: 258px minmax(520px, 1fr) 360px;
+  }
+}
+
+@media (min-width: 861px) and (max-width: 1100px) {
+  body.embedded .workbench {
+    grid-template-columns: 196px minmax(300px, 1fr) 300px;
+  }
+}
+
+/* ---------- 4. 面板：统一圆角与内边距 ---------- */
+body.embedded .panel {
+  border-radius: 10px;
+  border-color: #e6ebf1;
+}
+
+body.embedded .panel-heading {
+  padding: 10px 12px;
+}
+
+body.embedded .panel-heading h2 {
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- 5. 器具库 ---------- */
+body.embedded .category-list {
+  padding: 6px 8px;
+  gap: 4px;
+}
+
+body.embedded .category-list button {
+  padding: 4px 9px;
+  border-radius: 999px;
+}
+
+body.embedded .search {
+  margin: 6px 10px;
+  padding: 5px 9px;
+}
+
+body.embedded .library-scroll {
+  padding: 6px 10px;
+}
+
+body.embedded .library-group-title {
+  font-size: 10.5px;
+  margin: 8px 0 5px;
+}
+
+body.embedded .library-tools {
+  padding: 8px 10px 0;
+  gap: 4px;
+}
+
+body.embedded .library-tools .text-button {
+  font-size: 11.5px;
+}
+
+body.embedded .library-bottom {
+  font-size: 10.5px;
+  padding: 6px 10px;
+}
+
+/* ---------- 6. 场景工具条 ---------- */
+body.embedded .viewport-toolbar {
+  padding: 6px 10px;
+  gap: 4px;
+}
+
+body.embedded .tool-button {
+  width: 26px;
+  height: 26px;
+  font-size: 14px;
+}
+
+body.embedded .mode-switch button {
+  padding: 4px 9px;
+  font-size: 11.5px;
+}
+
+body.embedded .mode-switch button span {
+  display: none;
+}
+
+body.embedded .object-count {
+  font-size: 11px;
+}
+
+/* ---------- 7. 图表区 ---------- */
+body.embedded .measurement-heading {
+  padding: 7px 12px;
+}
+
+body.embedded .measurement-tabs button {
+  padding: 4px 2px;
+  font-size: 12px;
+}
+
+body.embedded .chart-area {
+  padding: 8px 12px 12px;
+}
+
+/* ---------- 8. 右侧 AI 栏 ---------- */
+body.embedded .sidebar-tabs {
+  padding: 6px;
+  gap: 4px;
+}
+
+body.embedded .sidebar-tabs button {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+body.embedded .drawer-heading {
+  padding: 9px 12px;
+}
+
+body.embedded .ai-title h2 {
+  font-size: 13px;
+}
+
+body.embedded .ai-title p {
+  font-size: 10.5px;
+}
+
+body.embedded .ai-drawer .drawer-body {
+  padding: 10px 12px;
+}
+
+body.embedded .chat-messages {
+  gap: 8px;
+  margin: 10px 0;
+  max-height: none;
+  flex: 1;
+}
+
+body.embedded .chat-message {
+  padding: 9px 11px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  border-radius: 8px;
+}
+
+body.embedded .chat-compose textarea {
+  padding: 9px 10px;
+  font-size: 12.5px;
+  border-radius: 7px;
+}
+
+body.embedded .chat-actions {
+  margin-top: 6px;
+}
+
+body.embedded .chat-actions .primary-button {
+  padding: 7px 14px;
+  font-size: 12.5px;
+}
+
+body.embedded .chat-actions span {
+  font-size: 10.5px;
+}
+
+/* ---------- 9. 属性面板 ---------- */
+body.embedded .inspector-tabs {
+  padding: 0 10px;
+  gap: 12px;
+}
+
+body.embedded .inspector-tabs button {
+  padding: 8px 0;
+  font-size: 12px;
+}
+
+body.embedded .inspector-content {
+  padding: 10px 12px;
+}
+
+body.embedded .param-row {
+  margin-bottom: 9px;
+}
+
+body.embedded .param-row > label {
+  font-size: 11.5px;
+  margin-bottom: 3px;
+}
+
+/* ---------- 10. 底部状态条 ---------- */
+body.embedded .status-bar {
+  padding: 0 12px;
+  font-size: 10.5px;
+  height: 26px;
+}
+
+body.embedded .status-bar .version-label {
+  font-size: 9.5px;
+}
+
+/* ---------- 11. 实验目标条（我们自己加的） ---------- */
+body.embedded .learning-details {
+  font-size: 12.5px;
+  line-height: 1.7;
+  margin: 10px 0;
+  padding: 9px 0;
+}
+
+body.embedded .learning-details p {
+  margin: 5px 0;
+}
+
+body.embedded .learning-details button {
+  font-size: 12.5px;
+}
+
+/* ---------- 12. 空场景提示 ---------- */
+body.embedded .empty-scene h1 {
+  font-size: 26px;
+}
+
+body.embedded .empty-scene p {
+  font-size: 13px;
+}
+
+body.embedded .empty-scene button {
+  font-size: 12.5px;
+  padding: 8px 16px;
+}
+
+/* ---------- 13. 运输条（播放/时间） ---------- */
+body.embedded .transport {
+  padding: 6px 10px;
+  gap: 8px;
+}
+
+body.embedded .play-button {
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+body.embedded .time-value {
+  font-size: 12px;
+}
+
+body.embedded .transport select {
+  font-size: 11.5px;
+  padding: 3px 6px;
+}

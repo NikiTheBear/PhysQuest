@@ -1,3 +1,4 @@
+import {validateAppearance} from './appearance.js';
 import { CATALOG, COUPLINGS, blankExperiment, component, uid, activeExperiment, ENDPOINT_KINDS, RIGID_KINDS, LINK_KINDS } from './catalog.js';
 import {sliderTarget,validateSliders} from './sliders.js';
 import {sampleChart,validateChart} from './experiment-chart.js';
@@ -8,7 +9,7 @@ const number = (v, min, max, name) => { if(typeof v !== 'number'||!Number.isFini
 export function validateComponent(c) {
   validateCollider(c);
   const def=Object.hasOwn(CATALOG,c.kind)&&CATALOG[c.kind];if(!def)throw new Error('未知器具类型');
-  text(c.id,100,'器具 ID');if(c.appearance&&(!/^#[0-9a-f]{6}$/i.test(c.appearance.color)||Object.keys(c.appearance).some(k=>k!=='color')))throw new Error('外观只支持 #RRGGBB color');text(c.name,60,'器具名称');
+  text(c.id,100,'器具 ID');validateAppearance(c.appearance);text(c.name,60,'器具名称');
   if(!Array.isArray(c.position)||c.position.length!==3)throw new Error('position 必须为 [x,y,z]');
   c.position.forEach(v=>number(v,-30,30,'位置'));
   if(typeof c.fixed!=='boolean')throw new Error('fixed 必须为布尔值');

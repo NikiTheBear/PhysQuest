@@ -43,6 +43,13 @@ export class LabScene {
     c={...c,kind:aliases[c.kind]||c.kind};
     const group=new THREE.Group(),color=c.appearance?.color||DOMAINS[CATALOG[c.kind].domain].color,p=c.params;
     const add=(geo,col=color,pos=[0,0,0],opts={})=>{const m=this.mesh(geo,col,opts);m.position.copy(V(pos));group.add(m);return m;};
+    if(c.appearance?.parts){
+      for(const part of c.appearance.parts){
+        const geometry=part.shape==='box'?new THREE.BoxGeometry(1,1,1):part.shape==='sphere'?new THREE.SphereGeometry(.5,16,12):new THREE.CylinderGeometry(.5,.5,1,16);
+        const mesh=add(geometry,part.color||color,part.offset);mesh.scale.copy(V(part.size));mesh.rotation.z=(part.angle||0)*Math.PI/180;mesh.userData.id=c.id;
+      }
+      group.position.copy(V(c.position));group.rotation.z=(p.angle||0)*Math.PI/180;return group;
+    }
     const stand=()=>{add(new THREE.CylinderGeometry(.23,.3,.12,24),'#434f5d',[0,-.5,0]);add(new THREE.CylinderGeometry(.035,.035,.45,12),'#7c8d9a',[0,-.24,0]);};
     if(c.kind==='lens_bench'){const g=benchGraphics(p);for(const l of g.lines){const obj=this.lines(l.points,l.color,l.dashed?.35:1,false);group.add(obj);}add(new THREE.BoxGeometry(.12,Math.max(.3,p.lensDiameter*.1),.12),'#83afc1');add(new THREE.BoxGeometry(.06,1.7,.6),'#b7cec1',[p.screenX*.1,0,0],{transparent:true,opacity:.4});add(new THREE.CylinderGeometry(.04,.04,p.h*.1,12),'#b7854b',[-p.u*.1,p.h*.05,0]);}
     if(['body','charge'].includes(c.kind)){add(new THREE.SphereGeometry(p.radius,32,24),c.kind==='charge'?(p.charge>=0?'#dd9983':'#72b4d6'):color);const ring=add(new THREE.TorusGeometry(p.radius*1.005,.008,8,50),'#ffffff',undefined,{transparent:true,opacity:.25});ring.rotation.x=Math.PI/2;}
@@ -136,7 +143,8 @@ export class LabScene {
   }
   draw3(sim) {
     this.controls.update();this.grid.visible=this.showGrid;this.axes.visible=this.showGrid;
-    for(const c of this.doc.components){const obj=this.objects.get(c.id),b=sim.bodies.get(c.id);if(!((this.transform.dragging||this.previewMove)&&c.id===this.selected))obj.position.copy(V(b.position));if(b.quaternion)obj.quaternion.fromArray(b.quaternion);if(LINK_KINDS.includes(c.kind)&&c.refs.a&&c.refs.b){const a=sim.bodies.get(c.refs.a),bb=sim.bodies.get(c.refs.b);if(a&&bb){const start=V(a.position),end=V(bb.position),diff=end.clone().sub(start),length=diff.length(),axis=diff.normalize(),perp=new THREE.Vector3(0,0,1);if(Math.abs(axis.dot(perp))>.9)perp.set(0,1,0);perp.cross(axis).normalize();const p2=axis.clone().cross(perp),points=[];for(let i=0;i<=120;i++){const t=i/120;points.push(start.clone().lerp(end,t).addScaledVector(perp,Math.cos(t*Math.PI*20)*(c.kind==='spring'?.1:0)).addScaledVector(p2,Math.sin(t*Math.PI*20)*(c.kind==='spring'?.1:0)));}obj.position.set(0,0,0);obj.children[0].geometry.setFromPoints(points);}}}
+    for(const c of this.doc.components){const obj=this.objects.get(c.id),b=sim.bodies.get(c.id);if(!((this.transform.dragging||this.previewMove)&&c.id===this.selected))obj.position.copy(V(b.position));if(b.quaternion)obj.quaternion.fromArray(b.quaternion);if(LINK_KINDS.includes(c.kind)&&c.refs.a&&c.refs.b){const a=sim.bodies.get(c.refs.a),bb=sim.bodies.get(c.refs.b);if(a&&bb){const start=V(a.position),end=V(bb.position),diff=end.clone().sub(start),length=diff.length(),axis=diff.normalize(),perp=new THREE.Vector3(0,0,1);if(Math.abs(axis.dot(perp))>.9)perp.set(0,1,0);if(c.appearance?.parts){obj.position.copy(start).lerp(end,.5);if(length>0)obj.quaternion.setFromUnitVectors(new THREE.Vector3(1,0,0),axis);continue;}
+      perp.cross(axis).normalize();const p2=axis.clone().cross(perp),points=[];for(let i=0;i<=120;i++){const t=i/120;points.push(start.clone().lerp(end,t).addScaledVector(perp,Math.cos(t*Math.PI*20)*(c.kind==='spring'?.1:0)).addScaledVector(p2,Math.sin(t*Math.PI*20)*(c.kind==='spring'?.1:0)));}obj.position.set(0,0,0);obj.children[0].geometry.setFromPoints(points);}}}
     this.disposeGroup(this.dynamic);
     for(const c of this.doc.components)this.drawCollider3(c,sim.bodies.get(c.id));
     const selected=this.objects.get(this.selected);if(selected){const box=new THREE.BoxHelper(selected,'#e9ac76');box.material.transparent=true;box.material.opacity=.55;this.dynamic.add(box);}
@@ -164,7 +172,24 @@ export class LabScene {
       if(this.showTrails)line(b.trail,color+'66');ctx.save();ctx.translate(...p);ctx.strokeStyle=color;ctx.fillStyle=color+'22';ctx.lineWidth=1.5;
       if(this.showFields&&c.kind==='field'){ctx.strokeStyle=color+'33';ctx.setLineDash([5,8]);ctx.beginPath();ctx.arc(0,0,c.params.radius*this.scale2,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle=color;}
       const radius=Math.max(9,(c.params.radius||.25)*this.scale2);
-      if(c.kind==='lens_bench'){drawBench2(ctx,c.params,this.scale2);}
+      if(c.appearance?.parts){
+        ctx.save();const q=b.quaternion;
+        if(this.isBound(c)){
+          const a=sim.bodies.get(c.refs.a).position,z=sim.bodies.get(c.refs.b).position;
+          ctx.translate(((a[0]+z[0])/2-pos[0])*this.scale2,(pos[1]-(a[1]+z[1])/2)*this.scale2);
+          ctx.rotate(-Math.atan2(z[1]-a[1],z[0]-a[0]));
+        }else ctx.rotate(-(q?2*Math.atan2(q[2],q[3]):(c.params.angle||0)*Math.PI/180));
+        for(const part of [...c.appearance.parts].sort((a,b)=>(a.offset?.[2]||0)-(b.offset?.[2]||0))){
+          const [x,y]=part.offset||[0,0],width=part.size[0]*this.scale2,height=part.size[1]*this.scale2;
+          ctx.save();ctx.translate(x*this.scale2,-y*this.scale2);ctx.rotate(-(part.angle||0)*Math.PI/180);
+          ctx.fillStyle=part.color||color;ctx.beginPath();
+          if(part.shape==='sphere')ctx.ellipse(0,0,width/2,height/2,0,0,2*Math.PI);
+          else ctx.rect(-width/2,-height/2,width,height);
+          ctx.fill();ctx.restore();
+        }
+        ctx.restore();
+      }
+      else if(c.kind==='lens_bench'){drawBench2(ctx,c.params,this.scale2);}
       else if(c.kind==='cylinder'){ctx.beginPath();ctx.arc(0,0,radius,0,Math.PI*2);ctx.fill();ctx.stroke();const q=b.quaternion||[0,0,0,1],angle=2*Math.atan2(q[2],q[3]);ctx.beginPath();ctx.moveTo(-radius*Math.cos(angle),radius*Math.sin(angle));ctx.lineTo(radius*Math.cos(angle),-radius*Math.sin(angle));ctx.stroke();}
       else if(c.kind==='box'||c.kind==='ramp'){const width=(c.kind==='box'?c.params.width:c.params.length)*this.scale2,height=(c.kind==='box'?c.params.height:.16)*this.scale2;const q=b.quaternion;const angle=q?Math.atan2(2*(q[3]*q[2]+q[0]*q[1]),1-2*(q[1]**2+q[2]**2)):(c.params.angle||0)*Math.PI/180;ctx.rotate(-angle);ctx.fillRect(-width/2,-height/2,width,height);ctx.strokeRect(-width/2,-height/2,width,height);ctx.rotate(angle);}
       else if(['body','charge','microphone','probe','motion_sensor','distance_sensor'].includes(c.kind)){ctx.beginPath();ctx.arc(0,0,Math.min(radius,40),0,Math.PI*2);ctx.fill();ctx.stroke();if(c.kind==='charge'){ctx.fillStyle=color;ctx.textAlign='center';ctx.font='16px sans-serif';ctx.fillText(c.params.charge>=0?'+':'−',0,5);}}

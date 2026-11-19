@@ -102,7 +102,7 @@ export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeReques
     if(busy)return toast('当前任务完成后可载入新卡片');
     resumeId=null;knowledgeTask=null;showTask();
     const task='实验目标：'+title+'。探究：'+goal+(formula?'\n理论参考：'+formula:'')+(preset!=='{}'?'\n光具座参考参数（长度单位 cm）：'+preset:'');
-    draft(task+'\n请新建实验，设置上述目标，搭建器具并用仿真检查可观测现象，说明模型范围。');
+    draft(task+'\n请新建实验，设置上述目标，搭建器具，用 set_variable_slider 为主要可调变量创建操作滑块，并用仿真检查可观测现象，说明模型范围。');
     status('卡片目标已载入，可编辑后发送。');
   },startKnowledgeBuild({knowledgeId,prompt}){
     if(busy){toast('当前 AI 任务仍在执行，请完成后再发起新的知识点搭建。');return false;}

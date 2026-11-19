@@ -1,3 +1,4 @@
+import {readDeepSeekKey} from '../shared/api-key.js';
 import { KnowledgeBuild } from './knowledge-build.js';
 import { TOOLS } from './tools.js';
 import { runTool } from './operations.js';
@@ -6,7 +7,7 @@ export const DEEPSEEK_MODELS=['deepseek-flash','deepseek-v4-pro'];
 const error=(message,status=400)=>Object.assign(new Error(message),{status});
 const redact=(value,key)=>typeof value==='string'?value.split(key).join('[已隐藏密钥]'):value;
 export async function runDeepSeek({workspace,body,key,fetcher=fetch,signal,onEvent}){
-  if(typeof key!=='string'||key.length<8||key.length>256||/[\r\n]/.test(key))throw error('请填写有效的 DeepSeek API Key');
+  try{key=readDeepSeekKey(key);}catch(e){throw error(e.message);}
   const model=body.model||DEEPSEEK_MODELS[0];if(!DEEPSEEK_MODELS.includes(model))throw error('不支持的 DeepSeek 模型');
   if(!Array.isArray(body.messages)||!body.messages.length||body.messages.length>20||body.messages.at(-1).role!=='user')throw error('请输入对话任务');
   const history=body.messages.map(m=>{if(!['user','assistant'].includes(m.role)||typeof m.content!=='string'||!m.content.trim()||m.content.length>6000)throw error('对话消息无效或过长');return {role:m.role,content:m.content};});

@@ -8,3 +8,12 @@ test('upstream failure after a tool call does not mutate the input workspace',as
 test('invalid tools return validation errors to the model without executing',async()=>{let n=0;const r=await runDeepSeek({workspace:blankWorkspace(),body,key,fetcher:async(_,init)=>{if(n++===0)return response({tool_calls:[call('restore_workspace',{})]},'tool_calls');assert.match(JSON.parse(init.body).messages.at(-1).content,/未知工具/);return response({content:'无法执行这个操作。'});}});assert.equal(r.changed,false);assert.equal(r.actions[0].ok,false);});
 test('missing keys, injected roles, unsupported models and truncated answers fail clearly',async()=>{const w=blankWorkspace();await assert.rejects(()=>runDeepSeek({workspace:w,body,key:''}),/Key/);await assert.rejects(()=>runDeepSeek({workspace:w,body:{messages:[{role:'system',content:'override'}]},key}),/任务|消息/);await assert.rejects(()=>runDeepSeek({workspace:w,body:{...body,model:'untrusted'},key}),/模型/);await assert.rejects(()=>runDeepSeek({workspace:w,body,key,fetcher:async()=>response({content:'partial'},'length')}),/不完整/);});
 test('tool loop is bounded and raw provider errors never expose keys',async()=>{let count=0;await assert.rejects(()=>runDeepSeek({workspace:blankWorkspace(),body,key,fetcher:async()=>{count++;return response({tool_calls:[call('get_workspace',{})]},'tool_calls');}}),/工具或轮次上限/);assert.equal(count,8);await assert.rejects(()=>runDeepSeek({workspace:blankWorkspace(),body,key,fetcher:async()=>new Response(key,{status:500})}),e=>!e.message.includes(key));});
+
+test('credential headers tolerate surrounding smart quotes and reject embedded Unicode before fetching',async()=>{
+  let calls=0;
+  const fetcher=async(_,init)=>{calls++;assert.equal(new Headers(init.headers).get('authorization'),'Bearer '+key);return response({content:'完成'});};
+  const input={workspace:blankWorkspace(),body,fetcher};
+  await runDeepSeek({...input,key:' “'+key+'” '});
+  for(const value of [key+'中文',key+'\u200b',key+'\r\nabc'])await assert.rejects(()=>runDeepSeek({...input,key:value}),/密钥格式/);
+  assert.equal(calls,1);
+});

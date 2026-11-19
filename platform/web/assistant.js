@@ -1,3 +1,4 @@
+import {readDeepSeekKey} from '../shared/api-key.js';
 import { renderMarkdown } from './markdown.js';
 import { getKnowledgePrompt } from '../shared/knowledge-prompts.js';
 export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeRequest,applyResult,setBusy,toast,openAssistant}){
@@ -64,9 +65,14 @@ export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeReques
   $('deepseek-prompt').oninput=resizeComposer;
   async function send(){
     if(busy)return;if(!isOnline())return toast('内置 DeepSeek 需要在线站点或本地服务，离线 HTML 无法代理 API 请求');
-    const key=$('deepseek-key').value.trim(),prompt=$('deepseek-prompt').value.trim(),knowledgeId=knowledgeTask;
+    const prompt=$('deepseek-prompt').value.trim(),knowledgeId=knowledgeTask;
     if(!prompt)return toast('请描述本次任务');
-    if(!key){status('消息已保留，请先填写 DeepSeek API Key。');await settings();return toast('填写 Key 后即可发送，消息已保留');}
+    let key;
+    try{key=readDeepSeekKey($('deepseek-key').value);}
+    catch(error){
+      status('消息已保留。'+error.message);settings();
+      $('ai-key-status').textContent=error.message;return;
+    }
     state(true);let sent=false;
     try{
       await beforeRequest();const before=structuredClone(getWorkspace());sent=true;append('user',prompt);draft('');pendingMessage=append('assistant','正在思考并操作实验…');pendingMessage.classList.add('pending');status('DeepSeek 正在通过 MCP 工具搭建、验证，完成后整轮保存…');

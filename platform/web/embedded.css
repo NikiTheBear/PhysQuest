@@ -374,3 +374,62 @@ body.embedded #chat-tools > *:not(summary),
 body.embedded .agent-context > *:not(summary) {
   margin-left: 14px;
 }
+
+/* ---------- 15. 实验目标区放大（用户说太小） ---------- */
+body.embedded .experiment-objective {
+  padding: 10px 16px;
+  max-height: clamp(110px, 20vh, 200px);
+}
+body.embedded .experiment-objective header {
+  font-size: 13.5px;
+}
+body.embedded .experiment-objective header strong {
+  font-size: 13.5px;
+}
+body.embedded .experiment-objective p {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 4px 0;
+}
+
+/* ---------- 16. 运输条（运行/时间）改成不挡视野 ---------- */
+/* 原来是一整块白色浮岛压在场景正中底部，挡住地面和物体。
+   改成：贴底、拉长变扁、半透明，尽量只占一条带。 */
+body.embedded .transport {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transform: none;
+  width: 100%;
+  height: 40px;
+  border-radius: 0;
+  padding: 4px 14px;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #e2e8ee;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  box-shadow: 0 -2px 10px rgba(20, 40, 60, 0.05);
+  justify-content: center;
+}
+body.embedded .play-button {
+  padding: 5px 16px;
+  font-size: 12px;
+}
+body.embedded .transport-icon {
+  font-size: 14px;
+}
+body.embedded .time-value {
+  font-size: 12px;
+  min-width: 62px;
+}
+body.embedded .transport select {
+  font-size: 11.5px;
+}
+
+/* 场景底部留出运输条的高度，别被压住 */
+body.embedded .scene-container {
+  padding-bottom: 40px;
+}

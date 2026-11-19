@@ -153,6 +153,7 @@ export default function MechanicsLab({
       }
       scene={<MechanicsScene params={params} samples={samples} />}
       sceneNote="场景为示意图；所有读数由左侧引擎实时计算"
+      notes={<MechanicsNotes params={params} />}
     />
   );
 }
@@ -423,5 +424,48 @@ function MechanicsScene({
         t = {params.time.toFixed(1)} s · 已下落 {Math.abs(m.displacement).toFixed(1)} m
       </text>
     </>
+  );
+}
+
+/* ============================================================
+ * 底部：观察笔记（填掉右侧空白，参照光学那套）
+ * ========================================================== */
+
+function MechanicsNotes({ params }: { params: MechanicsParams }) {
+  const m = solveMechanics(params);
+  const tips: Record<MechanicsMode, string> = {
+    'free-fall': '试试点 2 秒和 4 秒，看位移是不是变成 4 倍——这是平方关系，不是线性。',
+    incline: '把摩擦调到刚好让方块不动，那个临界角度就是 arctan(μ)。',
+    spring: '同一个弹簧，振幅变大周期不变——这是简谐振动最反直觉的地方。',
+    projectile: '把初速度调到 0，它就变成自由落体了。平抛可以拆成两个独立运动。',
+    collision: '摩擦因数越大，停下得越快。把摩擦调到 0，它会永远滑下去。',
+    oscillation: '把阻尼调大，振荡次数变少；调到很大，就不振荡了，直接回到平衡位置。',
+  };
+
+  return (
+    <div className="panel">
+      <h4>观察笔记</h4>
+      <div className="obs-panel-inline">
+        <div className="obs-row">
+          <span className="k">当前结果</span>
+          <b>{m.description}</b>
+        </div>
+        <div className="obs-grid" style={{ marginTop: 10 }}>
+          <div className="obs-cell">
+            <span className="k">加速度</span>
+            <b>{m.acceleration.toFixed(2)} m/s²</b>
+          </div>
+          <div className="obs-cell">
+            <span className="k">机械能</span>
+            <b>{m.mechanical.toFixed(1)} J</b>
+          </div>
+          <div className="obs-cell">
+            <span className="k">动量</span>
+            <b>{m.momentum.toFixed(1)} kg·m/s</b>
+          </div>
+        </div>
+        <div className="obs-tip">{tips[params.mode]}</div>
+      </div>
+    </div>
   );
 }

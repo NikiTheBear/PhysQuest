@@ -40,6 +40,8 @@ interface Props {
   scene: ReactNode;
   /** 场景下方的说明条 */
   sceneNote?: string;
+  /** 场景下方的补充面板（观察笔记之类），用来填掉右侧空白 */
+  notes?: ReactNode;
 }
 
 /**
@@ -65,6 +67,7 @@ export default function GenericLab({
   charts,
   scene,
   sceneNote,
+  notes,
 }: Props) {
   return (
     <div className="split">
@@ -145,6 +148,7 @@ export default function GenericLab({
           </svg>
         </div>
         {sceneNote && <div className="lab-scene-note">{sceneNote}</div>}
+        {notes}
       </div>
     </div>
   );

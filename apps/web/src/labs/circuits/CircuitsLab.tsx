@@ -119,6 +119,37 @@ export default function CircuitsLab({
       }
       scene={<CircuitScene params={params} metrics={m} />}
       sceneNote="电路图为示意；电流电压由左侧引擎实时计算"
+      notes={
+        <div className="panel">
+          <h4>观察笔记</h4>
+          <div className="obs-panel-inline">
+            <div className="obs-row">
+              <span className="k">当前</span>
+              <b>{m.description}</b>
+            </div>
+            <div className="obs-grid" style={{ marginTop: 10 }}>
+              <div className="obs-cell">
+                <span className="k">输出功率</span>
+                <b className={m.isMaxPower ? 'good' : undefined}>{m.powerOut.toFixed(1)} W</b>
+              </div>
+              <div className="obs-cell">
+                <span className="k">效率</span>
+                <b className={m.efficiency > 0.8 ? 'good' : 'warn'}>
+                  {(m.efficiency * 100).toFixed(0)}%
+                </b>
+              </div>
+              <div className="obs-cell">
+                <span className="k">内耗</span>
+                <b>{m.powerLoss.toFixed(1)} W</b>
+              </div>
+            </div>
+            <div className="obs-tip">
+              把内阻调成和外阻一样，看输出功率到不到峰顶——但注意效率此刻正好是一半。
+              「功率最大」和「效率最高」永远不会同时发生在同一个点上。
+            </div>
+          </div>
+        </div>
+      }
     />
   );
 }

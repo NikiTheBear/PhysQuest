@@ -56,7 +56,7 @@ import { loadAIConfig, type AIConfig } from './ai/client';
 import type { AIAction } from './ai/prompts';
 import { AUTO_CHALLENGES, CHALLENGES, KNOWLEDGE, quizForChallenge } from './data/content';
 import { LABS, labById, type LabId } from './labs/registry';
-import { EmptyPickLab, EmptyPickChallenge } from './components/common/EmptyStates';
+import { EmptyPickLab, EmptyPickChallenge, EmptyReport } from './components/common/EmptyStates';
 import ResetPanel from './components/common/ResetPanel';
 
 type View = 'map' | 'hub' | 'lab' | 'free' | 'cards' | 'report';
@@ -584,7 +584,39 @@ export default function App() {
         {view === 'hub' && !lab && <EmptyPickLab onGoMap={() => setView('map')} />}
 
         {view === 'lab' && !challenge && (
-          <EmptyPickChallenge lab={lab} onGoMap={() => setView('map')} onGoHub={() => setView('hub')} />
+          <EmptyPickChallenge
+            lab={lab}
+            onGoMap={() => setView('map')}
+            onGoHub={() => setView('hub')}
+            onPick={(cid) => {
+              const hand = CHALLENGES.find((c) => c.id === cid);
+              if (hand) {
+                beginChallenge(hand);
+                return;
+              }
+              const auto = AUTO_CHALLENGES.find((c) => c.id === cid);
+              if (!auto) return;
+              const targetLab = labById(auto.labId);
+              if (!targetLab) return;
+              setLabId(targetLab.id);
+              setChallenge({
+                id: auto.id,
+                labId: auto.labId,
+                title: auto.title,
+                brief: auto.brief,
+                hint: auto.hint,
+                winCondition: { metric: 'm', op: '<', value: 0 },
+                multiAnswer: true,
+                knowledgeIds: auto.knowledgeIds,
+                misconceptionIds: auto.misconceptionIds,
+                demoScriptId: '',
+                difficulty: 'beginner',
+                prediction: auto.prediction,
+              });
+              setPhase('explore');
+              setView('lab');
+            }}
+          />
         )}
 
         {/* ===== 力学 / 电路 / 声学：走各自的通用实验台 ===== */}
@@ -739,7 +771,18 @@ export default function App() {
           </>
         )}
 
-        {view === 'report' && (
+        {view === 'report' && learner.runs.length === 0 && (
+          <>
+            <div className="hub-head" style={{ paddingBottom: 18 }}>
+              <span className="eyebrow">Learning Report</span>
+              <h2>我的学习报告</h2>
+              <p>报告是根据你的探索记录生成的。先去做一次实验。</p>
+            </div>
+            <EmptyReport onGoMap={() => setView('map')} />
+          </>
+        )}
+
+        {view === 'report' && learner.runs.length > 0 && (
           <>
             <div className="hub-head" style={{ paddingBottom: 18 }}>
               <span className="eyebrow">Learning Report</span>

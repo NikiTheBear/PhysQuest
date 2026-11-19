@@ -3670,3 +3670,224 @@ html[data-theme='dark'] .pq-toast {
   padding-left: 2px;
   line-height: 1.5;
 }
+
+/* ================= UI 美化：模块卡交互反馈 ================= */
+
+/* 悬停：抬得更高、阴影更深、渐变更明显 */
+.module-card {
+  transition: transform 0.22s cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 0.22s cubic-bezier(0.32, 0.72, 0, 1),
+    background 0.2s ease, border-color 0.2s ease;
+}
+.module-card:hover:not(.disabled) {
+  transform: translateY(-5px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 22px 48px -20px rgba(0, 0, 0, 0.28);
+}
+.module-card:hover:not(.disabled)::before {
+  opacity: 1;
+}
+
+/* 按下：下沉一点，给触感 */
+.module-card:active:not(.disabled) {
+  transform: translateY(-1px) scale(0.992);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 20px -12px rgba(0, 0, 0, 0.2);
+  transition-duration: 0.08s;
+}
+
+/* 标题在悬停时变成强调色 */
+.module-card h3 {
+  transition: color 0.18s ease;
+}
+.module-card:hover:not(.disabled) h3 {
+  color: var(--accent);
+}
+
+/* 箭头：悬停时向右滑出去 */
+.module-card .module-meta .arrow {
+  transition: transform 0.22s cubic-bezier(0.32, 0.72, 0, 1), color 0.18s;
+}
+.module-card:hover:not(.disabled) .module-meta .arrow {
+  transform: translateX(6px);
+  color: var(--accent);
+}
+
+/* 左侧一道强调色竖条，随悬停长出来 */
+.module-card::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.26s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.module-card:hover:not(.disabled)::after {
+  transform: scaleY(1);
+}
+
+/* 图标轻微放大 */
+.module-card .module-icon {
+  transition: transform 0.26s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.module-card:hover:not(.disabled) .module-icon {
+  transform: scale(1.15) rotate(-6deg);
+}
+
+/* 键盘聚焦：清晰的焦点环 */
+.module-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 2px 6px rgba(0, 0, 0, 0.05),
+    0 22px 48px -20px rgba(0, 0, 0, 0.28);
+}
+
+/* ================= 挑战卡交互反馈 ================= */
+
+.challenge-card {
+  transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 0.2s cubic-bezier(0.32, 0.72, 0, 1), background 0.18s;
+}
+.challenge-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 18px 36px -18px rgba(0, 0, 0, 0.26);
+}
+.challenge-card:active {
+  transform: translateY(-1px) scale(0.995);
+  transition-duration: 0.08s;
+}
+.challenge-card:hover h3 {
+  color: var(--accent);
+}
+.challenge-card h3 {
+  transition: color 0.18s;
+}
+
+/* ================= 知识卡交互反馈 ================= */
+
+.know-pin {
+  transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 0.2s cubic-bezier(0.32, 0.72, 0, 1), background 0.18s;
+}
+.know-pin:active:not(.static) {
+  transform: scale(0.99);
+  transition-duration: 0.08s;
+}
+
+/* ================= 空状态美化（图6 / 图7） ================= */
+
+.empty-state {
+  max-width: 720px;
+  margin: 60px auto 80px;
+  padding: 44px 40px;
+  background: var(--surface);
+  border-radius: 22px;
+  box-shadow: var(--shadow-1);
+  text-align: center;
+}
+.empty-state .empty-icon {
+  font-size: 40px;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 16px;
+  opacity: 0.85;
+}
+.empty-state h3 {
+  font-size: 24px;
+  letter-spacing: -0.024em;
+  margin-bottom: 10px;
+}
+.empty-state p {
+  font-size: 14.5px;
+  color: var(--label-2);
+  line-height: 1.72;
+  margin: 0 auto 24px;
+  max-width: 460px;
+}
+.empty-state .empty-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* 空状态下面的「可以先去做什么」提示 */
+.empty-suggest {
+  margin-top: 34px;
+  padding-top: 22px;
+  border-top: var(--hairline);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  text-align: left;
+}
+.empty-suggest button {
+  background: var(--surface-2);
+  border: none;
+  border-radius: var(--r-ctrl);
+  padding: 12px 14px;
+  text-align: left;
+  color: var(--label-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.empty-suggest button:hover {
+  background: var(--fill);
+  color: var(--label);
+}
+.empty-suggest button b {
+  display: block;
+  color: var(--label);
+  font-size: 13.5px;
+  margin-bottom: 3px;
+}
+
+/* ================= 挑战导览空模块（图6） ================= */
+
+.hub-empty {
+  padding: 50px 40px;
+  background: var(--surface);
+  border-radius: 22px;
+  box-shadow: var(--shadow-1);
+  text-align: center;
+  margin-top: 24px;
+}
+.hub-empty h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.hub-empty p {
+  font-size: 13.5px;
+  color: var(--label-2);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+/* ================= 实验台下方的观察笔记区 ================= */
+
+.obs-panel-inline .obs-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.obs-panel-inline .obs-row .k {
+  font-size: 11.5px;
+  color: var(--label-3);
+  flex-shrink: 0;
+}
+.obs-panel-inline .obs-row b {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--label);
+  line-height: 1.5;
+}
+
+/* 通用实验台右侧空白：让场景 + 笔记撑满 */
+.lab-column {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}

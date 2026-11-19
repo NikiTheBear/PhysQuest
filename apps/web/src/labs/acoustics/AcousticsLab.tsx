@@ -123,6 +123,42 @@ export default function AcousticsLab({
       }
       scene={<SoundScene params={params} metrics={m} />}
       sceneNote="示意图；读数由左侧引擎实时计算（球面波 1/r 衰减）"
+      notes={
+        <div className="panel">
+          <h4>观察笔记</h4>
+          <div className="obs-panel-inline">
+            <div className="obs-row">
+              <span className="k">当前</span>
+              <b>{m.description}</b>
+            </div>
+            <div className="obs-grid" style={{ marginTop: 10 }}>
+              <div className="obs-cell">
+                <span className="k">波长</span>
+                <b>{m.wavelength.toFixed(2)} m</b>
+              </div>
+              <div className="obs-cell">
+                <span className="k">麦克风声压</span>
+                <b className="good">{m.amplitudeAtMic.toFixed(3)} Pa</b>
+              </div>
+              <div className="obs-cell">
+                <span className="k">干涉</span>
+                <b className={m.interferenceKind === '加强' ? 'good' : 'warn'}>
+                  {m.interferenceKind}
+                </b>
+              </div>
+            </div>
+            <div className="obs-tip">
+              {params.mode === 'attenuation'
+                ? '把距离从 1 m 挪到 2 m，声压不是减半那么简单——它按 1/r 衰减，声强按 1/r²。'
+                : params.mode === 'interference'
+                  ? '慢慢横向移动麦克风，会周期性出现最响和最静的点。频率越高，这些点越密。'
+                  : params.mode === 'directivity'
+                    ? '把麦克风绕到声源背后，声压几乎归零——指向性声源只在正面发声。'
+                    : '频率翻倍，波长减半。三个周期画在同一张图上，疏密差别一眼能看出来。'}
+            </div>
+          </div>
+        </div>
+      }
     />
   );
 }

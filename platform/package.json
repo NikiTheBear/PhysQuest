@@ -1,0 +1,26 @@
+{
+  "name": "fieldlab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node scripts/validate-artifact.mjs",
+    "install:ci": "npm ci && npm --prefix physquest/apps/web ci",
+    "sync:physquest": "node scripts/sync-physquest.mjs",
+    "test:physquest": "npm --prefix physquest/apps/web test",
+    "build:pages": "node scripts/build-pages.mjs"
+  },
+  "dependencies": {
+    "cannon-es": "0.20.0",
+    "markdown-it": "15.0.3",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

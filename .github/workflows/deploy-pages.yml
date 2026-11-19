@@ -30,12 +30,20 @@ jobs:
         working-directory: apps/web
         run: npm ci
 
-      - name: 构建
+      - name: 构建（静态模式）
         working-directory: apps/web
         env:
-          # GitHub Pages 部署在 /PhysQuest/ 子路径下，必须告诉 Vite
+          # Pages 部署在 /PhysQuest/ 子路径下
           VITE_BASE: /PhysQuest/
+          # 让自由搭建工作台走静态单文件版，不需要本地服务
+          VITE_STATIC_WORKBENCH: '1'
         run: npm run build
+
+      - name: 拷贝离线工作台与实验文件
+        run: |
+          mkdir -p apps/web/dist/prompts
+          cp shared/knowledge-data/knowledge-prompts.json apps/web/dist/prompts/ 2>/dev/null || true
+          touch apps/web/dist/.nojekyll
 
       - uses: actions/configure-pages@v5
 

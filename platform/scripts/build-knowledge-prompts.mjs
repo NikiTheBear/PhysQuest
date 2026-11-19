@@ -1,0 +1,22 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {CATALOG} from '../shared/catalog.js';
+const map=JSON.parse(await readFile('physquest/shared/knowledge-data/PLATFORM-MAP.json','utf8'));
+const entries=JSON.parse(await readFile('prompts/entries.json','utf8'));
+const stageLabels={primary:'小学',junior:'初中',senior:'高中',university:'大学'};
+const supportLabels={direct:'可计算实验',approximation:'近似 / 类比实验',conceptual:'概念示意'};
+const planned=map.disciplines.flatMap(d=>d.stages.filter(s=>s.status==='planned').flatMap(s=>s.items.map(i=>({...i,domain:d.key,domainLabel:d.label,stage:s.stage,stageLabel:stageLabels[s.stage]}))));
+if(entries.length!==planned.length||new Set(entries.map(e=>e.id)).size!==planned.length)throw new Error('提示词条目缺失或重复');
+for(const entry of entries)if(!planned.some(p=>p.id===entry.id))throw new Error('未知知识点 '+entry.id);
+const output=planned.map(item=>{
+  const e=entries.find(e=>e.id===item.id);if(!e)throw new Error('缺少 '+item.id);
+  for(const k of ['objective','construction','limitations'])if(typeof e[k]!=='string'||e[k].trim().length<8)throw new Error(item.id+' 缺少 '+k);
+  for(const k of ['variables','observations','models'])if(!Array.isArray(e[k])||!e[k].length||e[k].some(v=>typeof v!=='string'||!v.trim()))throw new Error(item.id+' 无效 '+k);
+  if(!supportLabels[e.support])throw new Error('未知支持级别 '+item.id);
+  for(const kind of e.models)if(!Object.hasOwn(CATALOG,kind))throw new Error(item.id+' 未支持器具 '+kind);
+  const title=`${item.title} · ${item.stageLabel}`;
+  const prompt=`请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「${item.title}」的可编辑实验空间。\n知识点：${item.id}；领域：${item.domainLabel}；学段：${item.stageLabel}。\n模型级别：${supportLabels[e.support]}。\n\n探索目标\n${e.objective}\n\n搭建方案\n${e.construction}\n建议器具模型：${e.models.join('、')}。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n${e.variables.map(v=>'• '+v).join('\n')}\n\n观测与比较\n${e.observations.map(v=>'• '+v).join('\n')}${e.formula?'\n理论参考：'+e.formula:''}\n\n模型边界\n${e.limitations}\n${e.support==='conceptual'?'只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。':e.support==='approximation'?'实验名称和目标须标明“近似 / 类比”，解释每个变量的映射及无法计算的效应。':'只报告求解器实际支持和返回的量，额外公式计算须单独注明。'}\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({"knowledgeId":"${item.id}"})。\n2. 调用 create_experiment 新建独立空间，标题建议“${title}”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。\n3. 优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n6. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。`;
+  if(prompt.length>6000)throw new Error(item.id+' 超出对话长度限制');
+  return {...item,...e,version:1,supportLabel:supportLabels[e.support],prompt};
+});
+await writeFile('physquest/shared/knowledge-data/knowledge-prompts.json',JSON.stringify(output,null,2)+'\n');
+console.log(`Built ${output.length} knowledge prompts: `+Object.entries(supportLabels).map(([k])=>k+'='+output.filter(e=>e.support===k).length).join(', '));

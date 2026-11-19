@@ -34,6 +34,11 @@ import KnowledgeCardView, {
 } from './components/knowledge-cards/KnowledgeCards';
 import ReportView from './components/report/ReportView';
 import AITutor from './components/ai-tutor/AITutor';
+import FreeBuildLab, {
+  type CaptureSnapshot,
+} from './components/free-build/FreeBuildLab';
+import type { KnowledgePrompt } from './data/knowledge-prompts';
+import PromptDialog from './components/knowledge-prompts/PromptDialog';
 import { loadAIConfig, type AIConfig } from './ai/client';
 import type { AIAction } from './ai/prompts';
 import { CHALLENGES, KNOWLEDGE, quizForChallenge } from './data/content';
@@ -41,7 +46,7 @@ import { LABS, labById, type LabId } from './labs/registry';
 import { EmptyPickLab, EmptyPickChallenge } from './components/common/EmptyStates';
 import ResetPanel from './components/common/ResetPanel';
 
-type View = 'map' | 'hub' | 'lab' | 'cards' | 'report';
+type View = 'map' | 'hub' | 'lab' | 'free' | 'cards' | 'report';
 type Phase = 'predict' | 'explore' | 'gate' | 'compare' | 'quiz' | 'quizResult' | 'done';
 
 const LAB_KEY = 'physquest.currentLab.v1';
@@ -107,6 +112,24 @@ export default function App() {
   });
   const [aiConfig, setAiConfig] = useState<AIConfig>(() => loadAIConfig());
   const [showReset, setShowReset] = useState(false);
+  /** 自由搭建：想用哪个知识点的提示词去搭 */
+  const [buildRequest, setBuildRequest] = useState<{
+    knowledgeId: string;
+    title: string;
+    prompt: string;
+  } | null>(null);
+  /** 自由搭建：提示词弹层 */
+  const [promptEntry, setPromptEntry] = useState<KnowledgePrompt | null>(null);
+  const [toast, setToast] = useState('');
+  /** 自由搭建的记录（和挑战那套分开存） */
+  const [freeRuns, setFreeRuns] = useState<CaptureSnapshot[]>(() => {
+    try {
+      const raw = localStorage.getItem('physquest.freebuild.v1');
+      return raw ? (JSON.parse(raw) as CaptureSnapshot[]) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const metrics = useMemo(() => solve(params), [params]);
   const weak = useMemo(() => weakMisconceptions(learner), [learner]);
@@ -115,6 +138,20 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', 'light');
     applyTheme(theme);
   }, [theme]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('physquest.freebuild.v1', JSON.stringify(freeRuns.slice(-40)));
+    } catch {
+      /* 存不下就算了 */
+    }
+  }, [freeRuns]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(''), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   useEffect(() => {
     if (labId) localStorage.setItem(LAB_KEY, labId);
@@ -143,8 +180,9 @@ export default function App() {
     setChallenge(null);
     setPrediction(null);
     setLocked(null);
-    setParams(meta.defaultParams);
-    setView('hub');
+    setParams(meta.defaultParams ?? DEFAULT_LENS_PARAMS);
+    // 自由搭建模式没有挑战，直接进工作台
+    setView(meta.mode === 'free' ? 'free' : 'hub');
   }, []);
 
   /** 从知识点直接进实验台：找到包含这个知识点的挑战，参数跳到卡片给的预设 */
@@ -157,7 +195,7 @@ export default function App() {
       if (!meta) return;
       setLabId(meta.id);
       setChallenge(ch);
-      setParams({ ...meta.defaultParams, ...card.labPreset });
+      setParams({ ...(meta.defaultParams ?? DEFAULT_LENS_PARAMS), ...card.labPreset });
       setPrediction(learner.predictions[ch.id]?.chosenIndex ?? null);
       setLocked(null);
       setPhase(learner.predictions[ch.id] ? 'explore' : 'predict');
@@ -179,6 +217,25 @@ export default function App() {
       setReflectionDraft(learner.reflections[c.id]?.text ?? '');
     },
     [learner, labId],
+  );
+
+  /** 自由搭建：把「记录此刻」的快照存下来 */
+  const handleCapture = useCallback((snap: CaptureSnapshot) => {
+    setFreeRuns((prev) => [snap, ...prev].slice(0, 40));
+    setToast(`已记录：「${snap.experiment.title}」   t = ${snap.time.toFixed(3)} s`);
+  }, []);
+
+  /** 自由搭建：用知识点提示词搭建 */
+  const handleBuildKnowledge = useCallback(
+    (knowledgeId: string, title: string, prompt: string) => {
+      setPromptEntry(null);
+      setLabId('fieldlab');
+      setView('free');
+      setBuildRequest({ knowledgeId, title, prompt });
+      // 让 FreeBuildLab 的 effect 只在下次渲染读到一次
+      setTimeout(() => setBuildRequest(null), 100);
+    },
+    [],
   );
 
   const patchParams = useCallback((patch: Partial<LensParams>) => {
@@ -450,6 +507,15 @@ export default function App() {
           </>
         )}
 
+        {view === 'free' && (
+          <FreeBuildLab
+            staticMode={import.meta.env.VITE_STATIC_WORKBENCH === '1'}
+            onCapture={handleCapture}
+            buildRequest={buildRequest}
+            onMessage={setToast}
+          />
+        )}
+
         {view === 'cards' && (
           <>
             <div className="hub-head" style={{ paddingBottom: 18 }}>
@@ -563,6 +629,20 @@ export default function App() {
           />
         )}
       </div>
+
+      {promptEntry && (
+        <PromptDialog
+          entry={promptEntry}
+          onClose={() => setPromptEntry(null)}
+          onBuild={handleBuildKnowledge}
+        />
+      )}
+
+      {toast && (
+        <div className="pq-toast" role="status">
+          {toast}
+        </div>
+      )}
 
       {showReset && (
         <ResetPanel

@@ -57,3 +57,9 @@ body.embedded input:not([type=range]),body.embedded textarea,body.embedded selec
 @media(max-width:860px){.right-sidebar{grid-column:2;height:660px;min-height:520px;max-height:760px}.right-sidebar .inspector{grid-column:auto;min-height:0;max-height:none}}
 @media(max-width:560px){.right-sidebar{order:3;height:640px;min-height:540px}.right-sidebar .chat-compose{padding-bottom:max(12px,env(safe-area-inset-bottom))}}
 @media(prefers-reduced-motion:reduce){.chat-message.pending .chat-author:after{animation:none}}
+
+#assistant-preferences{width:min(420px,92vw);border:1px solid #d6dce3;border-radius:14px;padding:22px;background:white}
+#assistant-preferences::backdrop{background:#18212d55}
+#assistant-preferences .ai-settings{display:grid;gap:10px}
+#chat-tools{flex:none;max-height:32vh;overflow:auto;padding:6px 12px;font-size:13px}
+#chat-tools summary{cursor:pointer}

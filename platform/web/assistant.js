@@ -19,10 +19,13 @@ export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeReques
     $('chat-send').textContent=value?'处理中…':knowledgeTask?'搭建实验':'发送';$('chat-messages').setAttribute('aria-busy',String(value));
     if(value){const started=Date.now();clock=setInterval(()=>{$('chat-status').textContent='AI 正在操作器具 · '+Math.floor((Date.now()-started)/1000)+' 秒';},1000);}
   }
-  function tab(chat){$('deepseek-panel').hidden=!chat;$('mcp-panel').hidden=chat;$('ai-chat-tab').classList.toggle('active',chat);$('ai-mcp-tab').classList.toggle('active',!chat);$('ai-chat-tab').setAttribute('aria-pressed',String(chat));$('ai-mcp-tab').setAttribute('aria-pressed',String(!chat));if(chat)resizeComposer();}
   function showTask(){const entry=knowledgeTask&&getKnowledgePrompt(knowledgeTask);$('knowledge-task').hidden=!entry;$('knowledge-task-title').textContent=entry?entry.title+' · '+entry.supportLabel:'';$('knowledge-task-description').textContent=entry?'新建独立空间，保留现有实验。'+entry.limitations:'';$('chat-send').textContent=entry?'搭建实验':'发送';$('chat-scope').textContent=entry?'新空间 · '+entry.title:'操作当前实验';}
-  function settings(){void openAssistant();tab(true);$('deepseek-key').closest('details').open=true;if(!$('deepseek-key').value)$('deepseek-key').focus();}
-  $('ai-chat-tab').onclick=()=>tab(true);$('ai-mcp-tab').onclick=()=>{tab(false);void openAssistant();};
+  function settings(){
+    const dialog=$('assistant-preferences');
+    if(!dialog.open)dialog.showModal();
+    $('deepseek-key').focus();
+  }
+  $('assistant-settings').onclick=settings;
   $('deepseek-key').oninput=()=>$('ai-key-status').textContent=$('deepseek-key').value?'会话中已填写':'未配置';
   $('clear-key').onclick=()=>{$('deepseek-key').value='';$('deepseek-key').oninput();toast('API Key 已从当前页面清除');};
   $('cancel-knowledge-task').onclick=()=>{knowledgeTask=null;showTask();draft('');status('已取消知识点搭建任务，当前空间不变。');};
@@ -35,7 +38,7 @@ export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeReques
     if(!key){status('消息已保留，请先填写 DeepSeek API Key。');await settings();return toast('填写 Key 后即可发送，消息已保留');}
     state(true);let sent=false;
     try{
-      await beforeRequest();const before=structuredClone(getWorkspace());sent=true;append('user',prompt);draft('');$('deepseek-key').closest('details').open=false;pendingMessage=append('assistant','正在思考并操作实验…');pendingMessage.classList.add('pending');status('DeepSeek 正在通过 MCP 工具搭建、验证，完成后整轮保存…');
+      await beforeRequest();const before=structuredClone(getWorkspace());sent=true;append('user',prompt);draft('');pendingMessage=append('assistant','正在思考并操作实验…');pendingMessage.classList.add('pending');status('DeepSeek 正在通过 MCP 工具搭建、验证，完成后整轮保存…');
       const response=await fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json','X-DeepSeek-Key':key},body:JSON.stringify({revision:before.revision,selectedId:getSelectedId(),model:$('deepseek-model').value,thinking:$('deepseek-thinking').checked,messages:[...(knowledgeId?[]:history.slice(-18)),{role:'user',content:prompt}],...(knowledgeId?{knowledgeId}:{})})});
       const result=await response.json();if(!response.ok)throw new Error(result.error||'请求失败');
       await applyResult(result,before);pendingMessage?.remove();pendingMessage=null;if(knowledgeId)history.length=0;history.push({role:'user',content:prompt},{role:'assistant',content:result.message});const div=append('assistant',result.message);
@@ -47,11 +50,11 @@ export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeReques
   }
   $('chat-send').onclick=send;
   $('deepseek-prompt').onkeydown=e=>{if(!e.isComposing&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}};
-  return {showChat:()=>tab(true),startKnowledgeBuild({knowledgeId,prompt}){
+  return {showChat:resizeComposer,startKnowledgeBuild({knowledgeId,prompt}){
     if(busy){toast('当前 AI 任务仍在执行，请完成后再发起新的知识点搭建。');return false;}
     const entry=getKnowledgePrompt(knowledgeId);if(typeof prompt!=='string'||!prompt.trim()||prompt.length>6000)throw new Error('搭建提示词须为 1–6000 字');
-    knowledgeTask=entry.id;tab(true);showTask();draft(prompt);
-    if($('deepseek-key').value.trim())send();else{$('deepseek-key').closest('details').open=true;status('提示词已载入。填写 DeepSeek API Key 后点击“搭建实验”。');$('deepseek-key').focus();toast('已载入「'+entry.title+'」提示词，请填写 DeepSeek API Key');}
+    knowledgeTask=entry.id;showTask();draft(prompt);
+    if($('deepseek-key').value.trim())send();else{settings();status('提示词已载入。填写 DeepSeek API Key 后点击“搭建实验”。');$('deepseek-key').focus();toast('已载入「'+entry.title+'」提示词，请填写 DeepSeek API Key');}
     return true;
   }};
 }

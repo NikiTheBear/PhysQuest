@@ -28,6 +28,7 @@ export class KnowledgeBuild {
     const doc=structuredClone(original);
     if(this.verified!==signature(doc))throw new Error('请先调用 simulate_experiment 验证最终器具配置，再报告完成。');
     doc.learning={...doc.learning,knowledgePrompt:{id:this.entry.id,title:this.entry.title,version:this.entry.version,support:this.entry.support,supportLabel:this.entry.supportLabel,limitations:this.entry.limitations,prompt:this.prompt}};
+    delete doc.learning.pendingCard;
     const needsLabel=this.entry.support==='conceptual'?!doc.title.includes('概念示意'):this.entry.support==='approximation'&&!/近似|类比/.test(doc.title);
     if(needsLabel)doc.title=doc.title.slice(0,80)+' · '+this.entry.supportLabel;
     doc.goal=(doc.goal.trim()||this.entry.objective).slice(0,1500)+'\n模型范围：'+this.entry.supportLabel+'。'+this.entry.limitations;

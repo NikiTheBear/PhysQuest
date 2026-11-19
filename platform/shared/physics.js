@@ -1,6 +1,7 @@
 import { CATALOG, RIGID_KINDS, CIRCUIT_KINDS, SOUND_KINDS, LENS_KINDS, LINK_KINDS } from './catalog.js';
 import { solve as solveLens } from './physquest-lens.js';
 import { Circuit } from './circuit.js';
+import {compileForce} from './force-expression.js';
 import { Mechanics } from './mechanics.js';
 export const DT = 1 / 480;
 const K = 8.9875517923e9;
@@ -35,6 +36,10 @@ export class Simulation {
       velocity: c.fixed ? [0,0,0] : [c.params.vx || 0, c.params.vy || 0, doc.mode === '2d' ? 0 : (c.params.vz || 0)],
       x: c.params.displacement || 0, v: 0, force: [0,0,0], trail: []
     }]));
+    this.forceSources=this.doc.components.filter(c=>['drag','expression_force'].includes(c.kind)).map(c=>({
+      source:c,target:this.doc.components.find(item=>item.id===c.refs.target),
+      axes:c.kind==='expression_force'?['fx','fy','fz'].map(axis=>compileForce(c.params[axis])):null
+    }));
     this.mechanics=new Mechanics(this.doc,this.bodies);this.circuit=new Circuit(this.doc);
     this.samples = []; this.measure();
   }
@@ -89,6 +94,25 @@ export class Simulation {
       if(c.kind==='rope')magnitude=extension>0?Math.max(0,magnitude):0;
       const f=mul(dir,magnitude);
       a.force=add(a.force,f); b.force=sub(b.force,f);
+    }
+    const dragVelocity=new Map();
+    for(const {source,target,axes} of this.forceSources){
+      if(!target)continue;
+      const body=this.bodies.get(target.id),[x,y,z]=body.position,[vx,vy,vz]=body.velocity,speed=norm(body.velocity);
+      const values={t:this.time,x,y,z,vx,vy,vz,speed,m:target.params.mass};
+      let applied;
+      if(axes)applied=axes.map(fn=>{
+        const value=fn(values);return Number.isFinite(value)?Math.max(-100,Math.min(100,value)):0;
+      });
+      else{
+        const velocity=dragVelocity.get(target.id)||body.velocity;
+        const rate=source.params.linear+source.params.quadratic*norm(velocity);
+        const scale=rate/(1+dt*rate/target.params.mass);
+        applied=mul(velocity,-scale);
+        dragVelocity.set(target.id,add(velocity,mul(applied,dt/target.params.mass)));
+      }
+      if(doc.mode==='2d')applied[2]=0;
+      body.force=add(body.force,applied);this.bodies.get(source.id).appliedForce=applied;
     }
     for(const c of doc.components.filter(c=>c.kind==='force')){const b=this.bodies.get(c.refs.target);if(b){b.force=add(b.force,[c.params.fx,c.params.fy,c.params.fz]);b.torque=add(b.torque,[c.params.tx,c.params.ty,c.params.tz]);}}
     for(const c of doc.components.filter(c=>c.kind==='harmonic_force')){const b=this.bodies.get(c.refs.target);if(b)b.force[c.params.axis]+=c.params.amplitude*Math.sin(TAU*c.params.frequency*this.time+c.params.phase*Math.PI/180);}
@@ -168,6 +192,7 @@ export class Simulation {
       if(c.kind==='distance_sensor'){const a=this.bodies.get(c.refs.a),bb=this.bodies.get(c.refs.b);value=a&&bb?norm(sub(a.position,bb.position)):0;unitLabel='m';}
       if(c.kind==='motion_sensor'){const target=this.bodies.get(c.refs.target),cfg=this.doc.components.find(x=>x.id===c.refs.target);value=target?norm(target.velocity):0;unitLabel='m/s';if(target)for(let i=0;i<3;i++){channels[c.id+':'+i]={value:target.position[i],unit:'m',label:c.name+' · '+'XYZ'[i],kind:c.kind};channels[c.id+':v'+i]={value:target.velocity[i],unit:'m/s',label:c.name+' · 速度 '+'XYZ'[i],kind:c.kind};}channels[c.id+':acceleration']={value:target&&cfg?.params.mass?norm(target.force)/cfg.params.mass:0,unit:'m/s²',label:c.name+' · 外力加速度（不含碰撞冲量）',kind:c.kind};}
       if(c.kind==='electric_field'){value=norm(fieldAt(this.doc,b.position,this.bodies).electric);unitLabel='N/C';}
+      if(['expression_force','drag'].includes(c.kind)){value=norm(b.appliedForce||[0,0,0]);unitLabel='N';}
       if(c.kind==='harmonic_force'){value=p.amplitude*Math.sin(TAU*p.frequency*this.time+p.phase*Math.PI/180);unitLabel='N';}
       if(c.kind==='force'){value=norm([p.fx,p.fy,p.fz]);unitLabel='N';}
       if(CIRCUIT_KINDS.includes(c.kind)){const r=this.circuit.readings[c.id];if(r){value=['battery','ac_source','capacitor','voltmeter'].includes(c.kind)?r.voltage:r.current;unitLabel=['battery','ac_source','capacitor','voltmeter'].includes(c.kind)?'V':'A';channels[c.id+':V']={value:r.voltage,unit:'V',label:c.name+' · 电压',kind:c.kind};channels[c.id+':I']={value:r.current,unit:'A',label:c.name+' · 电流',kind:c.kind};channels[c.id+':P']={value:r.power,unit:'W',label:c.name+' · 功率',kind:c.kind};}}

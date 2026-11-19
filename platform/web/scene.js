@@ -38,7 +38,7 @@ export class LabScene {
   lines(points,color,opacity=1,segments=true){const geo=new THREE.BufferGeometry().setFromPoints(points.map(V));return new (segments?THREE.LineSegments:THREE.Line)(geo,new THREE.LineBasicMaterial({color,transparent:opacity<1,opacity}));}
   disposeGroup(group){for(const c of [...group.children]){c.traverse(o=>{o.geometry?.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material?.dispose();});group.remove(c);}}
   create(c) {
-    const originalKind=c.kind;const aliases={rheostat:'resistor',ac_source:'battery',current_source:'battery',directional_speaker:'speaker',diverging_lens:'lens',harmonic_force:'force',motion_sensor:'probe',distance_sensor:'probe'};
+    const originalKind=c.kind;const aliases={rheostat:'resistor',ac_source:'battery',current_source:'battery',directional_speaker:'speaker',diverging_lens:'lens',drag:'probe',expression_force:'probe',harmonic_force:'force',motion_sensor:'probe',distance_sensor:'probe'};
     if(c.kind==='harmonic_force'){const f=[0,0,0];f[c.params.axis]=c.params.amplitude;c={...c,params:{...c.params,fx:f[0],fy:f[1],fz:f[2]}};}
     c={...c,kind:aliases[c.kind]||c.kind};
     const group=new THREE.Group(),color=c.appearance?.color||DOMAINS[CATALOG[c.kind].domain].color,p=c.params;
@@ -171,7 +171,7 @@ export class LabScene {
       else if([...LENS_KINDS,'mirror','detector','aperture','optical_filter'].includes(c.kind)){ctx.rotate(-((c.params.angle||0)*Math.PI/180));ctx.beginPath();if(LENS_KINDS.includes(c.kind))ctx.ellipse(0,0,6,radius,0,0,Math.PI*2);else{ctx.rect(-3,-radius,6,radius*2);}ctx.fill();ctx.stroke();}
       else if(LINK_KINDS.includes(c.kind)){ctx.restore();const a=sim.bodies.get(c.refs.a),bb=sim.bodies.get(c.refs.b),start=a?.position||pos.map((v,i)=>i===0?v-.7:v),end=bb?.position||pos.map((v,i)=>i===0?v+.7:v),dx=end[0]-start[0],dy=end[1]-start[1],len=Math.hypot(dx,dy)||1,points=Array.from({length:81},(_,i)=>{const t=i/80,s=Math.sin(t*Math.PI*20)*(c.kind==='spring'?.1:0);return[start[0]+dx*t-dy/len*s,start[1]+dy*t+dx/len*s,0];});line(points,color,1.5);continue;}
       else if(CIRCUIT_KINDS.includes(c.kind)){this.drawCircuitSymbol(ctx,c,sim);}
-      else{ctx.beginPath();ctx.roundRect(-18,-18,36,36,5);ctx.fill();ctx.stroke();ctx.fillStyle=color;ctx.font='16px monospace';ctx.textAlign='center';ctx.fillText({speaker:'≋',directional_speaker:'≋→',power:'∿',coil:'∿',field:'N S',bar_magnet:'N S',electric_field:'+ −',harmonic_force:'F∿',force:'F→',laser:'→',anchor:'⊥'}[c.kind]||'⊕',0,6);}
+      else{ctx.beginPath();ctx.roundRect(-18,-18,36,36,5);ctx.fill();ctx.stroke();ctx.fillStyle=color;ctx.font='16px monospace';ctx.textAlign='center';ctx.fillText({speaker:'≋',directional_speaker:'≋→',power:'∿',coil:'∿',field:'N S',bar_magnet:'N S',electric_field:'+ −',drag:'阻',expression_force:'F(t)',harmonic_force:'F∿',force:'F→',laser:'→',anchor:'⊥'}[c.kind]||'⊕',0,6);}
       if(c.id===this.selected){ctx.strokeStyle='#edb481';ctx.lineWidth=1;ctx.setLineDash([4,3]);ctx.strokeRect(-Math.max(24,Math.min(radius+7,47)),-Math.max(24,Math.min(radius+7,47)),Math.max(48,Math.min(radius*2+14,94)),Math.max(48,Math.min(radius*2+14,94)));}ctx.restore();
     }
     for(const c of this.doc.components)this.drawCollider2(c,sim.bodies.get(c.id));

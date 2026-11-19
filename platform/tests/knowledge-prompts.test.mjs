@@ -83,3 +83,23 @@ test('a card can build beyond eight replies and retain its objective',async()=>{
  assert.equal(round,10);
  assert.ok(activeExperiment(result.workspace).goal.includes(getKnowledgePrompt(result.build.knowledgeId).objective));
 });
+
+test('live tool events survive a paused card and continuation verifies the same draft',async()=>{
+ const events=[];let round=0;
+ const paused=await runDeepSeek({workspace:blankWorkspace(),body:task(),key,onEvent:event=>events.push(event),fetcher:async()=>{
+   round++;
+   const calls=round===1?[call('create_experiment',{title:'草稿'})]:round===2?[call('add_component',{kind:'box'})]:[call('get_workspace',{})];
+   return response({tool_calls:calls});
+ }});
+ assert.equal(paused.paused,true);
+ assert.equal(events.filter(e=>e.type==='end').length,24);
+ assert.deepEqual(events.slice(0,3).map(e=>e.type),['planning','start','end']);
+ let verified=false;
+ const resumed=await runDeepSeek({workspace:paused.workspace,body:{...task(),resumeId:paused.resumeId},key,fetcher:async()=>{
+   if(verified)return response({content:'已验证'});
+   verified=true;return response({tool_calls:[call('simulate_experiment',{duration:.1})]});
+ }});
+ assert.equal(resumed.build.experimentId,paused.resumeId);
+ assert.equal(resumed.workspace.experiments.length,2);
+ assert.equal(activeExperiment(resumed.workspace).learning.pendingCard,undefined);
+});

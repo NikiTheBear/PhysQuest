@@ -59,14 +59,25 @@ export default { async fetch(request,env) {
         const raw=await request.text();if(raw.length>150000)throw new ApiError('对话请求过大',413);const body=JSON.parse(raw);
         const {key:storageKey,etag,workspace}=await readWorkspace(env,user);
         if(body.revision!==workspace.revision)throw new ApiError('空间已更新，请同步后重试',409);
-        const result=await runDeepSeek({workspace,body,key:request.headers.get('X-DeepSeek-Key'),signal:request.signal});
-        if(request.signal.aborted)throw new ApiError('请求已取消，修改未保存',499);
-        if(result.changed){
-          result.workspace.revision=workspace.revision+1;
-          const saved=await env.BUCKET.put(storageKey,JSON.stringify(result.workspace),{onlyIf:new Headers(etag?{'If-Match':'"'+etag+'"'}:{'If-None-Match':'*'}),httpMetadata:{contentType:'application/json'}});
-          if(!saved)throw new ApiError('AI 生成期间空间已被修改，本轮未覆盖你的修改，请重试',409);
+        async function execute(onEvent){
+          const result=await runDeepSeek({workspace,body,key:request.headers.get('X-DeepSeek-Key'),signal:request.signal,onEvent});
+          if(request.signal.aborted)throw new ApiError('请求已取消，修改未保存',499);
+          if(result.changed){
+            result.workspace.revision=workspace.revision+1;
+            const saved=await env.BUCKET.put(storageKey,JSON.stringify(result.workspace),{onlyIf:new Headers(etag?{'If-Match':'"'+etag+'"'}:{'If-None-Match':'*'}),httpMetadata:{contentType:'application/json'}});
+            if(!saved)throw new ApiError('AI 生成期间空间已被修改，本轮未覆盖你的修改，请重试',409);
+          }
+          return result;
         }
-        return response(result);
+        if(request.headers.get('accept')==='application/x-ndjson'){
+          const encoder=new TextEncoder();
+          const stream=new ReadableStream({start(controller){
+            const emit=event=>controller.enqueue(encoder.encode(JSON.stringify(event)+'\n'));
+            execute(emit).then(result=>emit({type:'result',result}),err=>emit({type:'error',message:err.message})).finally(()=>controller.close()).catch(()=>{});
+          }});
+          return new Response(stream,{headers:{'Content-Type':'application/x-ndjson','Cache-Control':'no-store'}});
+        }
+        return response(await execute());
       }
       if(path==='/api/command'&&request.method==='POST'){const raw=await request.text();if(raw.length>4000000)throw new ApiError('请求过大',413);const body=JSON.parse(raw);return response(await operate(env,user,body.name,body.arguments||{},body.revision));}
       if(path==='/mcp'&&request.method==='POST'){const raw=await request.text();if(raw.length>512000)throw new ApiError('请求过大',413);let rpc;try{rpc=JSON.parse(raw);}catch{return response({jsonrpc:'2.0',id:null,error:{code:-32700,message:'Parse error'}},400);}if(rpc?.method==='tools/call'&&!user)throw new ApiError('请登录以使用实验工具',401);const result=await handleRpc(rpc,env,user);return result?response(result):new Response(null,{status:202});}

@@ -9,3 +9,14 @@ test('slack rope applies no compression force; taut rope pulls',()=>{const ancho
 test('rigid rod maintains a pendulum distance',()=>{const anchor=component('anchor',{position:[0,4,0]}),body=component('body',{position:[1.2,2.4,0]}),rod=component('rod');rod.refs={a:anchor.id,b:body.id};rod.params.restLength=2;const d=scene(anchor,body,rod);d.environment.gravity=9.81;const sim=new Simulation(d);sim.advance(2);const pos=sim.bodies.get(body.id).position;assert.ok(Math.abs(Math.hypot(pos[0],pos[1]-4,pos[2])-2)<.01);});
 test('damper reduces relative speed without adding an elastic force',()=>{const anchor=component('anchor',{position:[0,1,0]}),body=component('body',{position:[1,1,0]}),damper=component('damper');body.params.vx=1;damper.refs={a:anchor.id,b:body.id};const sim=new Simulation(scene(anchor,body,damper));sim.advance(1);assert.ok(sim.bodies.get(body.id).velocity[0]<.4);assert.ok(sim.bodies.get(body.id).velocity[0]>0);});
 test('box rests on floor and a tilted frictionless ramp drives downhill motion',()=>{const box=component('box',{position:[0,2,0]}),d=scene(box);d.environment.collisions=true;d.environment.gravity=9.81;const floor=new Simulation(d);floor.advance(2);assert.ok(floor.bodies.get(box.id).position[1]>.32);const ramp=component('ramp',{position:[0,1,0]});ramp.params.friction=0;box.params.friction=0;box.position=[0,1.6,0];d.components.push(ramp);const sim=new Simulation(d);sim.advance(1);assert.ok(sim.bodies.get(box.id).position[0]<-.1);});
+
+test('expression and drag forces act on the bound mass through the solver',()=>{
+  for(const kind of ['expression_force','drag']){
+    const box=component('box'),source=component(kind);
+    box.params.mass=1;box.params.vx=2;source.refs.target=box.id;
+    if(kind==='expression_force')source.params.fx='-vx^2';
+    else Object.assign(source.params,{linear:0,quadratic:1});
+    const sim=new Simulation(scene(box,source));sim.advance(.5);
+    assert.ok(Math.abs(sim.bodies.get(box.id).velocity[0]-1)<.005);
+  }
+});

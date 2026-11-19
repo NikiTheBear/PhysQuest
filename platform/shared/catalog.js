@@ -46,6 +46,8 @@ Object.assign(CATALOG, {
 
 Object.assign(CATALOG, {
   cylinder:{name:'圆柱滚轮',domain:'mechanics',icon:'sphere',description:'具有转动惯量的圆柱，滚动、摩擦与碰撞',params:{...motion,radius:p('半径',.35,.05,2,.01,'m'),height:p('轴向长度',.6,.1,5,.1,'m'),angle:p('初始转角 Z',0,-180,180,1,'°'),spin:p('初始角速度 Z',0,-20,20,.1,'rad/s'),friction:p('摩擦系数',.4,0,1,.01),restitution:p('恢复系数',.2,0,1,.01)}},
+  drag:{name:'流体阻力',domain:'mechanics',icon:'damper',description:'静止流体：F = −(b + k|v|)v，作用于目标刚体',refs:['target'],params:{linear:p('线性阻力系数',.5,0,10,.01,'kg/s'),quadratic:p('平方阻力系数',0,0,5,.01,'kg/m')}},
+  expression_force:{name:'表达式力源',domain:'mechanics',icon:'force',description:'绑定刚体，按 Fx、Fy、Fz 表达式施力。变量 t,x,y,z,vx,vy,vz,speed,m,pi；支持 + - * / ^ 和 sin,cos,abs,sqrt,exp。每轴限幅 ±100 N，未定义值按 0 N。',refs:['target'],params:Object.fromEntries(['fx','fy','fz'].map((axis,i)=>[axis,{type:'expression',label:axis.toUpperCase()+' (N)',value:i===0?'sin(t)':'0'}]))},
   harmonic_force:{name:'周期驱动器',domain:'mechanics',icon:'force',description:'对刚体施加正弦力，研究受迫振动',refs:['target'],params:{amplitude:p('力幅值',1,0,100,.1,'N'),frequency:p('频率',1,0,30,.1,'Hz'),phase:p('相位',0,-180,180,1,'°'),axis:p('方向 0=X 1=Y 2=Z',0,0,2,1)}},
   dynamometer:{name:'弹簧测力计',domain:'mechanics',icon:'spring',description:'弹性两端连接，读出带符号的轴向作用力',refs:['a','b'],params:{stiffness:p('劲度系数',20,.1,200,.1,'N/m'),restLength:p('原长',1,.1,8,.05,'m'),damping:p('阻尼',.1,0,5,.01,'N·s/m')}},
   electric_field:{name:'匀强电场',domain:'electricity',icon:'charge',description:'球形作用区内对电荷施加 qE 力',params:{strength:p('电场强度',1000,-1e6,1e6,10,'N/C'),radius:p('作用区半径',3,.5,10,.1,'m'),axis:p('方向 0=X 1=Y 2=Z',0,0,2,1)}},

@@ -1,4 +1,5 @@
 import { CATALOG, COUPLINGS, blankExperiment, component, uid, activeExperiment, ENDPOINT_KINDS, RIGID_KINDS, LINK_KINDS } from './catalog.js';
+import {compileForce} from './force-expression.js';
 import {validateCollider} from './colliders.js';
 const text = (v, max, name) => { if(typeof v !== 'string' || v.length > max) throw new Error(name+'必须是长度不超过 '+max+' 的文本'); return v; };
 const number = (v, min, max, name) => { if(typeof v !== 'number'||!Number.isFinite(v)||v<min||v>max)throw new Error(`${name} 必须在 ${min}–${max} 之间`);return v;};
@@ -10,7 +11,7 @@ export function validateComponent(c) {
   c.position.forEach(v=>number(v,-30,30,'位置'));
   if(typeof c.fixed!=='boolean')throw new Error('fixed 必须为布尔值');
   if(!c.params||typeof c.params!=='object'||Array.isArray(c.params))throw new Error('params 必须为对象');
-  for(const [key,spec] of Object.entries(def.params)){number(c.params[key],spec.min,spec.max,spec.label);if(['axis','closed','directivity','maskTop','objectShape'].includes(key)&&!Number.isInteger(c.params[key]))throw new Error(spec.label+'必须为整数');}
+  for(const [key,spec] of Object.entries(def.params)){if(spec.type==='expression'){compileForce(c.params[key]);continue;}number(c.params[key],spec.min,spec.max,spec.label);if(['axis','closed','directivity','maskTop','objectShape'].includes(key)&&!Number.isInteger(c.params[key]))throw new Error(spec.label+'必须为整数');}
   for(const key of Object.keys(c.params))if(!Object.hasOwn(def.params,key))throw new Error('未知参数 '+key);
   if(!c.refs||typeof c.refs!=='object'||Array.isArray(c.refs))throw new Error('refs 必须为对象');
   for(const [key,v] of Object.entries(c.refs)){if(!def.refs?.includes(key))throw new Error('未知连接端口');text(v,100,'端点');}
@@ -27,7 +28,7 @@ export function validateExperiment(doc) {
     for(const ref of Object.values(c.refs))if(ref&&!ENDPOINT_KINDS.includes(doc.components.find(x=>x.id===ref).kind))throw new Error('机械端点只能连接刚体、粒子或固定支点');
     if(c.refs.a&&c.refs.a===c.refs.b)throw new Error('机械连接需要两个不同端点');
   }
-  for(const c of doc.components.filter(c=>['force','harmonic_force','motion_sensor'].includes(c.kind)))if(c.refs.target&&!RIGID_KINDS.includes(doc.components.find(x=>x.id===c.refs.target)?.kind))throw new Error('目标必须是刚体');
+  for(const c of doc.components.filter(c=>['force','drag','expression_force','harmonic_force','motion_sensor'].includes(c.kind)))if(c.refs.target&&!RIGID_KINDS.includes(doc.components.find(x=>x.id===c.refs.target)?.kind))throw new Error('目标必须是刚体');
   if(!Array.isArray(doc.connections)||doc.connections.length>128)throw new Error('最多支持 128 个连接');
   const linkIds=new Set();
   for(const l of doc.connections){const k=COUPLINGS[l.kind],a=doc.components.find(c=>c.id===l.source),b=doc.components.find(c=>c.id===l.target);if(!k||!a||!b||!k.from.includes(a.kind)||!k.to.includes(b.kind))throw new Error('连接的源或目标类型不兼容');text(l.id,100,'连接 ID');if(linkIds.has(l.id))throw new Error('连接 ID 重复');linkIds.add(l.id);number(l.gain,-20,20,'连接增益');if(l.kind==='wire'){if(!CATALOG[a.kind].terminals.includes(l.sourcePort)||!CATALOG[b.kind].terminals.includes(l.targetPort))throw new Error('必须指定有效接线端子 a / b');if(a.id===b.id&&l.sourcePort===l.targetPort)throw new Error('不能将同一端子连接到自身');}}

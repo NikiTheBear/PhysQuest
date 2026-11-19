@@ -69,3 +69,17 @@ test('post-simulation edits require another simulation and conceptual builds kee
 test('unknown prompt IDs never send a paid provider request',async()=>{
  let called=false;await assert.rejects(()=>runDeepSeek({workspace:blankWorkspace(),body:{knowledgeId:'invalid',messages:[{role:'user',content:'搭建'}]},key,fetcher:async()=>{called=true;return response({content:'none'});}}),/提示词/);assert.equal(called,false);
 });
+
+test('a card can build beyond eight replies and retain its objective',async()=>{
+ let round=0;
+ const result=await runDeepSeek({workspace:blankWorkspace(),body:task(),key,fetcher:async()=>{
+   round++;
+   if(round===1)return response({tool_calls:[call('create_experiment',{title:'恒力实验'})]});
+   if(round===2)return response({tool_calls:[call('add_component',{kind:'box'})]});
+   if(round<9)return response({tool_calls:[call('get_workspace',{})]});
+   if(round===9)return response({tool_calls:[call('simulate_experiment',{duration:.1})]});
+   return response({content:'搭建完成'});
+ }});
+ assert.equal(round,10);
+ assert.ok(activeExperiment(result.workspace).goal.includes(getKnowledgePrompt(result.build.knowledgeId).objective));
+});

@@ -257,6 +257,9 @@ window.addEventListener('message',async event=>{
   if(action==='hello'){if(bridgeReady)bridgePost('ready');return;}
   if(!bridgeReady)return;
   if(action==='filter-library'&&(domain==='all'||Object.hasOwn(DOMAINS,domain))){category=domain;$('search').value='';renderLibrary();}
+  if(action==='prepare-optics-card'){
+    await showAI();assistant.prepareCard(event.data);return;
+  }
   if(action==='build-knowledge'){try{await showAI();assistant.startKnowledgeBuild({knowledgeId:event.data.knowledgeId,prompt:event.data.prompt});}catch(e){toast(e.message);}return;}
   if(action==='spaces')spacesModal();if(action==='help')helpModal();if(action==='open-ai')showAI();
   if(action==='visibility'){workbenchVisible=value!=='hidden';if(audioContext){if(workbenchVisible&&audioEnabled)audioContext.resume().catch(()=>{});else audioContext.suspend().catch(()=>{});}if(workbenchVisible)scene.resize();}

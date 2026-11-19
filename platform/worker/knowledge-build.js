@@ -6,7 +6,7 @@ export class KnowledgeBuild {
     this.entry=getKnowledgePrompt(knowledgeId);this.prompt=prompt;this.targetId=null;this.verified=null;
     this.originalDesigns=new Set(workspace.designs.map(d=>d.id));
   }
-  instruction(){const p=this.entry;return `本轮是知识地图的“用 DeepSeek 搭建”操作：${p.id} ${p.title}。级别：${p.supportLabel}。模型限制：${p.limitations}。必须先 create_experiment 新建一个独立空间，真实放入器具，最后 simulate_experiment 验证最终物理配置；原有空间不允许修改。conceptual 只建概念示意，approximation 标明近似或类比，不得冒称完整理论求解。可以设计新的可复用器具。总计最多 24 次工具调用、8 轮模型回复，优先一次 design_assembly 放置 2–8 个部件；调用结果中的 ID 才能用于后续引用。成功后简洁说明操作方法。`;}
+  instruction(){const p=this.entry;return `本轮是知识地图的“用 DeepSeek 搭建”操作：${p.id} ${p.title}。级别：${p.supportLabel}。模型限制：${p.limitations}。必须先 create_experiment 新建一个独立空间，真实放入器具，最后 simulate_experiment 验证最终物理配置；原有空间不允许修改。conceptual 只建概念示意，approximation 标明近似或类比，不得冒称完整理论求解。可以设计新的可复用器具。总计最多 24 次工具调用、最多 24 轮模型回复，优先一次 design_assembly 放置 2–8 个部件；调用结果中的 ID 才能用于后续引用。成功后简洁说明操作方法。`;}
   authorize(name,args,workspace,readOnly){
     if(readOnly)return;
     if(name==='create_experiment'){if(this.targetId)throw new Error('本轮只新建一个空间，请继续编辑已创建的空间');return;}
@@ -30,7 +30,7 @@ export class KnowledgeBuild {
     doc.learning={...doc.learning,knowledgePrompt:{id:this.entry.id,title:this.entry.title,version:this.entry.version,support:this.entry.support,supportLabel:this.entry.supportLabel,limitations:this.entry.limitations,prompt:this.prompt}};
     const needsLabel=this.entry.support==='conceptual'?!doc.title.includes('概念示意'):this.entry.support==='approximation'&&!/近似|类比/.test(doc.title);
     if(needsLabel)doc.title=doc.title.slice(0,80)+' · '+this.entry.supportLabel;
-    doc.goal=doc.goal.slice(0,1500)+'\n模型范围：'+this.entry.supportLabel+'。'+this.entry.limitations;
+    doc.goal=(doc.goal.trim()||this.entry.objective).slice(0,1500)+'\n模型范围：'+this.entry.supportLabel+'。'+this.entry.limitations;
     validateExperiment(doc);
     workspace.experiments[workspace.experiments.indexOf(original)]=doc;
     workspace.activeId=doc.id;

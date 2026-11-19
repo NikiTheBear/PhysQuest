@@ -19,7 +19,7 @@ export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeReques
     $('chat-send').textContent=value?'处理中…':knowledgeTask?'搭建实验':'发送';$('chat-messages').setAttribute('aria-busy',String(value));
     if(value){const started=Date.now();clock=setInterval(()=>{$('chat-status').textContent='AI 正在操作器具 · '+Math.floor((Date.now()-started)/1000)+' 秒';},1000);}
   }
-  function showTask(){const entry=knowledgeTask&&getKnowledgePrompt(knowledgeTask);$('knowledge-task').hidden=!entry;$('knowledge-task-title').textContent=entry?entry.title+' · '+entry.supportLabel:'';$('knowledge-task-description').textContent=entry?'新建独立空间，保留现有实验。'+entry.limitations:'';$('chat-send').textContent=entry?'搭建实验':'发送';$('chat-scope').textContent=entry?'新空间 · '+entry.title:'操作当前实验';}
+  function showTask(){const entry=knowledgeTask&&getKnowledgePrompt(knowledgeTask);$('knowledge-task').hidden=!entry;$('knowledge-task-title').textContent=entry?entry.title+' · '+entry.supportLabel:'';$('knowledge-task-description').textContent=entry?['实验目标：'+entry.objective,'搭建方案：'+entry.construction,'可调变量：'+entry.variables.join('、'),'观测量：'+entry.observations.join('、'),'模型范围：'+entry.limitations].join('\n'):'';$('chat-send').textContent=entry?'搭建实验':'发送';$('chat-scope').textContent=entry?'新空间 · '+entry.title:'操作当前实验';}
   function settings(){
     const dialog=$('assistant-preferences');
     if(!dialog.open)dialog.showModal();
@@ -50,7 +50,13 @@ export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeReques
   }
   $('chat-send').onclick=send;
   $('deepseek-prompt').onkeydown=e=>{if(!e.isComposing&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}};
-  return {showChat:resizeComposer,startKnowledgeBuild({knowledgeId,prompt}){
+  return {showChat:resizeComposer,prepareCard({title,goal,formula,preset}){
+    if(busy)return toast('当前任务完成后可载入新卡片');
+    knowledgeTask=null;showTask();
+    const task='实验目标：'+title+'。探究：'+goal+(formula?'\n理论参考：'+formula:'')+(preset!=='{}'?'\n光具座参考参数（长度单位 cm）：'+preset:'');
+    draft(task+'\n请新建实验，设置上述目标，搭建器具并用仿真检查可观测现象，说明模型范围。');
+    status('卡片目标已载入，可编辑后发送。');
+  },startKnowledgeBuild({knowledgeId,prompt}){
     if(busy){toast('当前 AI 任务仍在执行，请完成后再发起新的知识点搭建。');return false;}
     const entry=getKnowledgePrompt(knowledgeId);if(typeof prompt!=='string'||!prompt.trim()||prompt.length>6000)throw new Error('搭建提示词须为 1–6000 字');
     knowledgeTask=entry.id;showTask();draft(prompt);

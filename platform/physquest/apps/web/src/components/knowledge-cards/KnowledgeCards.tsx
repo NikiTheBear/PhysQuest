@@ -43,7 +43,7 @@ export default function KnowledgeCardView({ cards, onJump }: Props) {
               </div>
             )}
 
-            {Object.keys(c.labPreset ?? {}).length > 0 && (
+
               <button
                 className="btn-ghost btn-small"
                 style={{ alignSelf: 'flex-start' }}
@@ -51,7 +51,7 @@ export default function KnowledgeCardView({ cards, onJump }: Props) {
               >
                 带着问题去搭建
               </button>
-            )}
+
           </div>
         );
       })}

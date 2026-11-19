@@ -23,7 +23,9 @@ export async function runDeepSeek({workspace,body,key,fetcher=fetch,signal}){
   if(knowledgeBuild)messages.push({role:'system',content:knowledgeBuild.instruction()});
   const tools=TOOLS.map(t=>({type:'function',function:{name:t.name,description:t.description,parameters:t.inputSchema}}));
   let working=structuredClone(workspace),calls=0,totalTokens=0;const actions=[],started=Date.now();
-  for(let round=0;round<8;round++){
+  let lastIssue='';
+  // Allow longer builds while keeping read-only loops and total tool use bounded.
+  for(let round=0;round<24 && (round<8 || working.revision!==workspace.revision);round++){
     if(signal?.aborted)throw error('请求已取消，修改未保存',499);
     if(Date.now()-started>120000)throw error('AI 处理超时，修改未保存，请缩小任务后重试',504);
     let response;
@@ -40,10 +42,10 @@ export async function runDeepSeek({workspace,body,key,fetcher=fetch,signal}){
     if(!toolCalls.length){
       if(typeof m.content!=='string'||!m.content.trim())throw error('AI 未返回回答，修改未保存',502);
       let build;
-      if(knowledgeBuild){try{build=knowledgeBuild.finish(working);}catch(e){messages.push({role:'assistant',content:m.content,...(typeof m.reasoning_content==='string'?{reasoning_content:m.reasoning_content}:{})},{role:'system',content:e.message});continue;}}
+      if(knowledgeBuild){try{build=knowledgeBuild.finish(working);}catch(e){lastIssue=e.message;messages.push({role:'assistant',content:m.content,...(typeof m.reasoning_content==='string'?{reasoning_content:m.reasoning_content}:{})},{role:'system',content:e.message});continue;}}
       return {workspace:working,message:redact(m.content,key),actions,totalTokens,model,changed:working.revision!==workspace.revision,...(build?{build}:{}),toolTransport:'mcp-tool-bridge'};
     }
-    if(calls+toolCalls.length>24)throw error('本轮工具调用达到上限，修改未保存，请拆分任务',422);
+    if(calls+toolCalls.length>24)break;
     messages.push({role:'assistant',content:m.content||null,tool_calls:toolCalls,...(typeof m.reasoning_content==='string'?{reasoning_content:m.reasoning_content}:{})});
     for(const call of toolCalls){
       calls++;let result,ok=true;
@@ -54,10 +56,16 @@ export async function runDeepSeek({workspace,body,key,fetcher=fetch,signal}){
         knowledgeBuild?.authorize(call.function.name,args,working,!!spec.annotations.readOnlyHint);
         const output=runTool(working,call.function.name,args);knowledgeBuild?.record(call.function.name,args,output);working=output.workspace;result=output.result;
         if(call.function.name==='simulate_experiment')result={...result,series:result.series.slice(0,8),note:'为控制上下文，只展示前 8 个采样点；readings 为最终读数。'};
-      }catch(e){ok=false;result={error:redact(e.message,key)};}
+      }catch(e){ok=false;lastIssue=redact(e.message,key);result={error:lastIssue};}
       actions.push({tool:call.function?.name||'unknown',ok,...(!ok?{error:result.error}:{})});
       messages.push({role:'tool',tool_call_id:call.id,content:JSON.stringify(result)});
     }
   }
-  throw error('AI 尚未完成任务，修改未保存，请拆分任务后重试',422);
+  if(knowledgeBuild){
+    try{
+      const build=knowledgeBuild.finish(working);
+      return {workspace:working,build,changed:true,actions,totalTokens,model,toolTransport:'mcp-tool-bridge',message:'已保存经过仿真验证的器具配置。请对照卡片目标检查观测结果。'};
+    }catch(e){lastIssue=[e.message,lastIssue].filter(Boolean).filter((value,i,all)=>all.indexOf(value)===i).join(' ');}
+  }
+  throw error('AI 尚未完成任务，本轮修改未保存。'+(lastIssue||'已达到工具或轮次上限。')+'（工具调用 '+calls+' 次）',422);
 }

@@ -31,7 +31,12 @@ export default function App() {
     if (ready) send('filter-library', data); else pending.current = {action:'filter-library',data};
   }
   function buildKnowledge(id:string,title:string,prompt:string){setTopic(title+' · AI 搭建');navigate('lab');const data={knowledgeId:id,title,prompt};if(ready)send('build-knowledge',data);else pending.current={action:'build-knowledge',data};}
-  function openKnowledge(id: string) { openLab('optics', KNOWLEDGE.find(c => c.id === id)?.title || ''); }
+  function openKnowledge(id: string) { const card=KNOWLEDGE.find(c=>c.id===id);
+    if(!card)return;
+    const data={title:card.title,goal:card.oneLine,formula:card.formula||'',preset:JSON.stringify(card.labPreset||{})};
+    setTopic(card.title);navigate('lab');
+    if(ready)send('prepare-optics-card',data);else pending.current={action:'prepare-optics-card',data};
+   }
   function capture() {
     if (!ready || capturing) return; captureId.current = crypto.randomUUID(); setCapturing(true);
     send('capture', { requestId: captureId.current });

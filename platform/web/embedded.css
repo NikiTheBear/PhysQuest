@@ -319,3 +319,58 @@ body.embedded .transport select {
   font-size: 11.5px;
   padding: 3px 6px;
 }
+
+/* ---------- 14. 两个折叠条对齐（MCP / Agent） ----------
+   之前它们的缩进不一致：一个自带 padding，一个没有，
+   箭头和文字对不齐。这里统一：
+   - 左边距归零，让箭头贴齐同一列
+   - 行高、字号、箭头宽度统一
+   - 去掉默认三角标记，自己画一个固定宽度的 ▸
+   --------------------------------------------------------- */
+body.embedded #chat-tools,
+body.embedded .agent-context {
+  border-top: 1px solid #e6ebf1;
+  margin: 0;
+  padding: 0;
+}
+
+body.embedded #chat-tools summary,
+body.embedded .agent-context summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 2px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #5b7183;
+  cursor: pointer;
+  list-style: none;
+}
+
+body.embedded #chat-tools summary::-webkit-details-marker,
+body.embedded .agent-context summary::-webkit-details-marker {
+  display: none;
+}
+
+/* 自己画箭头，固定 8px 宽，保证两行文字左边缘严格对齐 */
+body.embedded #chat-tools summary::before,
+body.embedded .agent-context summary::before {
+  content: '▸';
+  display: inline-block;
+  width: 8px;
+  font-size: 8px;
+  line-height: 1;
+  color: #8fa4b4;
+  transform: translateY(1px);
+  transition: transform 0.15s;
+}
+
+body.embedded #chat-tools[open] summary::before,
+body.embedded .agent-context[open] summary::before {
+  content: '▾';
+}
+
+body.embedded #chat-tools > *:not(summary),
+body.embedded .agent-context > *:not(summary) {
+  margin-left: 14px;
+}

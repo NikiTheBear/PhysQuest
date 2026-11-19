@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "title": "两列声波叠在一起",
+    "description": "两个同频率的点声源，麦克风沿中间移动，找哪里最响、哪里最静。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AC-03",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ac-03",
+    "title": "两列声波叠在一起",
+    "goal": "两个同频率的点声源，麦克风沿中间移动，找哪里最响、哪里最静。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
+        "position": [
+          -1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "speaker-2",
+        "kind": "speaker",
+        "name": "speaker",
+        "position": [
+          1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "microphone-3",
+        "kind": "microphone",
+        "name": "microphone",
+        "position": [
+          3,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "两个声源的间距",
+        "麦克风横向位置",
+        "频率"
+      ],
+      "steps": [
+        "横向移动时的声压起伏",
+        "最强点与最弱点"
+      ],
+      "limitations": "两源相干、同相位；不含多径反射。"
+    }
+  }
+}

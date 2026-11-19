@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { Challenge } from '../../core/contracts';
-import { AUTO_CHALLENGES, CHALLENGES, MISCONCEPTIONS, KNOWLEDGE, autoChallengesFor } from '../../data/content';
+import { ALL_CARDS, AUTO_CHALLENGES, CHALLENGES, MISCONCEPTIONS, autoChallengesFor } from '../../data/content';
 import type { LabMeta } from '../../labs/registry';
 
 interface Props {
@@ -30,7 +30,10 @@ export default function Hub({
   /** 自动挑战：从提示词生成的 */
   const autoOnes = useMemo(() => autoChallengesFor(lab.id), [lab]);
 
-  const cards = useMemo(() => KNOWLEDGE.filter((k) => lab.stages.includes(k.stage)), [lab]);
+  const cards = useMemo(() => {
+    const ids = new Set(lab.knowledgeIds ?? []);
+    return ids.size ? ALL_CARDS.filter((k) => ids.has(k.id)) : [];
+  }, [lab]);
 
   const doneCount = challenges.filter((c) => completed[c.id]).length;
 

@@ -29,6 +29,7 @@ export default function HelpGuide({ onClose }: Props) {
           </button>
         </div>
 
+        <div className="help-scroll">
         {/* ============ 一句话说明 ============ */}
         <div className="help-lead">
           这个平台有<strong>两种玩法</strong>：
@@ -142,6 +143,8 @@ export default function HelpGuide({ onClose }: Props) {
               还能继续在那边加器具、存成实验文件导出。
             </p>
           </details>
+        </div>
+
         </div>
 
         <div className="modal-actions">

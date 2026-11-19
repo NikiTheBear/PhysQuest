@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "title": "把声源换成有指向性的",
+    "description": "把点声源换成指向性声源，转到它背后，看看声压会怎样。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AC-05",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ac-05",
+    "title": "把声源换成有指向性的",
+    "goal": "把点声源换成指向性声源，转到它背后，看看声压会怎样。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "directional_speaker-1",
+        "kind": "directional_speaker",
+        "name": "directional_speaker",
+        "position": [
+          -1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "microphone",
+        "position": [
+          1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "麦克风绕声源的角度",
+        "频率"
+      ],
+      "steps": [
+        "正面 / 侧面 / 背面三个方向的声压"
+      ],
+      "limitations": "前向余弦指向性；不含绕射。"
+    }
+  }
+}

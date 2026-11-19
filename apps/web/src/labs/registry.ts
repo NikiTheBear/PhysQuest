@@ -1,4 +1,23 @@
 import type { LensParams, Stage } from '../core/contracts';
+import PLATFORM_MAP from '@knowledge/PLATFORM-MAP.json';
+
+/** 从平台地图里按前缀取知识点 id */
+function idsOf(prefixes: string[]): string[] {
+  const out: string[] = [];
+  for (const d of (PLATFORM_MAP as { disciplines: Array<{ stages: Array<{ items: Array<{ id: string }> }> }> })
+    .disciplines) {
+    for (const s of d.stages) {
+      for (const i of s.items) {
+        if (prefixes.some((p) => i.id.startsWith(p))) out.push(i.id);
+      }
+    }
+  }
+  return out;
+}
+
+const KNOWLEDGE_IDS_OPTICS = idsOf(['K-O']);
+const KNOWLEDGE_IDS_MECH = idsOf(['K-M']);
+const KNOWLEDGE_IDS_EM = idsOf(['K-E']);
 import { DEFAULT_LENS_PARAMS } from '../core/contracts';
 
 /**
@@ -30,6 +49,8 @@ export interface LabMeta {
   defaultParams?: LensParams;
   /** 卡片底部三个数字 */
   stats: string[];
+  /** 这个模块涉及的知识点 id（用于统计卡片数） */
+  knowledgeIds?: string[];
 }
 
 export const LABS: LabMeta[] = [
@@ -44,6 +65,7 @@ export const LABS: LabMeta[] = [
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
     stats: ['5 个挑战', '21 个知识点', '26 张卡'],
+    knowledgeIds: KNOWLEDGE_IDS_OPTICS,
   },
   {
     id: 'mechanics',
@@ -56,6 +78,7 @@ export const LABS: LabMeta[] = [
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
     stats: ['29 个挑战', '46 个知识点', '46 张卡'],
+    knowledgeIds: KNOWLEDGE_IDS_MECH,
   },
   {
     id: 'circuits',
@@ -68,6 +91,21 @@ export const LABS: LabMeta[] = [
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
     stats: ['21 个挑战', '42 个知识点', '42 张卡'],
+    knowledgeIds: KNOWLEDGE_IDS_EM,
+  },
+  {
+    id: 'acoustics',
+    title: '声与波',
+    subtitle: '声学 · 从振动到干涉',
+    discipline: 'acoustics',
+    stages: ['junior', 'senior'],
+    intro:
+      '一个点声源、一支麦克风。改频率、挪距离、再加一个源，看声压怎么变——声波看不见，但能测。',
+    badge: '有引导',
+    mode: 'guided',
+    defaultParams: DEFAULT_LENS_PARAMS,
+    stats: ['5 个挑战', '4 个知识点', '2 张卡'],
+    knowledgeIds: ['K-M3-15', 'K-M3-16'],
   },
   {
     id: 'fieldlab',

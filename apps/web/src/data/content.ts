@@ -75,6 +75,7 @@ export const challengeById = (id: string) => CHALLENGES.find((c) => c.id === id)
 import mechAuto from '@knowledge/labs/mechanics-challenges.json';
 import circAuto from '@knowledge/labs/circuits-challenges.json';
 import opticsAuto from '@knowledge/labs/optics-lens-challenges.json';
+import acousticsAuto from '@knowledge/labs/acoustics-challenges.json';
 
 export interface AutoChallenge {
   id: string;
@@ -103,6 +104,7 @@ export const AUTO_CHALLENGES: AutoChallenge[] = [
   ...((mechAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
   ...((circAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
   ...((opticsAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
+  ...((acousticsAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
 ];
 
 /** 某个模块下自动生成的挑战 */

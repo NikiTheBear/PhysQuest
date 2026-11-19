@@ -1,0 +1,79 @@
+{
+  "metadata": {
+    "title": "让干涉条纹变密",
+    "description": "间距不变，只改频率，看强弱条纹的分布怎么变。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AC-04",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ac-04",
+    "title": "让干涉条纹变密",
+    "goal": "间距不变，只改频率，看强弱条纹的分布怎么变。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
+        "position": [
+          -1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "speaker-2",
+        "kind": "speaker",
+        "name": "speaker",
+        "position": [
+          1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "microphone-3",
+        "kind": "microphone",
+        "name": "microphone",
+        "position": [
+          3,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "频率",
+        "源间距"
+      ],
+      "steps": [
+        "同一段距离里出现几个强弱周期"
+      ],
+      "limitations": "同一关的线性叠加模型，波长 = 声速 / 频率。"
+    }
+  }
+}

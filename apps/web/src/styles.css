@@ -1202,11 +1202,18 @@ input[type='range']::-moz-range-thumb {
   background: rgba(0, 0, 0, 0.32);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 100;
   padding: 32px;
+  /* 弹层比窗口高时，允许 overlay 自己滚 */
+  overflow-y: auto;
+  overscroll-behavior: contain;
   animation: fadeIn 0.2s var(--ease);
+}
+.overlay > .modal {
+  margin: auto;
 }
 @keyframes fadeIn {
   from {
@@ -3367,7 +3374,9 @@ html[data-theme='dark'] .pq-toast {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  max-height: 88vh;
+  /* 让滚动发生在内部容器上，而不是把整个弹层撑开 */
+  overscroll-behavior: contain;
 }
 
 .help-head {
@@ -3387,9 +3396,18 @@ html[data-theme='dark'] .pq-toast {
   letter-spacing: -0.025em;
 }
 
-.help-modal > *:not(.help-head) {
+.help-modal > *:not(.help-head):not(.modal-actions) {
   padding-left: 30px;
   padding-right: 30px;
+}
+
+/* 内容和 FAQ 一起滚，头部和底部按钮固定 */
+.help-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 6px;
 }
 .help-modal > .modal-actions {
   padding: 18px 30px 22px;
@@ -3402,7 +3420,6 @@ html[data-theme='dark'] .pq-toast {
   font-size: 14.5px;
   line-height: 1.75;
   color: var(--label-2);
-  overflow-y: auto;
 }
 .help-lead strong {
   color: var(--accent);
@@ -3496,7 +3513,6 @@ html[data-theme='dark'] .pq-toast {
 .help-faq {
   padding-top: 22px;
   padding-bottom: 4px;
-  overflow-y: auto;
 }
 .help-faq h4 {
   font-size: 14px;

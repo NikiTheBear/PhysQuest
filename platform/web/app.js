@@ -376,5 +376,20 @@ window.addEventListener('message',async event=>{
   if(action==='spaces')spacesModal();if(action==='help')helpModal();if(action==='open-ai')showAI();
   if(action==='visibility'){workbenchVisible=value!=='hidden';if(audioContext){if(workbenchVisible&&audioEnabled)audioContext.resume().catch(()=>{});else audioContext.suspend().catch(()=>{});}if(workbenchVisible)scene.resize();}
   if(action==='capture'&&typeof requestId==='string'){await queue;sim.measure();bridgePost('capture',{requestId,snapshot:{experiment:structuredClone(doc()),time:sim.time,readings:structuredClone(sim.readings),circuitError:sim.circuit.error||null}});}
+  // 从 PhysQuest 实验台一键把参数搬过来
+  if(action==='import-experiment'){
+    try{
+      const payload=typeof event.data.experiment==='string'?JSON.parse(event.data.experiment):event.data.experiment;
+      if(!payload||typeof payload!=='object')throw new Error('实验数据无效');
+      await command('import_experiment',{file:payload},{throw:true,selectNone:true});
+      scene.fit();
+      bridgePost('import-done',{title:payload.title||''});
+      toast('已导入「'+(payload.title||'实验')+'」，可以继续加器具');
+    }catch(error){
+      toast('导入失败：'+error.message);
+      bridgePost('import-failed',{message:error.message});
+    }
+    return;
+  }
 });
 hydrateIcons();initialize();

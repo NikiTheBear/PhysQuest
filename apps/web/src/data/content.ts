@@ -3,6 +3,8 @@ import misconceptions from '@knowledge/optics-lens/misconceptions.json';
 import challenges from '@knowledge/optics-lens/challenges.json';
 import quiz from '@knowledge/optics-lens/quiz.json';
 import demos from '@knowledge/optics-lens/demo-scripts.json';
+import allCards from '@knowledge/knowledge-cards.json';
+import allPrompts from '@knowledge/knowledge-prompts.json';
 
 import type {
   Challenge,
@@ -17,6 +19,46 @@ export const MISCONCEPTIONS: Misconception[] =
 export const CHALLENGES: Challenge[] = challenges.challenges as unknown as Challenge[];
 export const QUIZ: QuizItem[] = quiz.items as unknown as QuizItem[];
 export const DEMOS = demos.scripts;
+
+/** 全平台 166 张知识卡（26 手写 + 140 生成） */
+export const ALL_CARDS = (allCards as { cards: unknown[] }).cards as Array<{
+  id: string;
+  title: string;
+  stage: string;
+  domain: string;
+  domainLabel: string;
+  oneLine: string;
+  analogy: string;
+  formula: string;
+  why: string;
+  variables: string[];
+  observations: string[];
+  support: 'direct' | 'approximation' | 'conceptual';
+  misconceptions: string[];
+  prerequisites: string[];
+  difficulty: string;
+}>;
+
+/** 全平台 140 条 AI 搭建提示词（知识卡的背面） */
+export const ALL_PROMPTS = allPrompts as Array<{
+  id: string;
+  title: string;
+  domainLabel: string;
+  stageLabel: string;
+  support: 'direct' | 'approximation' | 'conceptual';
+  supportLabel: string;
+  objective: string;
+  construction: string;
+  variables: string[];
+  observations: string[];
+  limitations: string;
+  models: string[];
+  formula?: string;
+  prompt: string;
+}>;
+
+export const promptById = (id: string) => ALL_PROMPTS.find((p) => p.id === id);
+export const allCardById = (id: string) => ALL_CARDS.find((c) => c.id === id);
 
 export const knowledgeById = (id: string) => KNOWLEDGE.find((k) => k.id === id);
 export const misconceptionById = (id: string) => MISCONCEPTIONS.find((m) => m.id === id);

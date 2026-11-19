@@ -28,15 +28,14 @@ import ObservationPanel from './components/lab-workspace/ObservationPanel';
 import SatisfactionGate from './components/lab-workspace/SatisfactionGate';
 import PredictionPanel from './components/prediction/PredictionPanel';
 import PredictionCompare from './components/prediction/PredictionCompare';
-import KnowledgeCardView, {
-  QuizModal,
-  QuizResult,
-} from './components/knowledge-cards/KnowledgeCards';
+import KnowledgeCards from './components/knowledge-cards/KnowledgeCards';
+import { QuizModal, QuizResult } from './components/knowledge-cards/Quiz';
 import ReportView from './components/report/ReportView';
 import AITutor from './components/ai-tutor/AITutor';
 import FreeBuildLab, {
   type CaptureSnapshot,
 } from './components/free-build/FreeBuildLab';
+import { buildPqexp } from './core/export-pqexp';
 import type { KnowledgePrompt } from './data/knowledge-prompts';
 import PromptDialog from './components/knowledge-prompts/PromptDialog';
 import { loadAIConfig, type AIConfig } from './ai/client';
@@ -112,6 +111,8 @@ export default function App() {
   });
   const [aiConfig, setAiConfig] = useState<AIConfig>(() => loadAIConfig());
   const [showReset, setShowReset] = useState(false);
+  /** 实验台 → 自由搭建：一键搬过去的实验数据 */
+  const [importedExp, setImportedExp] = useState<unknown | null>(null);
   /** 自由搭建：想用哪个知识点的提示词去搭 */
   const [buildRequest, setBuildRequest] = useState<{
     knowledgeId: string;
@@ -207,13 +208,6 @@ export default function App() {
 
   const beginChallenge = useCallback(
     (c: Challenge) => {
-      // 第 6 关这种「自己搭」的挑战，交给 Fieldlab
-      if (c.kind === 'free') {
-        setChallenge(c);
-        setLabId('optics-lens');
-        setView('free');
-        return;
-      }
       const meta = labById(labId ?? 'optics-lens');
       setChallenge(c);
       setParams({ ...(meta?.defaultParams ?? DEFAULT_LENS_PARAMS), ...presetFor(c) });
@@ -465,6 +459,20 @@ export default function App() {
                     还没有预测
                   </button>
                 )}
+                <button
+                  className="btn-ghost btn-small"
+                  onClick={() => {
+                    const data = buildPqexp(params, challenge.title, challenge.brief);
+                    setLabId('fieldlab');
+                    setView('free');
+                    setImportedExp(data);
+                    // 只让 effect 读一次
+                    setTimeout(() => setImportedExp(null), 200);
+                  }}
+                  title="带着这组参数直接进自由搭建工作台"
+                >
+                  搬到自由搭建 →
+                </button>
                 <button className="btn-primary" onClick={() => setPhase('gate')}>
                   我满意了
                 </button>
@@ -544,47 +552,26 @@ export default function App() {
             onCapture={handleCapture}
             buildRequest={buildRequest}
             onMessage={setToast}
-            goal={
-              challenge?.kind === 'free' && challenge.goal
-                ? {
-                    title: challenge.title,
-                    description: challenge.brief,
-                    check: (snap) => {
-                      const g = challenge.goal!;
-                      if (g.metric !== 'magnification') return null;
-                      const m = readMagnification(snap);
-                      if (m === null)
-                        return { ok: false, detail: '没读到光具座的读数——先放一个「凸透镜光具座」再试' };
-                      const target = Number(g.value);
-                      const tol = g.tolerance ?? 0.3;
-                      const ok = Math.abs(m - target) <= tol;
-                      return {
-                        ok,
-                        detail: `当前放大 ${m.toFixed(2)} 倍，目标 ${target} 倍${ok ? '' : `（差 ${Math.abs(m - target).toFixed(2)}）`}`,
-                      };
-                    },
-                  }
-                : null
-            }
-            onGoalReached={() => setToast('目标达成！')}
+            importExperiment={importedExp}
           />
         )}
 
         {view === 'cards' && (
           <>
-            <div className="hub-head" style={{ paddingBottom: 18 }}>
-              <span className="eyebrow">Knowledge Cards</span>
+            <div className="hub-head" style={{ paddingBottom: 16 }}>
+              <span className="eyebrow">Knowledge Cards · 166 张</span>
               <h2>知识卡</h2>
               <p>
-                每张卡下面都有「在实验台上看这个」——点一下，实验台直接跳到那个状态，
-                不用自己猜它说的是什么。
+                每张卡两面：<b>正面</b>是给你读的知识点，<b>背面</b>是「怎么把它搭出来」。
+                背面可以一键交给自由搭建工作台，让 AI 帮你搭好再去改。
               </p>
             </div>
-            <KnowledgeCardView
-              cards={KNOWLEDGE}
-              onJump={(preset) => {
-                patchParams(preset);
-                setView('lab');
+            <KnowledgeCards
+              onBuild={(prompt, title, knowledgeId) => {
+                setLabId('fieldlab');
+                setView('free');
+                setBuildRequest({ knowledgeId, title, prompt });
+                setTimeout(() => setBuildRequest(null), 100);
               }}
             />
           </>

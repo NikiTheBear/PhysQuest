@@ -82,6 +82,10 @@ async function proxyToFieldlab(req, res, url) {
       if (['host', 'connection', 'content-length', 'accept-encoding'].includes(k)) continue;
       if (typeof v === 'string') headers[k] = v;
     }
+    // 关键：工作台会校验 Origin 必须等于自己的地址。
+    // 页面在 8787，工作台在 4317，不改写就会被判成「跨站修改」。
+    headers.origin = FIELDLAB;
+    if (headers.referer) headers.referer = FIELDLAB + url.pathname;
     if (hasBody) headers['content-length'] = String(Buffer.byteLength(body));
 
     const upstream = await fetch(target, {

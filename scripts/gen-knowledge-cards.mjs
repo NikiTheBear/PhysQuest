@@ -17,6 +17,20 @@ const MAP = JSON.parse(
   await readFile(new URL('../shared/knowledge-data/PLATFORM-MAP.json', import.meta.url), 'utf8'),
 );
 
+/* 手写的卡面文字：四个领域各一个文件 */
+const DOMAIN_TEXT = {};
+for (const dom of ['mechanics', 'electromagnetism', 'thermodynamics', 'modern', 'optics-university']) {
+  try {
+    const raw = await readFile(
+      new URL(`../shared/knowledge-data/card-text/${dom}.json`, import.meta.url),
+      'utf8',
+    );
+    Object.assign(DOMAIN_TEXT, JSON.parse(raw));
+  } catch {
+    console.warn(`  ⚠ 没找到 card-text/${dom}.json，这一领域用生成兜底`);
+  }
+}
+
 /* 手写的生活类比：先覆盖光学（正在用的），其余按领域给通用句式 */
 const ANALOGY = {
   'K-O1-01': '手电筒照墙，光是直着射过去的。你用手一挡，后面就黑了。',
@@ -57,9 +71,10 @@ for (const disc of MAP.disciplines) {
       const fallbackAnalogy = p?.variables?.length
         ? `换一个「${p.variables[0]}」，结果就不一样——就像${p.variables.length > 1 ? `同时改变${p.variables.slice(0, 2).join('和')}` : '只调一个条件'}去试同一件事，感觉完全不同。`
         : DOMAIN_ANALOGY[disc.key];
-      const analogy = ANALOGY[item.id] ?? fallbackAnalogy;
+      const hand = DOMAIN_TEXT[item.id];
+      const analogy = hand?.analogy ?? ANALOGY[item.id] ?? fallbackAnalogy;
 
-      const why = p
+      const why = hand?.why ?? (p
         ? [
             p.construction ? `怎么研究：${p.construction}` : '',
             p.support === 'conceptual'
@@ -71,7 +86,7 @@ for (const disc of MAP.disciplines) {
           ]
             .filter(Boolean)
             .join('\n')
-        : DOMAIN_WHY[disc.key];
+        : DOMAIN_WHY[disc.key]);
 
       cards.push({
         id: item.id,

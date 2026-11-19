@@ -3120,3 +3120,151 @@ html[data-theme='dark'] .pq-toast {
   color: var(--label-2);
   font-variant-numeric: tabular-nums;
 }
+
+/* ================= 知识卡筛选器 ================= */
+
+.card-filter {
+  background: var(--fill);
+  border: none;
+  border-radius: var(--r-pill);
+  padding: 9px 16px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--label);
+  cursor: pointer;
+}
+
+/* ================= 双面知识卡 ================= */
+
+.flip-card {
+  min-height: 320px;
+}
+
+.fc-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+.fc-head .kid {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+}
+.fc-stage {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--label-3);
+}
+
+.fc-vars {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.fc-vars-label {
+  font-size: 11.5px;
+  color: var(--label-3);
+  margin-right: 2px;
+}
+
+.fc-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: var(--hairline);
+  align-items: center;
+}
+.fc-actions .btn-primary {
+  margin-left: auto;
+}
+
+/* 背面 */
+.fc-goal {
+  font-size: 14.5px;
+  color: var(--label);
+  font-weight: 500;
+  line-height: 1.6;
+  padding-left: 14px;
+  border-left: 3px solid var(--accent);
+  margin: 4px 0 6px;
+}
+.fc-block {
+  font-size: 13px;
+  line-height: 1.65;
+}
+.fc-k {
+  display: block;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  color: var(--label-3);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.fc-block p {
+  color: var(--label-2);
+  margin: 0;
+}
+.fc-block.warn p {
+  color: var(--orange);
+  background: var(--orange-soft);
+  border-radius: 8px;
+  padding: 9px 12px;
+}
+
+.fc-prompt {
+  border-top: var(--hairline);
+  padding-top: 8px;
+  font-size: 12.5px;
+}
+.fc-prompt summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 12.5px;
+  list-style: none;
+}
+.fc-prompt summary::-webkit-details-marker {
+  display: none;
+}
+.fc-prompt summary::before {
+  content: '▸ ';
+  font-size: 9px;
+}
+.fc-prompt[open] summary::before {
+  content: '▾ ';
+}
+.fc-prompt pre {
+  margin-top: 8px;
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--label-2);
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.fc-empty {
+  font-size: 13px;
+  color: var(--label-3);
+  line-height: 1.7;
+  padding: 20px 0;
+}
+
+.fc-why {
+  font-size: 13px;
+  line-height: 1.65;
+}
+.fc-why p {
+  color: var(--label-2);
+  margin: 0;
+  white-space: pre-wrap;
+}

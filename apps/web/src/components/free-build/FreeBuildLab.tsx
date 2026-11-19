@@ -56,6 +56,8 @@ interface Props {
   } | null;
   /** 达成目标时通知父组件 */
   onGoalReached?: () => void;
+  /** 从实验台一键搬过来的实验数据（.pqexp） */
+  importExperiment?: unknown | null;
 }
 
 const workbenchUrl = (staticMode: boolean) =>
@@ -70,6 +72,7 @@ export default function FreeBuildLab({
   onMessage,
   goal,
   onGoalReached,
+  importExperiment,
 }: Props) {
   const [goalState, setGoalState] = useState<{ ok: boolean; detail: string } | null>(null);
   const [ready, setReady] = useState(false);
@@ -101,6 +104,11 @@ export default function FreeBuildLab({
           send(pending.current.action, pending.current.data);
           pending.current = null;
         }
+        return;
+      }
+
+      if (event.data.type === 'import-done') {
+        onMessage?.(`已把「${event.data.title || '实验'}」搬到工作台，可以继续加器具了`);
         return;
       }
 
@@ -159,6 +167,14 @@ export default function FreeBuildLab({
     if (ready) send('build-knowledge', data);
     else pending.current = { action: 'build-knowledge', data };
   }, [buildRequest, ready, send]);
+
+  /* ---------- 从实验台导入 ---------- */
+  useEffect(() => {
+    if (!importExperiment) return;
+    const data = { experiment: JSON.stringify(importExperiment) };
+    if (ready) send('import-experiment', data);
+    else pending.current = { action: 'import-experiment', data };
+  }, [importExperiment, ready, send]);
 
   /* ---------- 可见性 ---------- */
   useEffect(() => {

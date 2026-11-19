@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Stage } from '../../core/contracts';
-import { CHALLENGES, KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
+import { ALL_CARDS, CHALLENGES, KNOWLEDGE, MISCONCEPTIONS, promptById } from '../../data/content';
 import { LABS } from '../../labs/registry';
 import PLATFORM_MAP from '@knowledge/PLATFORM-MAP.json';
 
@@ -23,6 +23,10 @@ const STATUS_LABEL: Record<string, string> = {
   content: '有卡片',
   planned: '规划中',
 };
+
+/** 这一档里有多少条已经有知识卡 */
+const bandWithCard = (band: { items: MapItem[] }) =>
+  band.items.filter((i) => ALL_CARDS.some((c) => c.id === i.id)).length;
 
 interface MapItem {
   id: string;
@@ -71,7 +75,8 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
     return item.id.toLowerCase().includes(kw) || item.title.toLowerCase().includes(kw);
   };
 
-  const detail = detailId ? KNOWLEDGE.find((k) => k.id === detailId) : null;
+  const detail = detailId ? ALL_CARDS.find((k) => k.id === detailId) : null;
+  const detailPrompt = detailId ? promptById(detailId) : null;
   const challengeFor = (kid: string) => CHALLENGES.find((c) => c.knowledgeIds.includes(kid));
 
   return (
@@ -205,19 +210,16 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
                 <div className="map-band-head">
                   <span className="lvl">{STAGE_LABEL[band.stage]}</span>
                   <span className="desc">{band.items.length} 条</span>
-                  <span
-                    className={`badge ${
-                      band.status === 'ready' ? 'on' : band.status === 'content' ? '' : 'off'
-                    }`}
-                  >
-                    {STATUS_LABEL[band.status]}
+                  <span className={`badge ${bandWithCard(band) > 0 ? 'on' : 'off'}`}>
+                    {bandWithCard(band) > 0 ? `${bandWithCard(band)} 张卡` : '规划中'}
                   </span>
                   <span className="n" />
                 </div>
                 <div className="map-grid">
                   {band.items.map((item) => {
-                    const card = KNOWLEDGE.find((k) => k.id === item.id);
-                    const clickable = band.status === 'ready' && !!card;
+                    const card = ALL_CARDS.find((k) => k.id === item.id);
+                    // 有卡就能点 —— 不再看 PLATFORM-MAP 里写的 status
+                    const clickable = !!card;
                     const Tag = clickable ? 'button' : 'div';
                     return (
                       <Tag
@@ -253,7 +255,7 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
         <div className="overlay" onClick={() => setDetailId(null)}>
           <div className="modal kdetail" onClick={(e) => e.stopPropagation()}>
             <span className="kid">
-              {detail.id} · {STAGE_LABEL[detail.stage]}
+              {detail.id} · {STAGE_LABEL[detail.stage as Stage] ?? detail.stage} · {detail.domainLabel}
             </span>
             <h3>{detail.title}</h3>
             <div className="oneline">{detail.oneLine}</div>
@@ -276,6 +278,31 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
               <div className="lbl">为什么会这样</div>
               <p>{detail.why}</p>
             </div>
+
+            {detail.variables?.length > 0 && (
+              <div className="sect">
+                <div className="lbl">可以调什么</div>
+                <div className="chips">
+                  {detail.variables.map((v: string) => (
+                    <span className="chip static" key={v}>
+                      {v}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {detailPrompt && (
+              <div className="sect">
+                <div className="lbl">怎么把它搭出来</div>
+                <p>{detailPrompt.construction}</p>
+                {detailPrompt.limitations && (
+                  <p style={{ marginTop: 8, color: 'var(--orange)' }}>
+                    模型边界：{detailPrompt.limitations}
+                  </p>
+                )}
+              </div>
+            )}
 
             {detail.misconceptions.length > 0 && (
               <div className="sect warnbox">

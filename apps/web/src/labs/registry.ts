@@ -39,11 +39,11 @@ export const LABS: LabMeta[] = [
     subtitle: '光学 · 几何光学',
     discipline: 'optics',
     stages: ['junior', 'senior'],
-    intro: '五个小目标，每个都先猜一句再动手；最后还有一关「自己搭」。猜错了不要紧——那一下才是真正记住的时候。',
+    intro: '五个小目标，每个都先猜一句再动手。猜错了不要紧——那一下才是真正记得的时候。',
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
-    stats: ['6 个挑战', '21 个知识点', '21 张卡'],
+    stats: ['5 个挑战', '21 个知识点', '166 张卡'],
   },
   {
     id: 'fieldlab',

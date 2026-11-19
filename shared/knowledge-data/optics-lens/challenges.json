@@ -159,42 +159,6 @@
         ],
         "answerIndex": 1
       }
-    },
-    {
-      "id": "CH-O2-06",
-      "labId": "optics-lens",
-      "kind": "free",
-      "title": "自己搭一个放大 3 倍的装置",
-      "brief": "不用现成的实验台。自己摆透镜、调距离，让像放大到 3 倍。",
-      "hint": "先想清楚：放大 3 倍时，物距应该是焦距的几倍？想好了再去搭。",
-      "goal": {
-        "metric": "magnification",
-        "op": "≈",
-        "value": 3,
-        "tolerance": 0.35,
-        "readFrom": "lens_bench"
-      },
-      "multiAnswer": true,
-      "knowledgeIds": [
-        "K-O2-07",
-        "K-O2-11",
-        "K-O2-04"
-      ],
-      "misconceptionIds": [
-        "MIS-O2-05",
-        "MIS-O2-06"
-      ],
-      "demoScriptId": "demo-magnify",
-      "difficulty": "advanced",
-      "prediction": {
-        "prompt": "要让像比物大 3 倍，物距应该放在什么范围？",
-        "options": [
-          "一倍焦距到两倍焦距之间",
-          "正好两倍焦距",
-          "两倍焦距以外"
-        ],
-        "answerIndex": 0
-      }
     }
   ]
 }

@@ -1,0 +1,3044 @@
+[
+  {
+    "id": "K-M1-01",
+    "support": "direct",
+    "objective": "观察向相反方向推拉同一物体时，运动如何改变。",
+    "construction": "零重力、零阻尼、关闭碰撞；放一长方体和指向它的恒力源，fx 先取 1 N 后改为 -1 N；运动传感器跟踪该物体。",
+    "variables": [
+      "力的方向与大小",
+      "物体质量"
+    ],
+    "observations": [
+      "X 位移和 X 速度",
+      "加速度方向变化"
+    ],
+    "limitations": "力源作用于质心；物体表面形变和手的接触过程未模拟。",
+    "models": [
+      "box",
+      "force",
+      "motion_sensor"
+    ],
+    "formula": "F = ma"
+  },
+  {
+    "id": "K-M1-02",
+    "support": "direct",
+    "objective": "比较不同质量的小球从相同高度释放时的下落过程。",
+    "construction": "设重力 9.8、阻尼 0；将两球分开放在 y=4 m，初速度为零，质量分别 1 和 2 kg；用传感器记录各自高度，先观察落地前。",
+    "variables": [
+      "球的质量",
+      "释放高度",
+      "重力大小"
+    ],
+    "observations": [
+      "高度随时间变化",
+      "落地前同一时刻的速度"
+    ],
+    "limitations": "这是无空气阻力的重力下落；相同半径用于避免接触时刻的几何差异。",
+    "models": [
+      "body",
+      "motion_sensor"
+    ],
+    "formula": "h = h₀ − gt²/2"
+  },
+  {
+    "id": "K-M1-03",
+    "support": "direct",
+    "objective": "观察滑块接触面的摩擦设置如何影响滑行。",
+    "construction": "有重力并打开碰撞，放水平斜面（angle=0）和贴近其上表面的长方体；给滑块相同水平初速度，分次改变滑块与斜面 friction。",
+    "variables": [
+      "接触双方的 friction",
+      "初速度"
+    ],
+    "observations": [
+      "滑块速度衰减",
+      "滑行距离"
+    ],
+    "limitations": "接触摩擦由刚体求解器近似，采用双方摩擦系数较小值；不含表面磨损，传感器加速度不含接触冲量。",
+    "models": [
+      "box",
+      "ramp",
+      "motion_sensor"
+    ]
+  },
+  {
+    "id": "K-M1-04",
+    "support": "conceptual",
+    "objective": "用示意模型区分重力与浮力，解释沉浮判断需要哪些条件。",
+    "construction": "零重力、关闭碰撞；固定长方体标注液面，固定三个球分别标注下沉、悬浮、上浮；把浮力和重量的比较写进目标，不运行假浮力动画。",
+    "variables": [
+      "说明中的物体密度",
+      "说明中的液体密度"
+    ],
+    "observations": [
+      "浮力与重力比较表",
+      "示意物体相对液面位置"
+    ],
+    "limitations": "没有液体、浸没体积或浮力求解；器具位置只是概念布局，不是沉浮计算结果。",
+    "models": [
+      "box",
+      "body"
+    ],
+    "formula": "静止浸没物体：F浮 = ρ液gV排"
+  },
+  {
+    "id": "K-M1-05",
+    "support": "conceptual",
+    "objective": "认识支点、动力臂和阻力臂，预测长短力臂的作用。",
+    "construction": "固定长方体作杠杆，固定支点标记转轴，另两固定球作施力点标记；用测距仪读取几何距离，所有器具固定并把力臂定义写入说明。",
+    "variables": [
+      "支点和标记的位置",
+      "说明中的力大小"
+    ],
+    "observations": [
+      "几何长度",
+      "静态力矩平衡的公式预测"
+    ],
+    "limitations": "没有偏置铰链或杠杆端点受力模型；测距仪给点间距离，只有力垂直杆时才等于力臂。",
+    "models": [
+      "box",
+      "anchor",
+      "body",
+      "distance_sensor"
+    ],
+    "formula": "垂直施力时 F₁l₁ = F₂l₂"
+  },
+  {
+    "id": "K-M1-06",
+    "support": "direct",
+    "objective": "比较不同倾斜程度对物体沿斜面滑动的影响。",
+    "construction": "放可调斜面和其上方不穿透的长方体，打开重力与碰撞；两者摩擦均设 0，从静止比较 10° 和 25°，保持坡长和初始相对位置一致。",
+    "variables": [
+      "斜面倾角",
+      "摩擦系数"
+    ],
+    "observations": [
+      "滑块速度与位置",
+      "同一时段滑动距离"
+    ],
+    "limitations": "斜面是固定刚体，边缘掉落属于另一运动阶段；理想无摩擦公式只用于仍接触斜面的时段。",
+    "models": [
+      "ramp",
+      "box",
+      "motion_sensor"
+    ],
+    "formula": "理想斜面沿坡加速度 a = g sinθ"
+  },
+  {
+    "id": "K-M1-07",
+    "support": "approximation",
+    "objective": "用滚轮与滑块比较滚动和滑动，理解轮子省力的条件。",
+    "construction": "同一水平斜面上分次放圆柱滚轮与等质量长方体，施加相同小水平恒力；设置重力、碰撞和非零接触摩擦，观察转动与滑移。",
+    "variables": [
+      "接触摩擦",
+      "水平力",
+      "质量与滚轮半径"
+    ],
+    "observations": [
+      "平动速度",
+      "圆柱角速度",
+      "是否满足 v≈ωr"
+    ],
+    "limitations": "这里只比较自由滚轮和滑块；没有轮轴轴承、滚动阻力或车架，不可据此给出真实车辆节能比例。",
+    "models": [
+      "cylinder",
+      "box",
+      "ramp",
+      "force",
+      "motion_sensor"
+    ]
+  },
+  {
+    "id": "K-M1-08",
+    "support": "direct",
+    "objective": "探究弹簧越拉长，弹性作用是否越大。",
+    "construction": "零重力、关闭碰撞；固定支点与固定球之间接弹簧测力计，两端距离先略大于原长；改变固定球位置，读取静态轴向力。",
+    "variables": [
+      "伸长量",
+      "劲度系数"
+    ],
+    "observations": [
+      "测力计轴向读数",
+      "长度与原长之差"
+    ],
+    "limitations": "线性理想弹簧不模拟塑性变形、断裂或材料弹性极限；固定端用于避免振动干扰。",
+    "models": [
+      "anchor",
+      "body",
+      "dynamometer"
+    ],
+    "formula": "F = kΔl"
+  },
+  {
+    "id": "K-M2-01",
+    "support": "direct",
+    "objective": "从位置和时间数据区分瞬时速度与一段过程的平均速度。",
+    "construction": "零重力、零阻尼、关闭碰撞；给球水平初速度并用运动传感器记录位置速度；再加小恒力比较非匀速情况。",
+    "variables": [
+      "初速度",
+      "恒力大小",
+      "取样时间段"
+    ],
+    "observations": [
+      "端点位移除以时间",
+      "各采样点速度"
+    ],
+    "limitations": "单向运动时位移大小等于路程；若反向运动，不能把位移平均速度误称为路程平均速率。",
+    "models": [
+      "body",
+      "motion_sensor",
+      "force"
+    ],
+    "formula": "v平均 = Δx/Δt"
+  },
+  {
+    "id": "K-M2-02",
+    "support": "approximation",
+    "objective": "用可编辑质量与几何尺寸计算密度，区分质量大小和材料密度。",
+    "construction": "放两个固定长方体，标注质量及宽高深；比较等体积不同质量、同质量不同体积，使用器具参数手算密度并写入教学说明。",
+    "variables": [
+      "质量",
+      "宽高深"
+    ],
+    "observations": [
+      "参数计算的体积",
+      "参数计算的密度"
+    ],
+    "limitations": "质量和尺寸为独立输入，没有材料、天平或排水测量模型；密度来自公式计算而非求解器读数。",
+    "models": [
+      "box"
+    ],
+    "formula": "ρ = m/(宽×高×深)"
+  },
+  {
+    "id": "K-M2-03",
+    "support": "approximation",
+    "objective": "区分力的大小、方向与作用点对平动转动的影响。",
+    "construction": "零重力、关闭碰撞；长方体受力源作用，先只改 fx/fy 观察平动，再按设定的偏置 r 手工填写等效 tz 来表示偏心施力。",
+    "variables": [
+      "力向量",
+      "说明中的偏置距离",
+      "等效力矩"
+    ],
+    "observations": [
+      "质心位移速度",
+      "角速度"
+    ],
+    "limitations": "力源不支持真实表面施力点；偏心力以质心力加独立力矩近似，必须声明映射 τ=r×F。",
+    "models": [
+      "box",
+      "force",
+      "motion_sensor"
+    ],
+    "formula": "τz = rxFy − ryFx"
+  },
+  {
+    "id": "K-M2-04",
+    "support": "direct",
+    "objective": "验证同一物体受到大小相等方向相反的两力时合力为零。",
+    "construction": "零重力、阻尼和碰撞；两个恒力源指向同一球，分别施加 +2 N 与 -2 N 的 X 力；比较静止和有初速度两组。",
+    "variables": [
+      "两力大小",
+      "初速度"
+    ],
+    "observations": [
+      "X 速度是否保持",
+      "合力变化后的加速"
+    ],
+    "limitations": "两力均作用质心，避免讨论力偶；平衡表示加速度为零，不必然表示静止。",
+    "models": [
+      "body",
+      "force",
+      "motion_sensor"
+    ],
+    "formula": "ΣF = 0 ⇒ a = 0"
+  },
+  {
+    "id": "K-M2-05",
+    "support": "approximation",
+    "objective": "区分物体重量、支承作用与运动状态。",
+    "construction": "将长方体置于水平斜面并开启重力和碰撞，观察静止支承；另用竖直测力计悬挂球作为可读出支承力的对照，等待振动减小。",
+    "variables": [
+      "质量",
+      "重力",
+      "测力计刚度与阻尼"
+    ],
+    "observations": [
+      "静止时高度",
+      "悬挂平衡后的测力计读数"
+    ],
+    "limitations": "平台不直接输出接触支持力，不能把外力加速度读数当净加速度；测力计读数只代表该弹性连接的轴向力。",
+    "models": [
+      "box",
+      "ramp",
+      "anchor",
+      "body",
+      "dynamometer"
+    ],
+    "formula": "静止且无其他竖直力时 N = mg"
+  },
+  {
+    "id": "K-M2-06",
+    "support": "approximation",
+    "objective": "在相同压力下比较不同接触面积对应的平均压强。",
+    "construction": "用固定长方体展示不同底面积，给定相同质量与重力；把 mg 作为静止水平面上的压力，再由底面积计算平均压强。",
+    "variables": [
+      "质量",
+      "底面宽与深"
+    ],
+    "observations": [
+      "面积变化",
+      "公式计算的平均压强"
+    ],
+    "limitations": "没有接触应力或压强分布求解；结果为刚体均匀受压假设下的公式计算。",
+    "models": [
+      "box"
+    ],
+    "formula": "p = F/A"
+  },
+  {
+    "id": "K-M2-07",
+    "support": "conceptual",
+    "objective": "建立静止液体中深度、密度与压强的关系。",
+    "construction": "用固定箱体标记水槽和液面，用三个固定支点标记不同深度；测距仪读几何深度，说明中列同密度液体的压强比较。",
+    "variables": [
+      "标记深度",
+      "说明中的液体密度"
+    ],
+    "observations": [
+      "几何深度",
+      "由公式推导的压强差"
+    ],
+    "limitations": "无液体静力学求解，器具没有真实液压读数；区分表压 ρgh 与加上表面压强的绝对压强。",
+    "models": [
+      "box",
+      "anchor",
+      "distance_sensor"
+    ],
+    "formula": "p = p表面 + ρgh"
+  },
+  {
+    "id": "K-M2-08",
+    "support": "conceptual",
+    "objective": "用排开液体的体积解释阿基米德浮力。",
+    "construction": "固定箱体表示容器，固定小箱体表示浸没物；在目标中明确浸没尺寸、液体密度和排液体积，比较部分和完全浸没的公式结果。",
+    "variables": [
+      "说明中的浸没深度",
+      "物体底面积",
+      "液体密度"
+    ],
+    "observations": [
+      "排液体积的几何推导",
+      "理论浮力与重量比较"
+    ],
+    "limitations": "没有自由液面、排液和浮力模型；示意物体固定，不能宣称求解了上浮或下沉轨迹。",
+    "models": [
+      "box"
+    ],
+    "formula": "F浮 = ρ液gV排"
+  },
+  {
+    "id": "K-M2-09",
+    "support": "direct",
+    "objective": "在恒力直线运动中计算力做的功并辨别零功情况。",
+    "construction": "零重力、零阻尼、关闭碰撞；给球施加恒定 X 力并用运动传感器取两时刻位置，计算 F·Δx；另用与初速度垂直的初始方向说明点积含义。",
+    "variables": [
+      "恒力大小与方向",
+      "所选时间区间"
+    ],
+    "observations": [
+      "位移向量",
+      "由恒力点积计算的功"
+    ],
+    "limitations": "功不是独立仪表读数，需从已知力与位移计算；持续垂直速度的情形不能用固定方向力代替。",
+    "models": [
+      "body",
+      "force",
+      "motion_sensor"
+    ],
+    "formula": "W = F·Δr"
+  },
+  {
+    "id": "K-M2-10",
+    "support": "direct",
+    "objective": "比较相同恒力在不同速度下做功快慢。",
+    "construction": "建立零重力、无阻尼的单球恒力装置，运动传感器跟踪 X 速度；用 Fvx 计算瞬时功率，并与区间功除以时间比较。",
+    "variables": [
+      "力大小",
+      "初速度",
+      "观测区间"
+    ],
+    "observations": [
+      "速度随时间",
+      "公式计算的瞬时与平均功率"
+    ],
+    "limitations": "机械功率由力和速度推算，平台电路功率通道不能当成机械功率表。",
+    "models": [
+      "body",
+      "force",
+      "motion_sensor"
+    ],
+    "formula": "P = F·v；P平均 = W/Δt"
+  },
+  {
+    "id": "K-M2-11",
+    "support": "direct",
+    "objective": "观察运动状态、高度和弹性伸长如何影响机械能。",
+    "construction": "先让球在无阻尼且无碰撞的重力场下落，读取机械能；另建零重力球—弹簧—支点，比较初始伸长不同的能量。",
+    "variables": [
+      "质量与初速度",
+      "高度",
+      "弹簧伸长"
+    ],
+    "observations": [
+      "机械能总读数",
+      "由参数分解的动能与势能"
+    ],
+    "limitations": "总机械能含平动、转动、重力和线性弹性部分；不同组实验的势能零点必须一致。",
+    "models": [
+      "body",
+      "anchor",
+      "spring",
+      "motion_sensor"
+    ],
+    "formula": "E机械 = K + U重 + U弹"
+  },
+  {
+    "id": "K-M2-12",
+    "support": "direct",
+    "objective": "追踪下落时重力势能向动能的转化。",
+    "construction": "球从 y=5 m 静止释放，重力 9.8，阻尼 0、碰撞关闭；记录落地高度之前的位置速度，以统一零点分解 mgy 与 mv²/2。",
+    "variables": [
+      "释放高度",
+      "初速度"
+    ],
+    "observations": [
+      "重力势能下降",
+      "动能增加",
+      "总能量的数值误差"
+    ],
+    "limitations": "只讨论未发生碰撞的过程；碰撞关闭后穿越地面是模型设置，不代表真实物体穿地。",
+    "models": [
+      "body",
+      "motion_sensor"
+    ],
+    "formula": "ΔK ≈ −ΔU重"
+  },
+  {
+    "id": "K-M2-13",
+    "support": "conceptual",
+    "objective": "在静态杠杆示意图上检验力臂与施力大小的平衡关系。",
+    "construction": "固定长方体表示杆，固定支点和球标记两侧作用点；把力方向标为垂直杆，测量两力臂，按 F₁l₁=F₂l₂ 计算配重需求。",
+    "variables": [
+      "左右力臂",
+      "已知的一侧施力"
+    ],
+    "observations": [
+      "测距读数",
+      "理论所需另一侧施力"
+    ],
+    "limitations": "无偏置铰链和端点施力模型，不运行假杠杆平衡；杆重未忽略时须另计重力矩。",
+    "models": [
+      "box",
+      "anchor",
+      "body",
+      "distance_sensor"
+    ],
+    "formula": "Στ = 0"
+  },
+  {
+    "id": "K-M2-14",
+    "support": "approximation",
+    "objective": "通过有摩擦斜面说明输入功、有效输出功与损失的区别。",
+    "construction": "重力与碰撞开启；长方体放在斜面下端，施加沿坡向上的恒力并记录位移和速度；比较摩擦为零与非零，选取仍在坡面上的时间段。",
+    "variables": [
+      "斜面摩擦",
+      "施力大小",
+      "提升高度"
+    ],
+    "observations": [
+      "输入功 F·Δr",
+      "有效重力势能增量",
+      "动能变化"
+    ],
+    "limitations": "平台没有独立机械效率表；若速度变化，输入功还改变动能，不能把所有非势能部分均叫摩擦损失。",
+    "models": [
+      "box",
+      "ramp",
+      "force",
+      "motion_sensor"
+    ],
+    "formula": "η = 有用输出功/输入功"
+  },
+  {
+    "id": "K-M3-01",
+    "support": "direct",
+    "objective": "比较位移向量、路程与各方向速度的含义。",
+    "construction": "零重力、零阻尼、关闭碰撞；球给定 vx=1、vy=0.5，运动传感器跟踪 X/Y 坐标与速度；用起终点向量计算位移。",
+    "variables": [
+      "初速度方向",
+      "取样时刻"
+    ],
+    "observations": [
+      "坐标分量",
+      "速度分量与速率",
+      "端点位移"
+    ],
+    "limitations": "传感器位置相对于世界原点，需自行减去初始位置；总路程需沿采样轨迹累加，不能用端点距离代替。",
+    "models": [
+      "body",
+      "motion_sensor"
+    ],
+    "formula": "Δr = r₂ − r₁；v = dr/dt"
+  },
+  {
+    "id": "K-M3-02",
+    "support": "direct",
+    "objective": "用恒定合力验证直线匀加速运动的位置与速度关系。",
+    "construction": "零重力、零阻尼、关闭碰撞；球从已知 x₀、vx₀ 出发，恒力源仅有 fx；运动传感器记录 0–2 s 的 X 位置速度，和解析值比较。",
+    "variables": [
+      "初速度",
+      "力与质量",
+      "观察时间"
+    ],
+    "observations": [
+      "v−t 线性关系",
+      "x−t 二次关系"
+    ],
+    "limitations": "只在力恒定、没有接触与阻尼时使用匀变速公式；数值积分会产生小误差。",
+    "models": [
+      "body",
+      "force",
+      "motion_sensor"
+    ],
+    "formula": "v = v₀+at；x = x₀+v₀t+at²/2"
+  },
+  {
+    "id": "K-M3-03",
+    "support": "direct",
+    "objective": "检验合外力为零时静止或匀速直线运动的保持。",
+    "construction": "关闭重力、阻尼和碰撞，放两个无连接球，一个静止、一个 vx=1；传感器分别记录位置和速度，再给运动球加小恒力作对照。",
+    "variables": [
+      "初速度",
+      "是否施加外力"
+    ],
+    "observations": [
+      "速度是否恒定",
+      "无外力时的直线轨迹"
+    ],
+    "limitations": "这里主动移除了环境阻力；不能用现实中物体自然停下来否定无合力条件下的惯性定律。",
+    "models": [
+      "body",
+      "motion_sensor",
+      "force"
+    ],
+    "formula": "ΣF = 0 ⇒ v 为常量"
+  },
+  {
+    "id": "K-M3-04",
+    "support": "direct",
+    "objective": "分别控制质量和恒力，检验加速度与合力及质量的关系。",
+    "construction": "零重力、零阻尼、关闭碰撞；1 kg 球受 1 N 的 X 恒力，传感器跟踪速度和外力加速度；固定质量改力，再固定力改质量，每次重置初值。",
+    "variables": [
+      "恒力大小",
+      "球的质量"
+    ],
+    "observations": [
+      "速度增量除以时间",
+      "外力加速度读数",
+      "F/m 对照"
+    ],
+    "limitations": "必须排除其他外力和约束；加速度读数不包含接触求解器的冲量，因此本实验关闭碰撞。",
+    "models": [
+      "body",
+      "force",
+      "motion_sensor"
+    ],
+    "formula": "a = F合/m"
+  },
+  {
+    "id": "K-M3-05",
+    "support": "direct",
+    "objective": "用两自由物体之间的弹簧作用说明作用力与反作用力成对出现。",
+    "construction": "零重力、零阻尼、关闭碰撞；两不同质量的球由无阻尼测力计连接，初始距离略大于原长；用传感器记录两侧速度变化。",
+    "variables": [
+      "两物体质量",
+      "初始伸长",
+      "弹簧刚度"
+    ],
+    "observations": [
+      "测力计轴向力",
+      "两球加速度和速度增量"
+    ],
+    "limitations": "连接两端受到等大反向力，作用在不同物体上；测力计只有一个带符号轴向读数，另一端力由方向取反得出。",
+    "models": [
+      "body",
+      "dynamometer",
+      "motion_sensor"
+    ],
+    "formula": "F_AB = −F_BA"
+  },
+  {
+    "id": "K-M3-06",
+    "support": "direct",
+    "objective": "将平抛运动分解为水平方向匀速和竖直方向下落。",
+    "construction": "设重力 9.8、零阻尼、关闭碰撞；球从 y=5 m 以 vx=2、vy=0 发射，传感器跟踪 X/Y 位置速度，计算时长小于落到 y=0 的时间。",
+    "variables": [
+      "水平初速度",
+      "释放高度",
+      "重力"
+    ],
+    "observations": [
+      "vx 保持",
+      "vy 的线性变化",
+      "抛物线形轨迹"
+    ],
+    "limitations": "不含空气阻力，不能在长时间穿过地面后继续解释真实落地运动。",
+    "models": [
+      "body",
+      "motion_sensor"
+    ],
+    "formula": "x = x₀+v₀t；y = y₀−gt²/2"
+  },
+  {
+    "id": "K-M3-07",
+    "support": "direct",
+    "objective": "用中心距离约束研究圆周运动的速度与向心加速度。",
+    "construction": "零重力、无阻尼、关闭碰撞；固定支点在 (0,4,0)，球在 (2,4,0)，连杆长度 2 m，球 vy=2；测距仪和运动传感器跟踪半径与速度。",
+    "variables": [
+      "连杆长度",
+      "切向初速度"
+    ],
+    "observations": [
+      "球到支点距离",
+      "轨迹与速率",
+      "由 v²/r 计算的向心加速度"
+    ],
+    "limitations": "连杆是中心间距离约束；外力加速度通道不含约束冲量，不能用该通道直接读向心加速度。",
+    "models": [
+      "anchor",
+      "body",
+      "rod",
+      "distance_sensor",
+      "motion_sensor"
+    ],
+    "formula": "a向 = v²/r"
+  },
+  {
+    "id": "K-M3-08",
+    "support": "conceptual",
+    "objective": "区分万有引力的质量和距离依赖与近地重力近似。",
+    "construction": "零重力、关闭碰撞；固定两球表示两质量，测距仪读取中心距离；在说明中给定质量并用 Gm₁m₂/r² 手算比较，不让球自动互相吸引。",
+    "variables": [
+      "两球的标注质量",
+      "中心间距"
+    ],
+    "observations": [
+      "距离读数",
+      "公式推导的引力比值"
+    ],
+    "limitations": "平台重力仅为统一向下的 g，没有质量之间的万有引力求解；不能拿库仑力动画充当真实引力实验。",
+    "models": [
+      "body",
+      "distance_sensor"
+    ],
+    "formula": "F = Gm₁m₂/r²"
+  },
+  {
+    "id": "K-M3-09",
+    "support": "conceptual",
+    "objective": "用圆轨道示意区分轨道速度与逃逸速度。",
+    "construction": "固定球作中心天体，较小固定球标记不同轨道半径；用固定支点补充轨道位置标记，说明中给定 GM 与半径并列两种速度公式。",
+    "variables": [
+      "说明中的 GM",
+      "轨道半径"
+    ],
+    "observations": [
+      "几何半径",
+      "理论圆轨道与逃逸速度比较"
+    ],
+    "limitations": "没有中心引力、轨道积分或大尺度天体单位模型；所有球均为固定示意，不宣称模拟卫星运行。",
+    "models": [
+      "body",
+      "anchor",
+      "distance_sensor"
+    ],
+    "formula": "v圆 = √(GM/r)；v逃 = √(2GM/r)"
+  },
+  {
+    "id": "K-M3-10",
+    "support": "direct",
+    "objective": "比较恒力做功和质点动能的增量。",
+    "construction": "无重力、阻尼和碰撞；恒力沿 X 推动球，运动传感器取两时刻的 X 位置及速度；分别计算 FΔx 与 m(v₂²−v₁²)/2。",
+    "variables": [
+      "恒力",
+      "质量",
+      "初速度"
+    ],
+    "observations": [
+      "位移",
+      "速度",
+      "功与动能增量的误差"
+    ],
+    "limitations": "仅比较平动且无其他做功机制的球；公式计算应与求解器采样区间一致。",
+    "models": [
+      "body",
+      "force",
+      "motion_sensor"
+    ],
+    "formula": "W合 = ΔK"
+  },
+  {
+    "id": "K-M3-11",
+    "support": "direct",
+    "objective": "检查保守弹性系统的机械能守恒及数值误差。",
+    "construction": "零重力、环境阻尼和碰撞；支点—弹簧—球沿 X 布置，弹簧 damping=0，初始伸长 0.2 m；记录机械能与位移速度。",
+    "variables": [
+      "劲度系数",
+      "质量",
+      "初始伸长"
+    ],
+    "observations": [
+      "机械能随时间",
+      "动能与弹性势能互换"
+    ],
+    "limitations": "不加入周期驱动或耗散；有限步长产生能量误差，不能要求每个浮点采样值绝对相等。",
+    "models": [
+      "anchor",
+      "spring",
+      "body",
+      "motion_sensor"
+    ],
+    "formula": "E = mv²/2 + kx²/2"
+  },
+  {
+    "id": "K-M3-12",
+    "support": "direct",
+    "objective": "用恒力作用时间检验冲量与动量改变量。",
+    "construction": "零重力、零阻尼、关闭碰撞；球受到已知 X 恒力，分别计算 0.5 s 和 1 s 的结果；读取初末速度并比较 FΔt 与 mΔv。",
+    "variables": [
+      "恒力",
+      "作用时长",
+      "质量"
+    ],
+    "observations": [
+      "速度增量",
+      "理论冲量",
+      "动量变化"
+    ],
+    "limitations": "恒力持续作用，改变模拟结束时刻代表不同作用时长；不把接触碰撞的瞬时力从传感器外力通道中反推。",
+    "models": [
+      "body",
+      "force",
+      "motion_sensor"
+    ],
+    "formula": "J = FΔt = Δp"
+  },
+  {
+    "id": "K-M3-13",
+    "support": "direct",
+    "objective": "检查一维两球碰撞前后总动量及动能的不同表现。",
+    "construction": "零重力、无阻尼、打开碰撞；两球同高对心相向运动，避免地面接触；分别设置恢复系数 1 和较小值，传感器记录碰撞前后 X 速度。",
+    "variables": [
+      "两球质量",
+      "初速度",
+      "双方恢复系数"
+    ],
+    "observations": [
+      "总 X 动量",
+      "碰撞前后总动能"
+    ],
+    "limitations": "求解器按双方恢复系数较小值处理接触；只比较系统无外部接触的时段，并允许有限数值误差。",
+    "models": [
+      "body",
+      "motion_sensor"
+    ],
+    "formula": "m₁v₁+m₂v₂ = 常量（孤立系统）"
+  },
+  {
+    "id": "K-M3-14",
+    "support": "direct",
+    "objective": "验证弹簧振子的周期对质量和刚度的依赖。",
+    "construction": "零重力、零阻尼、关闭碰撞；支点与球通过无阻尼弹簧相连，沿 X 小伸长释放；传感器记录位移峰值，选取 k 和 m 使周期约 1–3 s。",
+    "variables": [
+      "质量",
+      "弹簧劲度",
+      "初始小伸长"
+    ],
+    "observations": [
+      "振动周期",
+      "位移与速度相位关系"
+    ],
+    "limitations": "这是中心弹簧的单向初始运动，避免横向扰动和撞到支点；周期由足够长的记录测量，短验证调用不能覆盖全部周期。",
+    "models": [
+      "anchor",
+      "spring",
+      "body",
+      "motion_sensor"
+    ],
+    "formula": "T = 2π√(m/k)"
+  },
+  {
+    "id": "K-M3-15",
+    "support": "approximation",
+    "objective": "用声压波例子区分传播速度、频率与波长。",
+    "construction": "放点声源与两个不同距离的麦克风，保持同一传播方向；改变声源频率与 speed，观察声压场和到达相位，理论波长用 speed/frequency 计算。",
+    "variables": [
+      "声源频率",
+      "传播速度",
+      "麦克风距离"
+    ],
+    "observations": [
+      "声压与相位差",
+      "公式波长"
+    ],
+    "limitations": "平台是球面声压模型，没有介质粒子位移或绳波；低采样率记录会混叠，3D 波环只是慢速示意，不能由其移动速度测真实声速。",
+    "models": [
+      "speaker",
+      "microphone"
+    ],
+    "formula": "λ = c/f"
+  },
+  {
+    "id": "K-M3-16",
+    "support": "approximation",
+    "objective": "用双声源验证相干叠加，并辨明衍射不在当前求解范围内。",
+    "construction": "两点声源同频同幅，麦克风放等距位置；比较相位差 0° 与 180°，再移动麦克风比较路径差；把衍射条件仅写在概念说明。",
+    "variables": [
+      "两声源相位差",
+      "麦克风位置",
+      "声源间距"
+    ],
+    "observations": [
+      "等距点叠加或抵消",
+      "位置变化后的声压"
+    ],
+    "limitations": "只模拟无障碍球面波干涉；箱体、光阑等不会衍射声波，不用光学射线或装饰障碍物制造假衍射条纹。",
+    "models": [
+      "speaker",
+      "microphone"
+    ],
+    "formula": "相位差 = 源相位差 + 传播路径产生的相位差"
+  },
+  {
+    "id": "K-M4-01",
+    "support": "direct",
+    "objective": "比较长方体质量分布对绕主轴转动响应的影响。",
+    "construction": "零重力、无阻尼和碰撞；长方体仅受恒定 Z 力矩，fx/fy/fz 均设 0；分别改变质量、宽和高，读取角速度并比较 Δω/Δt。",
+    "variables": [
+      "长方体质量",
+      "宽高",
+      "Z 力矩"
+    ],
+    "observations": [
+      "角速度增长率",
+      "按尺寸计算的转动惯量"
+    ],
+    "limitations": "使用长方体绕质心 Z 主轴；力矩源不提供任意转轴约束，避免把圆柱多面体近似惯量当成解析圆柱精确值。",
+    "models": [
+      "box",
+      "force"
+    ],
+    "formula": "I_z = m(宽²+高²)/12；τz = I_zαz"
+  },
+  {
+    "id": "K-M4-02",
+    "support": "direct",
+    "objective": "观察无外力矩长方体绕主轴旋转时角动量是否保持。",
+    "construction": "关闭重力、阻尼与碰撞；长方体初始 spin=2，绕 Z 主轴自由旋转；按其固定质量尺寸计算 Iz，并用角速度读数计算 Lz，另加小 tz 作对照。",
+    "variables": [
+      "初始角速度",
+      "质量与尺寸",
+      "外加 Z 力矩"
+    ],
+    "observations": [
+      "角速度",
+      "公式计算的 Lz",
+      "有无外力矩的差别"
+    ],
+    "limitations": "此实验不模拟旋转中收臂或实时改变惯量；修改参数会重置运动，不能把两个独立配置当成同一守恒过程。",
+    "models": [
+      "box",
+      "force"
+    ],
+    "formula": "Lz = Izωz；τz = dLz/dt"
+  },
+  {
+    "id": "K-M4-03",
+    "support": "approximation",
+    "objective": "从弹簧振子的数值轨迹构造拉格朗日量，联系能量与运动方程。",
+    "construction": "搭无阻尼、零重力的支点—弹簧—球，用传感器读取 x 和 v；将相对平衡位置作为广义坐标 q，分别计算 T、V 和 L=T−V。",
+    "variables": [
+      "质量",
+      "刚度",
+      "初始广义坐标"
+    ],
+    "observations": [
+      "q 与 q̇",
+      "推算的 T、V、L",
+      "与简谐方程的对应"
+    ],
+    "limitations": "轨迹由现有牛顿式求解器产生；平台不进行符号变分或自动拉格朗日方程生成，L 为外部公式推导量。",
+    "models": [
+      "anchor",
+      "spring",
+      "body",
+      "motion_sensor"
+    ],
+    "formula": "L = m q̇²/2 − kq²/2"
+  },
+  {
+    "id": "K-M4-04",
+    "support": "conceptual",
+    "objective": "用固定端点的候选路径说明作用量的驻值含义。",
+    "construction": "关闭重力与碰撞，固定球标记两个时空端点，固定支点标记两条候选路径；在说明中给定各段时间和坐标，手工列 S=∫Ldt 的离散近似。",
+    "variables": [
+      "说明中的中间路径点",
+      "总时长",
+      "质量"
+    ],
+    "observations": [
+      "候选路径的几何差别",
+      "公式估算的作用量差"
+    ],
+    "limitations": "没有时空轨迹优化或变分求解；固定几何标记不能证明运动路径，总体原则是驻值，不能一概宣称所有情形都是全局最小。",
+    "models": [
+      "body",
+      "anchor"
+    ],
+    "formula": "δS = 0，S = ∫L dt"
+  },
+  {
+    "id": "K-M4-05",
+    "support": "direct",
+    "objective": "比较弱阻尼、临界附近与强阻尼弹簧振子的衰减行为。",
+    "construction": "零重力、关闭碰撞、环境阻尼 0；球—弹簧—支点沿 X 放置，弹簧 damping=0，另接阻尼器；取 m=1、k=4，依次比较 c=1、4、8。",
+    "variables": [
+      "阻尼器系数",
+      "质量",
+      "刚度"
+    ],
+    "observations": [
+      "位移衰减包络",
+      "是否越过平衡位置",
+      "机械能下降"
+    ],
+    "limitations": "阻尼器只沿连接轴作用；参数改变后重置初始伸长以公平比较，临界判定适用于该一维线性系统。",
+    "models": [
+      "anchor",
+      "body",
+      "spring",
+      "damper",
+      "motion_sensor"
+    ],
+    "formula": "c临界 = 2√(km)"
+  },
+  {
+    "id": "K-M4-06",
+    "support": "direct",
+    "objective": "扫描周期驱动力频率，比较阻尼下的受迫振幅与相位。",
+    "construction": "零重力、关闭碰撞；球经弹簧与阻尼器连接支点，周期驱动器沿 X 施力；例如 m=1、k=16、c=0.5、小振幅 0.2 N，分次扫过固有频率附近。",
+    "variables": [
+      "驱动频率",
+      "驱动幅值",
+      "阻尼"
+    ],
+    "observations": [
+      "稳态位移幅度",
+      "与驱动力的相位差",
+      "共振峰形"
+    ],
+    "limitations": "需要等瞬态衰减后比较，短验证只检查配置；单次求解最长 20 s，不把尚未稳定的最大位移当稳态共振幅度。",
+    "models": [
+      "anchor",
+      "body",
+      "spring",
+      "damper",
+      "harmonic_force",
+      "motion_sensor"
+    ],
+    "formula": "ω₀ = √(k/m)"
+  },
+  {
+    "id": "K-M4-07",
+    "support": "conceptual",
+    "objective": "用不同截面的流管示意联系流速、压强与高度。",
+    "construction": "用固定长方体和圆柱标记水平管道的宽窄段，用固定支点标记截面；在说明中给定面积、流量与高度，先用连续性关系再推导压强变化。",
+    "variables": [
+      "说明中的截面积",
+      "体积流量",
+      "截面高度"
+    ],
+    "observations": [
+      "理论流速",
+      "理论压强差"
+    ],
+    "limitations": "没有流体速度场或压力求解，也没有实际管壁边界；伯努利关系仅作稳态、不可压、无黏理想流动的公式示意。",
+    "models": [
+      "box",
+      "cylinder",
+      "anchor"
+    ],
+    "formula": "沿同一流线 p+ρv²/2+ρgh = 常量"
+  },
+  {
+    "id": "K-M4-08",
+    "support": "approximation",
+    "objective": "用线性阻力类比解释黏滞介质中的速度衰减。",
+    "construction": "零重力、关闭碰撞；球带初速度，使用 environment.damping 施加 −cv 阻力，传感器记录速度；说明 c 与流体黏度的关系需另选适用模型。",
+    "variables": [
+      "环境阻尼 c",
+      "球质量",
+      "初速度"
+    ],
+    "observations": [
+      "指数式速度衰减",
+      "由 m/c 计算的时间尺度"
+    ],
+    "limitations": "这是集中参数线性阻力类比，没有流体、雷诺数变化或尾流；不能宣称模拟了完整黏滞流体或直接测得黏度。",
+    "models": [
+      "body",
+      "motion_sensor"
+    ],
+    "formula": "v(t)=v₀e^(−ct/m)"
+  },
+  {
+    "id": "K-E1-01",
+    "support": "direct",
+    "objective": "比较开关闭合与断开时闭合回路的电流变化。",
+    "construction": "用 battery、switch、lamp 串联成完整回路，灯泡两端可并联 voltmeter。先断开再闭合开关，比较同一负载的两种状态。",
+    "variables": [
+      "开关 closed=0/1",
+      "电源电压"
+    ],
+    "observations": [
+      "支路电流",
+      "灯泡电功率与亮度"
+    ],
+    "limitations": "开关以高低电阻近似，断开仍有极小漏电流；不模拟接触火花。",
+    "models": [
+      "battery",
+      "switch",
+      "lamp",
+      "voltmeter"
+    ],
+    "formula": "闭合回路中 I≈ε/(R+r)。"
+  },
+  {
+    "id": "K-E1-02",
+    "support": "approximation",
+    "objective": "用不同电阻值类比导体与绝缘体对电流的阻碍程度。",
+    "construction": "搭建低压电源、待测 resistor 与 ammeter 串联回路。保持电源相同，分别取较小和较大阻值；器具命名为“导体电阻类比”和“绝缘体电阻类比”。",
+    "variables": [
+      "待测电阻",
+      "低压电源电压"
+    ],
+    "observations": [
+      "支路电流",
+      "待测元件端电压"
+    ],
+    "limitations": "只有集中电阻模型，没有材料微观导电、温度变化或绝缘击穿；不能据此识别真实材料。",
+    "models": [
+      "battery",
+      "resistor",
+      "ammeter"
+    ],
+    "formula": "I=U/R。"
+  },
+  {
+    "id": "K-E1-03",
+    "support": "direct",
+    "objective": "探索电源、灯泡与完整导线回路怎样共同决定灯泡是否发光。",
+    "construction": "放置 battery、lamp、switch，用 wire 从电源 a 经开关和灯泡回到电源 b。先用 3 V 和适当额定功率，比较断路与闭路。",
+    "variables": [
+      "开关状态",
+      "电源电压",
+      "灯泡工作电阻"
+    ],
+    "observations": [
+      "灯泡功率",
+      "灯泡亮度",
+      "电路电流"
+    ],
+    "limitations": "灯泡是定值电阻，亮度按功率映射，不模拟灯丝升温、熔断及真实光谱。",
+    "models": [
+      "battery",
+      "lamp",
+      "switch"
+    ],
+    "formula": "P=UI=U²/R。"
+  },
+  {
+    "id": "K-E1-04",
+    "support": "direct",
+    "objective": "识别电池极性反转时电压和约定电流方向的改变。",
+    "construction": "把 battery、resistor、ammeter 串联，voltmeter 跨接电阻并固定测量端子方向。保持布线，分别设置正、负电动势。",
+    "variables": [
+      "电源电动势符号",
+      "负载电阻"
+    ],
+    "observations": [
+      "有符号电压",
+      "有符号支路电流",
+      "负载功率"
+    ],
+    "limitations": "显示的是约定电流方向；不模拟导线中电子的微观迁移。电源含内阻。",
+    "models": [
+      "battery",
+      "resistor",
+      "ammeter",
+      "voltmeter"
+    ],
+    "formula": "电源反向使 I、U 反号，电阻耗散功率仍为正。"
+  },
+  {
+    "id": "K-E1-05",
+    "support": "conceptual",
+    "objective": "认识磁铁南北两极及同极、异极关系的概念。",
+    "construction": "放置两个固定 bar_magnet，按磁矩轴为两端作名称说明；另放 probe 观察不同位置的场强。用目标文本列出同极相斥、异极相吸的真实规律，明确场景不计算吸斥运动。",
+    "variables": [
+      "磁矩方向与符号",
+      "探针位置"
+    ],
+    "observations": [
+      "场强幅值随位置变化",
+      "两极位置与朝向示意"
+    ],
+    "limitations": "磁铁只有软化磁偶极子场，磁铁之间没有机械吸引或排斥；探针只显示幅值，不能用其正负判定极性。",
+    "models": [
+      "bar_magnet",
+      "probe"
+    ]
+  },
+  {
+    "id": "K-E1-06",
+    "support": "conceptual",
+    "objective": "区分磁性材料与普通材料，避免把所有金属都当成可被磁铁吸引。",
+    "construction": "用固定 bar_magnet 和三个固定 box，分别标记“铁样品”“铜样品”“木样品”，在 learning 中写真实材料分类与应观察的实物现象。仅做可编辑布置示意。",
+    "variables": [
+      "样品标签和位置",
+      "磁铁位置"
+    ],
+    "observations": [
+      "示意中的待测样品分类",
+      "需要在实物中验证的吸引现象"
+    ],
+    "limitations": "平台没有铁磁性、磁化或磁铁吸物求解；箱体不会因名称改变材料，不得报告吸引力数值。",
+    "models": [
+      "bar_magnet",
+      "box"
+    ]
+  },
+  {
+    "id": "K-E2-01",
+    "support": "direct",
+    "objective": "通过串联测量理解电流表示单位时间通过截面的电荷量。",
+    "construction": "建立 battery、resistor、ammeter 串联回路，电流表必须串入支路。先固定电阻改变电压，再固定电压改变电阻。",
+    "variables": [
+      "电源电压",
+      "负载电阻"
+    ],
+    "observations": [
+      "电流表读数",
+      "各串联支路电流"
+    ],
+    "limitations": "电流表内阻 1 mΩ，电源有内阻；没有逐个电子的运动模型。",
+    "models": [
+      "battery",
+      "resistor",
+      "ammeter"
+    ],
+    "formula": "I=ΔQ/Δt；稳态电阻支路 I=U/R。"
+  },
+  {
+    "id": "K-E2-02",
+    "support": "direct",
+    "objective": "理解电压是两点之间的电势差，并比较并联测量与错误接法。",
+    "construction": "把 battery 与 resistor 闭合连接，voltmeter 并联在电阻两端；再交换电压表 a、b 两端记录符号变化。保留正确接法作为最终配置。",
+    "variables": [
+      "电源电压",
+      "电压表接线方向"
+    ],
+    "observations": [
+      "端电压及符号",
+      "电源电动势与路端电压差"
+    ],
+    "limitations": "电压表内阻为 10 MΩ，读数有负载影响；这里是电路节点电压，不是空间电势场图。",
+    "models": [
+      "battery",
+      "resistor",
+      "voltmeter"
+    ],
+    "formula": "Uab=Va−Vb，Uba=−Uab。"
+  },
+  {
+    "id": "K-E2-03",
+    "support": "direct",
+    "objective": "研究电阻改变时电压与电流的关系，以及滑动变阻器的调节作用。",
+    "construction": "构成 battery、rheostat、ammeter 串联回路，在 rheostat 两端并联 voltmeter。固定电源，逐步调整 ratio，记录实际有效电阻与电流。",
+    "variables": [
+      "最大阻值 resistance",
+      "滑片比例 ratio"
+    ],
+    "observations": [
+      "电流",
+      "变阻器端电压",
+      "有效电阻"
+    ],
+    "limitations": "变阻器只有两个端子，有效阻值等于最大阻值乘比例；没有实际电阻丝几何或温度效应。",
+    "models": [
+      "battery",
+      "rheostat",
+      "ammeter",
+      "voltmeter"
+    ],
+    "formula": "R有效=R最大·ratio。"
+  },
+  {
+    "id": "K-E2-04",
+    "support": "direct",
+    "objective": "用控制变量法验证欧姆元件的电流与端电压成正比。",
+    "construction": "建立低压电源与 resistor 回路，串 ammeter、并 voltmeter。固定电阻改变电源电压，使用电阻实际端电压计算 U/I。",
+    "variables": [
+      "电源电压",
+      "负载电阻"
+    ],
+    "observations": [
+      "成对 U、I 数据",
+      "U/I 与设定阻值的比较"
+    ],
+    "limitations": "需考虑电源内阻和仪表内阻；只验证线性欧姆电阻，不外推至灯丝温变或半导体。",
+    "models": [
+      "battery",
+      "resistor",
+      "ammeter",
+      "voltmeter"
+    ],
+    "formula": "I=U/R。"
+  },
+  {
+    "id": "K-E2-05",
+    "support": "direct",
+    "objective": "验证串联电路电流相等、总电压等于各电阻电压之和。",
+    "construction": "用 battery 与两个不同阻值的 resistor 串联闭合。读取每个电阻支路的电流与端电压，可加 voltmeter 跨接两电阻整体。",
+    "variables": [
+      "两个电阻的阻值",
+      "电源电压"
+    ],
+    "observations": [
+      "两电阻支路电流",
+      "各端电压之和",
+      "分压比例"
+    ],
+    "limitations": "导线理想，电源内阻和仪表负载需单独计入；元件为线性电阻。",
+    "models": [
+      "battery",
+      "resistor",
+      "voltmeter"
+    ],
+    "formula": "R总=R1+R2，I1=I2，U1/U2=R1/R2。"
+  },
+  {
+    "id": "K-E2-06",
+    "support": "direct",
+    "objective": "验证并联支路电压相同及总电流等于各支路电流之和。",
+    "construction": "将两个 resistor 的 a 端同接 battery a，b 端同接 battery b；电流表串在电源总支路。改变其中一个支路电阻。",
+    "variables": [
+      "支路电阻 R1、R2",
+      "电源电压"
+    ],
+    "observations": [
+      "支路电压",
+      "支路电流之和",
+      "总电流"
+    ],
+    "limitations": "电源有内阻，因此改变负载会轻微改变路端电压；并联关系以实际端电压比较。",
+    "models": [
+      "battery",
+      "resistor",
+      "ammeter"
+    ],
+    "formula": "1/R总=1/R1+1/R2，I总=I1+I2。"
+  },
+  {
+    "id": "K-E2-07",
+    "support": "direct",
+    "objective": "区分电功率与一段时间内转化的电能。",
+    "construction": "建立 battery、resistor 回路，用 voltmeter、ammeter 测量实际负载 U、I。取恒定条件比较不同持续时间，用 P·t 计算理论电能并与瞬时功率分开记录。",
+    "variables": [
+      "负载电阻",
+      "电源电压",
+      "理论计时长度"
+    ],
+    "observations": [
+      "负载功率",
+      "U·I 交叉核对",
+      "由功率推算的电能"
+    ],
+    "limitations": "求解器直接返回瞬时功率；电能积算属于明确注明的公式后处理，不是温度或热量传感器读数。",
+    "models": [
+      "battery",
+      "resistor",
+      "voltmeter",
+      "ammeter"
+    ],
+    "formula": "P=UI，稳态 W=Pt。"
+  },
+  {
+    "id": "K-E2-08",
+    "support": "approximation",
+    "objective": "根据电阻电功率估算焦耳热，比较电流变化的平方效应。",
+    "construction": "搭建 battery 与 resistor 的闭合回路，保持阻值不变改变电源电压。读取电流与电阻功率，按相同时长估算 Q，并将装置命名为“焦耳热能量估算”。",
+    "variables": [
+      "电流（通过电压调节）",
+      "电阻",
+      "计时长度"
+    ],
+    "observations": [
+      "电阻耗散功率",
+      "理论 Q=I²Rt"
+    ],
+    "limitations": "没有热容、散热、温度或相变求解；只能由电功率估算转化能量，不能给出升温曲线。",
+    "models": [
+      "battery",
+      "resistor"
+    ],
+    "formula": "Q=I²Rt（恒定电流、纯电阻）。"
+  },
+  {
+    "id": "K-E2-09",
+    "support": "approximation",
+    "objective": "用低压并联电路类比家庭照明各支路独立控制。",
+    "construction": "使用 6 V battery，两条各含 switch 与 lamp 的并联支路；分别操作开关，比较另一路是否仍有电流。命名为“家庭照明低压类比”。",
+    "variables": [
+      "两个开关状态",
+      "两灯负载电阻"
+    ],
+    "observations": [
+      "支路独立通断",
+      "总电流变化"
+    ],
+    "limitations": "这不是市电接线仿真；未实现火线零线保护地制度、漏电保护、断路器或真实交流家庭负载。",
+    "models": [
+      "battery",
+      "switch",
+      "lamp"
+    ]
+  },
+  {
+    "id": "K-E2-10",
+    "support": "conceptual",
+    "objective": "理解断电操作、保护装置和不接触带电部分的安全原则。",
+    "construction": "放置低压 battery、switch、lamp 作为“电源—断开点—负载”结构图，用固定 box 标记未实现的保护装置。在目标中写明只讨论概念，不作为施工或触电风险评估。",
+    "variables": [
+      "断开点位置",
+      "开关状态"
+    ],
+    "observations": [
+      "断开后负载电流",
+      "保护装置概念位置"
+    ],
+    "limitations": "没有人体阻抗、漏电保护及触电生理模型，不提供安全电压结论或家庭带电操作指导。",
+    "models": [
+      "battery",
+      "switch",
+      "lamp",
+      "box"
+    ]
+  },
+  {
+    "id": "K-E2-11",
+    "support": "direct",
+    "objective": "用场强探针比较磁铁附近不同位置的磁场强弱。",
+    "construction": "固定 bar_magnet，在其轴向与侧向放置 probe，逐个移动探针记录磁场幅值；比较距离增大后的趋势。磁感线作为方向结构说明，不当成实体线。",
+    "variables": [
+      "探针位置",
+      "磁偶极矩",
+      "磁铁软化半径"
+    ],
+    "observations": [
+      "磁场幅值",
+      "轴向与侧向分布趋势"
+    ],
+    "limitations": "使用软化磁偶极子场，近磁芯不是真实条形磁铁内部场；probe 返回幅值，无法单凭数值恢复方向。",
+    "models": [
+      "bar_magnet",
+      "probe"
+    ],
+    "formula": "远离软化半径时，偶极子磁场量级随 r⁻³ 衰减。"
+  },
+  {
+    "id": "K-E2-12",
+    "support": "conceptual",
+    "objective": "认识通电导线产生环绕磁场，并区分电路电流与已实现的磁场源。",
+    "construction": "放置 battery、resistor 的真实闭合电路，再用固定 cylinder 标示直导线及固定 box 标出环绕方向参考。将理论 B 与测得 I 写入 learning 的公式比较，不自动驱动 field。",
+    "variables": [
+      "电路电流",
+      "理论距导线的距离"
+    ],
+    "observations": [
+      "真实支路电流",
+      "由长直导线公式计算的理论磁场"
+    ],
+    "limitations": "电路导线不生成空间磁场，未实现毕奥-萨伐尔积分；场强公式为外部理论说明，不能冒充 probe 读数。",
+    "models": [
+      "battery",
+      "resistor",
+      "cylinder",
+      "box"
+    ],
+    "formula": "理想无限长直导线 B=μ0 I/(2πr)。"
+  },
+  {
+    "id": "K-E2-13",
+    "support": "conceptual",
+    "objective": "分析电磁铁的电流、绕组与铁芯作用及其尚未实现的部分。",
+    "construction": "搭建 battery、switch、resistor 回路，用固定 cylinder 表示铁芯、固定 box 表示绕组。测量电流，文字说明绕组匝数和磁性材料是理论变量；不要把音圈 coil 当成可吸铁的电磁铁。",
+    "variables": [
+      "真实电路电流",
+      "说明中的绕组匝数和铁芯材料"
+    ],
+    "observations": [
+      "开关与电流变化",
+      "电磁铁结构和理论变量"
+    ],
+    "limitations": "没有线圈电流产生场、铁芯磁化、磁滞或吸力求解；图形装配只能用于概念说明。",
+    "models": [
+      "battery",
+      "switch",
+      "resistor",
+      "cylinder",
+      "box"
+    ]
+  },
+  {
+    "id": "K-E2-14",
+    "support": "approximation",
+    "objective": "用音圈直线运动演示电能到机械运动，并说明发电的反向过程为何未实现。",
+    "construction": "将 battery、resistor 组成回路，通过 electrical 连接把电阻支路电流送到 coil；coil 位于 Z 向 field 内。比较电源反向时运动方向，明确这是一维音圈类比。",
+    "variables": [
+      "电源电压和符号",
+      "Bz",
+      "音圈刚度与阻尼"
+    ],
+    "observations": [
+      "音圈位移",
+      "驱动电流",
+      "反向电流时的位移符号"
+    ],
+    "limitations": "不是旋转电动机，也没有运动感应电动势或反电动势回馈；发电机只写结构和能量方向说明，不报告输出电压。",
+    "models": [
+      "battery",
+      "resistor",
+      "coil",
+      "field"
+    ],
+    "formula": "F=Bz·L·I，m ẍ+c ẋ+kx=F。"
+  },
+  {
+    "id": "K-E3-01",
+    "support": "direct",
+    "objective": "通过试探电荷受力与场强读数理解电场强度的定义。",
+    "construction": "固定一个 charge 作为场源，在远离其软化半径的位置放置 probe 与小电量 charge；关闭重力与碰撞。也可用 electric_field 对比匀强场下 F/q 的恒定性。",
+    "variables": [
+      "源电荷量",
+      "试探电荷量",
+      "探针与场源距离"
+    ],
+    "observations": [
+      "probe 电场幅值",
+      "试探粒子外力加速度",
+      "F/q 与场强比较"
+    ],
+    "limitations": "点电荷场使用 0.04 m 软化半径，近距离偏离理想库仑场；试探电荷也会参与相互作用，应固定源并选较小试探量。",
+    "models": [
+      "charge",
+      "probe",
+      "electric_field"
+    ],
+    "formula": "E=F/q；远场 E≈k|Q|/r²。"
+  },
+  {
+    "id": "K-E3-02",
+    "support": "approximation",
+    "objective": "在匀强电场中用场强和位移推算电势差，区分电势与电场。",
+    "construction": "设置 X 向 electric_field，在其作用球内部放两个固定 anchor 作为 A、B 点，再放 probe 读取 E。根据有符号轴向位移手算 Uab，并在 learning 标为理论推算。",
+    "variables": [
+      "场强及方向",
+      "A、B 的轴向间距"
+    ],
+    "observations": [
+      "电场幅值",
+      "理论电势差",
+      "与位移方向的关系"
+    ],
+    "limitations": "求解器不提供空间电势或等势面，电路 voltmeter 不能跨接空间点；球形电场边界也不是自洽真实电极边界。",
+    "models": [
+      "electric_field",
+      "anchor",
+      "probe"
+    ],
+    "formula": "均匀场内部 Uab=E·(rb−ra)，电势沿电场方向降低。"
+  },
+  {
+    "id": "K-E3-03",
+    "support": "direct",
+    "objective": "研究电容储能以及 RC 充电过程中电压与电流的变化。",
+    "construction": "把 battery、resistor、capacitor 串联闭合，voltmeter 并联电容。选 R≈10 Ω、C≈100000 μF，初始电压为零，使秒级暂态可观测。",
+    "variables": [
+      "电容量",
+      "串联电阻",
+      "电源电压",
+      "初始电容电压"
+    ],
+    "observations": [
+      "电容电压随时间变化",
+      "充电电流衰减",
+      "理论储能"
+    ],
+    "limitations": "模型为线性理想电容，后向 Euler 积分有数值耗散；没有漏电、击穿、介质非线性或极板空间场。",
+    "models": [
+      "battery",
+      "resistor",
+      "capacitor",
+      "voltmeter"
+    ],
+    "formula": "Q=CU，W=½CU²，τ≈(R+r)C。"
+  },
+  {
+    "id": "K-E3-04",
+    "support": "direct",
+    "objective": "检验带内阻电源的闭合电路欧姆定律。",
+    "construction": "用 battery 与 resistor 构成闭合回路，明确设置非零电源内阻 r；串联 ammeter、并联 voltmeter。比较测得电流与考虑全部串联电阻的理论值。",
+    "variables": [
+      "电动势 ε",
+      "内阻 r",
+      "外电阻 R"
+    ],
+    "observations": [
+      "回路电流",
+      "路端电压",
+      "内外电压降"
+    ],
+    "limitations": "源内阻线性恒定；需把电流表 1 mΩ 及电压表分流计入高精度比较，不模拟电池化学。",
+    "models": [
+      "battery",
+      "resistor",
+      "ammeter",
+      "voltmeter"
+    ],
+    "formula": "I≈ε/(R+r)，U=ε−Ir。"
+  },
+  {
+    "id": "K-E3-05",
+    "support": "direct",
+    "objective": "绘制外电阻变化时路端电压与电流的关系。",
+    "construction": "给 battery 设置明显内阻，例如 ε=6 V、r=5 Ω，外接 rheostat 与 voltmeter。逐步改变有效外阻，记录 U、I 并保留一个中间阻值。",
+    "variables": [
+      "变阻器有效外阻",
+      "电源内阻"
+    ],
+    "observations": [
+      "路端电压 U",
+      "电流 I",
+      "U−I 变化趋势"
+    ],
+    "limitations": "理想电源加固定串联内阻模型，不包含电量下降、温度、极化和短路保护行为。",
+    "models": [
+      "battery",
+      "rheostat",
+      "voltmeter"
+    ],
+    "formula": "U=εR/(R+r)，U=ε−Ir。"
+  },
+  {
+    "id": "K-E3-06",
+    "support": "direct",
+    "objective": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
+    "construction": "设置 battery 的 ε=6 V、r=10 Ω，外接可调 resistor。分别比较 R=5、10、20 Ω 等配置的负载功率，明确读取负载而非电源带符号功率。",
+    "variables": [
+      "外电阻 R",
+      "内阻 r",
+      "电动势 ε"
+    ],
+    "observations": [
+      "外电阻功率",
+      "匹配点两侧功率",
+      "匹配时的端电压"
+    ],
+    "limitations": "只适用于固定电动势和正线性内阻的直流戴维南模型；最大功率不等于最高效率。",
+    "models": [
+      "battery",
+      "resistor"
+    ],
+    "formula": "P_R=ε²R/(R+r)²，R=r 时达到 ε²/(4r)。"
+  },
+  {
+    "id": "K-E3-07",
+    "support": "direct",
+    "objective": "研究电源输出功率与效率随负载改变的不同趋势。",
+    "construction": "用 battery 和 resistor 构成回路，设已知内阻。改变负载，读取电流与负载功率，并将 P负载/(ε|I电源|) 作为理论效率后处理。",
+    "variables": [
+      "负载电阻",
+      "电源内阻"
+    ],
+    "observations": [
+      "负载功率",
+      "电源提供的理论总功率",
+      "效率与电流的权衡"
+    ],
+    "limitations": "这是电阻内耗下的电路效率，不代表电池化学或电机系统效率；避免用电源端口净功率代替 εI。",
+    "models": [
+      "battery",
+      "resistor"
+    ],
+    "formula": "η=R/(R+r)；R=r 时 η=50%。"
+  },
+  {
+    "id": "K-E3-08",
+    "support": "approximation",
+    "objective": "用一维音圈的受力位移研究电流、有效导线长度与磁场对安培力的影响。",
+    "construction": "将 battery 与 resistor 闭合，使用 electrical 把支路电流驱动 coil，coil 放在 Z 向 field 内。设适中电流与刚度，比较反向电压、反向 Bz 和导线长度变化。",
+    "variables": [
+      "电流及符号",
+      "Bz",
+      "有效导线长度",
+      "悬挂刚度"
+    ],
+    "observations": [
+      "音圈位移",
+      "静态位移对应的弹力",
+      "方向反转"
+    ],
+    "limitations": "有效导线固定沿 Y，运动限 X，只取 Bz；没有任意方向导线、旋转线圈或反电动势回馈。",
+    "models": [
+      "battery",
+      "resistor",
+      "coil",
+      "field"
+    ],
+    "formula": "F_x=Bz·L·I，静态 kx≈F_x。"
+  },
+  {
+    "id": "K-E3-09",
+    "support": "direct",
+    "objective": "检验运动电荷在磁场中的洛伦兹力方向与速度垂直关系。",
+    "construction": "在足够大的 Z 向 field 内放置单个 charge，初速度沿 X，关闭重力、阻尼和碰撞。用 motion_sensor 跟踪速度和加速度，比较电荷符号或 B 符号反转。",
+    "variables": [
+      "电荷量符号",
+      "磁场强度与符号",
+      "初速度"
+    ],
+    "observations": [
+      "初始偏转方向",
+      "加速度与速度的垂直关系",
+      "速度大小"
+    ],
+    "limitations": "使用非相对论宏观带电粒子，电荷单位 μC、质量单位 kg；不能套用电子质量等超出范围的值，也不含辐射损失。",
+    "models": [
+      "charge",
+      "field",
+      "motion_sensor"
+    ],
+    "formula": "F=q(v×B)，B 沿 +Z、q>0、v 沿 +X 时 F 沿 −Y。"
+  },
+  {
+    "id": "K-E3-10",
+    "support": "direct",
+    "objective": "观察匀强磁场内带电粒子的弯曲轨迹并比较回旋尺度。",
+    "construction": "使用 Z 向 field 和单个 charge，关闭重力、阻尼、碰撞；可选 q=50 μC、m=0.01 kg、B=10 T、vx=0.02 m/s，保持粒子位于场区。短时校验后运行更长时间查看轨迹。",
+    "variables": [
+      "电荷量",
+      "质量",
+      "磁场强度",
+      "初速度大小"
+    ],
+    "observations": [
+      "轨迹弯曲",
+      "速度大小",
+      "理论半径和周期"
+    ],
+    "limitations": "参数范围对应教学宏观粒子，示例周期约 126 s；单次 MCP 最长 20 s 只能看到部分圆弧。球形场外磁场直接归零，不模拟边缘场。",
+    "models": [
+      "charge",
+      "field",
+      "motion_sensor"
+    ],
+    "formula": "r=mv⊥/(|q|B)，T=2πm/(|q|B)。"
+  },
+  {
+    "id": "K-E3-11",
+    "support": "conceptual",
+    "objective": "辨别磁通量变化与感应电动势之间的因果关系。",
+    "construction": "用固定 bar_magnet、固定 cylinder 绕组示意和固定 box 电表示意组成装置，改变磁铁位置作为可编辑几何。学习说明列出磁通定义和磁通变化的几种方式。",
+    "variables": [
+      "几何中的磁铁位置",
+      "说明中的绕组面积、匝数和转角"
+    ],
+    "observations": [
+      "磁通改变的情形分类",
+      "理论感应电动势符号"
+    ],
+    "limitations": "没有磁通积分或运动感应电动势求解，不能把手设电源电压或音圈输出当成自动感应结果。",
+    "models": [
+      "bar_magnet",
+      "cylinder",
+      "box"
+    ],
+    "formula": "ε感=−N dΦB/dt，ΦB=∫B·dA。"
+  },
+  {
+    "id": "K-E3-12",
+    "support": "conceptual",
+    "objective": "用磁铁进出线圈的结构示意解释感应电流阻碍磁通变化的方向规则。",
+    "construction": "放置固定 bar_magnet 和固定 cylinder 表示线圈，另用固定 box 标记进入、离开两种位置。将各情况下的磁通变化与感应磁场方向写成说明对照。",
+    "variables": [
+      "磁铁极性说明",
+      "磁铁接近或远离的位置序列"
+    ],
+    "observations": [
+      "磁通增减的判断",
+      "感应磁场及电流方向的理论判断"
+    ],
+    "limitations": "不计算感应电流、磁铁阻力或机械能转化；没有真实时间推进的磁通反馈，方向仅按楞次定律解释。",
+    "models": [
+      "bar_magnet",
+      "cylinder",
+      "box"
+    ],
+    "formula": "感应效应阻碍磁通的变化，而非一概阻碍原磁场。"
+  },
+  {
+    "id": "K-E3-13",
+    "support": "approximation",
+    "objective": "通过 RL 电流建立过程理解自感，同时指出互感需要额外耦合模型。",
+    "construction": "把 battery、resistor、inductor 串联，电感初始电流设零；选 L≈10000 mH、R≈10 Ω 观察秒级上升。可放固定 cylinder 标为“第二绕组：互感未求解”。",
+    "variables": [
+      "电感量 L",
+      "串联电阻 R",
+      "电源电压",
+      "初始电流"
+    ],
+    "observations": [
+      "RL 电流暂态",
+      "电感端电压",
+      "理论时间常数"
+    ],
+    "limitations": "自感可用集中电感计算；两个 inductor 之间没有互感系数或磁耦合，第二绕组不产生感应电压。后向 Euler 带数值耗散。",
+    "models": [
+      "battery",
+      "resistor",
+      "inductor",
+      "cylinder"
+    ],
+    "formula": "自感 uL=L di/dt，τ≈L/(R+r)；互感 ε2=−M di1/dt 仅作理论。"
+  },
+  {
+    "id": "K-E3-14",
+    "support": "direct",
+    "objective": "区分正弦交流的瞬时值、峰值和有效值。",
+    "construction": "使用零偏置 ac_source 与 resistor 闭合，串 ammeter、并 voltmeter。频率取约 1 Hz，以足够采样率覆盖整数周期，对实际瞬时读数计算 RMS。",
+    "variables": [
+      "交流幅值",
+      "频率",
+      "负载电阻"
+    ],
+    "observations": [
+      "瞬时电压和电流",
+      "整数周期的 RMS 后处理",
+      "理论峰值与有效值关系"
+    ],
+    "limitations": "仪表显示瞬时值，不是内置真有效值仪表；RMS 需另算，受采样率、源内阻和采样区间影响。不要用低采样率证明高频波形。",
+    "models": [
+      "ac_source",
+      "resistor",
+      "ammeter",
+      "voltmeter"
+    ],
+    "formula": "纯正弦 U有效=U峰/√2；离散 RMS=√(Σu_i²/n)。"
+  },
+  {
+    "id": "K-E3-15",
+    "support": "conceptual",
+    "objective": "说明理想变压器匝数比与电压、电流比的关系及适用条件。",
+    "construction": "用两个固定 cylinder 表示一次与二次绕组，固定 box 表示共同铁芯；可在一次侧放 ac_source 作输入标识。把匝数比写入说明，二次侧不接人为设置的假感应电源。",
+    "variables": [
+      "理论匝数比",
+      "输入正弦电压的理论有效值",
+      "说明中的负载"
+    ],
+    "observations": [
+      "结构中一次、二次绕组位置",
+      "理想电压比和电流比推导"
+    ],
+    "limitations": "平台没有互感、铁芯磁通或变压器模型，不能产生自动二次输出；独立电感并不构成变压器。",
+    "models": [
+      "cylinder",
+      "box",
+      "ac_source"
+    ],
+    "formula": "理想 U2/U1=N2/N1，I2/I1=N1/N2。"
+  },
+  {
+    "id": "K-E3-16",
+    "support": "direct",
+    "objective": "研究预充电电容与电感之间的能量交换及电阻造成的振荡衰减。",
+    "construction": "把 capacitor、inductor、resistor 串联成无外源闭环，电容设初始电压，电感初始电流设零。选 L=10000 mH、C=100000 μF、R=1 Ω，使振荡在秒级可见。",
+    "variables": [
+      "电容 C",
+      "电感 L",
+      "串联电阻 R",
+      "初始电容电压"
+    ],
+    "observations": [
+      "电容电压与电感电流",
+      "衰减振荡趋势",
+      "理论电场和磁场储能"
+    ],
+    "limitations": "后向 Euler 有额外数值耗散，不能声称无阻电路严格守恒；无电磁辐射、互感和分布参数。观察完整周期需要较长运行。",
+    "models": [
+      "capacitor",
+      "inductor",
+      "resistor"
+    ],
+    "formula": "ω0=1/√(LC)，欠阻尼条件 R<2√(L/C)，W=½CU²+½LI²。"
+  },
+  {
+    "id": "K-E4-01",
+    "support": "conceptual",
+    "objective": "将麦克斯韦四个方程与电荷、磁场、感应和位移电流的物理含义对应。",
+    "construction": "用固定 charge、bar_magnet、probe 搭建静态场展示区域，固定 box 标记“法拉第感应”和“位移电流”理论模块。只把可计算的静态幅值作为局部例子，其余写入学习说明。",
+    "variables": [
+      "静态电荷量",
+      "磁偶极矩",
+      "理论闭合面与回路选择"
+    ],
+    "observations": [
+      "静态场幅值",
+      "四个方程分别描述的物理关系"
+    ],
+    "limitations": "没有麦克斯韦偏微分方程或时域全波求解，静态器具不验证位移电流与波传播；软化源模型只作教学示意。",
+    "models": [
+      "charge",
+      "bar_magnet",
+      "probe",
+      "box"
+    ],
+    "formula": "∇·E=ρ/ε0，∇·B=0，∇×E=−∂B/∂t，∇×B=μ0J+μ0ε0∂E/∂t。"
+  },
+  {
+    "id": "K-E4-02",
+    "support": "conceptual",
+    "objective": "按频率和波长排列电磁波谱，并标出可见光只占其中一小段。",
+    "construction": "用固定 box 按对数尺度位置标注无线电、微波、红外、可见光、紫外、X 射线、γ 射线；放 laser 作为可见光段示例。只在支持的 380–750 nm 内改变激光波长。",
+    "variables": [
+      "可见光激光波长",
+      "各频段的说明标签与对数位置"
+    ],
+    "observations": [
+      "可见光颜色示意",
+      "频率与波长的理论换算"
+    ],
+    "limitations": "激光是几何光线模型，没有跨频段电磁波传播、吸收或辐射剂量计算；不能将超出范围的波长塞入参数。",
+    "models": [
+      "box",
+      "laser"
+    ],
+    "formula": "真空中 c=fλ；谱段边界是约定范围。"
+  },
+  {
+    "id": "K-E4-03",
+    "support": "conceptual",
+    "objective": "解释 PN 结耗尽层、内建电场以及正反偏对势垒的影响。",
+    "construction": "用固定 box 分别表示 P 区、耗尽区和 N 区，以命名、颜色和位置区分；battery 仅作为偏压标记，保持与示意箱体无电路连接。将载流子扩散与漂移写入说明。",
+    "variables": [
+      "示意中的偏压符号",
+      "区域宽度示意",
+      "说明中的掺杂程度"
+    ],
+    "observations": [
+      "PN 结区域划分",
+      "偏压对势垒的理论影响"
+    ],
+    "limitations": "没有半导体载流子、泊松方程、耗尽层或漂移扩散模型；箱体宽度不由电压自动求解。",
+    "models": [
+      "box",
+      "battery"
+    ]
+  },
+  {
+    "id": "K-E4-04",
+    "support": "conceptual",
+    "objective": "理解二极管单向导电与半波、全波整流的基本关系。",
+    "construction": "用固定 box 标记二极管及其阳极、阴极，可放 ac_source 说明输入正弦。把整流后的理想波形写为理论分段函数，不用开关或电阻伪装可自动整流的二极管。",
+    "variables": [
+      "输入幅值与频率",
+      "理论整流方式",
+      "理论导通压降"
+    ],
+    "observations": [
+      "输入波形说明",
+      "理论整流波形与平均值"
+    ],
+    "limitations": "器具库没有二极管、非线性 I–V 或整流求解；不会自动生成整流输出，示意仅支持人和 AI 编辑结构。",
+    "models": [
+      "box",
+      "ac_source"
+    ],
+    "formula": "理想半波整流 u出=max(0,u入)，仅作理论波形。"
+  },
+  {
+    "id": "K-E4-05",
+    "support": "conceptual",
+    "objective": "区分晶体管偏置、输入变化与输出放大的作用。",
+    "construction": "用三个固定 box 表示基极、集电极、发射极，用 battery 与 resistor 表示电源和负载位置。把偏置点、信号输入与输出区域写入学习说明，不接成能假装放大的线性网络。",
+    "variables": [
+      "说明中的静态偏置",
+      "理论电流增益 β",
+      "负载电阻"
+    ],
+    "observations": [
+      "三端结构及输入输出路径",
+      "理论小信号关系"
+    ],
+    "limitations": "没有 BJT/MOSFET、非线性偏置求解、截止饱和或小信号放大模型；电阻电路不能替代晶体管数值仿真。",
+    "models": [
+      "box",
+      "battery",
+      "resistor"
+    ],
+    "formula": "放大区简化关系 IC≈βIB；须注明适用偏置与小信号范围。"
+  },
+  {
+    "id": "K-E4-06",
+    "support": "conceptual",
+    "objective": "用互相垂直的电场、磁场与能流方向理解坡印廷矢量。",
+    "construction": "把 electric_field 设为 X 向、field 设为 Y 向，在同一区域放 probe；固定 box 标注 +Z 理论能流方向。使用设定场分量手算 E×H，明确这些场源独立设置。",
+    "variables": [
+      "电场和磁场强度",
+      "场方向与符号"
+    ],
+    "observations": [
+      "场强幅值",
+      "叉积的理论方向",
+      "理论能流密度"
+    ],
+    "limitations": "独立匀强场不是自洽传播电磁波；不计算真实能量通量、边界能流或辐射。probe 读数只有幅值，叉积方向来自已知设置。",
+    "models": [
+      "electric_field",
+      "field",
+      "probe",
+      "box"
+    ],
+    "formula": "S=E×H；真空 H=B/μ0。"
+  },
+  {
+    "id": "K-O4-01",
+    "support": "direct",
+    "objective": "比较自由传播与两片薄透镜组成的近轴系统，验证矩阵预测的光线高度与倾角。",
+    "construction": "沿 X 轴摆放激光源、两片薄透镜和探测器，选择小光束宽度与小倾角；改变透镜间距，结合画面光线和探测器功率读数，与理论矩阵预测比较。",
+    "variables": [
+      "透镜焦距",
+      "镜间距",
+      "入射小角度"
+    ],
+    "observations": [
+      "出射光束趋势",
+      "探测器接收功率",
+      "理论像面位置"
+    ],
+    "limitations": "仅近轴几何光学；有限的五条采样光线不能给出完整光强分布，ABCD 矩阵由参数另行计算。",
+    "models": [
+      "laser",
+      "lens",
+      "detector"
+    ],
+    "formula": "传播矩阵 P(d)=[[1,d],[0,1]]；薄透镜 L(f)=[[1,0],[-1/f,1]]"
+  },
+  {
+    "id": "K-O4-02",
+    "support": "approximation",
+    "objective": "用分离薄透镜解释复合系统的等效焦距和参考平面变化。",
+    "construction": "将两片薄透镜组成可复用镜组，以小角度激光照射并移动探测器寻找会聚位置；在说明中把该组合标为厚透镜的近轴替代模型。",
+    "variables": [
+      "两片焦距",
+      "镜间距",
+      "探测器位置"
+    ],
+    "observations": [
+      "后焦位置",
+      "理论等效焦距"
+    ],
+    "limitations": "没有折射率、曲面半径或真实厚玻璃追迹；镜组不是任意厚透镜的精确模型。",
+    "models": [
+      "laser",
+      "lens",
+      "detector"
+    ],
+    "formula": "1/f等效=1/f₁+1/f₂−d/(f₁f₂)（空气中）"
+  },
+  {
+    "id": "K-O4-03",
+    "support": "conceptual",
+    "objective": "区分圆孔的几何遮挡与波动光学形成的艾里斑。",
+    "construction": "固定激光源、圆形光阑和探测屏，命名为衍射实验结构示意；改变光阑口径与标注波长，用理论公式另算第一暗环角度。",
+    "variables": [
+      "光阑直径",
+      "理论波长",
+      "屏距"
+    ],
+    "observations": [
+      "几何透过光束",
+      "理论第一暗环大小"
+    ],
+    "limitations": "求解器只有几何光线，不产生衍射或艾里斑；几何接收功率不能当成衍射强度。",
+    "models": [
+      "laser",
+      "aperture",
+      "detector"
+    ],
+    "formula": "小角度第一暗环 θ≈1.22λ/D"
+  },
+  {
+    "id": "K-O4-04",
+    "support": "conceptual",
+    "objective": "比较光学口径和波长对两点分辨能力的理论影响。",
+    "construction": "用两个固定小球标记相邻点源，以透镜与探测屏示意成像路径；保存两点间距和屏距，在说明中按瑞利判据判断。",
+    "variables": [
+      "两点间距",
+      "孔径直径",
+      "理论波长"
+    ],
+    "observations": [
+      "两点角间隔",
+      "理论分辨角"
+    ],
+    "limitations": "没有点扩散函数和双点像强度叠加；不能根据三维图的像素清晰度判断光学分辨率。",
+    "models": [
+      "body",
+      "lens",
+      "detector"
+    ],
+    "formula": "θ最小≈1.22λ/D（圆孔瑞利判据）"
+  },
+  {
+    "id": "K-O4-05",
+    "support": "conceptual",
+    "objective": "理解透镜后焦面对应空间频率分布的条件及空间滤波结构。",
+    "construction": "用固定光阑、两片透镜和探测器搭建 4f 系统示意，镜间距设为两焦距之和；将中间光阑命名为空间滤波面。",
+    "variables": [
+      "镜间距",
+      "焦距",
+      "中间光阑位置与开口"
+    ],
+    "observations": [
+      "4f 几何布局",
+      "理论频率坐标与焦面位置映射"
+    ],
+    "limitations": "没有复振幅、相位或傅里叶变换求解；光阑只能几何遮挡，不能声称生成傅里叶频谱或滤波图像。",
+    "models": [
+      "laser",
+      "lens",
+      "aperture",
+      "detector"
+    ],
+    "formula": "近轴焦面坐标 x≈λf·νx"
+  },
+  {
+    "id": "K-O4-06",
+    "support": "approximation",
+    "objective": "用声波相位叠加类比相干条件，并与激光几何传播区分。",
+    "construction": "两点声源设相同频率和可调相位，麦克风位于等距处；再放置独立激光源作光路标记，明确相干干涉数值来自声学类比。",
+    "variables": [
+      "声源相位差",
+      "频率差",
+      "麦克风位置"
+    ],
+    "observations": [
+      "同相增强与反相抵消",
+      "相位漂移"
+    ],
+    "limitations": "激光模型没有光学相位、谱宽或受激辐射；声压干涉不是激光相干度的定量计算。",
+    "models": [
+      "speaker",
+      "microphone",
+      "laser"
+    ]
+  },
+  {
+    "id": "K-T1-01",
+    "support": "conceptual",
+    "objective": "区分冷暖感受与温度数值，说明冷热由比较对象决定。",
+    "construction": "并排放置三个固定长方体，分别命名为低温、中间温度、高温物体，在 learning 中给出温度示例及比较问题。",
+    "variables": [
+      "标注的温度",
+      "比较顺序"
+    ],
+    "observations": [
+      "相对冷热判断",
+      "温度排序"
+    ],
+    "limitations": "器具没有温度状态或感受模型，颜色和名称仅作教学标注，不会真实传热。",
+    "models": [
+      "box"
+    ]
+  },
+  {
+    "id": "K-T1-02",
+    "support": "conceptual",
+    "objective": "学习温标、量程和分度值，并区分摄氏温度与开尔文温度。",
+    "construction": "以固定细长长方体示意温度计，支点标记两端刻度；说明中设置读数案例和换算表，允许用户修改标注值。",
+    "variables": [
+      "标注读数",
+      "量程",
+      "分度值"
+    ],
+    "observations": [
+      "估读误差范围",
+      "温标换算"
+    ],
+    "limitations": "没有热膨胀测温器具，场强探针不能替代温度计；读数属于题设。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "T/K=t/°C+273.15"
+  },
+  {
+    "id": "K-T1-03",
+    "support": "approximation",
+    "objective": "用一阶弛豫说明温差减小和趋近平衡的趋势。",
+    "construction": "建立电容向电阻放电的闭合回路；将电容电压映射为物体相对环境的温差，将 RC 映射为热时间常数，并把装置命名为热交换电路类比。",
+    "variables": [
+      "初始电压对应初始温差",
+      "电阻",
+      "电容"
+    ],
+    "observations": [
+      "温差类比量的指数衰减",
+      "时间常数"
+    ],
+    "limitations": "这是真实 RC 电路求解，仅类比单一集中热容与恒温环境，不包含空间温度场。",
+    "models": [
+      "capacitor",
+      "resistor",
+      "voltmeter"
+    ],
+    "formula": "ΔT类比(t)=ΔT₀e^(−t/RC)"
+  },
+  {
+    "id": "K-T1-04",
+    "support": "approximation",
+    "objective": "用时间常数比较保温强弱对应的降温快慢。",
+    "construction": "建立两个相同初始电压与电容、不同电阻的放电回路；电阻类比热阻，电容类比热容，比较相同时刻的电压。",
+    "variables": [
+      "类比热阻的电阻",
+      "初始温差",
+      "电容"
+    ],
+    "observations": [
+      "相同时间剩余温差类比量",
+      "达到指定比例的时间"
+    ],
+    "limitations": "未包含真实保温材料、辐射或对流；只适用于线性集总类比。",
+    "models": [
+      "capacitor",
+      "resistor",
+      "voltmeter"
+    ],
+    "formula": "τ类比=RC"
+  },
+  {
+    "id": "K-T2-01",
+    "support": "conceptual",
+    "objective": "理解温度与内能不是同一物理量，物质量也影响内能。",
+    "construction": "用两组不同数量的固定球表示不同物质量的同温样品，以固定长方体作为容器示意；说明中列出同温不同内能的理想气体例子。",
+    "variables": [
+      "标注温度",
+      "粒子数量所代表的物质量"
+    ],
+    "observations": [
+      "同温样品的理论内能比",
+      "温度相同不代表总能量相同"
+    ],
+    "limitations": "球的静止或机械速度不代表分子温度；没有热运动与内能求解。",
+    "models": [
+      "body",
+      "box"
+    ],
+    "formula": "单原子理想气体 U=3nRT/2"
+  },
+  {
+    "id": "K-T2-02",
+    "support": "conceptual",
+    "objective": "区分传导、对流和辐射所需条件。",
+    "construction": "用三个分开的固定结构表示接触导热、流体环流和非接触辐射路径；各用名称标注传递方式，在说明中比较真空条件下的差别。",
+    "variables": [
+      "是否接触",
+      "是否有流体",
+      "是否为真空的题设"
+    ],
+    "observations": [
+      "三种机制的必要条件",
+      "能量传递路径"
+    ],
+    "limitations": "无温度场、流体流动或热辐射引擎；装置只能结构示意，不给出热流读数。",
+    "models": [
+      "box",
+      "anchor",
+      "body"
+    ]
+  },
+  {
+    "id": "K-T2-03",
+    "support": "approximation",
+    "objective": "在输入能量相同的条件下比较不同热容对应的温升。",
+    "construction": "用恒流源对两个不同电容量的电容充电，串联电流表并联电压表；电荷输入类比热量，电容类比总热容，电压变化类比温升。",
+    "variables": [
+      "电容量对应总热容",
+      "恒流输入",
+      "充电时长"
+    ],
+    "observations": [
+      "电压变化",
+      "由 IΔt 计算的电荷量"
+    ],
+    "limitations": "这是 Q电=CΔV 与 Q热=C热ΔT 的数学类比；电能与电荷不能混同，也不代表真实物质比热。",
+    "models": [
+      "current_source",
+      "capacitor",
+      "ammeter",
+      "voltmeter"
+    ],
+    "formula": "Q热=mcΔT；Q电=CΔV"
+  },
+  {
+    "id": "K-T2-04",
+    "support": "conceptual",
+    "objective": "区分晶体相变吸收潜热与单一物态的升温。",
+    "construction": "用固定长方体分区表示固态、固液共存和液态，用支点标记温度平台；在说明中给定质量、比热和潜热，逐段列能量账本。",
+    "variables": [
+      "质量",
+      "比热与熔化潜热的题设",
+      "输入热量"
+    ],
+    "observations": [
+      "理论温度平台",
+      "各阶段能量分配"
+    ],
+    "limitations": "不模拟熔化界面、物态或温度；平台为相变理论示意，不能用弹簧位移冒充温度。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "Q相变=mL；非相变段 Q=mcΔT"
+  },
+  {
+    "id": "K-T2-05",
+    "support": "conceptual",
+    "objective": "比较蒸发与沸腾，并理解汽化潜热。",
+    "construction": "以固定容器、液面标记和少量固定小球示意气相，分别标注表面蒸发和整体沸腾；说明中设置相同质量的汽化能量计算。",
+    "variables": [
+      "题设环境压强",
+      "温度",
+      "汽化质量"
+    ],
+    "observations": [
+      "蒸发与沸腾条件",
+      "潜热需求"
+    ],
+    "limitations": "无蒸汽压、成核、液滴或热流求解；固定粒子仅示意物态。",
+    "models": [
+      "box",
+      "body",
+      "anchor"
+    ],
+    "formula": "Q汽化=mL汽化"
+  },
+  {
+    "id": "K-T2-06",
+    "support": "conceptual",
+    "objective": "在温度和压强条件下区分升华、凝华与经液相的变化。",
+    "construction": "搭建固态、液态、气态三个固定区域，支点标明三相点概念；用说明表格比较干冰式升华与凝华路径。",
+    "variables": [
+      "题设温度",
+      "题设压强",
+      "变化路径"
+    ],
+    "observations": [
+      "经过的物态",
+      "理论相图路径"
+    ],
+    "limitations": "没有物态方程或相图求解；空间位置不对应自动计算的温压。",
+    "models": [
+      "box",
+      "body",
+      "anchor"
+    ]
+  },
+  {
+    "id": "K-T2-07",
+    "support": "conceptual",
+    "objective": "比较相同质量不同燃料和不同质量同种燃料的化学释热量。",
+    "construction": "用固定长方体表示燃料样品与受热物体，分别标注质量、热值和传递效率；在说明中列出能量计算与单位。",
+    "variables": [
+      "题设燃料质量",
+      "热值",
+      "传热效率"
+    ],
+    "observations": [
+      "理论释热量",
+      "进入受热物体的能量"
+    ],
+    "limitations": "不模拟燃烧反应、火焰或污染物，热值来自题设而非器具测量。",
+    "models": [
+      "box"
+    ],
+    "formula": "Q释放=mq"
+  },
+  {
+    "id": "K-T2-08",
+    "support": "conceptual",
+    "objective": "用能量流向区分热机输入热量、有用功与废热。",
+    "construction": "固定长方体分别标为高温热源、热机、低温冷源；以位置和名称显示能量流向，说明中给出 Qh、Qc 与 W 的守恒表。",
+    "variables": [
+      "题设输入热量",
+      "排出热量",
+      "热源温度"
+    ],
+    "observations": [
+      "理论效率",
+      "能量守恒关系"
+    ],
+    "limitations": "无热机循环或热机械耦合模型；不要用电路效率当真实热机效率。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "W=Qh−Qc；η=W/Qh"
+  },
+  {
+    "id": "K-T3-01",
+    "support": "conceptual",
+    "objective": "区分气体压强、体积、温度与物质量，并辨认状态变化时保持不变的量。",
+    "construction": "用固定长方体围成气缸示意，固定板表示活塞；在 learning 中保存两组 p、V、T、n 题设和单位，移动示意活塞对应比较体积。",
+    "variables": [
+      "标注压强",
+      "体积",
+      "绝对温度",
+      "物质量"
+    ],
+    "observations": [
+      "状态量变化",
+      "各量单位及约束"
+    ],
+    "limitations": "没有气体状态方程求解或活塞受压；几何体积只是比例示意。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "理想气体 pV=nRT"
+  },
+  {
+    "id": "K-T3-02",
+    "support": "conceptual",
+    "objective": "在物质量和温度不变时比较压强与体积的反比关系。",
+    "construction": "建立气缸与活塞的固定示意结构，标记 V、2V、V/2 三个位置；说明中列出对应理论压强 p、p/2、2p。",
+    "variables": [
+      "题设体积",
+      "恒定温度",
+      "物质量"
+    ],
+    "observations": [
+      "p-V 关系",
+      "pV 的恒定值"
+    ],
+    "limitations": "无气体碰撞统计或真实压力，活塞不会由压强自动驱动。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "p₁V₁=p₂V₂（等温理想气体）"
+  },
+  {
+    "id": "K-T3-03",
+    "support": "conceptual",
+    "objective": "按中文教材常用的等容查理定律，比较绝对温度变化引起的压强变化。",
+    "construction": "用固定容器示意恒定体积，把三个固定支点命名为不同开尔文温度状态；说明中给出等容 p/T 对照，并注明英文 Charles law 常指等压 V/T 关系。",
+    "variables": [
+      "绝对温度",
+      "恒定体积",
+      "物质量"
+    ],
+    "observations": [
+      "理论 p-T 直线",
+      "使用摄氏温度直接取比值的错误"
+    ],
+    "limitations": "无温度或压力求解，必须明确采用等容定义并使用开尔文温标。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "p₁/T₁=p₂/T₂（n、V 不变）"
+  },
+  {
+    "id": "K-T3-04",
+    "support": "conceptual",
+    "objective": "检查理想气体状态方程中四个状态量的联合约束。",
+    "construction": "以固定容器与活塞表示两种体积，创建可编辑状态标记；在说明中选择三个已知量计算第四个，并列出改变 n 与 T 的两个对照。",
+    "variables": [
+      "题设 p、V、T、n 中三个量",
+      "待求状态量"
+    ],
+    "observations": [
+      "理论状态一致性",
+      "量纲检查"
+    ],
+    "limitations": "未实现气体模型，不能用刚体压力或球数直接替代真实摩尔数；低温高压的非理想效应未包含。",
+    "models": [
+      "box",
+      "body",
+      "anchor"
+    ],
+    "formula": "pV=nRT"
+  },
+  {
+    "id": "K-T3-05",
+    "support": "conceptual",
+    "objective": "统一热量、气体对外做功和内能变化的符号约定。",
+    "construction": "搭建热源、气缸、活塞三个固定示意部件，在说明中设置吸热膨胀、绝热压缩和等容加热三组能量账本。",
+    "variables": [
+      "输入热量 Q",
+      "气体对外做功 W",
+      "过程条件"
+    ],
+    "observations": [
+      "理论内能变化",
+      "符号一致性"
+    ],
+    "limitations": "不存在热力学能量状态；符号和数值由题设推导，不从机械能通道读取内能。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "ΔU=Q−W（W 为系统对外做功）"
+  },
+  {
+    "id": "K-T3-06",
+    "support": "conceptual",
+    "objective": "比较等温、等压、等容过程在 p-V 图上的特点及做功差异。",
+    "construction": "用固定标记表示同一起点和各过程终点，气缸活塞展示体积变化；learning 分别写约束式、终态与曲线下面积含义。",
+    "variables": [
+      "过程类型",
+      "初末体积或压强",
+      "绝对温度"
+    ],
+    "observations": [
+      "理论做功",
+      "内能变化",
+      "过程路径"
+    ],
+    "limitations": "场景不是 p-V 曲线求解器，位置仅为示意；理论积分需单独标明。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "W=∫p dV；等容 W=0"
+  },
+  {
+    "id": "K-T3-07",
+    "support": "conceptual",
+    "objective": "比较闭合热力学循环中净做功与循环方向。",
+    "construction": "用四个固定支点表示循环四个状态，以气缸与两个热源组成示意；在说明中列出每段吸放热、做功及最终内能回到初值。",
+    "variables": [
+      "各状态 p、V、T",
+      "循环方向",
+      "高低温源温度"
+    ],
+    "observations": [
+      "理论净功",
+      "净吸热",
+      "循环面积"
+    ],
+    "limitations": "没有热循环自动积分或可动气体活塞；不可把四个标记之间的机械轨迹当 p-V 循环。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "循环 ΔU=0，W净=Q净"
+  },
+  {
+    "id": "K-T3-08",
+    "support": "conceptual",
+    "objective": "说明能量守恒并不足以判断过程方向，并比较可逆与不可逆熵变。",
+    "construction": "用两个固定热库和中间接触区示意热从高温流向低温；在说明中给出小量热交换的两热库熵变并比较总和。",
+    "variables": [
+      "高低温库的绝对温度",
+      "转移热量",
+      "是否可逆的题设"
+    ],
+    "observations": [
+      "两热库熵变",
+      "总熵产生"
+    ],
+    "limitations": "无热传导或熵状态求解；不可从机械阻尼曲线直接读取熵。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "ΔS总=−Q/Th+Q/Tc≥0（Th>Tc）"
+  },
+  {
+    "id": "K-T4-01",
+    "support": "conceptual",
+    "objective": "区分最概然速率、平均速率和方均根速率，比较温度对分布的影响。",
+    "construction": "用固定容器和少量固定球仅示意气体，把不同温度下的理论速率参数写入说明；不让少量经典球的初值冒充平衡分布。",
+    "variables": [
+      "分子质量",
+      "绝对温度"
+    ],
+    "observations": [
+      "理论最概然速率",
+      "理论方均根速率",
+      "分布展宽趋势"
+    ],
+    "limitations": "没有大粒子数热平衡采样或统计直方图求解，示意球速度不代表麦克斯韦分布。",
+    "models": [
+      "box",
+      "body"
+    ],
+    "formula": "v最概然=√(2kBT/m)，v方均根=√(3kBT/m)"
+  },
+  {
+    "id": "K-T4-02",
+    "support": "conceptual",
+    "objective": "比较单原子和双原子理想气体的有效自由度与平均能量。",
+    "construction": "以固定单球和固定双球组合表示分子种类；在说明中列出平动、转动与振动自由度，并比较经典适用温度范围。",
+    "variables": [
+      "分子类型",
+      "题设温度",
+      "有效自由度"
+    ],
+    "observations": [
+      "理论平均能量",
+      "摩尔定容热容"
+    ],
+    "limitations": "未模拟分子量子转动振动；低温自由度冻结不能由刚体动画证明。",
+    "models": [
+      "body",
+      "anchor"
+    ],
+    "formula": "每个经典二次型自由度平均能量 kBT/2"
+  },
+  {
+    "id": "K-T4-03",
+    "support": "conceptual",
+    "objective": "通过少量粒子在两区的分配计数理解宏观态与微观态。",
+    "construction": "用两个固定区域及四个固定球构成计数示意；在 learning 中列出左侧有 0 至 4 个粒子的组合数，比较最常见宏观态。",
+    "variables": [
+      "示意粒子数",
+      "左右占据数",
+      "区域划分"
+    ],
+    "observations": [
+      "理论组合数",
+      "宏观态概率",
+      "熵差"
+    ],
+    "limitations": "固定球位置用于组合计数，没有随机采样、真实混合或熵的动力学演化。",
+    "models": [
+      "box",
+      "body"
+    ],
+    "formula": "S=kB lnΩ；Ω=C(N,n左)"
+  },
+  {
+    "id": "K-T4-04",
+    "support": "conceptual",
+    "objective": "比较温度改变时黑体辐射谱的峰位和总辐射变化。",
+    "construction": "以固定腔体和小孔标记黑体结构，探测器仅作位置示意；说明中给出普朗克谱的变量与不同温度的理论趋势。",
+    "variables": [
+      "绝对温度",
+      "理论波长",
+      "表面积"
+    ],
+    "observations": [
+      "谱峰移动方向",
+      "理论总辐射增长"
+    ],
+    "limitations": "几何激光源和探测器不产生或测量热辐射谱；不把可见光颜色当完整黑体温度计。",
+    "models": [
+      "box",
+      "aperture",
+      "detector"
+    ],
+    "formula": "Bλ(T)=2hc²/[λ⁵(exp(hc/(λkBT))−1)]"
+  },
+  {
+    "id": "K-T4-05",
+    "support": "conceptual",
+    "objective": "比较温度、面积和发射率对辐射功率的影响。",
+    "construction": "用两块固定板表示辐射体与环境，名称注明绝对温度与面积；说明中计算两组温度下的总辐射和净辐射。",
+    "variables": [
+      "绝对温度",
+      "面积",
+      "发射率",
+      "环境温度"
+    ],
+    "observations": [
+      "理论 T⁴ 比例",
+      "理论净辐射功率"
+    ],
+    "limitations": "没有辐射传热模型；公式中的发射率是题设，不能加到不支持的器具参数中。",
+    "models": [
+      "box"
+    ],
+    "formula": "P净=εσA(T⁴−T环境⁴)"
+  },
+  {
+    "id": "K-T4-06",
+    "support": "conceptual",
+    "objective": "比较温度升高时按波长定义的黑体谱峰如何移动。",
+    "construction": "用固定热源示意体和标记点表示不同温度状态，在说明中计算峰值波长并与可见光范围对照。",
+    "variables": [
+      "绝对温度",
+      "按波长或频率表示谱的选择"
+    ],
+    "observations": [
+      "理论峰值波长",
+      "温度倍增时的峰位比例"
+    ],
+    "limitations": "未求解光谱；按频率的谱峰不能直接用 c/ν峰 代替按波长的谱峰。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "λ峰T≈2.898×10⁻³ m·K"
+  },
+  {
+    "id": "K-N1-01",
+    "support": "conceptual",
+    "objective": "区分宏观物体、分子、原子等结构层次，认识不同物质可由不同粒子构成。",
+    "construction": "用固定长方体表示宏观样品，分别摆放固定单球与固定多球组合表示原子及分子；名称明确是结构符号并注明非真实比例。",
+    "variables": [
+      "示意粒子种类",
+      "组合方式",
+      "结构层次"
+    ],
+    "observations": [
+      "原子与分子的区别",
+      "物质结构层级"
+    ],
+    "limitations": "没有化学键、电子结构或分子作用势；球形器具只是可编辑符号，不模拟真实粒子。",
+    "models": [
+      "box",
+      "body"
+    ]
+  },
+  {
+    "id": "K-N1-02",
+    "support": "conceptual",
+    "objective": "通过数量级比较理解原子尺度与日常尺度的巨大差别。",
+    "construction": "用三个固定球分别标记宏观物体、原子和原子核，并在名称中注明真实尺度的数量级；采用分区示意而非声称同一比例绘制。",
+    "variables": [
+      "题设尺度",
+      "放大倍数",
+      "数量级"
+    ],
+    "observations": [
+      "长度比",
+      "比例图的局限"
+    ],
+    "limitations": "场景长度范围无法同时容纳宏观和原子尺度，图形半径不能作为真实尺度测量。",
+    "models": [
+      "body",
+      "anchor"
+    ]
+  },
+  {
+    "id": "K-N1-03",
+    "support": "conceptual",
+    "objective": "比较地球、太阳系和星系的长度单位，理解用光行时表示距离。",
+    "construction": "三个固定区域分别放置地球、恒星和星系标记，在说明中列出 km、AU、ly 等单位与示例换算；明确各区不共用比例尺。",
+    "variables": [
+      "题设距离",
+      "光行时",
+      "单位选择"
+    ],
+    "observations": [
+      "数量级比较",
+      "单位换算"
+    ],
+    "limitations": "不求解天体引力或宇宙膨胀；场景米制距离仅用于排版。",
+    "models": [
+      "body",
+      "anchor"
+    ],
+    "formula": "静态近似下 d=ct"
+  },
+  {
+    "id": "K-N2-01",
+    "support": "conceptual",
+    "objective": "区分原子核与电子分布，并说明电子不能简单理解为行星式轨道。",
+    "construction": "固定小球组成原子核示意，外围固定标记表示电子分布区域；通过名称和说明区分结构示意与电子概率分布。",
+    "variables": [
+      "示意核电荷数",
+      "电子数",
+      "是否为离子的题设"
+    ],
+    "observations": [
+      "电中性条件",
+      "核与电子尺度差别"
+    ],
+    "limitations": "不启用库仑经典轨道来冒充量子原子；没有波函数或电子云求解。",
+    "models": [
+      "body",
+      "anchor"
+    ],
+    "formula": "中性原子的电子数等于质子数"
+  },
+  {
+    "id": "K-N2-02",
+    "support": "conceptual",
+    "objective": "比较质子、中子和电子的电荷、相对质量及在原子中的角色。",
+    "construction": "建立三组固定球并用不同名称标记粒子类型；在 learning 中列出电荷和相对质量表，再组合一个中性原子和一个同位素示意。",
+    "variables": [
+      "质子数",
+      "中子数",
+      "电子数"
+    ],
+    "observations": [
+      "元素种类",
+      "同位素区别",
+      "净电荷"
+    ],
+    "limitations": "器具质量、电荷范围不是微观粒子真实参数，禁止将场景动力学当成核或电子运动。",
+    "models": [
+      "body",
+      "anchor"
+    ],
+    "formula": "核素质量数 A=Z+N；净电荷=(Z−电子数)e"
+  },
+  {
+    "id": "K-N2-03",
+    "support": "conceptual",
+    "objective": "用质量亏损与结合能区分核能和普通机械能。",
+    "construction": "用固定球组表示初态核与末态核，分区标注各自题设质量；说明中统一原子质量或核质量口径后计算能量差。",
+    "variables": [
+      "题设初末态质量",
+      "粒子计数",
+      "质量单位"
+    ],
+    "observations": [
+      "质量亏损",
+      "理论释放或吸收能量"
+    ],
+    "limitations": "不模拟核力、核反应速率或辐射输运；场景机械能不包含静质量能。",
+    "models": [
+      "body",
+      "anchor"
+    ],
+    "formula": "ΔE=Δmc²"
+  },
+  {
+    "id": "K-N2-04",
+    "support": "conceptual",
+    "objective": "通过半衰期比较不同放射性核素的数量衰减和活度。",
+    "construction": "用固定球组表示初始样品，以固定支点标注 0、1、2、3 个半衰期；在说明中计算各时刻剩余比例，不把固定小球消失做成伪测量。",
+    "variables": [
+      "题设半衰期",
+      "初始核数",
+      "经过时间"
+    ],
+    "observations": [
+      "理论剩余核数",
+      "理论活度"
+    ],
+    "limitations": "没有随机核衰变、探测器计数或辐射剂量模型；该场景只作教学计数示意。",
+    "models": [
+      "body",
+      "anchor"
+    ],
+    "formula": "N(t)=N₀·2^(−t/T半)；A=λN"
+  },
+  {
+    "id": "K-N3-01",
+    "support": "conceptual",
+    "objective": "区分光照频率阈值与光强对光电效应的不同作用。",
+    "construction": "固定激光源照向固定板，板旁放置探测位置标记；在说明中给出材料逸出功，分别改变标注频率与入射功率计算最大动能。",
+    "variables": [
+      "光源波长所对应频率",
+      "光功率",
+      "题设逸出功"
+    ],
+    "observations": [
+      "理论截止频率",
+      "最大电子动能",
+      "光强与频率作用差别"
+    ],
+    "limitations": "光电探测器只统计几何光功率，不生成电子或截止电压；不能用接收功率冒充光电流。",
+    "models": [
+      "laser",
+      "box",
+      "anchor"
+    ],
+    "formula": "K最大=hν−W₀，需 hν≥W₀"
+  },
+  {
+    "id": "K-N3-02",
+    "support": "conceptual",
+    "objective": "比较不同波长下单光子能量，并区分单光子能量和总光功率。",
+    "construction": "并排放置两台固定激光源，设置不同可见波长和相同功率；在说明中由波长计算单光子能量，再估算同功率光子通量。",
+    "variables": [
+      "波长",
+      "光功率"
+    ],
+    "observations": [
+      "理论单光子能量",
+      "理论单位时间光子数"
+    ],
+    "limitations": "激光渲染为连续几何光束，没有光子计数；波长改变不引入量子事件。",
+    "models": [
+      "laser"
+    ],
+    "formula": "E光子=hc/λ；光子通量=P/E光子"
+  },
+  {
+    "id": "K-N3-03",
+    "support": "conceptual",
+    "objective": "区分干涉显示的波动性质与探测事件显示的量子性。",
+    "construction": "用固定激光源、双路径标记和探测屏搭建实验结构示意；在说明中分别列出波幅叠加与单次探测概率的作用。",
+    "variables": [
+      "题设路径差",
+      "是否保留路径信息",
+      "观测次数"
+    ],
+    "observations": [
+      "理论干涉条件",
+      "单事件与统计分布的区别"
+    ],
+    "limitations": "没有光学波幅、量子测量或光子事件采样；几何光线分叉不等于量子叠加。",
+    "models": [
+      "laser",
+      "anchor",
+      "detector"
+    ]
+  },
+  {
+    "id": "K-N3-04",
+    "support": "conceptual",
+    "objective": "用离散能级差解释吸收与发射光子的频率。",
+    "construction": "用不同高度的固定长方体表示离散能级，支点标记允许讨论的跃迁；在说明中列出能级数值与对应频率，明确高度只代表能量。",
+    "variables": [
+      "题设能级",
+      "选定初末态",
+      "跃迁方向"
+    ],
+    "observations": [
+      "能级差",
+      "理论光子频率",
+      "吸收与发射区别"
+    ],
+    "limitations": "不计算原子波函数或选择定则，未给出的跃迁是否允许不能仅凭两能级存在判断。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "hν=|E高−E低|"
+  },
+  {
+    "id": "K-N3-05",
+    "support": "conceptual",
+    "objective": "将离散能级差与线状光谱对应，并区别发射谱和吸收谱。",
+    "construction": "用固定能级标记和一排固定谱线标记组成两区示意；在说明中给定若干能级差，计算波长后为谱线命名。",
+    "variables": [
+      "题设能级差",
+      "跃迁集合",
+      "背景连续谱条件"
+    ],
+    "observations": [
+      "理论谱线波长",
+      "同一元素特征谱的含义"
+    ],
+    "limitations": "没有光谱仪、展宽、强度或选择定则求解；彩色标记不是实际测得光谱。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "λ=hc/ΔE"
+  },
+  {
+    "id": "K-N3-06",
+    "support": "conceptual",
+    "objective": "通过核子数和电荷守恒理解裂变前后结构及能量来源。",
+    "construction": "以固定球组表示一个重核和两个裂变碎片，另放固定中子标记；在说明中选一个守恒的教材反应例，核对质量数、电荷数和质量差。",
+    "variables": [
+      "题设反应道",
+      "初末态质量",
+      "中子数"
+    ],
+    "observations": [
+      "核子数守恒",
+      "电荷守恒",
+      "理论质量差能量"
+    ],
+    "limitations": "只作核反应概念示意，不模拟链式反应、材料临界性或反应装置。",
+    "models": [
+      "body",
+      "anchor"
+    ],
+    "formula": "A、Z 守恒；Q=(m初−m末)c²"
+  },
+  {
+    "id": "K-N3-07",
+    "support": "conceptual",
+    "objective": "比较轻核结合前后结合能变化，理解聚变需要克服的势垒。",
+    "construction": "固定球组分别表示两个轻核与产物核，空间间隔仅表示初末态；说明中列出教材反应的核子与电荷守恒及能量账本。",
+    "variables": [
+      "题设反应类型",
+      "初末态质量",
+      "势垒示意高度"
+    ],
+    "observations": [
+      "守恒量",
+      "理论反应能量",
+      "势垒与结合能的区别"
+    ],
+    "limitations": "没有核力、隧穿率、等离子体或反应速率求解，不用经典带电球碰撞冒充聚变。",
+    "models": [
+      "body",
+      "anchor"
+    ],
+    "formula": "Q=(m初−m末)c²"
+  },
+  {
+    "id": "K-N4-01",
+    "support": "conceptual",
+    "objective": "用一维无限深势阱说明边界条件、波函数归一化与能级离散。",
+    "construction": "固定长方体表示势阱边界，固定支点标出阱宽与节点位置；在说明中对 n=1、2、3 列出波函数和能级，注明空间模型不是粒子轨迹。",
+    "variables": [
+      "理论阱宽 L",
+      "量子数 n",
+      "粒子质量"
+    ],
+    "observations": [
+      "理论节点数",
+      "能级比例",
+      "概率密度归一化"
+    ],
+    "limitations": "未实现薛定谔方程、复数波函数或概率采样；固定几何标记仅表征理论结构。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "Eₙ=n²π²ℏ²/(2mL²)，ψₙ=√(2/L)sin(nπx/L)"
+  },
+  {
+    "id": "K-N4-02",
+    "support": "conceptual",
+    "objective": "区分量子位置与动量分布宽度的关系和测量仪器误差。",
+    "construction": "用两组固定边界标记不同空间宽度的波包示意，旁置固定动量区间标记；在说明中比较满足最小不确定度的高斯波包。",
+    "variables": [
+      "理论位置标准差",
+      "理论动量标准差",
+      "波包类型"
+    ],
+    "observations": [
+      "不确定度乘积",
+      "窄位置分布对应宽动量分布"
+    ],
+    "limitations": "没有波包演化或量子测量；不可用经典轨迹位置误差代替量子不确定度。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "ΔxΔp≥ℏ/2"
+  },
+  {
+    "id": "K-N4-03",
+    "support": "conceptual",
+    "objective": "比较势垒高度与宽度对量子透射概率的影响，明确 E<V 时仍可能透射。",
+    "construction": "固定长方体表示有限矩形势垒，固定标记表示入射、反射和透射区域；在说明中给定 E、V₀、a、m 并比较理论指数趋势。",
+    "variables": [
+      "势垒宽度",
+      "势垒高度与粒子能量差",
+      "粒子质量"
+    ],
+    "observations": [
+      "理论透射率随宽度的变化",
+      "经典与量子预测区别"
+    ],
+    "limitations": "未求解波函数匹配；禁止让经典小球穿墙后称作量子隧穿，指数式仅为厚势垒近似。",
+    "models": [
+      "box",
+      "anchor"
+    ],
+    "formula": "厚势垒 T∝e^(−2κa)，κ=√(2m(V₀−E))/ℏ"
+  },
+  {
+    "id": "K-N4-04",
+    "support": "conceptual",
+    "objective": "用价带、导带和带隙理解光子吸收阈值与材料分类。",
+    "construction": "两块固定长方体表示价带和导带，中间间距标记带隙；固定激光源作照明符号，说明中比较 hν 与 Eg。",
+    "variables": [
+      "题设带隙",
+      "光子频率",
+      "材料类型"
+    ],
+    "observations": [
+      "理论吸收阈值",
+      "导带价带间隔"
+    ],
+    "limitations": "没有能带结构、载流子输运或复合模型；几何距离和激光接收功率不是带隙的求解结果。",
+    "models": [
+      "box",
+      "laser",
+      "anchor"
+    ],
+    "formula": "理想带间吸收阈值 hν≥Eg"
+  },
+  {
+    "id": "K-N4-05",
+    "support": "conceptual",
+    "objective": "比较温度与化学势如何改变费米子能态的平均占据概率。",
+    "construction": "用分层固定支点代表若干能级，以固定球仅作占据示意；在说明中按题设 E、μ、T 计算概率表，比较低温与有限温度。",
+    "variables": [
+      "能量相对化学势的差值",
+      "绝对温度"
+    ],
+    "observations": [
+      "理论占据概率",
+      "费米边缘的热展宽"
+    ],
+    "limitations": "没有量子统计求解或电子粒子采样；示意球数量不是自动采样的费米分布。",
+    "models": [
+      "anchor",
+      "body"
+    ],
+    "formula": "f(E)=1/[exp((E−μ)/(kBT))+1]"
+  },
+  {
+    "id": "K-N4-06",
+    "support": "conceptual",
+    "objective": "理解单结太阳能电池的详细平衡效率限制来自光谱、带隙和辐射复合的共同约束。",
+    "construction": "固定板代表单结吸收体，固定激光源和探测器只示意入射与发射通道；在说明中分别列出带隙以下不吸收、高能光子热化和辐射复合损失。",
+    "variables": [
+      "题设带隙",
+      "入射光谱",
+      "电池温度",
+      "是否聚光的假设"
+    ],
+    "observations": [
+      "理论光生与辐射复合电流平衡",
+      "输出功率最大点",
+      "效率定义"
+    ],
+    "limitations": "无太阳光谱积分、半导体二极管或辐射复合引擎，不能由电阻负载或激光功率得到 S–Q 极限数值；只搭结构并列计算步骤。",
+    "models": [
+      "box",
+      "laser",
+      "detector"
+    ],
+    "formula": "η=P最大/P入射；详细平衡需求 J(V) 并最大化 VJ(V)"
+  }
+]

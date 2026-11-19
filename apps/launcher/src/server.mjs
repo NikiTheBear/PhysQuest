@@ -37,6 +37,82 @@ const CONFIG_FILE = join(APP, 'config.local.json');
 const PORT = Number(process.env.PORT ?? 8787);
 const HOST = '127.0.0.1';
 
+/**
+ * 自由搭建工作台（Fieldlab）是另一个服务，默认跑在 4317。
+ * 这个启动器把它的路径反向代理过来，这样学生只需要开一个地址。
+ *
+ * 哪些路径是我们自己的，哪些转给 Fieldlab，见下面的 route 判断。
+ */
+const FIELDLAB_PORT = Number(process.env.FIELDLAB_PORT ?? 4317);
+const FIELDLAB = `http://127.0.0.1:${FIELDLAB_PORT}`;
+
+/** 这些前缀属于 Fieldlab，转发过去 */
+const FIELDLAB_PREFIXES = ['/workbench', '/mcp', '/experiments', '/prompts'];
+const FIELDLAB_FILES = new Set([
+  '/app.js',
+  '/style.css',
+  '/light.css',
+  '/favicon.svg',
+  '/markdown.js',
+]);
+
+/** /api/* 里哪些属于 Fieldlab（其余 /api/health、/api/llm 是我们自己的） */
+const FIELDLAB_API = new Set(['/api/state', '/api/ai/chat', '/api/command']);
+
+function isFieldlabPath(pathname) {
+  if (FIELDLAB_FILES.has(pathname)) return true;
+  if (FIELDLAB_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))) return true;
+  if (FIELDLAB_API.has(pathname)) return true;
+  return false;
+}
+
+/** 反向代理到 Fieldlab */
+async function proxyToFieldlab(req, res, url) {
+  const target = FIELDLAB + url.pathname + url.search;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 120000);
+
+  try {
+    const method = req.method ?? 'GET';
+    const hasBody = method !== 'GET' && method !== 'HEAD';
+    const body = hasBody ? await readBody(req) : undefined;
+
+    const headers = {};
+    for (const [k, v] of Object.entries(req.headers)) {
+      if (['host', 'connection', 'content-length', 'accept-encoding'].includes(k)) continue;
+      if (typeof v === 'string') headers[k] = v;
+    }
+    if (hasBody) headers['content-length'] = String(Buffer.byteLength(body));
+
+    const upstream = await fetch(target, {
+      method,
+      headers,
+      body,
+      signal: ctrl.signal,
+      redirect: 'manual',
+    });
+
+    const buf = Buffer.from(await upstream.arrayBuffer());
+    const out = {};
+    upstream.headers.forEach((v, k) => {
+      if (['content-encoding', 'transfer-encoding', 'connection'].includes(k)) return;
+      out[k] = v;
+    });
+    res.writeHead(upstream.status, out);
+    res.end(buf);
+  } catch (e) {
+    const aborted = e.name === 'AbortError';
+    const msg = aborted ? '工作台响应超时' : '连不上工作台';
+    res.writeHead(aborted ? 504 : 502, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(
+      `${msg}（127.0.0.1:${FIELDLAB_PORT}）。\n` +
+        `请另开一个终端，在项目根目录运行：node scripts/run-platform.mjs`,
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function loadConfig() {
   if (!existsSync(CONFIG_FILE)) return {};
   try {
@@ -132,6 +208,12 @@ const server = createServer(async (req, res) => {
   const origin = req.headers.origin ?? '';
 
   try {
+    /* ---------- 转发给 Fieldlab ---------- */
+    if (isFieldlabPath(url.pathname)) {
+      await proxyToFieldlab(req, res, url);
+      return;
+    }
+
     /* ---------- 健康检查 ---------- */
     if (url.pathname === '/api/health') {
       sendJSON(
@@ -143,6 +225,7 @@ const server = createServer(async (req, res) => {
           runtime: `node ${process.version}`,
           hasConfig: Boolean(CONFIG.apiKey),
           model: CONFIG.model ?? null,
+          fieldlab: FIELDLAB,
         },
         200,
         origin,

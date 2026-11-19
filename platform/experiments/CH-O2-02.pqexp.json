@@ -1,0 +1,93 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "让像比蜡烛大三倍",
+    "description": "调到放大率大约 3 倍，看看这时候光屏要放到多远。",
+    "source": {
+      "project": "PhysQuest",
+      "commit": "d1e6abd934ec0d43b90bfccad145f2778056f8b1",
+      "license": "MIT",
+      "challengeId": "CH-O2-02"
+    }
+  },
+  "experiment": {
+    "id": "CH-O2-02",
+    "title": "让像比蜡烛大三倍",
+    "goal": "调到放大率大约 3 倍，看看这时候光屏要放到多远。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.81,
+      "damping": 0.02,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "lens-bench",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 20,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 20,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "id": "CH-O2-02",
+      "labId": "optics-lens",
+      "title": "让像比蜡烛大三倍",
+      "brief": "调到放大率大约 3 倍，看看这时候光屏要放到多远。",
+      "hint": "想放大，物体就得离透镜更近一点——但别越过焦距。",
+      "winCondition": {
+        "metric": "m",
+        "op": "≈",
+        "value": -3,
+        "tolerance": 0.4
+      },
+      "multiAnswer": false,
+      "knowledgeIds": [
+        "K-O2-07",
+        "K-O2-11"
+      ],
+      "misconceptionIds": [
+        "MIS-O2-05",
+        "MIS-O2-06"
+      ],
+      "demoScriptId": "demo-magnify",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "要让像变大，你觉得物体该往哪个方向挪？",
+        "options": [
+          "离透镜更远",
+          "离透镜更近（但仍在焦距以外）",
+          "往哪个方向都一样"
+        ],
+        "answerIndex": 1
+      }
+    },
+    "source": {
+      "project": "PhysQuest",
+      "commit": "d1e6abd934ec0d43b90bfccad145f2778056f8b1",
+      "license": "MIT",
+      "challengeId": "CH-O2-02"
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "让像和蜡烛一样大",
+    "description": "把蜡烛挪一挪，让光屏上的像恰好和蜡烛一样大。",
+    "source": {
+      "project": "PhysQuest",
+      "commit": "d1e6abd934ec0d43b90bfccad145f2778056f8b1",
+      "license": "MIT",
+      "challengeId": "CH-O2-01"
+    }
+  },
+  "experiment": {
+    "id": "CH-O2-01",
+    "title": "让像和蜡烛一样大",
+    "goal": "把蜡烛挪一挪，让光屏上的像恰好和蜡烛一样大。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.81,
+      "damping": 0.02,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "lens-bench",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 30,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 15,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "id": "CH-O2-01",
+      "labId": "optics-lens",
+      "title": "让像和蜡烛一样大",
+      "brief": "把蜡烛挪一挪，让光屏上的像恰好和蜡烛一样大。",
+      "hint": "一倍焦距不够，三倍焦距太多。中间有个特殊的位置。",
+      "winCondition": {
+        "metric": "m",
+        "op": "≈",
+        "value": -1,
+        "tolerance": 0.06
+      },
+      "multiAnswer": false,
+      "knowledgeIds": [
+        "K-O2-06"
+      ],
+      "misconceptionIds": [
+        "MIS-O2-05"
+      ],
+      "demoScriptId": "demo-equal-2f",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "先把蜡烛放在两倍焦距以外，再把光屏挪到像能清楚出现的地方。你猜屏上的像会是什么样？",
+        "options": [
+          "倒立、比蜡烛小",
+          "倒立、和蜡烛一样大",
+          "正立、比蜡烛大"
+        ],
+        "answerIndex": 0
+      }
+    },
+    "source": {
+      "project": "PhysQuest",
+      "commit": "d1e6abd934ec0d43b90bfccad145f2778056f8b1",
+      "license": "MIT",
+      "challengeId": "CH-O2-01"
+    }
+  }
+}

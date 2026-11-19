@@ -88,17 +88,16 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
       {/* ================= 模块入口 ================= */}
       <div className="module-grid">
         {LABS.map((lab) => {
-          const readyItems = disciplines
-            .filter((d) => d.key === lab.discipline)
-            .flatMap((d) => d.stages.filter((s) => s.status === 'ready').flatMap((s) => s.items));
-          const cardCount = KNOWLEDGE.filter((k) => lab.stages.includes(k.stage)).length;
-          const challengeCount = CHALLENGES.length;
-
+          const isFree = lab.mode === 'free';
           return (
-            <button key={lab.id} className="module-card" onClick={() => onOpenModule(lab.id)}>
+            <button
+              key={lab.id}
+              className={`module-card ${isFree ? 'is-free' : ''}`}
+              onClick={() => onOpenModule(lab.id)}
+            >
               <div className="module-card-top">
-                <span className="module-icon">◉</span>
-                <span className="badge on">可动手</span>
+                <span className="module-icon">{isFree ? '◎' : '◉'}</span>
+                <span className={`badge ${isFree ? 'free' : 'on'}`}>{lab.badge}</span>
               </div>
               <h3>{lab.title}</h3>
               <p className="module-sub">{lab.subtitle}</p>
@@ -111,9 +110,9 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
                 ))}
               </div>
               <div className="module-meta">
-                <span>{challengeCount} 个挑战</span>
-                <span>{readyItems.length} 个知识点</span>
-                {cardCount > 0 && <span>{cardCount} 张卡</span>}
+                {lab.stats.map((t) => (
+                  <span key={t}>{t}</span>
+                ))}
                 <span className="arrow">→</span>
               </div>
             </button>

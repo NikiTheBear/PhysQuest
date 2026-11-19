@@ -43,7 +43,7 @@ export const LABS: LabMeta[] = [
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
-    stats: ['6 个挑战', '26 个知识点', '26 张卡'],
+    stats: ['6 个挑战', '21 个知识点', '21 张卡'],
   },
   {
     id: 'fieldlab',
@@ -55,7 +55,7 @@ export const LABS: LabMeta[] = [
       '从空白空间开始，自己摆器具、连线路、跑仿真。可以让 AI 一起搭，也可以自己动手。',
     badge: '自由',
     mode: 'free',
-    stats: ['43 种器具', '2D / 3D', 'AI 协作'],
+    stats: ['46 种器具', '2D / 3D', 'AI 协作'],
   },
 ];
 

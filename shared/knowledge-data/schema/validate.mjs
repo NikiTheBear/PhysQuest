@@ -109,9 +109,15 @@ misconceptions.misconceptions.forEach((m, i) => {
 /* ---------- 5. 检查挑战 ---------- */
 challenges.challenges.forEach((c, i) => {
   const at = `challenges.json 第 ${i + 1} 个（${c.id ?? '无 id'}）`;
-  ['id', 'title', 'brief', 'hint', 'winCondition', 'prediction'].forEach((f) => {
+  ['id', 'title', 'brief', 'hint', 'prediction'].forEach((f) => {
     if (!c[f]) errors.push(`${at}：缺字段 ${f}`);
   });
+  // guided 挑战用 winCondition（本地引擎判定），free 挑战用 goal（工作台读数判定）
+  if (c.kind === 'free') {
+    if (!c.goal) errors.push(`${at}：自由搭建的挑战必须有 goal 字段`);
+  } else if (!c.winCondition) {
+    errors.push(`${at}：缺字段 winCondition`);
+  }
   (c.knowledgeIds ?? []).forEach((k) => {
     if (!kIds.has(k)) errors.push(`${at}：引用不存在的知识点 ${k}`);
   });

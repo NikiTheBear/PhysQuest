@@ -1,3 +1,4 @@
+import {lensTrain} from './lens-train.js';
 import { CATALOG, RIGID_KINDS, CIRCUIT_KINDS, SOUND_KINDS, LENS_KINDS, LINK_KINDS } from './catalog.js';
 import { solve as solveLens } from './physquest-lens.js';
 import { Circuit } from './circuit.js';
@@ -30,6 +31,7 @@ export function fieldAt(doc, point, bodies = null, exclude = '') {
 export class Simulation {
   constructor(doc) { this.reset(doc); }
   reset(doc) {
+    this.opticalTrain=lensTrain(doc.components);
     this.doc = structuredClone(doc); this.time = 0; this.steps = 0;
     this.bodies = new Map(doc.components.map(c => [c.id, {
       position: c.position.map((v, i) => doc.mode === '2d' && i === 2 ? 0 : v + (c.kind === 'coil' && i === 0 ? c.params.displacement : 0)),
@@ -139,13 +141,13 @@ export class Simulation {
       let dir=[Math.cos(a),Math.sin(a),0],origin=add(this.bodies.get(source.id).position,mul([-dir[1],dir[0],0],source.params.width*i/2));
       let power=source.params.power*this.modulation(source.id,'optical')/5;
       let lastId=source.id;
-      for(let bounce=0;bounce<8;bounce++) {
+      for(let bounce=0;bounce<Math.min(72,8+this.doc.components.length);bounce++) {
         let best=null;
         for(const c of this.doc.components.filter(c=>[...LENS_KINDS,'mirror','detector','aperture','optical_filter'].includes(c.kind)&&c.id!==lastId)) {
           const pos=this.bodies.get(c.id).position, angle=(c.params.angle||0)*Math.PI/180,n=[Math.cos(angle),Math.sin(angle),0],den=dot(dir,n);
           if(Math.abs(den)<1e-6)continue;
           const distance=dot(sub(pos,origin),n)/den;
-          if(distance<=.001||distance>30)continue;
+          if(distance<=1e-7||distance>30)continue;
           const hit=add(origin,mul(dir,distance));
           if(norm(sub(hit,pos))>c.params.radius)continue;
           if(!best||distance<best.distance)best={c,hit,n,pos,distance};
@@ -161,7 +163,7 @@ export class Simulation {
           // Paraxial thin-lens slope change: theta_out = theta_in - h/f.
           dir=unit(add(axis,sub(mul(sub(dir,mul(axis,normalPart)),1/Math.max(.001,normalPart)),mul(height,1/best.c.params.focal))));
         }
-        origin=add(end,mul(dir,.002));lastId=best.c.id;
+        origin=end;lastId=best.c.id;
       }
     }
     return segments;
@@ -197,6 +199,11 @@ export class Simulation {
       if(c.kind==='force'){value=norm([p.fx,p.fy,p.fz]);unitLabel='N';}
       if(CIRCUIT_KINDS.includes(c.kind)){const r=this.circuit.readings[c.id];if(r){value=['battery','ac_source','capacitor','voltmeter'].includes(c.kind)?r.voltage:r.current;unitLabel=['battery','ac_source','capacitor','voltmeter'].includes(c.kind)?'V':'A';channels[c.id+':V']={value:r.voltage,unit:'V',label:c.name+' · 电压',kind:c.kind};channels[c.id+':I']={value:r.current,unit:'A',label:c.name+' · 电流',kind:c.kind};channels[c.id+':P']={value:r.power,unit:'W',label:c.name+' · 功率',kind:c.kind};}}
       channels[c.id]={value,unit:unitLabel,label,kind:c.kind};
+    }
+    if(this.opticalTrain){
+      for(const [key,label] of [['effectiveFocal','镜组合成焦距'],['backFocal','末片至后焦点']]){
+        const distance=this.opticalTrain[key];channels['optics:'+key]={value:distance===null?0:1000*distance,valid:distance!==null,unit:'mm',label};
+      }
     }
     this.readings={energy,speed:maxSpeed,pressure:totalPressure,light,channels,circuit:{warnings:this.circuit.warnings,error:this.circuit.error||null,branches:this.circuit.readings}};return this.readings;
   }

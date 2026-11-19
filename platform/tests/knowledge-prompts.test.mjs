@@ -81,6 +81,7 @@ test('a card can build beyond eight replies and retain its objective',async()=>{
    return response({content:'搭建完成'});
  }});
  assert.equal(round,10);
+ assert.ok(activeExperiment(result.workspace).observation.includes(getKnowledgePrompt(result.build.knowledgeId).observations[0]));
  assert.ok(activeExperiment(result.workspace).goal.includes(getKnowledgePrompt(result.build.knowledgeId).objective));
 });
 

@@ -121,6 +121,14 @@ export type RigElementId =
 export interface Challenge {
   id: string;
   labId: string;
+  /**
+   * 用哪种实验台完成
+   *   guided（默认）—— 我们自己的双屏实验台，参数由本地引擎算
+   *   free           —— 交给 Fieldlab 自由搭建工作台，学生自己摆器具
+   */
+  kind?: 'guided' | 'free';
+  /** kind==='free' 时的目标判定，由 Fieldlab 的仿真读数提供 */
+  goal?: FreeGoal;
   title: string;
   /** 一句话任务说明，越短越好 */
   brief: string;
@@ -135,6 +143,16 @@ export interface Challenge {
   difficulty: 'beginner' | 'advanced';
   /** 进入实验台之前先让学生猜的那个问题 */
   prediction: PredictionQuestion;
+}
+
+export interface FreeGoal {
+  /** Fieldlab 读数里的哪个量 */
+  metric: 'magnification' | 'image_distance' | 'image_height' | 'real';
+  op: '≈' | '<' | '>' | 'true' | 'false';
+  value: number | boolean;
+  tolerance?: number;
+  /** 从哪个器具的读数里取（Fieldlab 的器具 key） */
+  readFrom: string;
 }
 
 export interface WinCondition {

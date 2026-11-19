@@ -207,6 +207,13 @@ export default function App() {
 
   const beginChallenge = useCallback(
     (c: Challenge) => {
+      // 第 6 关这种「自己搭」的挑战，交给 Fieldlab
+      if (c.kind === 'free') {
+        setChallenge(c);
+        setLabId('optics-lens');
+        setView('free');
+        return;
+      }
       const meta = labById(labId ?? 'optics-lens');
       setChallenge(c);
       setParams({ ...(meta?.defaultParams ?? DEFAULT_LENS_PARAMS), ...presetFor(c) });
@@ -218,6 +225,21 @@ export default function App() {
     },
     [learner, labId],
   );
+
+  /** 从快照里读出凸透镜光具座的放大率（Fieldlab 的通道名是 `<id>:m`，label 含「放大率」） */
+  const readMetric = (snap: CaptureSnapshot, metric: string): number | null => {
+    const ch = snap.readings?.channels ?? {};
+    for (const [key, val] of Object.entries(ch)) {
+      if (!val || typeof val.value !== 'number' || val.valid === false) continue;
+      if (key.endsWith(':' + metric)) return val.value;
+    }
+    return null;
+  };
+
+  const readMagnification = (snap: CaptureSnapshot): number | null => {
+    const m = readMetric(snap, 'm');
+    return m === null ? null : Math.abs(m);
+  };
 
   /** 自由搭建：把「记录此刻」的快照存下来 */
   const handleCapture = useCallback((snap: CaptureSnapshot) => {
@@ -522,6 +544,29 @@ export default function App() {
             onCapture={handleCapture}
             buildRequest={buildRequest}
             onMessage={setToast}
+            goal={
+              challenge?.kind === 'free' && challenge.goal
+                ? {
+                    title: challenge.title,
+                    description: challenge.brief,
+                    check: (snap) => {
+                      const g = challenge.goal!;
+                      if (g.metric !== 'magnification') return null;
+                      const m = readMagnification(snap);
+                      if (m === null)
+                        return { ok: false, detail: '没读到光具座的读数——先放一个「凸透镜光具座」再试' };
+                      const target = Number(g.value);
+                      const tol = g.tolerance ?? 0.3;
+                      const ok = Math.abs(m - target) <= tol;
+                      return {
+                        ok,
+                        detail: `当前放大 ${m.toFixed(2)} 倍，目标 ${target} 倍${ok ? '' : `（差 ${Math.abs(m - target).toFixed(2)}）`}`,
+                      };
+                    },
+                  }
+                : null
+            }
+            onGoalReached={() => setToast('目标达成！')}
           />
         )}
 

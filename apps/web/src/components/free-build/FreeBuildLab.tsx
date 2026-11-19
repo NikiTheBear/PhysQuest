@@ -48,6 +48,14 @@ interface Props {
   /** 想用某个知识点提示词搭建时传进来 */
   buildRequest?: { knowledgeId: string; title: string; prompt: string } | null;
   onMessage?: (text: string) => void;
+  /** 第 6 关这种「带着目标搭」的场景 */
+  goal?: {
+    title: string;
+    description: string;
+    check: (snap: CaptureSnapshot) => { ok: boolean; detail: string } | null;
+  } | null;
+  /** 达成目标时通知父组件 */
+  onGoalReached?: () => void;
 }
 
 const workbenchUrl = (staticMode: boolean) =>
@@ -60,7 +68,10 @@ export default function FreeBuildLab({
   onCapture,
   buildRequest,
   onMessage,
+  goal,
+  onGoalReached,
 }: Props) {
+  const [goalState, setGoalState] = useState<{ ok: boolean; detail: string } | null>(null);
   const [ready, setReady] = useState(false);
   const [slow, setSlow] = useState(false);
   const [capturing, setCapturing] = useState(false);
@@ -105,6 +116,15 @@ export default function FreeBuildLab({
           return;
         }
         onCapture?.(snapshot);
+
+        // 有目标时顺便判一下达没达成
+        if (goal) {
+          const verdict = goal.check(snapshot);
+          if (verdict) {
+            setGoalState(verdict);
+            if (verdict.ok) onGoalReached?.();
+          }
+        }
       }
     };
 
@@ -181,6 +201,27 @@ export default function FreeBuildLab({
           </button>
         </div>
       </div>
+
+      {goal && (
+        <div className={`freebuild-goal ${goalState?.ok ? 'ok' : ''}`}>
+          <div className="fg-main">
+            <span className="fg-label">本关目标</span>
+            <h3>{goal.title}</h3>
+            <p>{goal.description}</p>
+          </div>
+          <div className="fg-verdict">
+            {goalState === null && <span className="fg-hint">搭好后点「记录此刻」验一下</span>}
+            {goalState && (
+              <>
+                <span className={`fg-badge ${goalState.ok ? 'pass' : 'fail'}`}>
+                  {goalState.ok ? '达成' : '还没到'}
+                </span>
+                <span className="fg-detail">{goalState.detail}</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="freebuild-wrap">
         {!ready && (

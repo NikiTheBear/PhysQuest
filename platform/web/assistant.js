@@ -1,3 +1,4 @@
+import {activeExperiment} from '../shared/catalog.js';
 import {readDeepSeekKey} from '../shared/api-key.js';
 import { renderMarkdown } from './markdown.js';
 import { getKnowledgePrompt } from '../shared/knowledge-prompts.js';
@@ -91,6 +92,10 @@ export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeReques
         div.append(next);
       }
       if(result.build){const summary=document.createElement('div');summary.className='chat-build-result';summary.textContent='已搭建：'+result.build.title+' · '+result.build.supportLabel+'。'+result.build.limitations;div.prepend(summary);knowledgeTask=null;showTask();}
+      const finished=activeExperiment(result.workspace),previous=before.experiments.find(d=>d.id===finished.id);
+      if(!result.paused&&finished.observation&&(result.build||previous?.observation!==finished.observation)&&!result.message.includes(finished.observation)){
+        const note=document.createElement('p');note.textContent='观察指引：'+finished.observation;div.append(note);
+      }
       if(result.actions.length){const details=document.createElement('details');details.className='chat-trace';const summary=document.createElement('summary');summary.textContent=result.actions.length+' 次 MCP 工具调用 · '+(result.changed?'已整体保存':'只读查询');details.append(summary);for(const a of result.actions){const row=document.createElement('div');row.textContent=(a.ok?'✓ ':'× ')+a.tool+(a.error?' · '+a.error:'');details.append(row);}div.append(details);}
       const meta=document.createElement('small');meta.textContent=result.model+' · '+result.totalTokens.toLocaleString()+' tokens';div.append(meta);scrollMessages();status(result.changed?'本轮修改已保存，可使用工作台的「撤销」恢复。':'本轮未修改工作区。');
     }catch(error){if(pendingMessage){pendingMessage.classList.remove('pending');pendingMessage.querySelector('.chat-content').textContent='本次执行记录';}pendingMessage=null;if(sent)append('assistant',error.message,true);else toast(error.message);draft(prompt);status('未确认保存成功；消息已保留，可检查工作区后重试。');}
@@ -102,7 +107,7 @@ export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeReques
     if(busy)return toast('当前任务完成后可载入新卡片');
     resumeId=null;knowledgeTask=null;showTask();
     const task='实验目标：'+title+'。探究：'+goal+(formula?'\n理论参考：'+formula:'')+(preset!=='{}'?'\n光具座参考参数（长度单位 cm）：'+preset:'');
-    draft(task+'\n请新建实验，设置上述目标，搭建器具并用仿真检查可观测现象，说明模型范围。');
+    draft(task+'\n请新建实验，设置上述目标，搭建器具，用 set_variable_slider 为主要可调变量创建操作滑块，并用仿真检查可观测现象，说明模型范围。');
     status('卡片目标已载入，可编辑后发送。');
   },startKnowledgeBuild({knowledgeId,prompt}){
     if(busy){toast('当前 AI 任务仍在执行，请完成后再发起新的知识点搭建。');return false;}

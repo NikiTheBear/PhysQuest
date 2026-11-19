@@ -10,14 +10,14 @@ export function colliderOf(c){
   if(['body','charge'].includes(c.kind)){type='sphere';size=[p.radius*2,p.radius*2,p.radius*2];}
   else if(c.kind==='cylinder'){type='cylinder';size=[p.radius*2,p.radius*2,p.height];}
   else if(c.kind==='box')size=[p.width,p.height,p.depth];
-  else if(c.kind==='ramp')size=[p.length,.16,p.width];
+  else if(['floor_slab','ramp'].includes(c.kind))size=[p.length,.16,p.width];
   else if(c.kind==='anchor')size=[.3,.3,.3];
   else if(['lens','diverging_lens','mirror','aperture','optical_filter','detector'].includes(c.kind))size=[.12,p.radius*2,p.radius*2];
   else if(c.kind==='lens_bench')size=[2,1,.6];
   else if(c.kind==='bar_magnet')size=[1,.3,.3];
   else if(['speaker','directional_speaker'].includes(c.kind))size=[.65,.85,.45];
   const custom=c.collider?.shape==='box';
-  return {enabled:supportsCollider(c)&&(c.collider?.enabled??([...RIGID_KINDS,'ramp'].includes(c.kind))),shape:custom?'box':'auto',type:custom?'box':type,size:custom?[...c.collider.size]:size,offset:[...(c.collider?.offset||[0,0,0])]};
+  return {enabled:supportsCollider(c)&&(c.collider?.enabled??([...RIGID_KINDS,'ramp','floor_slab'].includes(c.kind))),shape:custom?'box':'auto',type:custom?'box':type,size:custom?[...c.collider.size]:size,offset:[...(c.collider?.offset||[0,0,0])]};
 }
 export function colliderConfig(c){const {enabled,shape,size,offset}=colliderOf(c);return {enabled,shape,size,offset};}
 export function validateCollider(c){

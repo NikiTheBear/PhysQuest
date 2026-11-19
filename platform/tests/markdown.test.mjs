@@ -6,3 +6,11 @@ test('chat renders Markdown without executing raw HTML or unsafe links',()=>{
   for(const tag of ['<strong>','<ol>','<code>','&lt;script&gt;'])assert.ok(html.includes(tag));
   assert.doesNotMatch(html,/<script>|href="javascript:/i);
 });
+
+test('pipe tables render aligned cells and inline formatting in a scrollable region',()=>{
+  const html=renderMarkdown('| 参数 | 数值 |\n| :--- | ---: |\n| **质量** | 2 kg |');
+  assert.match(html,/class="chat-table-scroll"/);
+  assert.match(html,/<th style="text-align:left">参数<\/th>/);
+  assert.match(html,/<td style="text-align:right">2 kg<\/td>/);
+  assert.match(html,/<strong>质量<\/strong>/);
+});

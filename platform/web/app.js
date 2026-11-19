@@ -1,3 +1,4 @@
+import {saveArchive,listArchives,loadArchive,deleteArchive} from './archives.js';
 import { CATALOG, DOMAINS, COUPLINGS, blankWorkspace, activeExperiment, uid, RIGID_KINDS, ENDPOINT_KINDS, LINK_KINDS, CIRCUIT_KINDS, SOUND_KINDS } from '../shared/catalog.js';
 import { runTool } from '../worker/operations.js';
 import { EXPERIMENT_FILES } from '../shared/experiment-library.js';
@@ -7,6 +8,7 @@ import { LabScene } from './scene.js';
 import { icon, hydrateIcons } from './icons.js';
 import { setupWorkshop } from './workshop.js';
 import { setupAssistant } from './assistant.js';
+import {sliderTarget} from '../shared/sliders.js';
 import { parameterPreview } from './parameter-preview.js';
 import {colliderConfig,colliderOf,supportsCollider} from '../shared/colliders.js';
 
@@ -64,11 +66,14 @@ function applySliderPreview(){
 }
 function render(){
   const d=doc();if(selected&&!d.components.some(c=>c.id===selected))selected=null;
+  $('objective-text').textContent=d.goal||'尚未设置目标';
+  $('observation-text').textContent=d.observation?'观察指引：'+d.observation:'';
+  $('observation-text').hidden=!d.observation;
   if(!applySliderPreview())syncSimulation(d);
   $('title-btn').innerHTML=esc(d.title)+' '+icon('chevron');$('space-count').textContent=String(workspace.experiments.length).padStart(2,'0');$('empty-scene').hidden=d.components.length>0;$('object-count').textContent=d.components.length+' 个器具';$('connection-count').textContent=d.connections.length;
   $('mode-2d').classList.toggle('selected',d.mode==='2d');$('mode-3d').classList.toggle('selected',d.mode==='3d');$('speed').value=d.environment.speed;
   $('play-btn').innerHTML=icon(d.control.running?'pause':'play')+`<span>${d.control.running?'暂停':'运行'}</span>`;$('scene-state').textContent=d.control.running?'仿真运行中':'自由构建';$('solver-status').textContent=d.control.running?'求解器运行中':'求解器就绪';$('view-caption').innerHTML=d.mode==='2d'?'正交视图 <span>·</span> 选中后拖动 X/Y 箭头':'透视视图 <span>·</span> 拖动旋转 · 选中后拖动坐标轴';
-  if(pendingWire&&!d.components.some(c=>c.id===pendingWire.id)){pendingWire=null;scene.pendingWire=null;}$('axis-help').hidden=!selected||scene.isBound(d.components.find(c=>c.id===selected));updateHistory();renderLibrary();renderInspector();renderChannels();hydrateIcons();
+  if(pendingWire&&!d.components.some(c=>c.id===pendingWire.id)){pendingWire=null;scene.pendingWire=null;}$('axis-help').hidden=!selected||scene.isBound(d.components.find(c=>c.id===selected));updateHistory();renderLibrary();renderInspector();renderVariableSliders();renderChannels();hydrateIcons();
 }
 function renderLibrary(){
   $('categories').innerHTML=[['all','全部'],...Object.entries(DOMAINS).map(([k,d])=>[k,d.name]),['custom','我的']].map(([key,label])=>`<button data-category="${key}" class="${key===category?'active':''}">${label}</button>`).join('');
@@ -105,12 +110,12 @@ function renderInspector(){
   if(sliderPreview?.element.isConnected&&sliderPreview.experimentId===d.id&&sliderPreview.componentId===selected&&sliderPreview.environment===(inspectorTab==='environment'))return;
   const context=d.id+':'+selected+':'+inspectorTab,focused=document.activeElement;
   if(inspectorContext===context&&el.contains(focused)&&focused.matches('input[type=number],textarea')&&focused.value!==focused.dataset.committed)return;
-  inspectorContext=context;sliderPreview=null;
+  inspectorContext=context;if(!sliderPreview?.element.closest('#experiment-sliders'))sliderPreview=null;
   if(inspectorTab==='objects'){
     el.innerHTML=hero('cube','场景对象',d.components.length+' 个器具 · 点击选中，F 聚焦')+d.components.map(c=>'<div class="object-row '+(c.id===selected?'active':'')+'"><button data-select-object="'+c.id+'">'+esc(c.name)+'<small>'+esc(CATALOG[c.kind].name)+'</small></button><button class="icon-button small" data-focus-object="'+c.id+'" aria-label="聚焦 '+esc(c.name)+'">'+icon('focus')+'</button></div>').join('')+(!d.components.length?'<p class="empty-list">添加器具后在此快速定位。</p>':'');return;
   }
   if(inspectorTab==='environment'){
-    el.innerHTML=hero('sliders','环境设置','所有器具共享的物理空间')+`<div class="section-label">物理环境</div>${parameter('gravity',{label:'重力加速度',unit:'m/s²',min:0,max:25,step:.01},d.environment.gravity,true)}${parameter('damping',{label:'线性环境阻尼',unit:'kg/s',min:0,max:5,step:.01},d.environment.damping,true)}<label class="toggle-row">地面与刚体碰撞<input class="toggle" type="checkbox" id="collisions" ${d.environment.collisions?'checked':''}></label><hr class="section-rule"><div class="section-label">数值计算</div><div class="overview-row"><span>基础步长</span><strong>1/480 s</strong></div><div class="overview-row"><span>刚体 / 音圈 / 电路</span><strong>Cannon / RK4 / 节点法</strong></div><div class="overview-row"><span>空间边界</span><strong>开放 · 地面 y = 0</strong></div><div class="concept-box"><span class="eyebrow">CONTROL THE CONDITIONS</span><p>默认无重力。你可以添加重力、阻尼和碰撞，逐步构建需要的实验条件。</p></div><p class="input-hint" style="margin-top:18px">更改物理参数后，仿真将从初始条件重新计时。时间倍率只改变播放速度。</p>`;return;
+    el.innerHTML=hero('sliders','环境设置','所有器具共享的物理空间')+`<div class="section-label">物理环境</div>${parameter('gravity',{label:'重力加速度',unit:'m/s²',min:0,max:25,step:.01},d.environment.gravity,true)}${parameter('damping',{label:'线性环境阻尼',unit:'kg/s',min:0,max:5,step:.01},d.environment.damping,true)}<label class="toggle-row">地面与刚体碰撞<input class="toggle" type="checkbox" id="collisions" ${d.environment.collisions?'checked':''}></label><hr class="section-rule"><div class="section-label">数值计算</div><div class="overview-row"><span>基础步长</span><strong>1/480 s</strong></div><div class="overview-row"><span>刚体 / 音圈 / 电路</span><strong>Cannon / RK4 / 节点法</strong></div><div class="overview-row"><span>空间边界</span><strong>${d.components.some(c=>c.kind==='floor_slab')?'有限地面器具':'默认地面 y = 0'}</strong></div><div class="concept-box"><span class="eyebrow">CONTROL THE CONDITIONS</span><p>默认无重力。你可以添加重力、阻尼和碰撞，逐步构建需要的实验条件。</p></div><p class="input-hint" style="margin-top:18px">更改物理参数后，仿真将从初始条件重新计时。时间倍率只改变播放速度。</p>`;return;
   }
   if(inspectorTab==='connections'){
     el.innerHTML=hero('link','物理过程连接','把不同领域的器具联系起来')+`<button class="outline-button full" id="connect-btn">${icon('plus')}添加连接</button>`+d.connections.map(l=>`<div class="connection-card"><h4>${esc(COUPLINGS[l.kind].name)}<button class="icon-button small" data-remove-link="${l.id}" aria-label="删除连接">${icon('close')}</button></h4><p>${esc(d.components.find(c=>c.id===l.source)?.name)} ${l.kind==='wire'?l.sourcePort.toUpperCase():''}<br><span style="color:#c6a485">↓</span> ${esc(d.components.find(c=>c.id===l.target)?.name)} ${l.kind==='wire'?l.targetPort.toUpperCase():''}</p>${l.kind==='wire'?'<div class="gain">IDEAL WIRE · 理想导线</div>':'<div class="gain">GAIN '+l.gain.toFixed(2)+'</div>'}</div>`).join('')+(!d.connections.length?'<div class="empty-selection"><span>'+icon('link')+'</span><p>让物理发生联系</p><small>点击电路器具的 A/B 端子接线，或在这里选择连接。</small></div>':'')+`<hr class="section-rule"><div class="section-label">可用连接</div>${Object.values(COUPLINGS).map(k=>`<div class="connection-card"><h4>${k.name}</h4><p>${esc(k.description)}</p></div>`).join('')}<p class="input-hint">机械连接器具的两端在属性中设置。电路导线直接连接 A/B 端子，参考地定义零电位。电场和磁场通过空间位置自动作用，不需要接线。换能连接采用单向线性模型。</p>`;return;
@@ -122,6 +127,28 @@ function renderInspector(){
   const def=CATALOG[c.kind];
   el.innerHTML=hero(def.icon,c.name,DOMAINS[def.domain].name+' · '+def.description)+`<label class="section-label" for="component-name">器具名称</label><input class="component-name" id="component-name" value="${esc(c.name)}" maxlength="60"><hr class="section-rule"><div class="section-label">初始位置 <span class="muted">/ m</span></div>${scene.isBound(c)?'<p class="bound-hint">此器具的位置由两端决定。移动端点即可调整它的位置。</p>':''}<div class="position-grid">${['X','Y','Z'].map((axis,i)=>`<label><span>${axis}</span><input type="number" data-axis="${i}" value="${c.position[i]}" min="-30" max="30" step="0.1" aria-label="${axis} 位置" ${scene.isBound(c)||d.mode==='2d'&&i===2?'disabled':''}></label>`).join('')}</div>${RIGID_KINDS.includes(c.kind)?`<label class="toggle-row">固定在空间中<input class="toggle" id="fixed" type="checkbox" ${c.fixed?'checked':''}></label>`:''}${(LINK_KINDS.includes(c.kind)||c.kind==='distance_sensor')?'<hr class="section-rule"><div class="section-label">连接端点</div>'+['a','b'].map(key=>`<label class="section-label">端点 ${key.toUpperCase()}</label><select class="field-select" data-ref="${key}"><option value="">请选择器具</option>${d.components.filter(o=>o.id!==c.id&&(c.kind==='distance_sensor'||ENDPOINT_KINDS.includes(o.kind))).map(o=>`<option value="${o.id}" ${o.id===c.refs[key]?'selected':''}>${esc(o.name)}</option>`).join('')}</select>`).join('')+(!c.refs.a||!c.refs.b?'<p class="warning-note">选择两个端点后，连接器具才会施加作用。</p>':''):''}${['force','drag','expression_force','harmonic_force','motion_sensor'].includes(c.kind)?'<hr class="section-rule"><label class="section-label">目标刚体</label><select class="field-select" data-ref="target"><option value="">请选择目标</option>'+d.components.filter(o=>RIGID_KINDS.includes(o.kind)).map(o=>'<option value="'+o.id+'" '+(o.id===c.refs.target?'selected':'')+'>'+esc(o.name)+'</option>').join('')+'</select>':''}${CIRCUIT_KINDS.includes(c.kind)?'<hr class="section-rule"><div class="section-label">电路端子 · 点击接线</div><div class="port-actions">'+def.terminals.map(port=>'<button data-wire-port="'+port+'">端子 '+port.toUpperCase()+(c.kind==='battery'?(port==='a'?' +':' −'):'')+'</button>').join('')+'</div><p class="input-hint">选中端子，再选中另一器具的端子建立导线。</p><div class="circuit-live" id="circuit-live"></div>':''}${colliderEditor(c)}<hr class="section-rule"><div class="section-label">物理参数</div>${Object.entries(def.params).map(([key,spec])=>parameter(key,spec,c.params[key])).join('')||'<p class="input-hint">此器具无额外参数，改变位置即可。</p>'}${c.kind==='coil'?'<p class="warning-note">音圈需置于 Z 方向磁场范围内，并通过「连接」接入信号电源，才能受到电磁驱动。</p>':''}<hr class="section-rule"><div class="inspector-actions"><button id="save-design">${icon('save')}保存为器具</button><button id="duplicate-component">${icon('copy')}复制</button><button id="delete-component" class="danger" aria-label="删除器具">${icon('trash')}</button></div>`;
 }
+function renderVariableSliders(){
+  const panel=$('experiment-sliders'),sliders=doc().sliders||[];
+  if(sliderPreview?.experimentId===doc().id&&panel.contains(sliderPreview.element))return;
+  panel.hidden=!sliders.length;
+  panel.innerHTML=sliders.length?'<strong>实验变量</strong>'+sliders.map((s,i)=>{
+    const {spec,value}=sliderTarget(doc(),s);
+    return `<label>${esc(s.label)} <output>${esc(value)}</output> ${esc(spec.unit)}<input type="range" data-slider="${i}" min="${s.min}" max="${s.max}" step="${s.step}" value="${value}"></label>`;
+  }).join(''):'';
+}
+$('experiment-sliders').oninput=e=>{
+  const el=e.target,s=doc().sliders?.[el.dataset.slider];if(!s)return;
+  el.previousElementSibling.textContent=el.value;
+  sliderPreview={element:el,experimentId:doc().id,componentId:s.componentId,key:s.parameter,value:Number(el.value),environment:s.componentId==null,dirty:true};
+  saveStatus('实时预览 · 松开滑块保存');
+};
+$('experiment-sliders').onchange=async e=>{
+  const s=doc().sliders?.[e.target.dataset.slider];if(!s)return;
+  const value=Number(e.target.value),experimentId=doc().id;
+  sliderPreview=null;
+  const result=s.componentId==null?await command('update_experiment',{experimentId,environment:{[s.parameter]:value}}):await command('update_component',{experimentId,componentId:s.componentId,params:{[s.parameter]:value}});
+  if(!result)render();
+};
 let displayedChart=null;
 function renderChannels(){
   const snapshot=doc().chart,tab=$('ai-chart-tab');
@@ -136,9 +163,51 @@ function renderChannels(){
 function showModal(title,body,footer=''){const modal=$('modal');$('modal-content').innerHTML=`<div class="modal-header"><h2>${title}</h2><button data-close class="icon-button" aria-label="关闭">${icon('close')}</button></div><div class="modal-body">${body}<div id="modal-error" class="modal-error"></div></div>${footer?'<div class="modal-footer">'+footer+'</div>':''}`;if(!modal.open)modal.showModal();$('modal-content').querySelector('[data-close]').onclick=()=>modal.close();}
 function errorInModal(error){$('modal-error').textContent=error.message||error;}
 function editTitle(){showModal('命名你的实验空间','<p>一个问题，也可以成为一个实验的名字。</p><label for="new-title">名称</label><input id="new-title" maxlength="100" value="'+esc(doc().title)+'">','<button class="primary-button" id="title-save">保存名称</button>');$('title-save').onclick=async()=>{const value=$('new-title').value.trim();if(!value)return errorInModal('请输入名称');await command('update_experiment',{title:value});$('modal').close();};$('new-title').focus();$('new-title').select();}
+function archiveModal(){
+  showModal('实验存档','<label for="archive-name">存档名称</label><input id="archive-name" maxlength="100"><button class="primary-button" id="archive-save">保存当前实验</button><p>存档保存在此浏览器，包含器具、参数、连线、滑块和图表。加载后会从初始条件打开一个独立副本。</p><h3>我的存档</h3><div id="archive-list"></div>','<button id="archive-import">从 JSON 文件加载</button>');
+  $('archive-name').value=doc().title;
+  function refresh(){
+    const entries=listArchives(localStorage);
+    $('archive-list').innerHTML=entries.map(({id,name,savedAt})=>`<div class="archive-row"><span><strong>${esc(name)}</strong><small>${esc(new Date(savedAt).toLocaleString())}</small></span><button data-load="${esc(id)}">加载</button><button data-download="${esc(id)}">下载</button><button data-delete="${esc(id)}" aria-label="删除存档 ${esc(name)}">删除</button></div>`).join('')||'<p>尚无存档</p>';
+  }
+  try{refresh();}catch{errorInModal('浏览器存储不可用，可使用工具栏的导出实验。');}
+  $('archive-save').onclick=async e=>{
+    const button=e.currentTarget;button.disabled=true;
+    try{await queue;saveArchive(localStorage,$('archive-name').value,doc());refresh();errorInModal('');toast('实验已存档');}
+    catch(err){errorInModal(err.name==='QuotaExceededError'?'浏览器空间不足，请下载或移除旧存档。':err.message);}
+    finally{button.disabled=false;}
+  };
+  $('archive-import').onclick=()=>$('import-file').click();
+  $('archive-list').onclick=async e=>{
+    const button=e.target.closest('button');if(!button)return;
+    button.disabled=true;
+    try{
+      if(button.dataset.load){
+        await command('import_experiment',{file:loadArchive(localStorage,button.dataset.load)},{throw:true,selectNone:true});
+        $('modal').close();scene.fit();toast('已加载存档副本');
+      }else if(button.dataset.download){
+        const file=loadArchive(localStorage,button.dataset.download);
+        download(file.experiment.title+'.pqexp.json',JSON.stringify(file));toast('存档已下载');
+      }else if(button.dataset.delete&&confirm('删除这份本机存档？')){
+        deleteArchive(localStorage,button.dataset.delete);refresh();
+      }
+    }catch(err){errorInModal(err.message);}finally{button.disabled=false;}
+  };
+}
+$('archives-btn').onclick=archiveModal;
+$('edit-objective').onclick=()=>{
+  const d=doc();
+  showModal('实验目标','<label for="objective-edit">研究问题</label><textarea id="objective-edit" maxlength="2000"></textarea><label for="observation-edit">观察指引</label><textarea id="observation-edit" maxlength="1200" placeholder="改变什么变量？观察哪个物体或仪表？"></textarea>','<button class="primary-button" id="objective-save">保存</button>');
+  $('objective-edit').value=d.goal;$('observation-edit').value=d.observation||'';
+  $('objective-save').onclick=async()=>{
+    const saved=await command('update_experiment',{experimentId:d.id,goal:$('objective-edit').value.trim(),observation:$('observation-edit').value.trim()});
+    if(saved)$('modal').close();
+  };
+};
 function spacesModal(){
-  showModal('实验文件与我的空间','<p>原版实验以 .pqexp.json 保存。点击即载入可编辑副本；现有空间会保留。</p><h3>PhysQuest 原版实验</h3>'+EXPERIMENT_FILES.map(f=>`<div class="experiment-file-row"><button class="space-card" data-load-file="${f.experiment.source.challengeId}"><span><strong>${esc(f.experiment.title)}</strong><small>${esc(f.experiment.goal)}</small></span></button><button class="text-button" data-download-file="${f.experiment.source.challengeId}" aria-label="下载 ${esc(f.experiment.title)}">JSON</button></div>`).join('')+'<h3>我的空间</h3>'+workspace.experiments.map(e=>`<button class="space-card ${e.id===workspace.activeId?'active':''}" data-open-space="${e.id}"><span><strong>${esc(e.title)}</strong><small>${e.mode.toUpperCase()} · ${e.components.length} 个器具 · ${e.connections.length} 个连接</small></span>${icon('chevron')}</button>`).join(''),'<button class="primary-button" id="modal-new-space">新建空白空间</button>');
+  showModal('实验文件与我的空间','<button id="open-archives" class="outline-button">存档与加载</button><p>原版实验以 .pqexp.json 保存。点击即载入可编辑副本；现有空间会保留。</p><h3>PhysQuest 原版实验</h3>'+EXPERIMENT_FILES.map(f=>`<div class="experiment-file-row"><button class="space-card" data-load-file="${f.experiment.source.challengeId}"><span><strong>${esc(f.experiment.title)}</strong><small>${esc(f.experiment.goal)}</small></span></button><button class="text-button" data-download-file="${f.experiment.source.challengeId}" aria-label="下载 ${esc(f.experiment.title)}">JSON</button></div>`).join('')+'<h3>我的空间</h3>'+workspace.experiments.map(e=>`<button class="space-card ${e.id===workspace.activeId?'active':''}" data-open-space="${e.id}"><span><strong>${esc(e.title)}</strong><small>${e.mode.toUpperCase()} · ${e.components.length} 个器具 · ${e.connections.length} 个连接</small></span>${icon('chevron')}</button>`).join(''),'<button class="primary-button" id="modal-new-space">新建空白空间</button>');
   document.querySelectorAll('[data-download-file]').forEach(b=>b.onclick=()=>{const file=EXPERIMENT_FILES.find(f=>f.experiment.source.challengeId===b.dataset.downloadFile);download(b.dataset.downloadFile+'.pqexp.json',JSON.stringify(file,null,2));});
+  $('open-archives').onclick=archiveModal;
   document.querySelectorAll('[data-open-space]').forEach(b=>b.onclick=async()=>{const result=await command('activate_experiment',{experimentId:b.dataset.openSpace},{selectNone:true});if(result){$('modal').close();scene.fit();}});
   document.querySelectorAll('[data-load-file]').forEach(b=>b.onclick=async()=>{b.disabled=true;const result=await command('load_experiment_file',{fileId:b.dataset.loadFile},{selectNone:true});if(result){$('modal').close();scene.fit();toast('已载入可编辑副本');}else b.disabled=false;});
   $('modal-new-space').onclick=async()=>{const result=await command('create_experiment',{title:'未命名实验'},{selectNone:true});if(result){$('modal').close();scene.fit();}};
@@ -146,7 +215,7 @@ function spacesModal(){
 function designModal(source=null){
   showModal('设计自定义器具','<label for="design-color">器具主色</label><input class="color-field" id="design-color" type="color" value="'+(source?.appearance?.color||'#d4a375')+'"><p>基于物理模型保存你自己的参数组合。器具不会自动加入实验空间。</p><label for="design-name">器具名称</label><input id="design-name" maxlength="60" value="'+esc(source?source.name+' · 自定义':'我的器具')+'"><label for="design-kind">基础物理模型</label><select id="design-kind">'+Object.entries(CATALOG).map(([k,d])=>`<option value="${k}" ${source?.kind===k?'selected':''}>${d.name} · ${DOMAINS[d.domain].name}</option>`).join('')+'</select><label for="design-params">参数（JSON，可修改；单位与器具库相同）</label><textarea id="design-params" rows="9" spellcheck="false"></textarea><p class="input-hint" style="margin-top:10px">使用基础模型中已有的参数。位置、连接端点与其他器具的关系在加入场景后设置。</p>','<button id="design-save" class="primary-button">保存到我的器具</button>');
   const updateParams=()=>$('design-params').value=JSON.stringify(Object.fromEntries(Object.entries(CATALOG[$('design-kind').value].params).map(([k,v])=>[k,v.value])),null,2);updateParams();if(source)$('design-params').value=JSON.stringify(source.params,null,2);$('design-kind').onchange=updateParams;
-  $('design-save').onclick=async()=>{try{const params=JSON.parse($('design-params').value),name=$('design-name').value.trim();if(!name)throw new Error('请输入器具名称');await command('design_component',{kind:$('design-kind').value,name,params,appearance:{color:$('design-color').value},fixed:source?.fixed||false,...(source?.kind===$('design-kind').value&&source?.collider?{collider:source.collider}:{})},{throw:true});$('modal').close();category='custom';renderLibrary();toast('自定义器具已保存');}catch(e){errorInModal(e);}};
+  $('design-save').onclick=async()=>{try{const params=JSON.parse($('design-params').value),name=$('design-name').value.trim();if(!name)throw new Error('请输入器具名称');await command('design_component',{kind:$('design-kind').value,name,params,appearance:{...(source?.kind===$('design-kind').value?source.appearance:{}),color:$('design-color').value},fixed:source?.fixed||false,...(source?.kind===$('design-kind').value&&source?.collider?{collider:source.collider}:{})},{throw:true});$('modal').close();category='custom';renderLibrary();toast('自定义器具已保存');}catch(e){errorInModal(e);}};
 }
 function wirePort(id,port){
   if(!pendingWire){pendingWire={id,port};scene.pendingWire=pendingWire;toast('已选择端子 '+port.toUpperCase()+'。点击另一器具的端子完成接线；Esc 取消。');return;}
@@ -214,7 +283,7 @@ function frame(now){const elapsed=Math.min(.1,(now-last)/1000);last=now;if(!work
 
 $('categories').onclick=e=>{const b=e.target.closest('[data-category]');if(b){category=b.dataset.category;renderLibrary();}};
 $('search').oninput=renderLibrary;
-$('library-items').onclick=async e=>{const manage=e.target.closest('[data-manage-design]');if(manage)return workshop.manage(manage.dataset.manageDesign);const b=e.target.closest('[data-add]');if(!b)return;const kind=b.dataset.add,design=workspace.designs.find(d=>d.id===b.dataset.design),index=doc().components.length;let position=[((index%5)-2)*1.3,1,Math.floor(index/5)*1.2];if(doc().mode==='2d'){position[2]=0;position[1]+=Math.floor(index/5)*1.2;}inspectorTab='properties';let result;
+$('library-items').onclick=async e=>{const manage=e.target.closest('[data-manage-design]');if(manage)return workshop.manage(manage.dataset.manageDesign);const b=e.target.closest('[data-add]');if(!b)return;const kind=b.dataset.add,design=workspace.designs.find(d=>d.id===b.dataset.design),index=doc().components.length;let position=[((index%5)-2)*1.3,1,Math.floor(index/5)*1.2];if(doc().mode==='2d'){position[2]=0;position[1]+=Math.floor(index/5)*1.2;}if(kind==='floor_slab'&&!design)position=[0,-.08,0];inspectorTab='properties';let result;
   if(design)result=await command('instantiate_design',{designId:design.id,position},{selectResult:true});
   else {const name=CATALOG[kind].name+' '+(doc().components.filter(c=>c.kind===kind).length+1);result=await command('add_component',{kind,name,position},{selectResult:true});}
   if(result)toast('已添加 '+(design?.name||CATALOG[kind].name));};
@@ -223,13 +292,13 @@ $('title-btn').onclick=editTitle;$('my-experiments').onclick=spacesModal;$('work
 $('new-btn').onclick=async()=>{await command('create_experiment',{title:'未命名实验'},{selectNone:true});scene.fit();toast('已创建空白实验空间');};
 $('export-btn').onclick=()=>{download(doc().title+'.pqexp.json',JSON.stringify(exportExperimentFile(doc()),null,2));toast('实验配置已导出');};
 $('import-btn').onclick=()=>$('import-file').click();
-$('import-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>512000)throw new Error('实验文件不能超过 500 KB');await command('import_experiment',{file:JSON.parse(await file.text())},{throw:true,selectNone:true});toast('已导入到新的可编辑空间');scene.fit();}catch(error){toast('导入失败：'+error.message);}e.target.value='';};
+$('import-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>512000)throw new Error('实验文件不能超过 500 KB');await command('import_experiment',{file:JSON.parse(await file.text())},{throw:true,selectNone:true});if($('modal').open&&$('archive-list'))$('modal').close();toast('已导入到新的可编辑空间');scene.fit();}catch(error){toast('导入失败：'+error.message);}e.target.value='';};
 $('design-btn').onclick=()=>designModal();
 document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>command('update_experiment',{mode:b.dataset.mode}));
 for(const [id,key]of[['grid-btn','showGrid'],['fields-btn','showFields'],['trails-btn','showTrails'],['colliders-btn','showColliders']])$(id).onclick=()=>{scene[key]=!scene[key];$(id).classList.toggle('active',scene[key]);};
 $('fit-btn').onclick=()=>scene.fit();$('fullscreen-btn').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.querySelector('.viewport').requestFullscreen();}catch{toast('当前浏览器不支持全屏');}};
 function togglePlay(){if(!doc().components.length)return toast('先从器具库添加一个器具');const experimentId=doc().id;command('control_simulation',()=>({experimentId,running:!workspace.experiments.find(d=>d.id===experimentId).control.running}));}
-$('play-btn').onclick=togglePlay;$('reset-btn').onclick=()=>command('control_simulation',{running:false,reset:true});$('step-btn').onclick=async()=>{if(!doc().components.length)return toast('先添加器具，再开始计算');if(doc().control.running)await command('control_simulation',{running:false});sim.advance(1/60);};$('speed').onchange=e=>command('update_experiment',{environment:{speed:Number(e.target.value)}});
+$('slow-play').onclick=()=>command('control_simulation',{running:true,speed:.25});$('play-btn').onclick=togglePlay;$('reset-btn').onclick=()=>command('control_simulation',{running:false,reset:true});$('step-btn').onclick=async()=>{if(!doc().components.length)return toast('先添加器具，再开始计算');if(doc().control.running)await command('control_simulation',{running:false});sim.advance(1/60);};$('speed').onchange=e=>command('update_experiment',{environment:{speed:Number(e.target.value)}});
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{inspectorTab=b.dataset.tab;renderInspector();});
 $('inspector-content').addEventListener('input',e=>{
   const el=e.target,ci=el.dataset.colliderRange??el.dataset.colliderSize,oi=el.dataset.colliderOffset;

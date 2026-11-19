@@ -1,4 +1,6 @@
+import {validateAppearance} from './appearance.js';
 import { CATALOG, COUPLINGS, blankExperiment, component, uid, activeExperiment, ENDPOINT_KINDS, RIGID_KINDS, LINK_KINDS } from './catalog.js';
+import {sliderTarget,validateSliders} from './sliders.js';
 import {sampleChart,validateChart} from './experiment-chart.js';
 import {compileForce} from './force-expression.js';
 import {validateCollider} from './colliders.js';
@@ -7,7 +9,7 @@ const number = (v, min, max, name) => { if(typeof v !== 'number'||!Number.isFini
 export function validateComponent(c) {
   validateCollider(c);
   const def=Object.hasOwn(CATALOG,c.kind)&&CATALOG[c.kind];if(!def)throw new Error('未知器具类型');
-  text(c.id,100,'器具 ID');if(c.appearance&&(!/^#[0-9a-f]{6}$/i.test(c.appearance.color)||Object.keys(c.appearance).some(k=>k!=='color')))throw new Error('外观只支持 #RRGGBB color');text(c.name,60,'器具名称');
+  text(c.id,100,'器具 ID');validateAppearance(c.appearance);text(c.name,60,'器具名称');
   if(!Array.isArray(c.position)||c.position.length!==3)throw new Error('position 必须为 [x,y,z]');
   c.position.forEach(v=>number(v,-30,30,'位置'));
   if(typeof c.fixed!=='boolean')throw new Error('fixed 必须为布尔值');
@@ -20,8 +22,9 @@ export function validateComponent(c) {
   return c;
 }
 export function validateExperiment(doc) {
+  validateSliders(doc);
   if(doc.chart!==undefined)validateChart(doc.chart);
-  text(doc.id,100,'实验 ID');text(doc.title,100,'实验名称');text(doc.goal,2000,'实验目标');
+  text(doc.id,100,'实验 ID');text(doc.title,100,'实验名称');text(doc.goal,2000,'实验目标');if(doc.observation!==undefined)text(doc.observation,1200,'观察指引');
   if(!['2d','3d'].includes(doc.mode))throw new Error('模式只能是 2d 或 3d');
   if(!Array.isArray(doc.components)||doc.components.length>64)throw new Error('最多支持 64 个器具');
   const ids=new Set();for(const c of doc.components){validateComponent(c);if(ids.has(c.id))throw new Error('器具 ID 重复');ids.add(c.id);}
@@ -34,7 +37,7 @@ export function validateExperiment(doc) {
   if(!Array.isArray(doc.connections)||doc.connections.length>128)throw new Error('最多支持 128 个连接');
   const linkIds=new Set();
   for(const l of doc.connections){const k=COUPLINGS[l.kind],a=doc.components.find(c=>c.id===l.source),b=doc.components.find(c=>c.id===l.target);if(!k||!a||!b||!k.from.includes(a.kind)||!k.to.includes(b.kind))throw new Error('连接的源或目标类型不兼容');text(l.id,100,'连接 ID');if(linkIds.has(l.id))throw new Error('连接 ID 重复');linkIds.add(l.id);number(l.gain,-20,20,'连接增益');if(l.kind==='wire'){if(!CATALOG[a.kind].terminals.includes(l.sourcePort)||!CATALOG[b.kind].terminals.includes(l.targetPort))throw new Error('必须指定有效接线端子 a / b');if(a.id===b.id&&l.sourcePort===l.targetPort)throw new Error('不能将同一端子连接到自身');}}
-  const env=doc.environment;if(!env)throw new Error('缺少环境参数');number(env.gravity,0,25,'重力加速度');number(env.damping,0,5,'环境阻尼');number(env.speed,.1,4,'时间倍率');if(typeof env.collisions!=='boolean')throw new Error('collisions 必须为布尔值');
+  const env=doc.environment;if(!env)throw new Error('缺少环境参数');number(env.gravity,0,25,'重力加速度');number(env.damping,0,5,'环境阻尼');number(env.speed,.05,4,'时间倍率');if(typeof env.collisions!=='boolean')throw new Error('collisions 必须为布尔值');
   if(!doc.control||typeof doc.control.running!=='boolean')throw new Error('缺少运行状态');number(doc.control.reset,0,1e9,'重置序号');
   for(const key of ['learning','source'])if(doc[key]!==undefined){if(!doc[key]||typeof doc[key]!=='object'||Array.isArray(doc[key])||JSON.stringify(doc[key]).length>12000)throw new Error(key+' 必须是 12 KB 以内的对象');}
   if(doc.learning?.prediction?.options!==undefined&&(!Array.isArray(doc.learning.prediction.options)||doc.learning.prediction.options.some(o=>typeof o!=='string')))throw new Error('预测选项必须为文本数组');
@@ -45,6 +48,16 @@ export function mutate(workspace,name,args) {
   if(!doc)throw new Error('实验不存在');let result;
   const getComponent=id=>{const c=doc.components.find(c=>c.id===id);if(!c)throw new Error('器具不存在');return c;};
   switch(name) {
+    case 'set_variable_slider': {
+      const {spec}=sliderTarget(doc,args);
+      const componentId=args.componentId??null,parameter=args.parameter;
+      const list=doc.sliders??=[],index=list.findIndex(s=>(s.componentId??null)===componentId&&s.parameter===parameter);
+      if(args.remove===true){if(index>=0)list.splice(index,1);result={removed:index>=0};break;}
+      const previous=list[index];
+      const slider={componentId,parameter,label:args.label??previous?.label??spec.label,min:args.min??previous?.min??spec.min,max:args.max??previous?.max??spec.max,step:args.step??previous?.step??spec.step};
+      if(index<0)list.push(slider);else list[index]=slider;
+      validateSliders(doc);result=slider;break;
+    }
     case 'plot_chart': {
       doc.chart=sampleChart(doc,args);
       result={title:doc.chart.title,samples:doc.chart.times.length,curves:doc.chart.lines.map(l=>l.label),location:'实验台下方'};
@@ -56,6 +69,7 @@ export function mutate(workspace,name,args) {
       const imported=readExperimentFile(args.file),mapping=new Map(imported.components.map(c=>[c.id,uid()]));
       imported.id=uid();imported.control={running:false,reset:0};
       for(const c of imported.components){c.id=mapping.get(c.id);c.refs=Object.fromEntries(Object.entries(c.refs).map(([k,v])=>[k,mapping.get(v)||'']));}
+      for(const slider of imported.sliders||[])if(slider.componentId!=null)slider.componentId=mapping.get(slider.componentId);
       for(const link of imported.connections){link.id=uid();link.source=mapping.get(link.source);link.target=mapping.get(link.target);}
       validateExperiment(imported);
       if(args.bootstrap)w.experiments[0]=imported;else w.experiments.push(imported);
@@ -63,11 +77,11 @@ export function mutate(workspace,name,args) {
     }
     case 'create_experiment': {
       if(w.experiments.length>=30)throw new Error('最多保存 30 个实验空间');
-      const e=blankExperiment(args.title||'未命名实验');e.goal=args.goal||'';e.mode=args.mode||'3d';validateExperiment(e);w.experiments.push(e);w.activeId=e.id;result=e;break;
+      const e=blankExperiment(args.title||'未命名实验');e.goal=args.goal||'';if(args.observation!==undefined)e.observation=args.observation;e.mode=args.mode||'3d';validateExperiment(e);w.experiments.push(e);w.activeId=e.id;result=e;break;
     }
     case 'activate_experiment': w.activeId=doc.id;result=doc;break;
     case 'update_experiment': {
-      for(const key of ['title','goal','mode','learning'])if(args[key]!==undefined)doc[key]=args[key];
+      for(const key of ['title','goal','observation','mode','learning'])if(args[key]!==undefined)doc[key]=args[key];
       if(args.environment)Object.assign(doc.environment,args.environment);validateExperiment(doc);result=doc;break;
     }
     case 'replace_experiment': {
@@ -81,6 +95,7 @@ export function mutate(workspace,name,args) {
       const c=getComponent(args.componentId);for(const key of ['name','position','fixed','refs','appearance','collider'])if(args[key]!==undefined)c[key]=args[key];if(args.params)Object.assign(c.params,args.params);validateExperiment(doc);result=c;break;
     }
     case 'remove_component': {
+      if(doc.sliders)doc.sliders=doc.sliders.filter(s=>s.componentId!==args.componentId);
       getComponent(args.componentId);doc.components=doc.components.filter(c=>c.id!==args.componentId);doc.connections=doc.connections.filter(l=>l.source!==args.componentId&&l.target!==args.componentId);
       for(const c of doc.components)for(const key of Object.keys(c.refs))if(c.refs[key]===args.componentId)delete c.refs[key];result={removed:args.componentId};break;
     }
@@ -88,7 +103,7 @@ export function mutate(workspace,name,args) {
       const l={id:uid(),kind:args.kind,source:args.source,target:args.target,gain:args.gain??1,...(args.kind==='wire'?{sourcePort:args.sourcePort||'a',targetPort:args.targetPort||'a'}:{})};if(doc.connections.some(x=>x.kind===l.kind&&((x.source===l.source&&x.target===l.target&&(l.kind!=='wire'||x.sourcePort===l.sourcePort&&x.targetPort===l.targetPort))||(l.kind==='wire'&&x.source===l.target&&x.target===l.source&&x.sourcePort===l.targetPort&&x.targetPort===l.sourcePort))))throw new Error('此连接已经存在');doc.connections.push(l);validateExperiment(doc);result=l;break;
     }
     case 'disconnect_components': { if(!doc.connections.some(l=>l.id===args.connectionId))throw new Error('连接不存在');doc.connections=doc.connections.filter(l=>l.id!==args.connectionId);result={removed:args.connectionId};break; }
-    case 'control_simulation': { if(args.running!==undefined)doc.control.running=args.running;if(args.reset)doc.control.reset++;validateExperiment(doc);result=doc.control;break; }
+    case 'control_simulation': { if(args.speed!==undefined)doc.environment.speed=args.speed;if(args.running!==undefined)doc.control.running=args.running;if(args.reset)doc.control.reset++;validateExperiment(doc);result=doc.control;break; }
     case 'design_component':
     case 'design_assembly': {
       if(w.designs.length>=50)throw new Error('最多保存 50 个自定义器具');

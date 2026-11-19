@@ -391,9 +391,11 @@ window.addEventListener('message',async event=>{
       if(!payload||typeof payload!=='object')throw new Error('实验数据无效');
       await command('import_experiment',{file:payload},{throw:true,selectNone:true});
       scene.fit();
-      bridgePost('import-done',{title:payload.title||''});
-      toast('已导入「'+(payload.title||'实验')+'」，可以继续加器具');
+      bridgePost('import-done',{title:payload?.metadata?.title||payload?.experiment?.title||''});
+      toast('已导入「'+(payload?.metadata?.title||payload?.experiment?.title||'实验')+'」，可以继续加器具');
     }catch(error){
+      // 关键：把真实原因回给父窗口，别让学生只看到「什么都没有」
+      console.error('导入失败', error);
       toast('导入失败：'+error.message);
       bridgePost('import-failed',{message:error.message});
     }

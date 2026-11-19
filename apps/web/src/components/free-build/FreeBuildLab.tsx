@@ -115,6 +115,11 @@ export default function FreeBuildLab({
         return;
       }
 
+      if (event.data.type === 'import-failed') {
+        onMessage?.(`搬过来失败：${event.data.message || '格式不被接受'}`);
+        return;
+      }
+
       if (event.data.type === 'capture') {
         if (!captureId.current || event.data.requestId !== captureId.current) return;
         clearTimeout(captureTimer.current);

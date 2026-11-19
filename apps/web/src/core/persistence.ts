@@ -95,8 +95,37 @@ export function weakMisconceptions(s: LearnerState, minHits = 1): string[] {
  * 重置
  * ========================================================== */
 
-/** 只清学习进度，保留主题和 AI 设置 */
+
+/** 所有本项目的 localStorage key 前缀 */
+const PREFIX = 'physquest.';
+
+/** 清掉所有 physquest.* 开头的 key，除了 keep 名单里的 */
+function clearAll(keep: string[] = []) {
+  try {
+    const victims: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(PREFIX) && !keep.includes(k)) victims.push(k);
+    }
+    victims.forEach((k) => localStorage.removeItem(k));
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * 只清学习进度
+ *
+ * 清掉：参数记录 / 预测 / 已完成 / 错题 / 自由搭建记录 / 引导标记 / 提示词草稿
+ * 保留：主题、AI 设置（端点、模型、Key）、侧栏宽度、用量统计
+ */
 export function resetProgress(): LearnerState {
+  clearAll([
+    'physquest.ai.v1',
+    'physquest.ai.width.v1',
+    'physquest.theme.v1',
+    'physquest.usage.v1',
+  ]);
   const fresh = empty();
   saveLearner(fresh);
   return fresh;
@@ -104,13 +133,6 @@ export function resetProgress(): LearnerState {
 
 /** 清掉所有本地数据（包括 AI Key），回到第一次打开的状态 */
 export function resetEverything(): LearnerState {
-  try {
-    localStorage.removeItem(KEY);
-    localStorage.removeItem('physquest.ai.v1');
-    localStorage.removeItem('physquest.ai.width.v1');
-    localStorage.removeItem('physquest.currentLab.v1');
-  } catch {
-    /* ignore */
-  }
+  clearAll();
   return empty();
 }

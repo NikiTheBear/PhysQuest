@@ -44,7 +44,12 @@ import { LabWorkHead, LabGateFooter } from './components/lab-workspace/LabChrome
 import FreeBuildLab, {
   type CaptureSnapshot,
 } from './components/free-build/FreeBuildLab';
-import { buildPqexp } from './core/export-pqexp';
+import {
+  buildLensPqexp,
+  buildMechanicsPqexp,
+  buildCircuitPqexp,
+  buildSoundPqexp,
+} from './core/export-pqexp';
 import type { KnowledgePrompt } from './data/knowledge-prompts';
 import PromptDialog from './components/knowledge-prompts/PromptDialog';
 import { loadAIConfig, type AIConfig } from './ai/client';
@@ -278,6 +283,27 @@ export default function App() {
     const m = readMetric(snap, 'm');
     return m === null ? null : Math.abs(m);
   };
+
+  /** 统一入口：把当前实验台的参数转成 .pqexp 并跳过去 */
+  const sendToFreeBuild = useCallback(
+    (which: 'lens' | 'mechanics' | 'circuits' | 'acoustics') => {
+      const title = challenge?.title ?? '自由实验';
+      const goal = challenge?.brief ?? '';
+      let data: unknown;
+
+      if (which === 'lens') data = buildLensPqexp(params, title, goal);
+      else if (which === 'mechanics') data = buildMechanicsPqexp(mechParams, title, goal);
+      else if (which === 'circuits') data = buildCircuitPqexp(circParams, title, goal);
+      else data = buildSoundPqexp(soundParams, title, goal);
+
+      setLabId('fieldlab');
+      setView('free');
+      setImportedExp(data);
+      // 让 FreeBuildLab 的 effect 只读一次
+      setTimeout(() => setImportedExp(null), 300);
+    },
+    [challenge, params, mechParams, circParams, soundParams],
+  );
 
   /** 自由搭建：把「记录此刻」的快照存下来 */
   const handleCapture = useCallback((snap: CaptureSnapshot) => {
@@ -568,18 +594,7 @@ export default function App() {
             <MechanicsLab params={mechParams} onChange={(p) => setMechParams((prev) => ({ ...prev, ...p }))} />
             <LabGateFooter
               onGate={() => setPhase('gate')}
-              onToFree={() => {
-                const m = solveMechanics(mechParams);
-                const data = buildPqexp(
-                  params,
-                  challenge.title,
-                  `${challenge.brief}\n当前：${m.description}`,
-                );
-                setLabId('fieldlab');
-                setView('free');
-                setImportedExp(data);
-                setTimeout(() => setImportedExp(null), 200);
-              }}
+              onToFree={() => sendToFreeBuild('mechanics')}
             />
           </>
         )}
@@ -588,7 +603,7 @@ export default function App() {
           <>
             <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="电路与电流" />
             <CircuitsLab params={circParams} onChange={(p) => setCircParams((prev) => ({ ...prev, ...p }))} />
-            <LabGateFooter onGate={() => setPhase('gate')} onToFree={() => {}} />
+            <LabGateFooter onGate={() => setPhase('gate')} onToFree={() => sendToFreeBuild('circuits')} />
           </>
         )}
 
@@ -596,7 +611,7 @@ export default function App() {
           <>
             <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="声与波" />
             <AcousticsLab params={soundParams} onChange={(p) => setSoundParams((prev) => ({ ...prev, ...p }))} />
-            <LabGateFooter onGate={() => setPhase('gate')} onToFree={() => {}} />
+            <LabGateFooter onGate={() => setPhase('gate')} onToFree={() => sendToFreeBuild('acoustics')} />
           </>
         )}
 
@@ -786,13 +801,7 @@ export default function App() {
             metrics={metrics}
             onCancel={() => setPhase('explore')}
             onConfirm={confirmLock}
-            onSendToLab={() => {
-              const data = buildPqexp(params, challenge.title, challenge.brief);
-              setLabId('fieldlab');
-              setView('free');
-              setImportedExp(data);
-              setTimeout(() => setImportedExp(null), 200);
-            }}
+            onSendToLab={() => sendToFreeBuild('lens')}
           />
         )}
 
@@ -865,9 +874,16 @@ export default function App() {
             setChallenge(null);
             setPrediction(null);
             setLocked(null);
+            setQuizItems([]);
+            setQuizAnswers({});
             setReflectionDraft('');
+            setFreeRuns([]);
+            setImportedExp(null);
+            setBuildRequest(null);
+            setPromptEntry(null);
             setPhase('explore');
             setView('map');
+            setToast('学习进度已清除');
           }}
           onResetEverything={() => {
             setLearner(resetEverything());
@@ -875,10 +891,21 @@ export default function App() {
             setChallenge(null);
             setPrediction(null);
             setLocked(null);
+            setQuizItems([]);
+            setQuizAnswers({});
             setReflectionDraft('');
+            setFreeRuns([]);
+            setImportedExp(null);
+            setBuildRequest(null);
+            setPromptEntry(null);
             setPhase('explore');
             setView('map');
             setAiConfig(loadAIConfig());
+            setMechParams(DEFAULT_MECHANICS);
+            setCircParams(DEFAULT_CIRCUIT);
+            setSoundParams(DEFAULT_SOUND);
+            setParams(DEFAULT_LENS_PARAMS);
+            setToast('已全部清空');
           }}
           onClose={() => setShowReset(false)}
         />

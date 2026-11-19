@@ -1,4 +1,5 @@
 import { CATALOG, COUPLINGS, blankExperiment, component, uid, activeExperiment, ENDPOINT_KINDS, RIGID_KINDS, LINK_KINDS } from './catalog.js';
+import {sampleChart,validateChart} from './experiment-chart.js';
 import {compileForce} from './force-expression.js';
 import {validateCollider} from './colliders.js';
 const text = (v, max, name) => { if(typeof v !== 'string' || v.length > max) throw new Error(name+'必须是长度不超过 '+max+' 的文本'); return v; };
@@ -19,6 +20,7 @@ export function validateComponent(c) {
   return c;
 }
 export function validateExperiment(doc) {
+  if(doc.chart!==undefined)validateChart(doc.chart);
   text(doc.id,100,'实验 ID');text(doc.title,100,'实验名称');text(doc.goal,2000,'实验目标');
   if(!['2d','3d'].includes(doc.mode))throw new Error('模式只能是 2d 或 3d');
   if(!Array.isArray(doc.components)||doc.components.length>64)throw new Error('最多支持 64 个器具');
@@ -43,6 +45,11 @@ export function mutate(workspace,name,args) {
   if(!doc)throw new Error('实验不存在');let result;
   const getComponent=id=>{const c=doc.components.find(c=>c.id===id);if(!c)throw new Error('器具不存在');return c;};
   switch(name) {
+    case 'plot_chart': {
+      doc.chart=sampleChart(doc,args);
+      result={title:doc.chart.title,samples:doc.chart.times.length,curves:doc.chart.lines.map(l=>l.label),location:'实验台下方'};
+      break;
+    }
     case 'import_experiment': {
       if(w.experiments.length>=30&&!args.bootstrap)throw new Error('最多保存 30 个实验空间');
       if(args.bootstrap&&(w.revision!==0||w.experiments.length!==1||doc.components.length||doc.connections.length))throw new Error('自动载入只适用于未编辑的初始空间');

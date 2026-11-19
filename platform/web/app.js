@@ -122,7 +122,14 @@ function renderInspector(){
   const def=CATALOG[c.kind];
   el.innerHTML=hero(def.icon,c.name,DOMAINS[def.domain].name+' · '+def.description)+`<label class="section-label" for="component-name">器具名称</label><input class="component-name" id="component-name" value="${esc(c.name)}" maxlength="60"><hr class="section-rule"><div class="section-label">初始位置 <span class="muted">/ m</span></div>${scene.isBound(c)?'<p class="bound-hint">此器具的位置由两端决定。移动端点即可调整它的位置。</p>':''}<div class="position-grid">${['X','Y','Z'].map((axis,i)=>`<label><span>${axis}</span><input type="number" data-axis="${i}" value="${c.position[i]}" min="-30" max="30" step="0.1" aria-label="${axis} 位置" ${scene.isBound(c)||d.mode==='2d'&&i===2?'disabled':''}></label>`).join('')}</div>${RIGID_KINDS.includes(c.kind)?`<label class="toggle-row">固定在空间中<input class="toggle" id="fixed" type="checkbox" ${c.fixed?'checked':''}></label>`:''}${(LINK_KINDS.includes(c.kind)||c.kind==='distance_sensor')?'<hr class="section-rule"><div class="section-label">连接端点</div>'+['a','b'].map(key=>`<label class="section-label">端点 ${key.toUpperCase()}</label><select class="field-select" data-ref="${key}"><option value="">请选择器具</option>${d.components.filter(o=>o.id!==c.id&&(c.kind==='distance_sensor'||ENDPOINT_KINDS.includes(o.kind))).map(o=>`<option value="${o.id}" ${o.id===c.refs[key]?'selected':''}>${esc(o.name)}</option>`).join('')}</select>`).join('')+(!c.refs.a||!c.refs.b?'<p class="warning-note">选择两个端点后，连接器具才会施加作用。</p>':''):''}${['force','drag','expression_force','harmonic_force','motion_sensor'].includes(c.kind)?'<hr class="section-rule"><label class="section-label">目标刚体</label><select class="field-select" data-ref="target"><option value="">请选择目标</option>'+d.components.filter(o=>RIGID_KINDS.includes(o.kind)).map(o=>'<option value="'+o.id+'" '+(o.id===c.refs.target?'selected':'')+'>'+esc(o.name)+'</option>').join('')+'</select>':''}${CIRCUIT_KINDS.includes(c.kind)?'<hr class="section-rule"><div class="section-label">电路端子 · 点击接线</div><div class="port-actions">'+def.terminals.map(port=>'<button data-wire-port="'+port+'">端子 '+port.toUpperCase()+(c.kind==='battery'?(port==='a'?' +':' −'):'')+'</button>').join('')+'</div><p class="input-hint">选中端子，再选中另一器具的端子建立导线。</p><div class="circuit-live" id="circuit-live"></div>':''}${colliderEditor(c)}<hr class="section-rule"><div class="section-label">物理参数</div>${Object.entries(def.params).map(([key,spec])=>parameter(key,spec,c.params[key])).join('')||'<p class="input-hint">此器具无额外参数，改变位置即可。</p>'}${c.kind==='coil'?'<p class="warning-note">音圈需置于 Z 方向磁场范围内，并通过「连接」接入信号电源，才能受到电磁驱动。</p>':''}<hr class="section-rule"><div class="inspector-actions"><button id="save-design">${icon('save')}保存为器具</button><button id="duplicate-component">${icon('copy')}复制</button><button id="delete-component" class="danger" aria-label="删除器具">${icon('trash')}</button></div>`;
 }
+let displayedChart=null;
 function renderChannels(){
+  const snapshot=doc().chart,tab=$('ai-chart-tab');
+  tab.hidden=!snapshot;
+  if((snapshot?.id||null)!==displayedChart){
+    displayedChart=snapshot?.id||null;
+    if(snapshot)tab.click();else if(chartMode==='snapshot')document.querySelector('[data-chart="signal"]').click();
+  }
   const measurable=Object.entries(sim.readings.channels).filter(([id,c])=>c.unit).sort(([a],[b])=>Number(a.includes(':'))-Number(b.includes(':'))).map(([id,c])=>({id,name:c.label}));if(!measurable.some(c=>c.id===channel))channel=measurable[0]?.id||'';
   $('channel-select').innerHTML=measurable.length?measurable.map(c=>`<option value="${c.id}" ${c.id===channel?'selected':''}>${esc(c.name)}</option>`).join(''):'<option value="">选择通道</option>';
 }
@@ -158,10 +165,43 @@ function switchSidebar(chat){$('ai-drawer').hidden=!chat;$('property-panel').hid
 async function showAI(){ switchSidebar(true);if(offline){$('mcp-endpoint').textContent='本地服务地址 /mcp';$('mcp-detail').textContent='静态版需要本地或在线服务连接 AI';$('mcp-tools').textContent='启动完整平台后即可使用 MCP 与 DeepSeek。';return;}$('mcp-endpoint').textContent=location.protocol==='file:'?'离线 HTML：MCP 需要在线版或本地服务器':location.origin+'/mcp';try{const r=await fetch('/mcp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list',params:{}})}),data=await r.json();if(!r.ok||!data.result?.tools)throw new Error('unavailable');aiTools=data.result.tools;$('mcp-detail').textContent='MCP 服务可用';$('mcp-tools').innerHTML=aiTools.map(t=>`<div class="tool-entry"><code>${esc(t.name)}</code><p>${esc(t.description)}</p></div>`).join('');}catch{$('mcp-detail').textContent='MCP 暂不可用';$('mcp-tools').textContent='连接服务器后可使用远程工具。';}}
 async function copy(text,message){try{await navigator.clipboard.writeText(text);toast(message||'已复制');}catch{showModal('复制文本','<textarea id="copy-fallback" rows="9" readonly>'+esc(text)+'</textarea>');$('copy-fallback').select();}}
 function syncAudio(d=doc()){for(const node of audioNodes){try{node.osc.stop();}catch{}node.osc.disconnect();node.gain.disconnect();}audioNodes=[];if(!audioEnabled||!audioContext)return;for(const c of d.components.filter(c=>SOUND_KINDS.includes(c.kind))){const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.frequency.value=c.params.frequency;gain.gain.value=0;osc.connect(gain).connect(audioContext.destination);osc.start();audioNodes.push({id:c.id,osc,gain});}}
+function drawSnapshot(ctx,w,h,chart){
+  const colors=['#16766c','#b04b20','#554caa','#206f9c'];
+  const values=chart.lines.flatMap(line=>line.values.filter(Number.isFinite));
+  let lo=Math.min(...values),hi=Math.max(...values);
+  if(!values.length){lo=0;hi=1;}else if(hi===lo){const pad=Math.abs(hi)*.05||1;lo-=pad;hi+=pad;}
+  const left=53,right=w-18,top=40,bottom=h-25,end=chart.times.at(-1);
+  if(bottom<=top||right<=left)return;
+  ctx.font='10px sans-serif';ctx.lineWidth=1;ctx.textAlign='right';
+  for(let i=0;i<=3;i++){
+    const y=top+i*(bottom-top)/3;
+    ctx.strokeStyle='#dbe4ea';ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke();
+    ctx.fillStyle='#466473';ctx.fillText(Number((hi+(lo-hi)*i/3).toPrecision(3)).toString(),left-4,y+3);
+  }
+  ctx.textAlign='center';
+  for(let i=0;i<=4;i++)ctx.fillText(Number((end*i/4).toPrecision(3)).toString(),left+(right-left)*i/4,bottom+13);
+  chart.lines.forEach((line,j)=>{
+    ctx.fillStyle=ctx.strokeStyle=colors[j];ctx.textAlign='left';ctx.lineWidth=2;
+    ctx.fillText(line.label,left+(right-left)*j/chart.lines.length,29,(right-left)/chart.lines.length-4);
+    ctx.beginPath();let joined=false;
+    line.values.forEach((v,i)=>{
+      if(v===null){joined=false;return;}
+      const x=left+chart.times[i]/end*(right-left),y=bottom-(v-lo)/(hi-lo)*(bottom-top);
+      if(joined)ctx.lineTo(x,y);else ctx.moveTo(x,y);joined=true;
+    });ctx.stroke();
+  });
+}
 function drawChart(){
   const canvas=$('chart'),r=canvas.getBoundingClientRect(),ratio=Math.min(devicePixelRatio,2);if(canvas.width!==Math.round(r.width*ratio)||canvas.height!==Math.round(r.height*ratio)){canvas.width=Math.round(r.width*ratio);canvas.height=Math.round(r.height*ratio);}const ctx=canvas.getContext('2d');ctx.setTransform(ratio,0,0,ratio,0,0);const w=r.width,h=r.height;ctx.clearRect(0,0,w,h);
   const live=$('circuit-live');if(live){const r=sim.circuit.readings[selected];live.innerHTML=r?[['电压',r.voltage,'V'],['电流 A → B',r.current,'A'],['功率',r.power,'W']].map(([label,value,unit])=>'<div><span>'+label+'</span><code>'+value.toPrecision(5)+' '+unit+'</code></div>').join(''):'<p class="input-hint">参考地 · 0 V</p>';}
   const readings=sim.readings,has=doc().components.length>0;$('chart-placeholder').hidden=has;$('readings-table').hidden=chartMode!=='readings';canvas.hidden=chartMode==='readings';
+  const snapshot=chartMode==='snapshot'?doc().chart:null;
+  $('channel-select').hidden=Boolean(snapshot);$('csv-btn').hidden=Boolean(snapshot);
+  if(snapshot){
+    $('chart-placeholder').hidden=true;
+    $('chart-unit').textContent=snapshot.title+' · '+snapshot.lines[0].unit;
+    drawSnapshot(ctx,w,h,snapshot);return;
+  }
   if(chartMode==='readings'){const entries=Object.entries(readings.channels).filter(([id,v])=>v.unit);$('readings-table').innerHTML=entries.length?entries.map(([id,v])=>`<div class="reading-row"><span>${esc(v.label)}</span><code>${v.valid===false?'无有限值':v.value.toFixed(5)} <span class="muted">${v.unit}</span></code></div>`).join(''):'<div class="empty-list">添加可测量器具后显示数值</div>';return;}
   const left=42,right=w-17,top=24,bottom=h-24;ctx.strokeStyle='#dfe8ef';ctx.lineWidth=1;ctx.setLineDash([3,5]);for(let i=0;i<4;i++){const y=top+(bottom-top)*i/3;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke();}for(let i=0;i<7;i++){const x=left+(right-left)*i/6;ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);ctx.stroke();}ctx.setLineDash([]);
   const values=sim.samples.map(s=>({t:s.t,v:chartMode==='energy'?s.energy:(s.channels[channel]?.value||0)})),max=Math.max(.001,...values.map(s=>Math.abs(s.v)))*1.15;const tmax=Math.max(5,sim.time),tmin=Math.max(0,tmax-10),min=chartMode==='energy'?0:-max;

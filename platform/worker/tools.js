@@ -9,6 +9,7 @@ const assembly={components:{type:'array',items:part,minItems:1,maxItems:24},conn
 const kinds={type:'string',enum:Object.keys(CATALOG)};
 const tool=(name,description,properties,required=[],readOnly=false)=>({name,description,inputSchema:{type:'object',properties,required,additionalProperties:false},annotations:{readOnlyHint:readOnly,destructiveHint:false,idempotentHint:readOnly,openWorldHint:false}});
 export const TOOLS=[
+  tool('plot_chart','在实验台下方绘制并显示真实仿真采样的时间曲线。从当前初始条件独立计算；channels 使用 simulate_experiment 的 readings.channels 的完整键，机械能用 energy。可比较最多四条同单位曲线。',{...id,title:str,duration:{type:'number',minimum:.02,maximum:20},channels:{type:'array',items:str,minItems:1,maxItems:4}},['channels']),
   tool('list_knowledge_prompts','分页查找知识地图的全部规划知识点实验提示词。direct=可计算，approximation=近似或类比，conceptual=概念示意。不能把提示词存在当成求解器支持。',{query:str,domain:{type:'string',enum:['mechanics','electromagnetism','optics','thermodynamics','modern']},stage:{type:'string',enum:['primary','junior','senior','university']},support:{type:'string',enum:['direct','approximation','conceptual']},offset:{type:'integer',minimum:0},limit:{type:'integer',minimum:1,maximum:50}},[],true),
   tool('get_knowledge_prompt','读取一个知识点的完整搭建提示词，包括目标、器具、可调变量、观测量和模型边界。之后请真实调用工具新建空间并搭建。',{knowledgeId:str},['knowledgeId'],true),
   tool('get_workspace','读取当前用户的所有实验空间、当前选中空间、器具、连接、目标、模式和修订号。新空间默认完全空白。',{},[],true),

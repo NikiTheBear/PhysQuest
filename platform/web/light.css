@@ -72,3 +72,7 @@ body.embedded input:not([type=range]),body.embedded textarea,body.embedded selec
 .markdown blockquote{border-left:3px solid #a8bcc8;padding-left:.65em}
 .markdown table{border-collapse:collapse}.markdown td,.markdown th{border:1px solid #cbd5dc;padding:.25em .5em}
 .markdown a{color:inherit;text-decoration:underline}
+
+#experiment-sliders{background:white;border-top:1px solid #dce4e8;padding:8px 12px;overflow:auto;max-height:32vh;flex:none}
+#experiment-sliders strong,#experiment-sliders label{display:block;font-size:12px;margin:3px 0}
+#experiment-sliders input{display:block;width:100%;accent-color:#16766c}

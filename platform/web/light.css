@@ -76,3 +76,8 @@ body.embedded input:not([type=range]),body.embedded textarea,body.embedded selec
 #experiment-sliders{background:white;border-top:1px solid #dce4e8;padding:8px 12px;overflow:auto;max-height:32vh;flex:none}
 #experiment-sliders strong,#experiment-sliders label{display:block;font-size:12px;margin:3px 0}
 #experiment-sliders input{display:block;width:100%;accent-color:#16766c}
+
+.chat-table-scroll{max-width:100%;overflow-x:auto;margin:.6em 0}
+.chat-table-scroll table{width:max-content;min-width:100%;background:white;color:#203545}
+.chat-table-scroll td,.chat-table-scroll th{max-width:24ch;padding:.4em .65em;vertical-align:top}
+.chat-table-scroll th{background:#eff5f7;font-weight:650}

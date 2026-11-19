@@ -34,6 +34,13 @@ import ReportView from './components/report/ReportView';
 import AITutor from './components/ai-tutor/AITutor';
 import AISettings from './components/ai-tutor/AISettings';
 import HelpGuide from './components/common/HelpGuide';
+import MechanicsLab from './labs/mechanics/MechanicsLab';
+import CircuitsLab from './labs/circuits/CircuitsLab';
+import AcousticsLab from './labs/acoustics/AcousticsLab';
+import { DEFAULT_MECHANICS, solveMechanics, type MechanicsParams } from './labs/mechanics/engine';
+import { DEFAULT_CIRCUIT, solveCircuit, type CircuitParams } from './labs/circuits/engine';
+import { DEFAULT_SOUND, type SoundParams } from './labs/acoustics/engine';
+import { LabWorkHead, LabGateFooter } from './components/lab-workspace/LabChrome';
 import FreeBuildLab, {
   type CaptureSnapshot,
 } from './components/free-build/FreeBuildLab';
@@ -42,7 +49,7 @@ import type { KnowledgePrompt } from './data/knowledge-prompts';
 import PromptDialog from './components/knowledge-prompts/PromptDialog';
 import { loadAIConfig, type AIConfig } from './ai/client';
 import type { AIAction } from './ai/prompts';
-import { CHALLENGES, KNOWLEDGE, quizForChallenge } from './data/content';
+import { AUTO_CHALLENGES, CHALLENGES, KNOWLEDGE, quizForChallenge } from './data/content';
 import { LABS, labById, type LabId } from './labs/registry';
 import { EmptyPickLab, EmptyPickChallenge } from './components/common/EmptyStates';
 import ResetPanel from './components/common/ResetPanel';
@@ -92,7 +99,25 @@ export default function App() {
   /** ★ 不再默认给第一个挑战，而是 null */
   const [challenge, setChallenge] = useState<Challenge | null>(() => {
     if (!DEEP.challenge) return null;
-    return CHALLENGES.find((c) => c.id === DEEP.challenge) ?? null;
+    const hand = CHALLENGES.find((c) => c.id === DEEP.challenge);
+    if (hand) return hand;
+    // 自动挑战（CH-AUTO-xxx / CH-AC-xx）也能通过 URL 直接打开
+    const auto = AUTO_CHALLENGES.find((c) => c.id === DEEP.challenge);
+    if (!auto) return null;
+    return {
+      id: auto.id,
+      labId: auto.labId,
+      title: auto.title,
+      brief: auto.brief,
+      hint: auto.hint,
+      winCondition: { metric: 'm', op: '<', value: 0 },
+      multiAnswer: true,
+      knowledgeIds: auto.knowledgeIds,
+      misconceptionIds: auto.misconceptionIds,
+      demoScriptId: '',
+      difficulty: 'beginner',
+      prediction: auto.prediction,
+    };
   });
   const [phase, setPhase] = useState<Phase>('explore');
   const [params, setParams] = useState<LensParams>(DEFAULT_LENS_PARAMS);
@@ -113,6 +138,10 @@ export default function App() {
   });
   const [aiConfig, setAiConfig] = useState<AIConfig>(() => loadAIConfig());
   const [showReset, setShowReset] = useState(false);
+  /* 三套新实验台的状态 */
+  const [mechParams, setMechParams] = useState<MechanicsParams>(DEFAULT_MECHANICS);
+  const [circParams, setCircParams] = useState<CircuitParams>(DEFAULT_CIRCUIT);
+  const [soundParams, setSoundParams] = useState<SoundParams>(DEFAULT_SOUND);
   /** 全站唯一的 AI 设置入口（顶栏齿轮打开） */
   const [showAISettings, setShowAISettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -146,6 +175,8 @@ export default function App() {
   });
 
   const metrics = useMemo(() => solve(params), [params]);
+  /** 当前模块（可能为 null） */
+  const currentLab = lab;
   const weak = useMemo(() => weakMisconceptions(learner), [learner]);
 
   useEffect(() => {
@@ -499,10 +530,26 @@ export default function App() {
             weakMisconceptions={weak}
             onPick={beginChallenge}
             onPickAuto={(c) => {
-              setLabId('fieldlab');
-              setView('free');
-              setBuildRequest({ knowledgeId: c.knowledgeIds[0], title: c.title, prompt: c.build.prompt });
-              setTimeout(() => setBuildRequest(null), 100);
+              // 自动挑战 → 进自己模块的实验台，而不是直接跳 Fieldlab
+              const targetLab = labById(c.labId);
+              if (!targetLab) return;
+              setLabId(targetLab.id);
+              setChallenge({
+                id: c.id,
+                labId: c.labId,
+                title: c.title,
+                brief: c.brief,
+                hint: c.hint,
+                winCondition: { metric: 'm', op: '<', value: 0 },
+                multiAnswer: true,
+                knowledgeIds: c.knowledgeIds,
+                misconceptionIds: c.misconceptionIds,
+                demoScriptId: '',
+                difficulty: 'beginner',
+                prediction: c.prediction,
+              });
+              setPhase('explore');
+              setView('lab');
             }}
             onBackToMap={() => setView('map')}
           />
@@ -514,7 +561,46 @@ export default function App() {
           <EmptyPickChallenge lab={lab} onGoMap={() => setView('map')} onGoHub={() => setView('hub')} />
         )}
 
-        {view === 'lab' && challenge && (
+        {/* ===== 力学 / 电路 / 声学：走各自的通用实验台 ===== */}
+        {view === 'lab' && challenge && currentLab?.id === 'mechanics' && (
+          <>
+            <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="力与运动" />
+            <MechanicsLab params={mechParams} onChange={(p) => setMechParams((prev) => ({ ...prev, ...p }))} />
+            <LabGateFooter
+              onGate={() => setPhase('gate')}
+              onToFree={() => {
+                const m = solveMechanics(mechParams);
+                const data = buildPqexp(
+                  params,
+                  challenge.title,
+                  `${challenge.brief}\n当前：${m.description}`,
+                );
+                setLabId('fieldlab');
+                setView('free');
+                setImportedExp(data);
+                setTimeout(() => setImportedExp(null), 200);
+              }}
+            />
+          </>
+        )}
+
+        {view === 'lab' && challenge && currentLab?.id === 'circuits' && (
+          <>
+            <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="电路与电流" />
+            <CircuitsLab params={circParams} onChange={(p) => setCircParams((prev) => ({ ...prev, ...p }))} />
+            <LabGateFooter onGate={() => setPhase('gate')} onToFree={() => {}} />
+          </>
+        )}
+
+        {view === 'lab' && challenge && currentLab?.id === 'acoustics' && (
+          <>
+            <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="声与波" />
+            <AcousticsLab params={soundParams} onChange={(p) => setSoundParams((prev) => ({ ...prev, ...p }))} />
+            <LabGateFooter onGate={() => setPhase('gate')} onToFree={() => {}} />
+          </>
+        )}
+
+        {view === 'lab' && challenge && (!currentLab || currentLab.id === 'optics-lens') && (
           <>
             <div className="work-head">
               <div>

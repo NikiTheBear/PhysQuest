@@ -22,24 +22,6 @@ export default function SatisfactionGate({
   const [score, setScore] = useState(3);
   const [reason, setReason] = useState('');
 
-  /** 本地判定：这组参数离挑战目标有多近 —— 客观分由引擎锁死 */
-  const objective = useMemo(() => {
-    const w = challenge.winCondition;
-    if (w.op === '≈' && typeof w.value === 'number') {
-      const actual = metrics[w.metric] as number;
-      const diff = Math.abs(actual - w.value);
-      const tol = w.tolerance ?? 0.1;
-      return diff <= tol ? 1 : Math.max(0, 1 - diff / (tol * 6));
-    }
-    if (w.op === 'false') return metrics[w.metric] === false ? 1 : 0;
-    if (w.op === 'true') return metrics[w.metric] === true ? 1 : 0;
-    if (w.op === '<' && typeof w.value === 'number')
-      return (metrics[w.metric] as number) < w.value ? 1 : 0;
-    if (w.op === '>' && typeof w.value === 'number')
-      return (metrics[w.metric] as number) > w.value ? 1 : 0;
-    return 0;
-  }, [challenge, metrics]);
-
   const cards = challenge.knowledgeIds
     .map((id) => KNOWLEDGE.find((k) => k.id === id))
     .filter(Boolean);
@@ -56,21 +38,17 @@ export default function SatisfactionGate({
         </p>
 
         <div className="compare">
-          <div className={`box ${objective >= 0.99 ? 'hit' : 'miss'}`}>
-            <div className="k">目标达成度（本地引擎算，不打折）</div>
-            <div className="v">{Math.round(objective * 100)}%</div>
-          </div>
           <div className="box">
-            <div className="k">当前结果</div>
+            <div className="k">现在这组参数的结果</div>
             <div className="v">{metrics.description}</div>
           </div>
-        </div>
-
-        {objective < 0.99 && (
-          <div className="gate">
-            还没达到「{challenge.title}」的目标。你可以直接提交，但这样学到的东西会少一些。
+          <div className="box">
+            <div className="k">调到什么程度算好</div>
+            <div className="v" style={{ fontSize: 13.5, fontWeight: 400 }}>
+              由你自己判断。这里的探索没有标准答案。
+            </div>
           </div>
-        )}
+        </div>
 
         <div style={{ marginTop: 18 }}>
           <div style={{ fontSize: 13, color: 'var(--label-2)', marginBottom: 6 }}>

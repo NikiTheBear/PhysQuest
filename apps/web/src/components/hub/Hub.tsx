@@ -1,6 +1,13 @@
 import { useMemo } from 'react';
 import type { Challenge } from '../../core/contracts';
-import { ALL_CARDS, AUTO_CHALLENGES, CHALLENGES, MISCONCEPTIONS, autoChallengesFor } from '../../data/content';
+import {
+  ALL_CARDS,
+  AUTO_CHALLENGES,
+  CHALLENGES,
+  MISCONCEPTIONS,
+  autoChallengesFor,
+  type AutoChallenge,
+} from '../../data/content';
 import type { LabMeta } from '../../labs/registry';
 
 interface Props {
@@ -10,7 +17,7 @@ interface Props {
   weakMisconceptions: string[];
   onPick: (c: Challenge) => void;
   /** 自动生成挑战的点击（走另一条路：直接进自由搭建） */
-  onPickAuto?: (c: { id: string; title: string; brief: string; build: { prompt: string }; knowledgeIds: string[] }) => void;
+  onPickAuto?: (c: AutoChallenge) => void;
   onBackToMap: () => void;
 }
 

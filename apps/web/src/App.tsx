@@ -356,6 +356,15 @@ export default function App() {
               >
                 实验台
               </button>
+              <button
+                className={view === 'free' ? 'active' : ''}
+                onClick={() => {
+                  setLabId('fieldlab');
+                  setView('free');
+                }}
+              >
+                自由搭建
+              </button>
               <button className={view === 'report' ? 'active' : ''} onClick={() => setView('report')}>
                 我的报告
               </button>

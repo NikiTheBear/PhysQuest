@@ -90,6 +90,15 @@ function colliderEditor(c){
   return `<details class="collision-details" open><summary>碰撞范围 <span>${hull.enabled?'已启用':'未启用'}</span></summary><label class="toggle-row">参与机械碰撞<input type="checkbox" class="toggle" id="collider-enabled" ${hull.enabled?'checked':''}></label><label class="section-label" for="collider-shape">碰撞形状</label><select id="collider-shape" class="field-select"><option value="auto" ${hull.shape==='auto'?'selected':''}>随器具形状</option><option value="box" ${hull.shape==='box'?'selected':''}>自定义长方体</option></select>${hull.shape==='box'?hull.size.map((v,i)=>parameter('collider-size-'+i,{label:['碰撞宽度 X','碰撞高度 Y','碰撞深度 Z'][i],unit:'m',min:.02,max:60,step:.02},v).replace('data-range="collider-size-'+i+'"','data-collider-range="'+i+'"').replace('data-param="collider-size-'+i+'"','data-collider-size="'+i+'"')).join(''):'<p class="input-hint">范围：'+hull.size.map(v=>Number(v.toFixed(3))).join(' × ')+' m，随物理尺寸更新。</p>'}<label class="section-label">局部中心偏移 / m</label><div class="position-grid">${hull.offset.map((v,i)=>'<label><span>'+['X','Y','Z'][i]+'</span><input type="number" data-collider-offset="'+i+'" value="'+v+'" min="-30" max="30" step=".1" aria-label="碰撞中心偏移 '+['X','Y','Z'][i]+'"></label>').join('')}</div><button class="text-button" id="reset-collider">恢复默认范围</button>${!doc().environment.collisions?'<p class="warning-note">环境碰撞已关闭。<button id="enable-collisions" class="text-button">开启全局碰撞</button></p>':''}<p class="input-hint">蓝色线框参与碰撞，灰色为停用。编辑时可自由摆放，运行后发生阻挡。${RIGID_KINDS.includes(c.kind)?'':'此器具作为固定障碍物。'} 碰撞范围不改变外观和光路。</p></details>`;
 }
 function renderInspector(){
+  const experiment=doc();
+  const focus=experiment.components.find(component=>component.id===selected);
+  $('agent-context').textContent=[
+    experiment.title+' · '+experiment.mode.toUpperCase(),
+    '目标：'+(experiment.goal||'尚未设置'),
+    experiment.components.length+' 个器具 · '+experiment.connections.length+' 条连接',
+    '当前选中：'+(focus?.name||'无')
+  ].join(' ｜ ');
+
   document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===inspectorTab));const d=doc(),c=d.components.find(c=>c.id===selected),el=$('inspector-content');
   if(sliderPreview?.element.isConnected&&sliderPreview.experimentId===d.id&&sliderPreview.componentId===selected&&sliderPreview.environment===(inspectorTab==='environment'))return;
   const context=d.id+':'+selected+':'+inspectorTab,focused=document.activeElement;
@@ -240,7 +249,7 @@ async function initialize(){
 }
 $('undo-btn').onclick=()=>travelHistory();$('redo-btn').onclick=()=>travelHistory(true);$('snap-btn').onclick=()=>{scene.setSnap(!scene.snap);$('snap-btn').classList.toggle('active',scene.snap);toast(scene.snap?'网格吸附开启 · 0.1 m':'网格吸附关闭');};
 const workshop=setupWorkshop({getWorkspace:()=>workspace,getDoc:doc,command,showModal,errorInModal,esc,download,toast,onCategory:value=>{category=value;renderLibrary();}});
-const assistant=setupAssistant({openAssistant:showAI,getWorkspace:()=>workspace,isOnline:()=>online,beforeRequest:()=>queue,setBusy:value=>{aiBusy=value;pending+=value?1:-1;for(const region of document.querySelectorAll('.library,.center-column,#property-panel'))region.inert=value;for(const button of document.querySelectorAll('.workspace-bar button'))button.disabled=value;updateHistory();},toast,applyResult:async(result,before)=>{if(!result.changed)return;remember(before);workspace=result.workspace;selected=null;localStorage.setItem('fieldlab-workspace',JSON.stringify(workspace));render();scene.fit();saveStatus(localServer?'AI 修改已保存到本机':'AI 修改已保存到云端');}});
+const assistant=setupAssistant({openAssistant:showAI,getWorkspace:()=>workspace,getSelectedId:()=>selected,isOnline:()=>online,beforeRequest:()=>queue,setBusy:value=>{aiBusy=value;pending+=value?1:-1;for(const region of document.querySelectorAll('.library,.center-column,#property-panel'))region.inert=value;for(const button of document.querySelectorAll('.workspace-bar button'))button.disabled=value;updateHistory();},toast,applyResult:async(result,before)=>{if(!result.changed)return;remember(before);workspace=result.workspace;selected=null;localStorage.setItem('fieldlab-workspace',JSON.stringify(workspace));render();scene.fit();saveStatus(localServer?'AI 修改已保存到本机':'AI 修改已保存到云端');}});
 function bridgePost(type,data={}){if(embedded)parent.postMessage({source:'fieldlab',type,...data},location.origin);}
 window.addEventListener('message',async event=>{
   if(!embedded||event.origin!==location.origin||event.source!==parent||event.data?.source!=='physquest')return;

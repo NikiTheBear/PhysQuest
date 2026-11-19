@@ -1,5 +1,5 @@
 import { getKnowledgePrompt } from '../shared/knowledge-prompts.js';
-export function setupAssistant({getWorkspace,isOnline,beforeRequest,applyResult,setBusy,toast,openAssistant}){
+export function setupAssistant({getWorkspace,getSelectedId,isOnline,beforeRequest,applyResult,setBusy,toast,openAssistant}){
   const $=id=>document.getElementById(id);let busy=false,knowledgeTask=null,clock,pendingMessage;const history=[];
   const emptyMessage=$('chat-messages').firstElementChild.cloneNode(true);
   function resizeComposer(){const input=$('deepseek-prompt');input.style.height='auto';input.style.height=Math.min(144,Math.max(76,input.scrollHeight))+'px';}
@@ -36,7 +36,7 @@ export function setupAssistant({getWorkspace,isOnline,beforeRequest,applyResult,
     state(true);let sent=false;
     try{
       await beforeRequest();const before=structuredClone(getWorkspace());sent=true;append('user',prompt);draft('');$('deepseek-key').closest('details').open=false;pendingMessage=append('assistant','正在思考并操作实验…');pendingMessage.classList.add('pending');status('DeepSeek 正在通过 MCP 工具搭建、验证，完成后整轮保存…');
-      const response=await fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json','X-DeepSeek-Key':key},body:JSON.stringify({revision:before.revision,model:$('deepseek-model').value,thinking:$('deepseek-thinking').checked,messages:[...(knowledgeId?[]:history.slice(-18)),{role:'user',content:prompt}],...(knowledgeId?{knowledgeId}:{})})});
+      const response=await fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json','X-DeepSeek-Key':key},body:JSON.stringify({revision:before.revision,selectedId:getSelectedId(),model:$('deepseek-model').value,thinking:$('deepseek-thinking').checked,messages:[...(knowledgeId?[]:history.slice(-18)),{role:'user',content:prompt}],...(knowledgeId?{knowledgeId}:{})})});
       const result=await response.json();if(!response.ok)throw new Error(result.error||'请求失败');
       await applyResult(result,before);pendingMessage?.remove();pendingMessage=null;if(knowledgeId)history.length=0;history.push({role:'user',content:prompt},{role:'assistant',content:result.message});const div=append('assistant',result.message);
       if(result.build){const summary=document.createElement('div');summary.className='chat-build-result';summary.textContent='已搭建：'+result.build.title+' · '+result.build.supportLabel+'。'+result.build.limitations;div.prepend(summary);knowledgeTask=null;showTask();}

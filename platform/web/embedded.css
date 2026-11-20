@@ -471,3 +471,5 @@ body.sim-stage .transport{position:absolute;bottom:9px;left:50%;right:auto;trans
 }
 
 .sim-stage .terminal.connected:not(.armed){border-color:#2d739e;background:#e4f1fa;color:#1d5a80}
+/* Leave both axis handles hittable when the selected instrument is labelled. */
+.sim-stage #scene-container:has(#scene-2d:not([hidden])) .object-label.selected{transform:translate(calc(-100% - 12px),-100%)}

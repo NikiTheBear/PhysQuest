@@ -27,7 +27,7 @@ import { DEFAULT_LENS_PARAMS } from '../core/contracts';
  * 加第三个模块时只需在这里加一条 + 提供对应的实验台组件。
  */
 
-export type LabId = 'optics-lens' | 'mechanics' | 'circuits' | 'acoustics' | 'fieldlab';
+export type LabId = 'optics-lens' | 'mechanics' | 'circuits' | 'acoustics';
 
 export interface LabMeta {
   id: LabId;
@@ -106,18 +106,6 @@ export const LABS: LabMeta[] = [
     defaultParams: DEFAULT_LENS_PARAMS,
     stats: ['5 个挑战', '4 个知识点', '2 张卡'],
     knowledgeIds: ['K-M3-15', 'K-M3-16'],
-  },
-  {
-    id: 'fieldlab',
-    title: '自由搭建实验台',
-    subtitle: '全领域 · 自由构建',
-    discipline: 'all',
-    stages: ['junior', 'senior', 'university'],
-    intro:
-      '从空白空间开始，自己摆器具、连线路、跑仿真。可以让 AI 一起搭，也可以自己动手。',
-    badge: '自由',
-    mode: 'free',
-    stats: ['46 种器具', '2D / 3D', 'AI 协作'],
   },
 ];
 

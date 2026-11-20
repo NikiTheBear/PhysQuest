@@ -27,7 +27,6 @@ import CurveChart from './components/lab-workspace/CurveChart';
 import ObservationPanel from './components/lab-workspace/ObservationPanel';
 import SatisfactionGate from './components/lab-workspace/SatisfactionGate';
 import PredictionPanel from './components/prediction/PredictionPanel';
-import PredictionCompare from './components/prediction/PredictionCompare';
 import KnowledgeCards from './components/knowledge-cards/KnowledgeCards';
 import { QuizModal, QuizResult } from './components/knowledge-cards/Quiz';
 import ReportView from './components/report/ReportView';
@@ -42,26 +41,20 @@ import { DEFAULT_MECHANICS, solveMechanics, type MechanicsParams } from './labs/
 import { DEFAULT_CIRCUIT, solveCircuit, type CircuitParams } from './labs/circuits/engine';
 import { DEFAULT_SOUND, type SoundParams } from './labs/acoustics/engine';
 import { LabWorkHead, LabGateFooter } from './components/lab-workspace/LabChrome';
-import FreeBuildLab, {
+import ImmersiveLab, {
   type CaptureSnapshot,
-} from './components/free-build/FreeBuildLab';
-import {
-  buildLensPqexp,
-  buildMechanicsPqexp,
-  buildCircuitPqexp,
-  buildSoundPqexp,
-} from './core/export-pqexp';
+} from './components/free-build/ImmersiveLab';
 import type { KnowledgePrompt } from './data/knowledge-prompts';
 import PromptDialog from './components/knowledge-prompts/PromptDialog';
 import { loadAIConfig, type AIConfig } from './ai/client';
 import type { AIAction } from './ai/prompts';
 import { AUTO_CHALLENGES, CHALLENGES, KNOWLEDGE, quizForChallenge } from './data/content';
 import { LABS, labById, type LabId } from './labs/registry';
-import { EmptyPickLab, EmptyPickChallenge, EmptyReport } from './components/common/EmptyStates';
+import { EmptyPickLab, EmptyReport } from './components/common/EmptyStates';
 import ResetPanel from './components/common/ResetPanel';
 
 type View = 'map' | 'hub' | 'lab' | 'free' | 'cards' | 'quiz-bank' | 'report';
-type Phase = 'predict' | 'explore' | 'gate' | 'compare' | 'quiz' | 'quizResult' | 'done';
+type Phase = 'predict' | 'explore' | 'gate' | 'quiz' | 'quizResult' | 'done';
 
 const LAB_KEY = 'physquest.currentLab.v1';
 
@@ -165,8 +158,6 @@ export default function App() {
       return false;
     }
   });
-  /** 实验台 → 自由搭建：一键搬过去的实验数据 */
-  const [importedExp, setImportedExp] = useState<unknown | null>(null);
   /** 自由搭建：想用哪个知识点的提示词去搭 */
   const [buildRequest, setBuildRequest] = useState<{
     knowledgeId: string;
@@ -238,8 +229,7 @@ export default function App() {
     setPrediction(null);
     setLocked(null);
     setParams(meta.defaultParams ?? DEFAULT_LENS_PARAMS);
-    // 自由搭建模式没有挑战，直接进工作台
-    setView(meta.mode === 'free' ? 'free' : 'hub');
+    setView('hub');
   }, []);
 
   /** 从知识点直接进实验台：找到包含这个知识点的挑战，参数跳到卡片给的预设 */
@@ -291,41 +281,20 @@ export default function App() {
     return m === null ? null : Math.abs(m);
   };
 
-  /** 统一入口：把当前实验台的参数转成 .pqexp 并跳过去 */
-  const sendToFreeBuild = useCallback(
-    (which: 'lens' | 'mechanics' | 'circuits' | 'acoustics') => {
-      const title = challenge?.title ?? '自由实验';
-      const goal = challenge?.brief ?? '';
-      let data: unknown;
-
-      if (which === 'lens') data = buildLensPqexp(params, title, goal);
-      else if (which === 'mechanics') data = buildMechanicsPqexp(mechParams, title, goal);
-      else if (which === 'circuits') data = buildCircuitPqexp(circParams, title, goal);
-      else data = buildSoundPqexp(soundParams, title, goal);
-
-      setLabId('fieldlab');
-      setView('free');
-      setImportedExp(data);
-      // 让 FreeBuildLab 的 effect 只读一次
-      setTimeout(() => setImportedExp(null), 300);
-    },
-    [challenge, params, mechParams, circParams, soundParams],
-  );
-
   /** 自由搭建：把「记录此刻」的快照存下来 */
   const handleCapture = useCallback((snap: CaptureSnapshot) => {
     setFreeRuns((prev) => [snap, ...prev].slice(0, 40));
     setToast(`已记录：「${snap.experiment.title}」   t = ${snap.time.toFixed(3)} s`);
   }, []);
 
-  /** 自由搭建：用知识点提示词搭建 */
+  /** 用知识点提示词让 AI 搭 —— 直接进实验台（自由模式，不挂挑战） */
   const handleBuildKnowledge = useCallback(
     (knowledgeId: string, title: string, prompt: string) => {
       setPromptEntry(null);
-      setLabId('fieldlab');
-      setView('free');
+      setChallenge(null);
+      setPhase('explore');
       setBuildRequest({ knowledgeId, title, prompt });
-      // 让 FreeBuildLab 的 effect 只在下次渲染读到一次
+      setView('lab');
       setTimeout(() => setBuildRequest(null), 100);
     },
     [],
@@ -375,15 +344,7 @@ export default function App() {
       });
       return next;
     });
-    setPhase(prediction !== null ? 'compare' : 'quiz');
-    if (prediction === null) {
-      setQuizItems(quizForChallenge(challenge));
-      setPhase('quiz');
-    }
-  };
-
-  const afterCompare = () => {
-    if (!challenge) return;
+    // 锁定后直接进题库（不再弹「预测 vs 实际」对比）
     setQuizItems(quizForChallenge(challenge));
     setPhase('quiz');
   };
@@ -443,20 +404,14 @@ export default function App() {
                 className={
                   view === 'lab' || view === 'cards' || view === 'report' ? 'active' : ''
                 }
-                onClick={() => setView('lab')}
-                disabled={!lab || !challenge}
-                title={!lab ? '先在知识地图里选一个模块' : !challenge ? '先选一个挑战' : undefined}
-              >
-                实验台
-              </button>
-              <button
-                className={view === 'free' ? 'active' : ''}
                 onClick={() => {
-                  setLabId('fieldlab');
-                  setView('free');
+                  // 直接进实验台：不挂挑战，从空白开始自己搭
+                  setChallenge(null);
+                  setPhase('explore');
+                  setView('lab');
                 }}
               >
-                自由搭建
+                实验台
               </button>
               <button
                 className={view === 'quiz-bank' ? 'active' : ''}
@@ -596,169 +551,35 @@ export default function App() {
 
         {view === 'hub' && !lab && <EmptyPickLab onGoMap={() => setView('map')} />}
 
-        {view === 'lab' && !challenge && (
-          <EmptyPickChallenge
-            lab={lab}
-            onGoMap={() => setView('map')}
-            onGoHub={() => setView('hub')}
-            onPick={(cid) => {
-              const hand = CHALLENGES.find((c) => c.id === cid);
-              if (hand) {
-                beginChallenge(hand);
-                return;
-              }
-              const auto = AUTO_CHALLENGES.find((c) => c.id === cid);
-              if (!auto) return;
-              const targetLab = labById(auto.labId);
-              if (!targetLab) return;
-              setLabId(targetLab.id);
-              setChallenge({
-                id: auto.id,
-                labId: auto.labId,
-                title: auto.title,
-                brief: auto.brief,
-                hint: auto.hint,
-                winCondition: { metric: 'm', op: '<', value: 0 },
-                multiAnswer: true,
-                knowledgeIds: auto.knowledgeIds,
-                misconceptionIds: auto.misconceptionIds,
-                demoScriptId: '',
-                difficulty: 'beginner',
-                prediction: auto.prediction,
-              });
-              setPhase(auto.prediction ? 'predict' : 'explore');
-              setView('lab');
-            }}
-          />
-        )}
-
-        {/* ===== 力学 / 电路 / 声学：走各自的通用实验台 ===== */}
-        {view === 'lab' && challenge && currentLab?.id === 'mechanics' && (
-          <>
-            <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="力与运动" />
-            <MechanicsLab params={mechParams} onChange={(p) => setMechParams((prev) => ({ ...prev, ...p }))} />
-            <LabGateFooter
-              onGate={() => setPhase('gate')}
-              onToFree={() => sendToFreeBuild('mechanics')}
-            />
-          </>
-        )}
-
-        {view === 'lab' && challenge && currentLab?.id === 'circuits' && (
-          <>
-            <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="电路与电流" />
-            <CircuitsLab params={circParams} onChange={(p) => setCircParams((prev) => ({ ...prev, ...p }))} />
-            <LabGateFooter onGate={() => setPhase('gate')} onToFree={() => sendToFreeBuild('circuits')} />
-          </>
-        )}
-
-        {view === 'lab' && challenge && currentLab?.id === 'acoustics' && (
-          <>
-            <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="声与波" />
-            <AcousticsLab params={soundParams} onChange={(p) => setSoundParams((prev) => ({ ...prev, ...p }))} />
-            <LabGateFooter onGate={() => setPhase('gate')} onToFree={() => sendToFreeBuild('acoustics')} />
-          </>
-        )}
-
-        {view === 'lab' && challenge && (!currentLab || currentLab.id === 'optics-lens') && (
-          <>
-            <div className="work-head">
-              <div>
-                <span className="eyebrow">
-                  {challenge.id} · 凸透镜成像
-                </span>
-                <h2>{challenge.title}</h2>
-                <div className="brief">{challenge.brief}</div>
-              </div>
-              <div className="work-actions">
-                <button className="btn-ghost btn-small" onClick={() => setView('cards')}>
-                  看知识卡
-                </button>
-                {prediction === null && (
-                  <button className="btn-ghost btn-small" onClick={() => setPhase('predict')}>
-                    还没有预测
-                  </button>
-                )}
-                <button className="btn-primary" onClick={() => setPhase('gate')}>
-                  我满意了
-                </button>
-              </div>
-            </div>
-
-            <div className="split">
-              <div>
-                <CurveChart
-                  params={params}
-                  metrics={metrics}
-                  highlight={activeSlider === 'u' ? 'u' : activeSlider === 'f' ? 'f' : null}
-                />
-                <ControlPanel
-                  params={params}
-                  metrics={metrics}
-                  onChange={patchParams}
-                  activeSlider={activeSlider}
-                  onSliderFocus={setActiveSlider}
-                />
-                <div className="panel">
-                  <h4>提示</h4>
-                  <div className="hint-box">{challenge.hint}</div>
-                </div>
-              </div>
-
-              <div className="lab-column">
-                <LabStage
-                  params={params}
-                  stage="junior"
-                  metrics={metrics}
-                  showRays={showRays}
-                  showVirtualExtensions={showVirtual}
-                  onParamChange={patchParams}
-                  fullscreenExtra={
-                    <>
-                      <CurveChart params={params} metrics={metrics} highlight={null} />
-                      <ObservationPanel params={params} metrics={metrics} />
-                    </>
-                  }
-                />
-                <div style={{ marginTop: 18 }}>
-                  <ObservationPanel params={params} metrics={metrics} />
-                </div>
-
-                <div className="panel" style={{ marginTop: 18 }}>
-                  <div className="toggle-row" style={{ padding: 0 }}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={showRays}
-                        onChange={(e) => setShowRays(e.target.checked)}
-                      />
-                      三条特殊光线
-                    </label>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={showVirtual}
-                        onChange={(e) => setShowVirtual(e.target.checked)}
-                      />
-                      虚像延长线
-                    </label>
-                    <span style={{ marginLeft: 'auto', color: 'var(--label-3)' }}>
-                      黄 平行→焦点 · 蓝 过光心 · 粉 过焦点→平行
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {view === 'free' && (
-          <FreeBuildLab
+        {/* ===== 实验台：一个统一的全屏工作台 ===== */}
+        {/* 有挑战 → 自动载入这个挑战的器具；没挑战 → 从空白开始自己搭 */}
+        {view === 'lab' && (
+          <ImmersiveLab
+            key={challenge?.id ?? 'blank'}
             staticMode={import.meta.env.VITE_STATIC_WORKBENCH === '1'}
-            onCapture={handleCapture}
+            loadExperiment={challenge?.id}
+            challengeTitle={challenge?.title ?? '自由实验台'}
+            challengeBrief={challenge?.brief ?? '不挂挑战，从空白开始自己搭；也可以让 AI 帮你搭'}
+            phaseLabel={
+              challenge ? (prediction === null ? '还没预测' : '探索中') : undefined
+            }
+            primaryAction={
+              challenge
+                ? prediction === null
+                  ? { label: '先猜一下', onClick: () => setPhase('predict') }
+                  : { label: '我满意了', onClick: () => setPhase('gate') }
+                : null
+            }
             buildRequest={buildRequest}
+            onExit={() => {
+              setPhase('explore');
+              setView(challenge ? 'hub' : 'map');
+            }}
+            onCapture={(snap) => {
+              handleCapture(snap);
+              if (challenge) setPhase('gate');
+            }}
             onMessage={setToast}
-            importExperiment={importedExp}
             aiConfig={aiConfig}
           />
         )}
@@ -773,14 +594,7 @@ export default function App() {
                 背面可以一键交给自由搭建工作台，让 AI 帮你搭好再去改。
               </p>
             </div>
-            <KnowledgeCards
-              onBuild={(prompt, title, knowledgeId) => {
-                setLabId('fieldlab');
-                setView('free');
-                setBuildRequest({ knowledgeId, title, prompt });
-                setTimeout(() => setBuildRequest(null), 100);
-              }}
-            />
+            <KnowledgeCards onBuild={handleBuildKnowledge} />
           </>
         )}
 
@@ -871,16 +685,10 @@ export default function App() {
             metrics={metrics}
             onCancel={() => setPhase('explore')}
             onConfirm={confirmLock}
-            onSendToLab={() => sendToFreeBuild('lens')}
-          />
-        )}
-
-        {phase === 'compare' && locked && challenge && learner.predictions[challenge.id] && (
-          <PredictionCompare
-            challenge={challenge}
-            prediction={learner.predictions[challenge.id]}
-            metrics={metrics}
-            onNext={afterCompare}
+            onGoQuiz={() => {
+              setQuizItems(quizForChallenge(challenge));
+              setPhase('quiz');
+            }}
           />
         )}
 
@@ -948,7 +756,6 @@ export default function App() {
             setQuizAnswers({});
             setReflectionDraft('');
             setFreeRuns([]);
-            setImportedExp(null);
             setBuildRequest(null);
             setPromptEntry(null);
             setPhase('explore');
@@ -965,7 +772,6 @@ export default function App() {
             setQuizAnswers({});
             setReflectionDraft('');
             setFreeRuns([]);
-            setImportedExp(null);
             setBuildRequest(null);
             setPromptEntry(null);
             setPhase('explore');

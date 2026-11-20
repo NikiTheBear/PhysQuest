@@ -4192,3 +4192,162 @@ html[data-theme='dark'] .pq-toast {
   padding: 8px 12px;
   margin-top: 10px;
 }
+
+/* ================= 沉浸式全屏实验台 ================= */
+
+.immersive-lab {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* 顶栏 */
+.immersive-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 18px;
+  background: var(--surface);
+  border-bottom: var(--hairline);
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.ib-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.ib-exit {
+  background: var(--fill);
+  color: var(--label-2);
+  font-size: 12.5px;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  flex-shrink: 0;
+}
+.ib-exit:hover {
+  background: var(--fill-2);
+  color: var(--label);
+}
+.ib-phase {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.ib-title {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+}
+.ib-title b {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ib-title span {
+  font-size: 11.5px;
+  color: var(--label-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ib-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.ib-ready {
+  font-size: 11.5px;
+  color: var(--label-3);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.ib-ready.on {
+  color: var(--green);
+}
+.ib-btn {
+  background: var(--fill);
+  color: var(--label-2);
+  font-size: 12.5px;
+  padding: 7px 16px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.ib-btn:hover:not(:disabled) {
+  background: var(--fill-2);
+  color: var(--label);
+}
+.ib-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ib-btn.primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 500;
+}
+.ib-btn.primary:hover {
+  background: var(--accent-hover);
+}
+.ib-btn.ghost {
+  padding: 7px 11px;
+}
+
+/* 顶栏收起时只留退出按钮 */
+.immersive-lab.bar-collapsed .immersive-bar {
+  padding: 6px 18px;
+}
+.immersive-lab.bar-collapsed .ib-title,
+.immersive-lab.bar-collapsed .ib-phase,
+.immersive-lab.bar-collapsed .ib-ready,
+.immersive-lab.bar-collapsed .ib-btn:not(.ghost) {
+  display: none;
+}
+
+/* 主体 */
+.immersive-body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.immersive-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: var(--surface);
+}
+
+/* 加载态在沉浸模式下要居中 */
+.immersive-body .freebuild-loading {
+  position: absolute;
+  inset: 0;
+}
+
+/* 清空实验台：第一次点变成警告色，再点一次才真清 */
+.ib-btn.danger {
+  background: var(--red);
+  color: #fff;
+  font-weight: 500;
+}
+.ib-btn.danger:hover {
+  filter: brightness(1.08);
+}

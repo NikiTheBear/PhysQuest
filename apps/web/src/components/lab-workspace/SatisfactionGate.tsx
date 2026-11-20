@@ -7,8 +7,8 @@ interface Props {
   metrics: LensMetrics;
   onCancel: () => void;
   onConfirm: () => void;
-  /** 锁定后把这组参数搬到自由搭建工作台 */
-  onSendToLab: () => void;
+  /** 锁定后直接去做题库 */
+  onGoQuiz: () => void;
 }
 
 /** 满意度闸门：学生必须自己调到满意才能提交，提交后才解锁 AI 演示。 */
@@ -17,7 +17,7 @@ export default function SatisfactionGate({
   metrics,
   onCancel,
   onConfirm,
-  onSendToLab,
+  onGoQuiz,
 }: Props) {
   const [score, setScore] = useState(3);
   const [reason, setReason] = useState('');
@@ -96,25 +96,18 @@ export default function SatisfactionGate({
           </details>
         )}
 
-        <div className="gate-send">
-          <div>
-            <b>想把它搭出来？</b>
-            <p>
-              把这组参数搬到自由搭建工作台，用 46 种器具把它做成一个真正的装置，
-              还能让 AI 一起搭。
-            </p>
-          </div>
-          <button className="btn-ghost" onClick={onSendToLab}>
-            搬到自由搭建 →
-          </button>
-        </div>
-
         <div className="modal-actions">
           <button className="btn-ghost" onClick={onCancel}>
-            再调调
+            回去再调调
           </button>
-          <button className="btn-primary" onClick={onConfirm}>
-            锁定这组参数
+          <button
+            className="btn-primary"
+            onClick={() => {
+              onConfirm();
+              onGoQuiz();
+            }}
+          >
+            锁定，去做题库 →
           </button>
         </div>
       </div>

@@ -12,7 +12,7 @@ import { LabScene } from './scene.js';
 import { icon, hydrateIcons } from './icons.js';
 import { setupWorkshop } from './workshop.js';
 import { setupAssistant } from './assistant.js';
-import {sliderTarget} from '../shared/sliders.js';
+import {setupTuning} from './tuning.js';
 import { parameterPreview } from './parameter-preview.js';
 import {colliderConfig,colliderOf,supportsCollider} from '../shared/colliders.js';
 
@@ -78,7 +78,7 @@ function render(){
   $('title-btn').innerHTML=esc(d.title)+' '+icon('chevron');$('space-count').textContent=String(workspace.experiments.length).padStart(2,'0');$('empty-scene').hidden=d.components.length>0;$('object-count').textContent=d.components.length+' 个器具';$('connection-count').textContent=d.connections.length;
   $('mode-2d').classList.toggle('selected',d.mode==='2d');$('mode-3d').classList.toggle('selected',d.mode==='3d');$('speed').value=d.environment.speed;$('plane-label').textContent=scene.mode==='2d'?(d.plane2d==='xz'?'XZ 俯视':'XY 侧视'):'';
   $('play-btn').innerHTML=icon(d.control.running?'pause':'play')+`<span>${d.control.running?'暂停':'运行'}</span>`;$('scene-state').textContent=d.control.running?'仿真运行中':'自由构建';$('solver-status').textContent=d.control.running?'求解器运行中':'求解器就绪';$('view-caption').innerHTML=d.mode==='2d'?'正交视图 <span>·</span> 选中器具后拖动坐标轴':'透视视图 <span>·</span> 拖动旋转 · 选中后拖动坐标轴';
-  if(pendingWire&&!d.components.some(c=>c.id===pendingWire.id)){pendingWire=null;scene.pendingWire=null;}$('axis-help').hidden=!selected||scene.isBound(d.components.find(c=>c.id===selected));updateHistory();renderLibrary();renderInspector();renderVariableSliders();renderChannels();hydrateIcons();
+  if(pendingWire&&!d.components.some(c=>c.id===pendingWire.id)){pendingWire=null;scene.pendingWire=null;}$('axis-help').hidden=!selected||scene.isBound(d.components.find(c=>c.id===selected));updateHistory();renderLibrary();renderInspector();tuning.render();renderChannels();hydrateIcons();
 }
 function renderLibrary(){
   $('categories').innerHTML=[['all','全部'],...Object.entries(DOMAINS).map(([k,d])=>[k,d.name]),['custom','我的']].map(([key,label])=>`<button data-category="${key}" class="${key===category?'active':''}">${label}</button>`).join('');
@@ -132,28 +132,25 @@ function renderInspector(){
   const def=CATALOG[c.kind];
   el.innerHTML=hero(def.icon,c.name,DOMAINS[def.domain].name+' · '+def.description)+`<label class="section-label" for="component-name">器具名称</label><input class="component-name" id="component-name" value="${esc(c.name)}" maxlength="60"><hr class="section-rule"><div class="section-label">初始位置 <span class="muted">/ m</span></div>${scene.isBound(c)?'<p class="bound-hint">此器具的位置由两端决定。移动端点即可调整它的位置。</p>':''}<div class="position-grid">${['X','Y','Z'].map((axis,i)=>`<label><span>${axis}</span><input type="number" data-axis="${i}" value="${c.position[i]}" min="-30" max="30" step="0.1" aria-label="${axis} 位置" ${scene.isBound(c)||d.mode==='2d'&&i===normalAxis(d)?'disabled':''}></label>`).join('')}</div>${RIGID_KINDS.includes(c.kind)?`<label class="toggle-row">固定在空间中<input class="toggle" id="fixed" type="checkbox" ${c.fixed?'checked':''}></label>`:''}${(LINK_KINDS.includes(c.kind)||c.kind==='distance_sensor')?'<hr class="section-rule"><div class="section-label">连接端点</div>'+['a','b'].map(key=>`<label class="section-label">端点 ${key.toUpperCase()}</label><select class="field-select" data-ref="${key}"><option value="">请选择器具</option>${d.components.filter(o=>o.id!==c.id&&(c.kind==='distance_sensor'||ENDPOINT_KINDS.includes(o.kind))).map(o=>`<option value="${o.id}" ${o.id===c.refs[key]?'selected':''}>${esc(o.name)}</option>`).join('')}</select>`).join('')+(!c.refs.a||!c.refs.b?'<p class="warning-note">选择两个端点后，连接器具才会施加作用。</p>':''):''}${['force','drag','expression_force','harmonic_force','motion_sensor'].includes(c.kind)?'<hr class="section-rule"><label class="section-label">目标刚体</label><select class="field-select" data-ref="target"><option value="">请选择目标</option>'+d.components.filter(o=>RIGID_KINDS.includes(o.kind)).map(o=>'<option value="'+o.id+'" '+(o.id===c.refs.target?'selected':'')+'>'+esc(o.name)+'</option>').join('')+'</select>':''}${CIRCUIT_KINDS.includes(c.kind)?'<hr class="section-rule"><div class="section-label">电路端子 · 点击接线</div><div class="port-actions">'+def.terminals.map(port=>'<button data-wire-port="'+port+'">端子 '+port.toUpperCase()+(c.kind==='battery'?(port==='a'?' +':' −'):'')+'</button>').join('')+'</div><p class="input-hint">选中端子，再选中另一器具的端子建立导线。</p><div class="circuit-live" id="circuit-live"></div>':''}${colliderEditor(c)}<hr class="section-rule"><div class="section-label">物理参数</div>${Object.entries(def.params).map(([key,spec])=>parameter(key,spec,c.params[key])).join('')||'<p class="input-hint">此器具无额外参数，改变位置即可。</p>'}${c.kind==='coil'?'<p class="warning-note">音圈需置于 Z 方向磁场范围内，并通过「连接」接入信号电源，才能受到电磁驱动。</p>':''}<hr class="section-rule"><div class="inspector-actions"><button id="save-design">${icon('save')}保存为器具</button><button id="duplicate-component">${icon('copy')}复制</button><button id="delete-component" class="danger" aria-label="删除器具">${icon('trash')}</button></div>`;
 }
-function renderVariableSliders(){
-  const panel=$('experiment-sliders'),sliders=doc().sliders||[];
-  if(sliderPreview?.experimentId===doc().id&&panel.contains(sliderPreview.element))return;
-  panel.hidden=!sliders.length;
-  panel.innerHTML=sliders.length?'<strong>实验变量</strong>'+sliders.map((s,i)=>{
-    const {spec,value}=sliderTarget(doc(),s);
-    return `<label>${esc(s.label)} <output>${esc(value)}</output> ${esc(spec.unit)}<input type="range" data-slider="${i}" min="${s.min}" max="${s.max}" step="${s.step}" value="${value}"></label>`;
-  }).join(''):'';
-}
-$('experiment-sliders').oninput=e=>{
-  const el=e.target,s=doc().sliders?.[el.dataset.slider];if(!s)return;
-  el.previousElementSibling.textContent=el.value;
-  sliderPreview={element:el,experimentId:doc().id,componentId:s.componentId,key:s.parameter,value:Number(el.value),environment:s.componentId==null,dirty:true};
-  saveStatus('实时预览 · 松开滑块保存');
-};
-$('experiment-sliders').onchange=async e=>{
-  const s=doc().sliders?.[e.target.dataset.slider];if(!s)return;
-  const value=Number(e.target.value),experimentId=doc().id;
-  sliderPreview=null;
-  const result=s.componentId==null?await command('update_experiment',{experimentId,environment:{[s.parameter]:value}}):await command('update_component',{experimentId,componentId:s.componentId,params:{[s.parameter]:value}});
-  if(!result)render();
-};
+const tuning=setupTuning({
+  getDoc:doc,
+  onPreview(element,s,value){
+    sliderPreview={element,experimentId:doc().id,componentId:s.componentId,key:s.parameter,value,environment:s.componentId==null,dirty:true};
+    saveStatus('实时预览 · 完成调整后保存');
+  },
+  onCancel(){
+    if(sliderPreview?.element.closest('#experiment-sliders')){sliderPreview=null;syncSimulation(doc());}
+  },
+  async onCommit(experimentId,s,value){
+    if(sliderPreview){applySliderPreview();sliderPreview=null;}
+    const key=s.parameter;
+    const result=s.componentId==null
+      ?await command('update_experiment',{experimentId,environment:{[key]:value}})
+      :await command('update_component',{experimentId,componentId:s.componentId,params:{[key]:value}});
+    if(!result)render();
+  }
+});
+$('collapse-tuning').onclick=()=>{panels.open('tuning',false);document.querySelector('[data-panel="tuning"]').focus();};
 let displayedChart=null;
 function renderChannels(){
   const snapshot=doc().chart,tab=$('ai-chart-tab');
@@ -382,12 +379,12 @@ async function initialize(){
       }
     }catch(error){const message='打开挑战失败：'+error.message;toast(message);bridgePost('load-failed',{message});return;}
   }
-  render();scene.fit();if(challengeId)panels.open('objective');bridgeReady=true;bridgePost('ready');requestAnimationFrame(frame);
+  render();scene.fit();if(challengeId)panels.open('objective');if(doc().components.length&&matchMedia('(min-width: 761px)').matches)panels.open('tuning');bridgeReady=true;bridgePost('ready');requestAnimationFrame(frame);
   setInterval(async()=>{if(!online||pending||document.hidden||['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)||$('modal').open)return;try{if(offline)throw new Error('standalone');const r=await fetch('/api/state');if(!r.ok)return;const remote=await r.json();if(remote.revision>workspace.revision){undoStack.length=redoStack.length=0;workspace=remote;localStorage.setItem('fieldlab-workspace',JSON.stringify(workspace));render();saveStatus('已同步 AI / 其他窗口');toast('实验空间已同步');}}catch{saveStatus('同步暂时中断',true);}},2500);
 }
 $('undo-btn').onclick=()=>travelHistory();$('redo-btn').onclick=()=>travelHistory(true);$('snap-btn').onclick=()=>{scene.setSnap(!scene.snap);$('snap-btn').classList.toggle('active',scene.snap);toast(scene.snap?'网格吸附开启 · 0.1 m':'网格吸附关闭');};
 const workshop=setupWorkshop({getWorkspace:()=>workspace,getDoc:doc,command,showModal,errorInModal,esc,download,toast,onCategory:value=>{category=value;renderLibrary();}});
-const assistant=setupAssistant({openAssistant:showAI,getWorkspace:()=>workspace,getSelectedId:()=>selected,isOnline:()=>online,beforeRequest:()=>queue,setBusy:value=>{aiBusy=value;pending+=value?1:-1;for(const region of document.querySelectorAll('.library,.center-column,#property-panel'))region.inert=value;for(const button of document.querySelectorAll('.workspace-bar button'))button.disabled=value;updateHistory();},toast,applyResult:async(result,before)=>{if(!result.changed)return;remember(before);workspace=result.workspace;selected=null;localStorage.setItem('fieldlab-workspace',JSON.stringify(workspace));render();scene.fit();saveStatus(localServer?'AI 修改已保存到本机':'AI 修改已保存到云端');}});
+const assistant=setupAssistant({openAssistant:showAI,getWorkspace:()=>workspace,getSelectedId:()=>selected,isOnline:()=>online,beforeRequest:()=>queue,setBusy:value=>{aiBusy=value;pending+=value?1:-1;for(const region of document.querySelectorAll('.library,.center-column,#property-panel,#experiment-sliders'))region.inert=value;for(const button of document.querySelectorAll('.workspace-bar button'))button.disabled=value;updateHistory();},toast,applyResult:async(result,before)=>{if(!result.changed)return;remember(before);workspace=result.workspace;selected=null;localStorage.setItem('fieldlab-workspace',JSON.stringify(workspace));render();scene.fit();saveStatus(localServer?'AI 修改已保存到本机':'AI 修改已保存到云端');}});
 function bridgePost(type,data={}){if(embedded)parent.postMessage({source:'fieldlab',type,...data},location.origin);}
 window.addEventListener('message',async event=>{
   if(!embedded||event.origin!==location.origin||event.source!==parent||event.data?.source!=='physquest')return;

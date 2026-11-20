@@ -473,3 +473,21 @@ body.sim-stage .transport{position:absolute;bottom:9px;left:50%;right:auto;trans
 .sim-stage .terminal.connected:not(.armed){border-color:#2d739e;background:#e4f1fa;color:#1d5a80}
 /* Leave both axis handles hittable when the selected instrument is labelled. */
 .sim-stage #scene-container:has(#scene-2d:not([hidden])) .object-label.selected{transform:translate(calc(-100% - 12px),-100%)}
+
+.sim-stage #experiment-sliders{
+  position:fixed;z-index:5;top:108px;left:10px;width:min(276px,calc(100vw - 20px));
+  max-height:calc(100dvh - 174px);display:flex;flex-direction:column;overflow:hidden;
+  background:#fff;color:#284558;border:1px solid #d5e0e8;border-radius:10px;box-shadow:0 4px 16px #1f405714
+}
+#experiment-sliders header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 4px}
+#experiment-sliders h2{font-size:15px;margin:0}
+#tuning-group{margin:4px 14px 10px;padding:6px 8px;color:inherit;background:#fff;border:1px solid #d4dfe6;border-radius:6px}
+#tuning-rows{padding:0 14px 4px;overflow:auto;overscroll-behavior:contain}
+.tuning-row{padding:9px 0;border-top:1px solid #e8eef2}
+.tuning-line{display:flex;align-items:center;gap:5px}
+.tuning-line label{flex:1;min-width:0;font-size:14px;overflow-wrap:anywhere}
+.sim-stage .tuning-line input{width:72px;color:#275a7d;text-align:right;border:1px solid #d3dfe7;border-radius:5px;padding:3px 4px;font:13px/1.4 var(--font,sans-serif);font-variant-numeric:tabular-nums}
+.tuning-unit,.tuning-limits{font-size:12px;color:#526f82}
+.tuning-row input[type=range]{display:block;width:100%;height:22px;margin:3px 0 0;accent-color:#2875a5;cursor:pointer}
+.tuning-limits{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+@media(max-width:760px){.sim-stage #experiment-sliders{max-height:min(46dvh,calc(100dvh - 174px))}}

@@ -1,3 +1,4 @@
+import {normalAxis,verticalAxis} from './planes.js';
 import {lensTrain} from './lens-train.js';
 import { CATALOG, RIGID_KINDS, CIRCUIT_KINDS, SOUND_KINDS, LENS_KINDS, LINK_KINDS } from './catalog.js';
 import { solve as solveLens } from './physquest-lens.js';
@@ -31,11 +32,12 @@ export function fieldAt(doc, point, bodies = null, exclude = '') {
 export class Simulation {
   constructor(doc) { this.reset(doc); }
   reset(doc) {
+    this.normal=normalAxis(doc);
     this.opticalTrain=lensTrain(doc.components);
     this.doc = structuredClone(doc); this.time = 0; this.steps = 0;
     this.bodies = new Map(doc.components.map(c => [c.id, {
-      position: c.position.map((v, i) => doc.mode === '2d' && i === 2 ? 0 : v + (c.kind === 'coil' && i === 0 ? c.params.displacement : 0)),
-      velocity: c.fixed ? [0,0,0] : [c.params.vx || 0, c.params.vy || 0, doc.mode === '2d' ? 0 : (c.params.vz || 0)],
+      position: c.position.map((v, i) => doc.mode === '2d' && i === this.normal ? 0 : v + (c.kind === 'coil' && i === 0 ? c.params.displacement : 0)),
+      velocity: c.fixed ? [0,0,0] : [c.params.vx || 0, c.params.vy || 0,c.params.vz || 0].map((v,i)=>doc.mode==='2d'&&i===this.normal?0:v),
       x: c.params.displacement || 0, v: 0, force: [0,0,0], trail: []
     }]));
     this.forceSources=this.doc.components.filter(c=>['drag','expression_force'].includes(c.kind)).map(c=>({
@@ -68,7 +70,7 @@ export class Simulation {
     let sum = 0;
     for (const c of this.doc.components.filter(c => SOUND_KINDS.includes(c.kind))) {
       const d = Math.max(.2, norm(sub(point, this.bodies.get(c.id).position)));
-      const relative=sub(point,this.bodies.get(c.id).position),angle=(c.params.angle||0)*Math.PI/180,directivity=c.kind==='directional_speaker'?Math.max(0,(relative[0]*Math.cos(angle)+relative[1]*Math.sin(angle))/d)**c.params.directivity:1;
+      const relative=sub(point,this.bodies.get(c.id).position),angle=(c.params.angle||0)*Math.PI/180,directivity=c.kind==='directional_speaker'?Math.max(0,(relative[0]*Math.cos(angle)+relative[verticalAxis(this.doc)]*Math.sin(angle))/d)**c.params.directivity:1;
       sum += directivity*c.params.amplitude * this.modulation(c.id, 'acoustic') / Math.max(1, d) * Math.sin(TAU*c.params.frequency*(t-d/c.params.speed) + c.params.phase*Math.PI/180);
     }
     return sum;
@@ -113,7 +115,7 @@ export class Simulation {
         applied=mul(velocity,-scale);
         dragVelocity.set(target.id,add(velocity,mul(applied,dt/target.params.mass)));
       }
-      if(doc.mode==='2d')applied[2]=0;
+      if(doc.mode==='2d')applied[this.normal]=0;
       body.force=add(body.force,applied);this.bodies.get(source.id).appliedForce=applied;
     }
     for(const c of doc.components.filter(c=>c.kind==='force')){const b=this.bodies.get(c.refs.target);if(b){b.force=add(b.force,[c.params.fx,c.params.fy,c.params.fz]);b.torque=add(b.torque,[c.params.tx,c.params.ty,c.params.tz]);}}
@@ -126,7 +128,7 @@ export class Simulation {
       const accel=(t,x,v)=>(B*p.length*this.sourceCurrent(c.id,t)-p.stiffness*x-p.damping*v)/p.mass;
       const a1=accel(this.time,b.x,b.v),v1=b.v,a2=accel(this.time+dt/2,b.x+v1*dt/2,b.v+a1*dt/2),v2=b.v+a1*dt/2,a3=accel(this.time+dt/2,b.x+v2*dt/2,b.v+a2*dt/2),v3=b.v+a2*dt/2,a4=accel(this.time+dt,b.x+v3*dt,b.v+a3*dt),v4=b.v+a3*dt;
       b.x+=dt*(v1+2*v2+2*v3+v4)/6; b.v+=dt*(a1+2*a2+2*a3+a4)/6;
-      b.position=[c.position[0]+b.x,c.position[1],doc.mode==='2d'?0:c.position[2]];b.velocity=[b.v,0,0];b.force=[B*p.length*this.sourceCurrent(c.id,this.time),0,0];
+      b.position=[c.position[0]+b.x,c.position[1],c.position[2]].map((v,i)=>doc.mode==='2d'&&i===this.normal?0:v);b.velocity=[b.v,0,0];b.force=[B*p.length*this.sourceCurrent(c.id,this.time),0,0];
     }
     this.time+=dt;this.steps++;
     if(this.steps%8===0) {

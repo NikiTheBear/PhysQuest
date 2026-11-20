@@ -5,6 +5,11 @@ execFileSync(process.execPath,['scripts/build-knowledge-prompts.mjs'],{stdio:'in
 execFileSync('npm',['--prefix','physquest/apps/web','run','build'],{stdio:'inherit'});
 import { readFile, writeFile, mkdir, rm, copyFile } from 'node:fs/promises';
 await mkdir('.generated',{recursive:true});
+const challengeFiles={};
+for(const name of await readdir('experiments')){
+  if(name.endsWith('.pqexp.json'))challengeFiles[name.split('.')[0]]=JSON.parse(await readFile('experiments/'+name,'utf8'));
+}
+await writeFile('.generated/challenges.js','export default '+JSON.stringify(challengeFiles));
 const browser=await build({entryPoints:['web/app.js'],bundle:true,minify:true,format:'esm',target:'es2022',write:false});
 const assets={'/app.js':{body:browser.outputFiles[0].text,type:'text/javascript; charset=utf-8'}};
 for(const [file,type] of [['index.html','text/html; charset=utf-8'],['style.css','text/css; charset=utf-8'],['light.css','text/css; charset=utf-8'],['embedded.css','text/css; charset=utf-8'],['favicon.svg','image/svg+xml']])assets['/'+file]={body:await readFile('web/'+file,'utf8'),type};
@@ -20,6 +25,7 @@ await mkdir('standalone',{recursive:true});
 const standalone=assets['/index.html'].body
   .replace('<link rel="stylesheet" href="/style.css">',()=>'<style>'+assets['/style.css'].body+'</style>')
   .replace('<link rel="stylesheet" href="/light.css">',()=>'<style>'+assets['/light.css'].body+'</style>')
+  .replace('<link rel="stylesheet" href="/embedded.css">',()=>'<style>'+assets['/embedded.css'].body+'</style>')
   .replace('href="/favicon.svg"',()=>'href="data:image/svg+xml,'+encodeURIComponent(assets['/favicon.svg'].body)+'"')
   .replace('<script type="module" src="/app.js"></script>',()=>'<script type="module">'+assets['/app.js'].body.replaceAll('</script','<\\/script')+'</script>');
 await writeFile('standalone/fieldlab.html',standalone);

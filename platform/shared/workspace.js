@@ -1,9 +1,12 @@
+import {instrumentPlane} from './planes.js';
 import {validateAppearance} from './appearance.js';
 import { CATALOG, COUPLINGS, blankExperiment, component, uid, activeExperiment, ENDPOINT_KINDS, RIGID_KINDS, LINK_KINDS } from './catalog.js';
 import {sliderTarget,validateSliders} from './sliders.js';
 import {sampleChart,validateChart} from './experiment-chart.js';
 import {compileForce} from './force-expression.js';
 import {validateCollider} from './colliders.js';
+// One editable copy per teaching challenge plus room for independent workspaces.
+const maxExperiments=100;
 const text = (v, max, name) => { if(typeof v !== 'string' || v.length > max) throw new Error(name+'必须是长度不超过 '+max+' 的文本'); return v; };
 const number = (v, min, max, name) => { if(typeof v !== 'number'||!Number.isFinite(v)||v<min||v>max)throw new Error(`${name} 必须在 ${min}–${max} 之间`);return v;};
 export function validateComponent(c) {
@@ -25,6 +28,7 @@ export function validateExperiment(doc) {
   validateSliders(doc);
   if(doc.chart!==undefined)validateChart(doc.chart);
   text(doc.id,100,'实验 ID');text(doc.title,100,'实验名称');text(doc.goal,2000,'实验目标');if(doc.observation!==undefined)text(doc.observation,1200,'观察指引');
+  if(doc.plane2d!==undefined&&!['xy','xz'].includes(doc.plane2d))throw new Error('二维平面必须为 xy 或 xz');
   if(!['2d','3d'].includes(doc.mode))throw new Error('模式只能是 2d 或 3d');
   if(!Array.isArray(doc.components)||doc.components.length>64)throw new Error('最多支持 64 个器具');
   const ids=new Set();for(const c of doc.components){validateComponent(c);if(ids.has(c.id))throw new Error('器具 ID 重复');ids.add(c.id);}
@@ -64,7 +68,7 @@ export function mutate(workspace,name,args) {
       break;
     }
     case 'import_experiment': {
-      if(w.experiments.length>=30&&!args.bootstrap)throw new Error('最多保存 30 个实验空间');
+      if(w.experiments.length>=maxExperiments&&!args.bootstrap)throw new Error(`最多保存 ${maxExperiments} 个实验空间`);
       if(args.bootstrap&&(w.revision!==0||w.experiments.length!==1||doc.components.length||doc.connections.length))throw new Error('自动载入只适用于未编辑的初始空间');
       const imported=readExperimentFile(args.file),mapping=new Map(imported.components.map(c=>[c.id,uid()]));
       imported.id=uid();imported.control={running:false,reset:0};
@@ -76,12 +80,12 @@ export function mutate(workspace,name,args) {
       w.activeId=imported.id;result=imported;break;
     }
     case 'create_experiment': {
-      if(w.experiments.length>=30)throw new Error('最多保存 30 个实验空间');
-      const e=blankExperiment(args.title||'未命名实验');e.goal=args.goal||'';if(args.observation!==undefined)e.observation=args.observation;e.mode=args.mode||'3d';validateExperiment(e);w.experiments.push(e);w.activeId=e.id;result=e;break;
+      if(w.experiments.length>=maxExperiments)throw new Error(`最多保存 ${maxExperiments} 个实验空间`);
+      const e=blankExperiment(args.title||'未命名实验');e.goal=args.goal||'';if(args.observation!==undefined)e.observation=args.observation;e.mode=args.mode||'3d';if(args.plane2d!==undefined)e.plane2d=args.plane2d;validateExperiment(e);w.experiments.push(e);w.activeId=e.id;result=e;break;
     }
     case 'activate_experiment': w.activeId=doc.id;result=doc;break;
     case 'update_experiment': {
-      for(const key of ['title','goal','observation','mode','learning'])if(args[key]!==undefined)doc[key]=args[key];
+      for(const key of ['title','goal','observation','mode','plane2d','learning'])if(args[key]!==undefined)doc[key]=args[key];
       if(args.environment)Object.assign(doc.environment,args.environment);validateExperiment(doc);result=doc;break;
     }
     case 'replace_experiment': {
@@ -89,7 +93,7 @@ export function mutate(workspace,name,args) {
       const validated=validateExperiment(structuredClone(args.experiment));w.experiments[w.experiments.indexOf(doc)]=validated;result=validated;break;
     }
     case 'add_component': {
-      const c=component(args.kind);if(args.name!==undefined)c.name=args.name;if(args.position)c.position=args.position;if(args.params)Object.assign(c.params,args.params);if(args.fixed!==undefined)c.fixed=args.fixed;if(args.refs)c.refs=args.refs;if(args.appearance)c.appearance=args.appearance;if(args.collider!==undefined)c.collider=args.collider;doc.components.push(c);validateExperiment(doc);result=c;break;
+      const c=component(args.kind);if(args.name!==undefined)c.name=args.name;if(args.position)c.position=args.position;if(args.params)Object.assign(c.params,args.params);if(args.fixed!==undefined)c.fixed=args.fixed;if(args.refs)c.refs=args.refs;if(args.appearance)c.appearance=args.appearance;if(args.collider!==undefined)c.collider=args.collider;if(!doc.components.length)doc.plane2d??=instrumentPlane(c.kind);doc.components.push(c);validateExperiment(doc);result=c;break;
     }
     case 'update_component': {
       const c=getComponent(args.componentId);for(const key of ['name','position','fixed','refs','appearance','collider'])if(args[key]!==undefined)c[key]=args[key];if(args.params)Object.assign(c.params,args.params);validateExperiment(doc);result=c;break;
@@ -126,13 +130,14 @@ export function mutate(workspace,name,args) {
       for(const c of parts)mapping.set(c.id,uid());
       const occupiedNames=new Set(doc.components.map(c=>c.name));
       for(const c of parts){c.id=mapping.get(c.id);c.position=c.position.map((v,i)=>v+base[i]);c.name=args.name?(parts.length===1?args.name:args.name+' · '+c.name):c.name;c.refs=Object.fromEntries(Object.entries(c.refs).map(([key,id])=>[key,mapping.get(id)||'']));const baseName=c.name;let suffix=1;while(occupiedNames.has(c.name))c.name=baseName.slice(0,52)+' · '+(++suffix);occupiedNames.add(c.name);validateComponent(c);created.push(c);}
+      if(!doc.components.length)doc.plane2d??=instrumentPlane(created[0].kind);
       doc.components.push(...created);
       const links=(d.connections||[]).map(l=>({...l,id:uid(),source:mapping.get(l.source),target:mapping.get(l.target)}));doc.connections.push(...links);validateExperiment(doc);
       const ports=Object.fromEntries((d.ports||[]).map(p=>[p.name,{componentId:mapping.get(p.componentId),port:p.port}]));
       result={id:created[0].id,designId:d.id,componentIds:created.map(c=>c.id),connectionIds:links.map(l=>l.id),ports};break;
     }
     case 'restore_workspace': {
-      const value=args.workspace;if(!value||!Array.isArray(value.experiments)||!value.experiments.length||value.experiments.length>30||!Array.isArray(value.designs)||value.designs.length>50)throw new Error('无效的工作区历史');
+      const value=args.workspace;if(!value||!Array.isArray(value.experiments)||!value.experiments.length||value.experiments.length>maxExperiments||!Array.isArray(value.designs)||value.designs.length>50)throw new Error('无效的工作区历史');
       value.experiments.forEach(validateExperiment);if(new Set(value.experiments.map(e=>e.id)).size!==value.experiments.length||!value.experiments.some(e=>e.id===value.activeId))throw new Error('无效空间 ID');
       w.experiments=structuredClone(value.experiments);w.designs=value.designs.map(normalizeDesign);if(new Set(w.designs.map(d=>d.id)).size!==w.designs.length)throw new Error('设计 ID 重复');w.activeId=value.activeId;for(const e of w.experiments)e.control.running=false;result={restored:true};break;
     }

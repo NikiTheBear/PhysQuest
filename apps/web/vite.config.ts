@@ -26,6 +26,7 @@ export default defineConfig({
       '/api': 'http://127.0.0.1:4317',
       '/mcp': 'http://127.0.0.1:4317',
       '/app.js': 'http://127.0.0.1:4317',
+      '/embedded.css': 'http://127.0.0.1:4317',
       '/light.css': 'http://127.0.0.1:4317',
       '/style.css': 'http://127.0.0.1:4317',
       '/favicon.svg': 'http://127.0.0.1:4317',

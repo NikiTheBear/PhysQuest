@@ -26,7 +26,7 @@ export interface CaptureSnapshot {
     title: string;
     mode: string;
     goal: string;
-    components: Array<{ id: string; name: string; kind: string }>;
+    components: Array<{ id: string; name: string; kind: string; params?: Record<string,number> }>;
     connections: Array<{ id: string }>;
   };
   time: number;
@@ -37,6 +37,7 @@ export interface CaptureSnapshot {
 }
 
 interface Props {
+  onExit:()=>void;
   /** GitHub Pages 上用静态单文件版，本地用服务版 */
   staticMode: boolean;
   /** 选定的领域筛选（all / optics / mechanics …） */
@@ -56,8 +57,6 @@ interface Props {
   } | null;
   /** 达成目标时通知父组件 */
   onGoalReached?: () => void;
-  /** 从实验台一键搬过来的实验数据（.pqexp） */
-  importExperiment?: unknown | null;
   /** 顶栏配的 AI 配置，传给工作台用 */
   aiConfig?: { apiKey: string; model: string; endpoint: string; connection: string } | null;
 }
@@ -66,7 +65,7 @@ const workbenchUrl = (staticMode: boolean) =>
   staticMode ? `${import.meta.env.BASE_URL}workbench.html?offline=1` : '/workbench';
 
 export default function FreeBuildLab({
-  staticMode,
+  onExit,staticMode,
   domain = 'all',
   loadExperiment,
   onCapture,
@@ -74,15 +73,15 @@ export default function FreeBuildLab({
   onMessage,
   goal,
   onGoalReached,
-  importExperiment,
   aiConfig,
 }: Props) {
   const [goalState, setGoalState] = useState<{ ok: boolean; detail: string } | null>(null);
   const [ready, setReady] = useState(false);
   const [slow, setSlow] = useState(false);
+  const [loadError,setLoadError]=useState('');
   const [capturing, setCapturing] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
-  const pending = useRef<{ action: string; data: Record<string, string> } | null>(null);
+  const sentBuild = useRef<Props['buildRequest']>(null);
   const captureId = useRef<string | null>(null);
   const captureTimer = useRef<ReturnType<typeof setTimeout>>();
 
@@ -93,6 +92,8 @@ export default function FreeBuildLab({
     );
   }, []);
 
+  useEffect(() => () => clearTimeout(captureTimer.current), []);
+
   /* ---------- 接收工作台的消息 ---------- */
   useEffect(() => {
     const receive = (event: MessageEvent) => {
@@ -100,13 +101,10 @@ export default function FreeBuildLab({
       if (event.source !== frame.current?.contentWindow) return;
       if (event.data?.source !== 'fieldlab') return;
 
+      if(event.data.type==='load-failed'){setLoadError(event.data.message);return;}
       if (event.data.type === 'ready') {
         setReady(true);
         setSlow(false);
-        if (pending.current) {
-          send(pending.current.action, pending.current.data);
-          pending.current = null;
-        }
         return;
       }
 
@@ -157,23 +155,20 @@ export default function FreeBuildLab({
 
   /* ---------- 领域筛选 ---------- */
   useEffect(() => {
-    if (!ready) {
-      pending.current = { action: 'filter-library', data: { domain } };
-      return;
-    }
+    if (!ready) return;
     send('filter-library', { domain });
   }, [domain, ready, send]);
 
   /* ---------- 用知识点提示词搭建 ---------- */
   useEffect(() => {
-    if (!buildRequest) return;
+    if (!ready || !buildRequest || sentBuild.current === buildRequest) return;
+    sentBuild.current = buildRequest;
     const data = {
       knowledgeId: buildRequest.knowledgeId,
       title: buildRequest.title,
       prompt: buildRequest.prompt,
     };
-    if (ready) send('build-knowledge', data);
-    else pending.current = { action: 'build-knowledge', data };
+    send('build-knowledge', data);
   }, [buildRequest, ready, send]);
 
   /* ---------- 把 Key 同步给工作台 ---------- */
@@ -185,14 +180,6 @@ export default function FreeBuildLab({
       endpoint: aiConfig.endpoint,
     });
   }, [ready, aiConfig, send]);
-
-  /* ---------- 从实验台导入 ---------- */
-  useEffect(() => {
-    if (!importExperiment) return;
-    const data = { experiment: JSON.stringify(importExperiment) };
-    if (ready) send('import-experiment', data);
-    else pending.current = { action: 'import-experiment', data };
-  }, [importExperiment, ready, send]);
 
   /* ---------- 可见性 ---------- */
   useEffect(() => {
@@ -213,29 +200,11 @@ export default function FreeBuildLab({
   };
 
   return (
-    <>
-      <div className="work-head">
-        <div>
-          <span className="eyebrow">FIELDLAB · 自由搭建</span>
-          <h2>自由搭建实验台</h2>
-          <div className="brief">
-            自己摆器具、连线路、跑仿真。也可以让 AI 一起搭——
-            <b> AI 的每一次修改都能撤销</b>，你的实验文件在你手里。
-          </div>
-        </div>
-        <div className="work-actions">
-          <button className="btn-ghost btn-small" onClick={() => send('help')} disabled={!ready}>
-            操作指南
-          </button>
-          <button className="btn-ghost btn-small" onClick={() => send('spaces')} disabled={!ready}>
-            实验文件
-          </button>
-          <button className="btn-primary" onClick={capture} disabled={!ready || capturing}>
-            {capturing ? '正在记录…' : '记录此刻'}
-          </button>
-        </div>
-      </div>
-
+    <section className="immersive-lab">
+      <nav className="lab-return">
+        <button onClick={onExit}>← 返回</button>
+        <button disabled={!ready||capturing} onClick={capture}>{capturing?'记录中…':'记录此刻'}</button>
+      </nav>
       {goal && (
         <div className={`freebuild-goal ${goalState?.ok ? 'ok' : ''}`}>
           <div className="fg-main">
@@ -260,7 +229,7 @@ export default function FreeBuildLab({
       <div className="freebuild-wrap">
         {!ready && (
           <div className="freebuild-loading" role="status">
-            {slow ? (
+            {loadError ? <><p>{loadError}</p><button onClick={()=>{setLoadError('');if(frame.current)frame.current.src=frame.current.src;}}>重新载入</button></> : slow ? (
               <>
                 <p>工作台加载较慢。</p>
                 <a href={workbenchUrl(staticMode)} target="_blank" rel="noreferrer">
@@ -280,10 +249,10 @@ export default function FreeBuildLab({
           ref={frame}
           src={`${workbenchUrl(staticMode)}${workbenchUrl(staticMode).includes('?') ? '&' : '?'}embed=1${loadExperiment ? `&experiment=${encodeURIComponent(loadExperiment)}` : ''}`}
           title="Fieldlab 自由搭建物理实验台"
-          className="freebuild-frame"
+          className="freebuild-frame" allowFullScreen
           onLoad={() => send('hello')}
         />
       </div>
-    </>
+    </section>
   );
 }

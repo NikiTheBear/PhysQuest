@@ -11,7 +11,6 @@ import {
   hitMisconception,
   loadLearner,
   pushRun,
-  setPrediction as persistPrediction,
   setReflection as persistReflection,
   weakMisconceptions,
   resetEverything,
@@ -19,14 +18,9 @@ import {
 } from './core/persistence';
 import { applyTheme, loadTheme, saveTheme, useTheme, type Theme } from './core/theme';
 import { solve } from './labs/optics-lens/engine';
-import LabStage from './labs/optics-lens/LabStage';
 import Hub from './components/hub/Hub';
 import KnowledgeMap from './components/knowledge-map/KnowledgeMap';
-import ControlPanel from './components/lab-workspace/ControlPanel';
-import CurveChart from './components/lab-workspace/CurveChart';
-import ObservationPanel from './components/lab-workspace/ObservationPanel';
 import SatisfactionGate from './components/lab-workspace/SatisfactionGate';
-import PredictionPanel from './components/prediction/PredictionPanel';
 import PredictionCompare from './components/prediction/PredictionCompare';
 import KnowledgeCards from './components/knowledge-cards/KnowledgeCards';
 import { QuizModal, QuizResult } from './components/knowledge-cards/Quiz';
@@ -35,22 +29,9 @@ import AITutor from './components/ai-tutor/AITutor';
 import AISettings from './components/ai-tutor/AISettings';
 import HelpGuide from './components/common/HelpGuide';
 import QuizBank from './components/quiz-bank/QuizBank';
-import MechanicsLab from './labs/mechanics/MechanicsLab';
-import CircuitsLab from './labs/circuits/CircuitsLab';
-import AcousticsLab from './labs/acoustics/AcousticsLab';
-import { DEFAULT_MECHANICS, solveMechanics, type MechanicsParams } from './labs/mechanics/engine';
-import { DEFAULT_CIRCUIT, solveCircuit, type CircuitParams } from './labs/circuits/engine';
-import { DEFAULT_SOUND, type SoundParams } from './labs/acoustics/engine';
-import { LabWorkHead, LabGateFooter } from './components/lab-workspace/LabChrome';
 import FreeBuildLab, {
   type CaptureSnapshot,
 } from './components/free-build/FreeBuildLab';
-import {
-  buildLensPqexp,
-  buildMechanicsPqexp,
-  buildCircuitPqexp,
-  buildSoundPqexp,
-} from './core/export-pqexp';
 import type { KnowledgePrompt } from './data/knowledge-prompts';
 import PromptDialog from './components/knowledge-prompts/PromptDialog';
 import { loadAIConfig, type AIConfig } from './ai/client';
@@ -61,7 +42,7 @@ import { EmptyPickLab, EmptyPickChallenge, EmptyReport } from './components/comm
 import ResetPanel from './components/common/ResetPanel';
 
 type View = 'map' | 'hub' | 'lab' | 'free' | 'cards' | 'quiz-bank' | 'report';
-type Phase = 'predict' | 'explore' | 'gate' | 'compare' | 'quiz' | 'quizResult' | 'done';
+type Phase = 'explore' | 'gate' | 'compare' | 'quiz' | 'quizResult' | 'done';
 
 const LAB_KEY = 'physquest.currentLab.v1';
 
@@ -127,9 +108,6 @@ export default function App() {
   });
   const [phase, setPhase] = useState<Phase>('explore');
   const [params, setParams] = useState<LensParams>(DEFAULT_LENS_PARAMS);
-  const [activeSlider, setActiveSlider] = useState<keyof LensParams | null>(null);
-  const [showRays, setShowRays] = useState(true);
-  const [showVirtual, setShowVirtual] = useState(true);
   const [prediction, setPrediction] = useState<number | null>(null);
   const [locked, setLocked] = useState<LockedRun | null>(null);
   const [quizItems, setQuizItems] = useState<QuizItem[]>([]);
@@ -144,10 +122,6 @@ export default function App() {
   });
   const [aiConfig, setAiConfig] = useState<AIConfig>(() => loadAIConfig());
   const [showReset, setShowReset] = useState(false);
-  /* 三套新实验台的状态 */
-  const [mechParams, setMechParams] = useState<MechanicsParams>(DEFAULT_MECHANICS);
-  const [circParams, setCircParams] = useState<CircuitParams>(DEFAULT_CIRCUIT);
-  const [soundParams, setSoundParams] = useState<SoundParams>(DEFAULT_SOUND);
   /** 全站唯一的 AI 设置入口（顶栏齿轮打开） */
   const [showAISettings, setShowAISettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -165,8 +139,6 @@ export default function App() {
       return false;
     }
   });
-  /** 实验台 → 自由搭建：一键搬过去的实验数据 */
-  const [importedExp, setImportedExp] = useState<unknown | null>(null);
   /** 自由搭建：想用哪个知识点的提示词去搭 */
   const [buildRequest, setBuildRequest] = useState<{
     knowledgeId: string;
@@ -255,7 +227,7 @@ export default function App() {
       setParams({ ...(meta.defaultParams ?? DEFAULT_LENS_PARAMS), ...card.labPreset });
       setPrediction(learner.predictions[ch.id]?.chosenIndex ?? null);
       setLocked(null);
-      setPhase(learner.predictions[ch.id] ? 'explore' : 'predict');
+      setPhase('explore');
       setReflectionDraft(learner.reflections[ch.id]?.text ?? '');
       setView('lab');
     },
@@ -269,47 +241,11 @@ export default function App() {
       setParams({ ...(meta?.defaultParams ?? DEFAULT_LENS_PARAMS), ...presetFor(c) });
       setPrediction(learner.predictions[c.id]?.chosenIndex ?? null);
       setLocked(null);
-      setPhase(learner.predictions[c.id] ? 'explore' : 'predict');
+      setPhase('explore');
       setView('lab');
       setReflectionDraft(learner.reflections[c.id]?.text ?? '');
     },
     [learner, labId],
-  );
-
-  /** 从快照里读出凸透镜光具座的放大率（Fieldlab 的通道名是 `<id>:m`，label 含「放大率」） */
-  const readMetric = (snap: CaptureSnapshot, metric: string): number | null => {
-    const ch = snap.readings?.channels ?? {};
-    for (const [key, val] of Object.entries(ch)) {
-      if (!val || typeof val.value !== 'number' || val.valid === false) continue;
-      if (key.endsWith(':' + metric)) return val.value;
-    }
-    return null;
-  };
-
-  const readMagnification = (snap: CaptureSnapshot): number | null => {
-    const m = readMetric(snap, 'm');
-    return m === null ? null : Math.abs(m);
-  };
-
-  /** 统一入口：把当前实验台的参数转成 .pqexp 并跳过去 */
-  const sendToFreeBuild = useCallback(
-    (which: 'lens' | 'mechanics' | 'circuits' | 'acoustics') => {
-      const title = challenge?.title ?? '自由实验';
-      const goal = challenge?.brief ?? '';
-      let data: unknown;
-
-      if (which === 'lens') data = buildLensPqexp(params, title, goal);
-      else if (which === 'mechanics') data = buildMechanicsPqexp(mechParams, title, goal);
-      else if (which === 'circuits') data = buildCircuitPqexp(circParams, title, goal);
-      else data = buildSoundPqexp(soundParams, title, goal);
-
-      setLabId('fieldlab');
-      setView('free');
-      setImportedExp(data);
-      // 让 FreeBuildLab 的 effect 只读一次
-      setTimeout(() => setImportedExp(null), 300);
-    },
-    [challenge, params, mechParams, circParams, soundParams],
   );
 
   /** 自由搭建：把「记录此刻」的快照存下来 */
@@ -325,8 +261,6 @@ export default function App() {
       setLabId('fieldlab');
       setView('free');
       setBuildRequest({ knowledgeId, title, prompt });
-      // 让 FreeBuildLab 的 effect 只在下次渲染读到一次
-      setTimeout(() => setBuildRequest(null), 100);
     },
     [],
   );
@@ -342,13 +276,6 @@ export default function App() {
     },
     [patchParams],
   );
-
-  const confirmPrediction = (chosen: number) => {
-    if (!challenge) return;
-    setPrediction(chosen);
-    setLearner((s) => persistPrediction(s, challenge.id, chosen));
-    setPhase('explore');
-  };
 
   const confirmLock = () => {
     if (!challenge) return;
@@ -569,7 +496,6 @@ export default function App() {
             weakMisconceptions={weak}
             onPick={beginChallenge}
             onPickAuto={(c) => {
-              // 自动挑战 → 进自己模块的实验台，而不是直接跳 Fieldlab
               const targetLab = labById(c.labId);
               if (!targetLab) return;
               setLabId(targetLab.id);
@@ -587,7 +513,7 @@ export default function App() {
                 difficulty: 'beginner',
                 prediction: c.prediction,
               });
-              setPhase(c.prediction ? 'predict' : 'explore');
+              setPhase('explore');
               setView('lab');
             }}
             onBackToMap={() => setView('map')}
@@ -626,139 +552,30 @@ export default function App() {
                 difficulty: 'beginner',
                 prediction: auto.prediction,
               });
-              setPhase(auto.prediction ? 'predict' : 'explore');
+              setPhase('explore');
               setView('lab');
             }}
           />
         )}
 
-        {/* ===== 力学 / 电路 / 声学：走各自的通用实验台 ===== */}
-        {view === 'lab' && challenge && currentLab?.id === 'mechanics' && (
-          <>
-            <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="力与运动" />
-            <MechanicsLab params={mechParams} onChange={(p) => setMechParams((prev) => ({ ...prev, ...p }))} />
-            <LabGateFooter
-              onGate={() => setPhase('gate')}
-              onToFree={() => sendToFreeBuild('mechanics')}
-            />
-          </>
-        )}
-
-        {view === 'lab' && challenge && currentLab?.id === 'circuits' && (
-          <>
-            <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="电路与电流" />
-            <CircuitsLab params={circParams} onChange={(p) => setCircParams((prev) => ({ ...prev, ...p }))} />
-            <LabGateFooter onGate={() => setPhase('gate')} onToFree={() => sendToFreeBuild('circuits')} />
-          </>
-        )}
-
-        {view === 'lab' && challenge && currentLab?.id === 'acoustics' && (
-          <>
-            <LabWorkHead challenge={challenge} onCards={() => setView('cards')} onGate={() => setPhase('gate')} labTitle="声与波" />
-            <AcousticsLab params={soundParams} onChange={(p) => setSoundParams((prev) => ({ ...prev, ...p }))} />
-            <LabGateFooter onGate={() => setPhase('gate')} onToFree={() => sendToFreeBuild('acoustics')} />
-          </>
-        )}
-
-        {view === 'lab' && challenge && (!currentLab || currentLab.id === 'optics-lens') && (
-          <>
-            <div className="work-head">
-              <div>
-                <span className="eyebrow">
-                  {challenge.id} · 凸透镜成像
-                </span>
-                <h2>{challenge.title}</h2>
-                <div className="brief">{challenge.brief}</div>
-              </div>
-              <div className="work-actions">
-                <button className="btn-ghost btn-small" onClick={() => setView('cards')}>
-                  看知识卡
-                </button>
-                {prediction === null && (
-                  <button className="btn-ghost btn-small" onClick={() => setPhase('predict')}>
-                    还没有预测
-                  </button>
-                )}
-                <button className="btn-primary" onClick={() => setPhase('gate')}>
-                  我满意了
-                </button>
-              </div>
-            </div>
-
-            <div className="split">
-              <div>
-                <CurveChart
-                  params={params}
-                  metrics={metrics}
-                  highlight={activeSlider === 'u' ? 'u' : activeSlider === 'f' ? 'f' : null}
-                />
-                <ControlPanel
-                  params={params}
-                  metrics={metrics}
-                  onChange={patchParams}
-                  activeSlider={activeSlider}
-                  onSliderFocus={setActiveSlider}
-                />
-                <div className="panel">
-                  <h4>提示</h4>
-                  <div className="hint-box">{challenge.hint}</div>
-                </div>
-              </div>
-
-              <div className="lab-column">
-                <LabStage
-                  params={params}
-                  stage="junior"
-                  metrics={metrics}
-                  showRays={showRays}
-                  showVirtualExtensions={showVirtual}
-                  onParamChange={patchParams}
-                  fullscreenExtra={
-                    <>
-                      <CurveChart params={params} metrics={metrics} highlight={null} />
-                      <ObservationPanel params={params} metrics={metrics} />
-                    </>
-                  }
-                />
-                <div style={{ marginTop: 18 }}>
-                  <ObservationPanel params={params} metrics={metrics} />
-                </div>
-
-                <div className="panel" style={{ marginTop: 18 }}>
-                  <div className="toggle-row" style={{ padding: 0 }}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={showRays}
-                        onChange={(e) => setShowRays(e.target.checked)}
-                      />
-                      三条特殊光线
-                    </label>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={showVirtual}
-                        onChange={(e) => setShowVirtual(e.target.checked)}
-                      />
-                      虚像延长线
-                    </label>
-                    <span style={{ marginLeft: 'auto', color: 'var(--label-3)' }}>
-                      黄 平行→焦点 · 蓝 过光心 · 粉 过焦点→平行
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {view === 'free' && (
+        {(view === 'free' || (view === 'lab' && challenge)) && (
           <FreeBuildLab
+            key={view === 'lab' ? challenge?.id : 'free'}
             staticMode={import.meta.env.VITE_STATIC_WORKBENCH === '1'}
-            onCapture={handleCapture}
-            buildRequest={buildRequest}
+            loadExperiment={view === 'lab' ? challenge?.id : undefined}
+            onExit={() => {setPhase('explore');setBuildRequest(null);setView(view === 'lab' ? 'hub' : 'map');}}
+            onCapture={snap=>{
+              handleCapture(snap);
+              if(view==='lab' && challenge){
+                const bench=snap.experiment.components.find(c=>c.kind==='lens_bench')?.params;
+                if(bench){
+                  setParams({u:bench.u,f:bench.f,h:bench.h,screenX:bench.screenX,lensDiameter:bench.lensDiameter,maskTop:!!bench.maskTop,objectShape:bench.objectShape===1?'F':bench.objectShape===2?'candle':'arrow'});
+                  setPhase('gate');
+                }else{setQuizItems(quizForChallenge(challenge));setPhase('quiz');}
+              }
+            }}
+            buildRequest={view === 'free' ? buildRequest : null}
             onMessage={setToast}
-            importExperiment={importedExp}
             aiConfig={aiConfig}
           />
         )}
@@ -778,7 +595,6 @@ export default function App() {
                 setLabId('fieldlab');
                 setView('free');
                 setBuildRequest({ knowledgeId, title, prompt });
-                setTimeout(() => setBuildRequest(null), 100);
               }}
             />
           </>
@@ -861,17 +677,12 @@ export default function App() {
           </>
         )}
 
-        {phase === 'predict' && challenge && (
-          <PredictionPanel challenge={challenge} onLock={confirmPrediction} />
-        )}
-
         {phase === 'gate' && challenge && (
           <SatisfactionGate
             challenge={challenge}
             metrics={metrics}
             onCancel={() => setPhase('explore')}
             onConfirm={confirmLock}
-            onSendToLab={() => sendToFreeBuild('lens')}
           />
         )}
 
@@ -948,7 +759,6 @@ export default function App() {
             setQuizAnswers({});
             setReflectionDraft('');
             setFreeRuns([]);
-            setImportedExp(null);
             setBuildRequest(null);
             setPromptEntry(null);
             setPhase('explore');
@@ -965,15 +775,11 @@ export default function App() {
             setQuizAnswers({});
             setReflectionDraft('');
             setFreeRuns([]);
-            setImportedExp(null);
             setBuildRequest(null);
             setPromptEntry(null);
             setPhase('explore');
             setView('map');
             setAiConfig(loadAIConfig());
-            setMechParams(DEFAULT_MECHANICS);
-            setCircParams(DEFAULT_CIRCUIT);
-            setSoundParams(DEFAULT_SOUND);
             setParams(DEFAULT_LENS_PARAMS);
             setToast('已全部清空');
           }}

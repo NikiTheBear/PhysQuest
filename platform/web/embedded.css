@@ -433,3 +433,41 @@ body.embedded .transport select {
 body.embedded .scene-container {
   padding-bottom: 40px;
 }
+
+/* Full-window experiment canvas and its independent controls. */
+html body.sim-stage{display:block;height:100dvh;min-height:0;overflow:hidden;background:#fff}
+body.sim-stage :is(.app-header,.status-bar,.axis-widget,.scene-top){display:none}
+body.sim-stage :is(.workbench,.center-column,.viewport){display:contents!important}
+body.sim-stage #scene-container{position:fixed;inset:0;width:100%;height:100%;min-height:0;padding:0;overflow:hidden;border:0;border-radius:0}
+body.sim-stage .stage-hidden{display:none!important}
+.sim-stage .wire-guide{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.sim-stage .stage-dock,.sim-stage .viewport-toolbar,.sim-stage :is(#floating-sidebar,#floating-files,#floating-goal,#floating-readings,#library){
+  position:fixed;z-index:5;background:#fff;border:1px solid #d5e0e8;border-radius:10px;box-shadow:0 4px 16px #1f405714;
+}
+.sim-stage .stage-dock,.sim-stage .viewport-toolbar{left:10px;display:flex;align-items:center;gap:3px;padding:4px;max-width:calc(100vw - 20px);width:max-content;height:auto;overflow-x:auto;scrollbar-width:thin}
+.sim-stage .stage-dock{top:7px;z-index:9}
+.sim-stage.embedded .stage-dock{max-width:calc(100vw - 146px)}
+.stage-dock button,.sim-stage #wire-btn{white-space:nowrap;color:#3c576c;border:0;border-radius:6px;background:transparent;padding:6px 10px;font:600 13px/19px var(--font,sans-serif);cursor:pointer}
+.stage-dock button:hover,.stage-dock button[aria-expanded=true],.sim-stage #wire-btn[aria-pressed=true]{background:#e8f2fa;color:#185a88}
+.sim-stage .viewport-toolbar{top:56px;z-index:7;flex-wrap:nowrap;min-height:32px}
+.sim-stage .viewport-toolbar>*{flex-shrink:0}
+.sim-stage .plane-label{font-size:12px;white-space:nowrap;color:#416079}
+.sim-stage #library,.sim-stage #floating-sidebar{display:flex;flex-direction:column;top:108px;bottom:62px;min-height:0;height:auto;max-height:none;overflow:hidden}
+.sim-stage #library{left:10px;width:min(270px,calc(100vw - 20px))}
+.sim-stage #floating-sidebar{right:10px;width:min(360px,calc(100vw - 20px))}
+.sim-stage #floating-files{display:flex;align-items:flex-start;flex-direction:column;gap:8px;left:10px;top:55px;width:min(440px,calc(100vw - 20px));height:auto;padding:12px;z-index:8}
+.sim-stage #floating-files .bar-actions{display:flex;flex-wrap:wrap;gap:5px}
+.sim-stage #floating-goal{top:56px;right:10px;width:min(340px,35vw);max-height:24vh;overflow:auto;padding:9px 12px}
+.sim-stage:has(#floating-sidebar:not(.stage-hidden)) #floating-goal{top:106px;right:382px}
+.sim-stage #floating-readings{bottom:62px;left:50%;transform:translateX(-50%);width:min(660px,calc(100vw - 20px));height:clamp(150px,24vh,250px);min-height:0;display:flex;flex-direction:column;z-index:6}
+.sim-stage #floating-readings .chart-area{min-height:0;flex:1}
+body.sim-stage .transport{position:absolute;bottom:9px;left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:100%;height:auto;border:1px solid #d5e0e8;border-radius:10px;background:#fff;padding:5px 9px;z-index:3}
+.sim-stage .view-caption{left:14px;bottom:15px}
+@media(max-width:760px){
+  .sim-stage #floating-goal,.sim-stage:has(#floating-sidebar:not(.stage-hidden)) #floating-goal{top:108px;left:10px;right:auto;width:calc(100vw - 20px)}
+  .sim-stage .view-caption,.sim-stage .object-count,.sim-stage .toolbar-spacer{display:none}
+  .sim-stage #library,.sim-stage #floating-sidebar{max-height:65dvh}
+  .sim-stage .stage-dock button{padding:5px 8px}
+}
+
+.sim-stage .terminal.connected:not(.armed){border-color:#2d739e;background:#e4f1fa;color:#1d5a80}

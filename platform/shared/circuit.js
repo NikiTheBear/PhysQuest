@@ -8,7 +8,7 @@ function factorLinear(A){
 function solveFactored({LU,permutation},b){const n=b.length,x=permutation.map(i=>b[i]);for(let i=0;i<n;i++)for(let j=0;j<i;j++)x[i]-=LU[i][j]*x[j];for(let i=n-1;i>=0;i--){for(let j=i+1;j<n;j++)x[i]-=LU[i][j]*x[j];x[i]/=LU[i][i];if(!Number.isFinite(x[i]))throw new Error('电路求解未收敛');}return x;}
 export class Circuit {
   constructor(doc){
-    this.components=doc.components.filter(c=>CIRCUIT_KINDS.includes(c.kind));this.dynamic=this.components.some(c=>['capacitor','inductor','ac_source'].includes(c.kind));this.time=0;this.cache=null;this.history=new Map();this.readings={};this.nodeVoltages={};this.warnings=[];
+    this.components=doc.components.filter(c=>CIRCUIT_KINDS.includes(c.kind)).map(c=>c.kind==='switch'?{...c,params:{...c.params}}:c);this.dynamic=this.components.some(c=>['capacitor','inductor','ac_source'].includes(c.kind));this.time=0;this.cache=null;this.history=new Map();this.readings={};this.nodeVoltages={};this.warnings=[];
     const parent=new Map(),key=(id,port)=>id+':'+port;
     const root=k=>{let p=parent.get(k);if(p===k)return k;p=root(p);parent.set(k,p);return p;};
     const join=(a,b)=>parent.set(root(a),root(b));
@@ -22,6 +22,22 @@ export class Circuit {
     for(const node of nodes){if(seen.has(node))continue;const cluster=[],stack=[node];while(stack.length){const n=stack.pop();if(seen.has(n))continue;seen.add(n);cluster.push(n);for(const other of adj.get(n))stack.push(other);}const g=cluster.find(n=>grounded.has(n));refs.add(g||cluster[0]);if(!g)floating++;}
     if(floating)this.warnings.push(`${floating} 个网络未放置参考地，已自动选择参考节点；电压差与支路电流仍可求解。`);
     this.indices=new Map(nodes.filter(n=>!refs.has(n)).map((n,i)=>[n,i]));this.refs=refs;this.step(1e-8,false);
+  }
+  updateSwitches(components){
+    let changed=false;
+    for(const sw of this.components){
+      if(sw.kind!=='switch')continue;
+      const next=components.find(c=>c.id===sw.id);
+      if(next&&sw.params.closed!==next.params.closed){
+        sw.params.closed=next.params.closed;
+        changed=true;
+      }
+    }
+    if(changed){
+      this.cache=null;
+      this.step(1e-8,false);
+    }
+    return changed;
   }
   step(dt,commit=true){
     if(!this.components.length||(!this.dynamic&&this.cache))return;

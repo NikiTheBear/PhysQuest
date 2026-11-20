@@ -31,3 +31,13 @@ test('resistance uses an accessible lower range and snaps to physical increments
   assert.equal(Number(value.toFixed(2)),value);
   assert.equal(physicalValue({min:-10,max:10,step:.1},-.3),-.3);
 });
+
+test('choice controls respect saved MCP limits and use physical option labels',async()=>{
+  const {choiceSpec,allowedChoices}=await import('../web/choice-controls.js');
+  assert.equal(choiceSpec('closed').type,'switch');
+  assert.equal(choiceSpec('maskTop').type,'switch');
+  assert.deepEqual(allowedChoices('axis',{min:0,max:2,step:2}),[{label:'X',value:0},{label:'Z',value:2}]);
+  assert.deepEqual(allowedChoices('objectShape',{min:1,max:2,step:1}).map(c=>c.label),['字母 F','蜡烛']);
+  assert.deepEqual(allowedChoices('directivity',{min:2,max:8,step:3}).map(c=>c.value),[2,5,8]);
+  assert.equal(choiceSpec('resistance'),null);
+});

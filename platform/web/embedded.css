@@ -491,3 +491,27 @@ body.sim-stage .transport{position:absolute;bottom:9px;left:50%;right:auto;trans
 .tuning-row input[type=range]{display:block;width:100%;height:22px;margin:3px 0 0;accent-color:#2875a5;cursor:pointer}
 .tuning-limits{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
 @media(max-width:760px){.sim-stage #experiment-sliders{max-height:min(46dvh,calc(100dvh - 174px))}}
+
+.parameter-choice{min-width:0;border:0;padding:0;margin:0}
+.parameter-choice legend{display:block;margin-bottom:6px;padding:0;font-size:14px;color:#284558;overflow-wrap:anywhere}
+.inspector-content .parameter-choice{margin:10px 0 14px}
+.parameter-choice .toggle-choice,.segmented-choice label{position:relative;display:inline-flex;align-items:center;cursor:pointer;margin:0}
+.parameter-choice :is(input[type=checkbox],input[type=radio]){position:absolute;width:1px;height:1px;opacity:0}
+.parameter-choice .toggle-choice{min-height:32px;gap:8px;font-size:14px;color:#375568}
+.switch-track{display:inline-block;position:relative;width:36px;height:21px;flex:none;border:1px solid #8b9ba8;border-radius:15px;background:#e7edf0}
+.switch-track:after{content:'';position:absolute;top:2px;left:2px;width:15px;height:15px;background:#fff;border-radius:50%;box-shadow:0 1px 3px #45647c70}
+.toggle-choice input:checked+.switch-track{background:#2775a5;border-color:#2775a5}
+.toggle-choice input:checked+.switch-track:after{left:17px}
+.toggle-choice input:checked~.when-off,.toggle-choice input:not(:checked)~.when-on{display:none}
+.parameter-choice input:focus-visible+span{outline:2px solid #2879ad;outline-offset:3px}
+.segmented-choice{display:inline-flex;gap:3px;padding:3px;background:#eef2f5;border-radius:8px}
+.segmented-choice label span{padding:5px 11px;min-width:32px;text-align:center;color:#466374;border:1px solid transparent;border-radius:5px;font-size:14px}
+.segmented-choice input:checked+span{background:white;color:#195a81;border-color:#bdceda;box-shadow:0 1px 3px #7892a330}
+.parameter-choice select{padding:6px 10px;color:#284558;background:white;border:1px solid #bdceda;border-radius:6px}
+.object-label [data-scene-switch]{margin-left:5px;padding:3px 5px;border-radius:5px;background:#edf1f4;color:#3b5262;font:600 11px/1.4 var(--font,sans-serif)}
+.object-label [data-scene-switch]:before{content:'○'}
+.object-label [data-scene-switch][aria-checked=true]{background:#d9eef6;color:#155c7d}
+.object-label [data-scene-switch][aria-checked=true]:before{content:'●'}
+/* Keep the switch accessible to touch without expanding the whole scene label. */
+.object-label [data-scene-switch]{min-height:24px;min-width:46px}
+.object-label [data-scene-switch][hidden]{display:none}

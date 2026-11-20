@@ -9,8 +9,13 @@ import { fieldAt } from '../shared/physics.js';
 import {colliderOf,colliderRotation,supportsCollider} from '../shared/colliders.js';
 const V=a=>new THREE.Vector3(...a);
 export class LabScene {
-  constructor({onSelect,onMove,onFallback,onDragStart,onPort}) {
-    this.container=document.getElementById('scene-container');this.canvas=document.getElementById('scene');this.canvas2=document.getElementById('scene-2d');this.ctx=this.canvas2.getContext('2d');this.labels=document.getElementById('scene-labels');this.onSelect=onSelect;this.onMove=onMove;this.onDragStart=onDragStart;this.onPort=onPort;this.pendingWire=null;this.ports=document.createElement('div');this.ports.className='port-labels';this.container.append(this.ports);this.ports.addEventListener('click',e=>{const b=e.target.closest('[data-port]');if(b){e.stopPropagation();this.onPort(b.dataset.component,b.dataset.port);}});this.objects=new Map();this.selected=null;this.showGrid=true;this.showFields=true;this.showTrails=true;this.scale2=65;this.pan2=[0,0];this.mode='3d';this.doc=null;this.snap=false;this.labels.addEventListener('click',e=>{const label=e.target.closest('[data-id]');if(label)this.onSelect(label.dataset.id);});
+  constructor({onSelect,onMove,onFallback,onDragStart,onPort,onSwitch}) {
+    this.container=document.getElementById('scene-container');this.canvas=document.getElementById('scene');this.canvas2=document.getElementById('scene-2d');this.ctx=this.canvas2.getContext('2d');this.labels=document.getElementById('scene-labels');this.onSelect=onSelect;this.onMove=onMove;this.onSwitch=onSwitch;this.onDragStart=onDragStart;this.onPort=onPort;this.pendingWire=null;this.ports=document.createElement('div');this.ports.className='port-labels';this.container.append(this.ports);this.ports.addEventListener('click',e=>{const b=e.target.closest('[data-port]');if(b){e.stopPropagation();this.onPort(b.dataset.component,b.dataset.port);}});this.objects=new Map();this.selected=null;this.showGrid=true;this.showFields=true;this.showTrails=true;this.scale2=65;this.pan2=[0,0];this.mode='3d';this.doc=null;this.snap=false;this.labels.addEventListener('click',e=>{const label=e.target.closest('[data-id]');
+      if(!label)return;
+      if(e.target.closest('[data-scene-switch]')){
+        if(this.wiring||this.pendingWire)return;
+        this.onSwitch(label.dataset.id);
+      }else this.onSelect(label.dataset.id);});
     try {
       this.renderer=new THREE.WebGLRenderer({canvas:this.canvas,antialias:true,alpha:true});this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));this.renderer.setClearColor(0,0);this.renderer.outputColorSpace=THREE.SRGBColorSpace;
       this.scene=new THREE.Scene();this.scene.fog=new THREE.FogExp2('#f8fafc',.035);
@@ -22,7 +27,7 @@ export class LabScene {
       this.root=new THREE.Group();this.dynamic=new THREE.Group();this.colliderRoot=new THREE.Group();this.colliderObjects=new Map();this.scene.add(this.root,this.dynamic,this.colliderRoot);this.raycaster=new THREE.Raycaster();this.raycaster.params.Line.threshold=.1;this.pointer=new THREE.Vector2();
       this.transform=new TransformControls(this.camera,this.canvas);this.transform.setMode('translate');this.transform.setSpace('world');this.transform.setSize(.85);this.transform.minX=this.transform.minY=this.transform.minZ=-30;this.transform.maxX=this.transform.maxY=this.transform.maxZ=30;this.transform.showXY=this.transform.showXZ=this.transform.showYZ=false;this.scene.add(this.transform.getHelper());
       this.transform.addEventListener('dragging-changed',e=>{this.controls.enabled=!e.value;if(e.value)this.onDragStart?.();else if(this.transform.object){const id=this.selected,position=this.transform.object.position.toArray().map(v=>Math.round(v*100)/100);this.previewMove={id,position};Promise.resolve(this.onMove(id,position)).finally(()=>{this.previewMove=null;});}});
-      let down,axisDown=false;this.canvas.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];axisDown=!!this.transform.axis;});this.canvas.addEventListener('pointerup',e=>{if(axisDown||!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5)return;const r=this.canvas.getBoundingClientRect();this.pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);this.raycaster.setFromCamera(this.pointer,this.camera);const hit=this.raycaster.intersectObjects([...this.objects.values()],true).find(h=>h.object.userData.id);this.onSelect(hit?.object.userData.id||null);});
+      let down,axisDown=false;this.canvas.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];axisDown=!!this.transform.axis;});this.canvas.addEventListener('pointerup',e=>{if(e.button!==0||axisDown||!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5)return;const r=this.canvas.getBoundingClientRect();this.pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);this.raycaster.setFromCamera(this.pointer,this.camera);const hit=this.raycaster.intersectObjects([...this.objects.values()],true).find(h=>h.object.userData.id);const id=hit?.object.userData.id;if(this.canToggle(id))this.onSwitch(id);else this.onSelect(id||null);});
     } catch(error){this.renderer=null;this.canvas.hidden=true;this.canvas2.hidden=false;this.mode='2d';onFallback(error);}
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(this.container);
     this.wirePreview=document.getElementById('wire-preview');
@@ -32,14 +37,15 @@ export class LabScene {
     });
     this.showColliders=true;
     let drag=null;
-    this.canvas2.addEventListener('pointerdown',e=>{const r=this.canvas2.getBoundingClientRect(),p=[e.clientX-r.left,e.clientY-r.top],selected=this.doc?.components.find(c=>c.id===this.selected);let axis=null,hit=null;
+    this.canvas2.addEventListener('pointerdown',e=>{if(e.button!==0)return;const r=this.canvas2.getBoundingClientRect(),p=[e.clientX-r.left,e.clientY-r.top],selected=this.doc?.components.find(c=>c.id===this.selected);let axis=null,hit=null;
       if(selected&&!this.isBound(selected)){const origin=this.project2(this.sim?.bodies.get(selected.id)?.position||selected.position),dx=p[0]-origin[0],dy=p[1]-origin[1];if(dx>9&&dx<94&&Math.abs(dy)<13)axis=0;if(dy<-9&&dy>-94&&Math.abs(dx)<13)axis=1;if(axis!==null)hit=selected;}
-      if(!hit){let dist=Infinity;for(const c of this.doc?.components||[]){const b=this.sim?.bodies.get(c.id),q=this.project2(b?.position||c.position),d=Math.hypot(p[0]-q[0],p[1]-q[1]);if(d<dist&&(d<24||this.hitCollider2(p,c,b))){hit=c;dist=d;}}this.onSelect(hit?.id||null);}
-      if(hit&&!this.isBound(hit)){const start=[...(this.sim?.bodies.get(hit.id)?.position||hit.position)];drag={id:hit.id,start,pixel:p,axis,active:false};this.canvas2.setPointerCapture(e.pointerId);}});
-    this.canvas2.addEventListener('pointermove',e=>{if(!drag)return;const r=this.canvas2.getBoundingClientRect(),dx=(e.clientX-r.left-drag.pixel[0])/this.scale2,dy=-(e.clientY-r.top-drag.pixel[1])/this.scale2;if(!drag.active){if(Math.hypot(dx,dy)*this.scale2<3)return;drag.active=true;drag.start=[...(this.sim?.bodies.get(drag.id)?.position||drag.start)];this.onDragStart?.();}const pos=[...drag.start];if(drag.axis!==1)pos[0]+=dx;if(drag.axis!==0)pos[this.vertical]+=dy;pos[3-this.vertical]=0;this.previewMove={id:drag.id,position:pos.map(v=>Math.max(-30,Math.min(30,this.snap?Math.round(v*10)/10:v)))};});
-    const endDrag=()=>{if(this.previewMove){const move=this.previewMove;Promise.resolve(this.onMove(move.id,move.position.map(x=>Math.round(x*100)/100))).finally(()=>{this.previewMove=null;});}drag=null;};this.canvas2.addEventListener('pointerup',endDrag);this.canvas2.addEventListener('pointercancel',()=>{this.previewMove=null;drag=null;});
+      if(!hit){let dist=Infinity;for(const c of this.doc?.components||[]){const b=this.sim?.bodies.get(c.id),q=this.project2(b?.position||c.position),d=Math.hypot(p[0]-q[0],p[1]-q[1]);if(d<dist&&(d<24||this.hitCollider2(p,c,b))){hit=c;dist=d;}}if(!this.canToggle(hit?.id))this.onSelect(hit?.id||null);}
+      if(hit&&!this.isBound(hit)){const start=[...(this.sim?.bodies.get(hit.id)?.position||hit.position)];drag={id:hit.id,start,pixel:p,axis,active:false,toggle:axis===null&&this.canToggle(hit.id)};this.canvas2.setPointerCapture(e.pointerId);}});
+    this.canvas2.addEventListener('pointermove',e=>{if(!drag)return;const r=this.canvas2.getBoundingClientRect(),dx=(e.clientX-r.left-drag.pixel[0])/this.scale2,dy=-(e.clientY-r.top-drag.pixel[1])/this.scale2;if(!drag.active){if(Math.hypot(dx,dy)*this.scale2<3)return;drag.active=true;if(drag.toggle)this.onSelect(drag.id);drag.start=[...(this.sim?.bodies.get(drag.id)?.position||drag.start)];this.onDragStart?.();}const pos=[...drag.start];if(drag.axis!==1)pos[0]+=dx;if(drag.axis!==0)pos[this.vertical]+=dy;pos[3-this.vertical]=0;this.previewMove={id:drag.id,position:pos.map(v=>Math.max(-30,Math.min(30,this.snap?Math.round(v*10)/10:v)))};});
+    const endDrag=()=>{if(drag?.toggle&&!drag.active&&this.canToggle(drag.id))this.onSwitch(drag.id);else if(drag?.active&&this.previewMove){const move=this.previewMove;Promise.resolve(this.onMove(move.id,move.position.map(x=>Math.round(x*100)/100))).finally(()=>{this.previewMove=null;});}drag=null;};this.canvas2.addEventListener('pointerup',endDrag);this.canvas2.addEventListener('pointercancel',()=>{this.previewMove=null;drag=null;});
     this.canvas2.addEventListener('wheel',e=>{e.preventDefault();this.scale2=Math.min(180,Math.max(18,this.scale2*Math.exp(-e.deltaY*.001)));},{passive:false});
   }
+  canToggle(id){return !this.wiring&&!this.pendingWire&&this.doc?.components.some(c=>c.id===id&&c.kind==='switch');}
   material(color,options={}){return new THREE.MeshStandardMaterial({color,metalness:.35,roughness:.43,...options});}
   mesh(geometry,color,options){return new THREE.Mesh(geometry,this.material(color,options));}
   lines(points,color,opacity=1,segments=true){const geo=new THREE.BufferGeometry().setFromPoints(points.map(V));return new (segments?THREE.LineSegments:THREE.Line)(geo,new THREE.LineBasicMaterial({color,transparent:opacity<1,opacity}));}
@@ -71,7 +77,13 @@ export class LabScene {
       if(c.kind==='battery'){add(new THREE.BoxGeometry(.75,.45,.45),'#5483a3');add(new THREE.BoxGeometry(.1,.32,.46),'#dec58a',[-.3,0,0]);}
       if(c.kind==='capacitor'){add(new THREE.CylinderGeometry(.22,.22,.55,24),'#5e9fb8');add(new THREE.CylinderGeometry(.2,.2,.015,24),'#cad8dc',[0,.285,0]);}
       if(c.kind==='inductor'){const pts=[];for(let i=0;i<=180;i++)pts.push([(i/180-.5)*.8,Math.cos(i/180*Math.PI*18)*.2,Math.sin(i/180*Math.PI*18)*.2]);group.add(this.lines(pts,'#bc8152',1,false));add(new THREE.BoxGeometry(.8,.12,.4),'#71838b',[0,-.26,0]);}
-      if(c.kind==='switch'){add(new THREE.BoxGeometry(.8,.12,.35),'#bccbd2',[0,-.15,0]);const lever=add(new THREE.BoxGeometry(.65,.035,.07),p.closed?'#67a58a':'#c59865',[0,.03,0]);lever.rotation.z=p.closed?0:.5;}
+      if(c.kind==='switch'){
+        add(new THREE.BoxGeometry(.82,.12,.36),'#bccbd2',[0,-.14,0]);
+        for(const x of [-.31,.31])add(new THREE.CylinderGeometry(.065,.07,.14,12),'#827766',[x,-.02,0]);
+        const hinge=new THREE.Group();hinge.name='switch-hinge';hinge.position.set(-.31,.05,0);
+        const lever=this.mesh(new THREE.BoxGeometry(.66,.055,.1),p.closed?'#548c73':'#bd8852');
+        lever.name='switch-lever';lever.position.x=.31;hinge.add(lever);hinge.rotation.z=p.closed?0:.55;group.add(hinge);
+      }
       if(c.kind==='lamp'){const bulb=add(new THREE.SphereGeometry(.27,24,18),'#fff0b6',[0,.1,0],{transparent:true,opacity:.8,emissive:'#ffd770',emissiveIntensity:0});bulb.name='bulb';add(new THREE.CylinderGeometry(.15,.18,.2,20),'#96a5ad',[0,-.25,0]);}
       if(['voltmeter','ammeter'].includes(c.kind)){add(new THREE.BoxGeometry(.7,.55,.3),'#d1e1e7');add(new THREE.BoxGeometry(.5,.28,.015),'#a5c6c8',[0,.03,.16]);}
       if(c.kind==='ground'){group.add(this.lines([[-.3,0,0],[.3,0,0],[-.2,-.12,0],[.2,-.12,0],[-.1,-.24,0],[.1,-.24,0]],'#668495'));}
@@ -100,7 +112,25 @@ export class LabScene {
   setDoc(doc) {
     this.transform?.detach();this.doc=doc;this.mode=doc.mode;if(!this.renderer)this.mode='2d';this.canvas.hidden=this.mode!=='3d';this.canvas2.hidden=this.mode!=='2d';this.labels.replaceChildren();this.ports.replaceChildren();
     if(this.renderer){this.disposeGroup(this.root);this.disposeGroup(this.colliderRoot);this.colliderObjects.clear();this.objects.clear();for(const c of doc.components){const obj=this.create(c);this.root.add(obj);this.objects.set(c.id,obj);}}
-    for(const c of doc.components){const el=document.createElement('span');el.className='object-label';el.dataset.id=c.id;el.textContent=c.name;this.labels.append(el);if(CATALOG[c.kind].terminals)for(const port of CATALOG[c.kind].terminals){const button=document.createElement('button');button.className='terminal';button.dataset.component=c.id;button.dataset.port=port;button.textContent=port.toUpperCase();const count=doc.connections.filter(l=>l.kind==='wire'&&(l.source===c.id&&l.sourcePort===port||l.target===c.id&&l.targetPort===port)).length;button.classList.toggle('connected',count>0);button.title=c.name+' 端子 '+port.toUpperCase()+' · '+count+' 根导线';button.setAttribute('aria-label',button.title);this.ports.append(button);}}this.select(this.selected);this.resize();
+    for(const c of doc.components){const el=document.createElement('span');el.className='object-label';el.dataset.id=c.id;el.textContent=c.name;
+      if(c.kind==='switch'){
+        const button=document.createElement('button');button.type='button';button.dataset.sceneSwitch='';
+        button.setAttribute('role','switch');button.title='切换电路通断';button.setAttribute('aria-label',c.name+'通断');
+        button.setAttribute('aria-checked',String(Boolean(c.params.closed)));button.textContent=c.params.closed?'闭合':'断开';
+        el.append(button);
+      }
+      this.labels.append(el);if(CATALOG[c.kind].terminals)for(const port of CATALOG[c.kind].terminals){const button=document.createElement('button');button.className='terminal';button.dataset.component=c.id;button.dataset.port=port;button.textContent=port.toUpperCase();const count=doc.connections.filter(l=>l.kind==='wire'&&(l.source===c.id&&l.sourcePort===port||l.target===c.id&&l.targetPort===port)).length;button.classList.toggle('connected',count>0);button.title=c.name+' 端子 '+port.toUpperCase()+' · '+count+' 根导线';button.setAttribute('aria-label',button.title);this.ports.append(button);}}this.select(this.selected);this.resize();
+  }
+  updateSwitches(doc){
+    this.doc=doc;
+    for(const label of this.labels.children){
+      const button=label.querySelector('[data-scene-switch]');if(!button)continue;
+      const c=doc.components.find(c=>c.id===label.dataset.id);
+      button.setAttribute('aria-checked',String(Boolean(c.params.closed)));
+      button.textContent=c.params.closed?'闭合':'断开';
+      const lever=this.objects.get(c.id)?.getObjectByName('switch-lever');
+      if(lever){lever.parent.rotation.z=c.params.closed?0:.55;lever.material.color.set(c.appearance?.color||(c.params.closed?'#548c73':'#bd8852'));}
+    }
   }
   resize(){const r=this.container.getBoundingClientRect();this.width=r.width;this.height=r.height;const d=Math.min(devicePixelRatio,2);this.canvas2.width=r.width*d;this.canvas2.height=r.height*d;this.ctx.setTransform(d,0,0,d,0,0);if(this.renderer){this.renderer.setSize(r.width,r.height,false);this.camera.aspect=r.width/Math.max(1,r.height);this.camera.updateProjectionMatrix();}}
   fit(){this.scale2=65;this.pan2=[0,0];const bench=this.doc?.components.find(c=>c.kind==='lens_bench');if(bench){const g=benchGraphics(bench.params);this.scale2=Math.min(80,Math.max(18,(this.width-80)/(g.right-g.left+1)));this.pan2=[-(g.right+g.left)/2-bench.position[0],-bench.position[1]+.5];}if(this.renderer){const list=this.doc?.components||[],center=list.length?list.reduce((v,c)=>v.add(V(c.position)),new THREE.Vector3()).divideScalar(list.length):new THREE.Vector3(0,1,0);const span=list.length?Math.max(5,...list.map(c=>V(c.position).distanceTo(center)))*1.5:8;this.controls.target.copy(center);this.camera.position.copy(center.clone().add(new THREE.Vector3(span,span*.7,span*1.2)));this.controls.update();}}
@@ -156,6 +186,7 @@ export class LabScene {
     }
     for(const el of this.labels.children){const c=this.doc.components.find(c=>c.id===el.dataset.id);if(!c)continue;const b=sim.bodies.get(c.id);let point=this.previewMove?.id===c.id?this.previewMove.position:b.position;let q;
       if(this.mode==='2d')q=this.project2(point).map((v,i)=>i?v-30:v);else{const v=V(point).add(new THREE.Vector3(0,.6,0)).project(this.camera);q=[(v.x+1)*this.width/2,(1-v.y)*this.height/2];el.style.opacity=v.z>1?0:1;}
+      if(c.kind==='switch')el.querySelector('button').hidden=!!(this.wiring||this.pendingWire);
       el.style.left=q[0]+'px';el.style.top=q[1]+'px';el.classList.toggle('selected',c.id===this.selected);el.hidden=this.doc.components.length>24&&c.id!==this.selected;
     }
   }
@@ -233,7 +264,10 @@ export class LabScene {
     if(c.kind==='battery'){ctx.moveTo(-7,-17);ctx.lineTo(-7,17);ctx.moveTo(7,-9);ctx.lineTo(7,9);ctx.stroke();ctx.font='10px sans-serif';ctx.fillStyle='#507594';ctx.fillText('+',-15,-21);}
     if(c.kind==='capacitor'){ctx.moveTo(-5,-17);ctx.lineTo(-5,17);ctx.moveTo(5,-17);ctx.lineTo(5,17);ctx.stroke();}
     if(c.kind==='inductor'){ctx.moveTo(-18,0);for(let i=0;i<4;i++)ctx.arc(-13+i*9,0,4.5,Math.PI,0);ctx.stroke();}
-    if(c.kind==='switch'){ctx.moveTo(-17,0);ctx.lineTo(17,c.params.closed?0:-18);ctx.stroke();}
+    if(c.kind==='switch'){
+      ctx.moveTo(-17,0);ctx.lineTo(c.params.closed?17:12,c.params.closed?0:-18);ctx.stroke();
+      for(const x of [-17,17]){ctx.beginPath();ctx.arc(x,0,2.8,0,Math.PI*2);ctx.fill();ctx.stroke();}
+    }
     if(['voltmeter','ammeter','lamp'].includes(c.kind)){ctx.arc(0,0,19,0,Math.PI*2);if(c.kind==='lamp'){const power=Math.max(0,sim.circuit.readings[c.id]?.power||0);ctx.fillStyle=power>.001?'rgba(246,194,67,'+Math.min(.8,power/c.params.ratedPower*.8)+')':'#f7f8fa';}ctx.fill();ctx.stroke();ctx.fillStyle='#4081b5';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText({voltmeter:'V',ammeter:'A',lamp:'×'}[c.kind],0,5);}
     if(originalKind==='rheostat'){ctx.beginPath();ctx.moveTo(-10,-20);ctx.lineTo(12,10);ctx.moveTo(12,10);ctx.lineTo(12,2);ctx.moveTo(12,10);ctx.lineTo(4,8);ctx.stroke();}
     if(['ac_source','current_source'].includes(originalKind)){ctx.fillStyle='#f4f9fc';ctx.fillRect(-19,-20,38,40);ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#4081b5';ctx.font='18px sans-serif';ctx.textAlign='center';ctx.fillText(originalKind==='ac_source'?'∿':'↑',0,6);}

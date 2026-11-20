@@ -18,3 +18,22 @@ test('unconnected instruments remain finite and shorted battery is limited by in
 test('invalid circuit terminals are rejected before solving',()=>{const v=component('battery'),g=component('ground'),d=circuit(v,g);wire(d,v,'a',g,'b');assert.throws(()=>validateExperiment(d),/端子/);});
 test('voltmeter and ammeter produce correct loaded circuit readings',()=>{const v=component('battery'),r=component('resistor'),a=component('ammeter'),m=component('voltmeter'),d=series(v,r,a);d.components.push(m);wire(d,r,'a',m,'a');wire(d,r,'b',m,'b');const s=new Circuit(d);assert.ok(Math.abs(s.readings[m.id].voltage-s.readings[r.id].voltage)<1e-10);assert.ok(Math.abs(s.readings[a.id].current-s.readings[r.id].current)<2e-6);});
 test('circuit branch current can drive a mechanical coil',()=>{const v=component('battery'),r=component('resistor'),coil=component('coil'),field=component('field'),d=series(v,r);d.components.push(coil,field);d.connections.push({id:uid(),kind:'electrical',source:v.id,target:coil.id,gain:1});const sim=new Simulation(d);sim.advance(.1);assert.ok(sim.bodies.get(coil.id).x>0);});
+
+test('opening an operating switch retains the simulation time and capacitor charge',()=>{
+  const source=component('battery'),sw=component('switch'),r=component('resistor'),cap=component('capacitor');
+  const d=series(source,sw,r,cap),sim=new Simulation(d);
+  sim.advance(.06);
+  const t=sim.circuit.time,chargeState={...sim.circuit.history.get(cap.id)};
+  assert.ok(Math.abs(chargeState.voltage)>1);
+  const changed=structuredClone(d.components);
+  changed.find(c=>c.id===sw.id).params.closed=0;
+  assert.equal(sim.circuit.updateSwitches(changed),true);
+  assert.equal(sim.circuit.time,t);
+  assert.deepEqual(sim.circuit.history.get(cap.id),chargeState);
+  assert.equal(d.components.find(c=>c.id===sw.id).params.closed,1);
+  assert.ok(Math.abs(sim.circuit.readings[r.id].current)<1e-8);
+  sim.advance(.02);
+  assert.ok(Math.abs(sim.circuit.readings[cap.id].voltage-chargeState.voltage)<1e-6);
+  assert.equal(sim.circuit.updateSwitches(d.components),true);
+  assert.ok(Math.abs(sim.circuit.readings[r.id].current)>.01);
+});

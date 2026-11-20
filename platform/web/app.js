@@ -12,6 +12,7 @@ import { LabScene } from './scene.js';
 import { icon, hydrateIcons } from './icons.js';
 import { setupWorkshop } from './workshop.js';
 import { setupAssistant } from './assistant.js';
+import {choiceSpec,choiceValue,createChoice} from './choice-controls.js';
 import {setupTuning} from './tuning.js';
 import { parameterPreview } from './parameter-preview.js';
 import {colliderConfig,colliderOf,supportsCollider} from '../shared/colliders.js';
@@ -29,7 +30,7 @@ async function travelHistory(redo=false){if(pending)return;const source=redo?red
 let workspace=blankWorkspace(),selected=null,category='all',inspectorTab='properties',chartMode='signal',channel='',online=false,pending=0,queue=Promise.resolve(),physicsSignature='',toastTimer,audioContext,audioNodes=[],audioEnabled=false,aiTools=[];
 const panels=floatingPanels();
 let sim=new Simulation(activeExperiment(workspace));
-const scene=new LabScene({onSelect:id=>{if(id&&!scene.wiring&&!pendingWire)switchSidebar(false);selected=id;inspectorTab='properties';scene.select(id);$('axis-help').hidden=!id||scene.isBound(doc().components.find(c=>c.id===id));renderInspector();},onMove:(id,position)=>command('update_component',{componentId:id,position}),onDragStart:()=>{if(doc().control.running)command('control_simulation',{running:false});},onPort:(id,port)=>wirePort(id,port),onFallback:()=>setTimeout(()=>{$('mode-3d').disabled=true;toast('当前设备无法启动 WebGL，已启用 2D 画布。');},0)});
+const scene=new LabScene({onSelect:id=>{if(id&&!scene.wiring&&!pendingWire)switchSidebar(false);selected=id;inspectorTab='properties';scene.select(id);$('axis-help').hidden=!id||scene.isBound(doc().components.find(c=>c.id===id));renderInspector();},onMove:(id,position)=>command('update_component',{componentId:id,position}),onDragStart:()=>{if(doc().control.running)command('control_simulation',{running:false});},onPort:(id,port)=>wirePort(id,port),onSwitch:toggleCircuitSwitch,onFallback:()=>setTimeout(()=>{$('mode-3d').disabled=true;toast('当前设备无法启动 WebGL，已启用 2D 画布。');},0)});
 const doc=()=>activeExperiment(workspace);
 function toast(message){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,5000);}
 function download(name,text,type='application/json'){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([text],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);}
@@ -57,9 +58,20 @@ async function command(name,args={},options={}) {
   queue=promise.catch(e=>{failed=true;toast(e.message);}).finally(()=>{pending--;updateHistory();if(!sliderPreview)saveStatus(failed?'保存失败，请重试':online?(localServer?'已保存到本机':'已保存到云端'):'仅保存在本机',failed||!online);});
   try{return await promise;}catch(e){if(options.throw)throw e;return null;}
 }
+function toggleCircuitSwitch(componentId){
+  const experimentId=doc().id;
+  return command('update_component',()=>{
+    const component=workspace.experiments.find(d=>d.id===experimentId)?.components.find(c=>c.id===componentId);
+    if(component?.kind!=='switch')throw new Error('开关已被移除');
+    return {experimentId,componentId,params:{closed:component.params.closed?0:1}};
+  });
+}
 function syncSimulation(d){
-  const signature=JSON.stringify({id:d.id,mode:d.mode,plane2d:d.plane2d,components:d.components,connections:d.connections,environment:{...d.environment,speed:1},reset:d.control.reset});
-  if(signature!==physicsSignature){physicsSignature=signature;sim.reset(d);scene.setDoc(d);scene.select(selected);syncAudio(d);}else sim.doc=structuredClone(d);
+  const signature=JSON.stringify({id:d.id,mode:d.mode,plane2d:d.plane2d,components:d.components.map(c=>c.kind==='switch'?{...c,params:{...c.params,closed:0}}:c),connections:d.connections,environment:{...d.environment,speed:1},reset:d.control.reset});
+  if(signature!==physicsSignature){physicsSignature=signature;sim.reset(d);scene.setDoc(d);scene.select(selected);syncAudio(d);}else{
+    sim.doc=structuredClone(d);
+    if(sim.circuit.updateSwitches(d.components)){scene.updateSwitches(d);sim.measure();}
+  }
 }
 function applySliderPreview(){
   if(!sliderPreview)return false;
@@ -93,6 +105,7 @@ function renderLibrary(){
   $('library-items').innerHTML=groups.join('')||'<p class="empty-list">没有找到器具<br>试试其他关键词，或设计自定义器具。</p>';$('catalog-count').textContent=Object.keys(CATALOG).length+workspace.designs.length;
 }
 function parameter(key,spec,value,environment=false){
+  if(choiceSpec(key))return `<div data-choice-slot="${key}"></div>`;
   if(spec.type==='expression')return `<label class="section-label">${esc(spec.label)}<input class="component-name" data-expression="${key}" maxlength="160" value="${esc(value)}"></label>`;
   return `<div class="param-row"><label for="num-${key}">${esc(spec.label)}<span>${esc(spec.unit)}</span></label><div class="param-values"><input type="range" data-range="${key}" ${environment?'data-env="true"':''} aria-label="${esc(spec.label)}" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${value}"><input type="number" id="num-${key}" data-param="${key}" ${environment?'data-env="true"':''} min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${value}" aria-label="${esc(spec.label)}数值"></div></div>`;}
 function hero(kind,title,subtitle){return `<div class="inspector-hero"><span class="hero-icon">${icon(kind)}</span><div class="hero-text"><h3>${esc(title)}</h3><span>${esc(subtitle)}</span></div></div>`;}
@@ -115,12 +128,13 @@ function renderInspector(){
   if(sliderPreview?.element.isConnected&&sliderPreview.experimentId===d.id&&sliderPreview.componentId===selected&&sliderPreview.environment===(inspectorTab==='environment'))return;
   const context=d.id+':'+selected+':'+inspectorTab,focused=document.activeElement;
   if(inspectorContext===context&&el.contains(focused)&&focused.matches('input[type=number],textarea')&&focused.value!==focused.dataset.committed)return;
+  const focusedChoice=inspectorContext===context&&el.contains(focused)?focused.closest('[data-choice]')?.dataset.choice:null;
   inspectorContext=context;if(!sliderPreview?.element.closest('#experiment-sliders'))sliderPreview=null;
   if(inspectorTab==='objects'){
     el.innerHTML=hero('cube','场景对象',d.components.length+' 个器具 · 点击选中，F 聚焦')+d.components.map(c=>'<div class="object-row '+(c.id===selected?'active':'')+'"><button data-select-object="'+c.id+'">'+esc(c.name)+'<small>'+esc(CATALOG[c.kind].name)+'</small></button><button class="icon-button small" data-focus-object="'+c.id+'" aria-label="聚焦 '+esc(c.name)+'">'+icon('focus')+'</button></div>').join('')+(!d.components.length?'<p class="empty-list">添加器具后在此快速定位。</p>':'');return;
   }
   if(inspectorTab==='environment'){
-    el.innerHTML=hero('sliders','环境设置','所有器具共享的物理空间')+`<div class="section-label">物理环境</div>${parameter('gravity',{label:'重力加速度',unit:'m/s²',min:0,max:25,step:.01},d.environment.gravity,true)}${parameter('damping',{label:'线性环境阻尼',unit:'kg/s',min:0,max:5,step:.01},d.environment.damping,true)}<label class="toggle-row">地面与刚体碰撞<input class="toggle" type="checkbox" id="collisions" ${d.environment.collisions?'checked':''}></label><hr class="section-rule"><div class="section-label">数值计算</div><div class="overview-row"><span>基础步长</span><strong>1/480 s</strong></div><div class="overview-row"><span>刚体 / 音圈 / 电路</span><strong>Cannon / RK4 / 节点法</strong></div><div class="overview-row"><span>空间边界</span><strong>${d.components.some(c=>c.kind==='floor_slab')?'有限地面器具':'默认地面 y = 0'}</strong></div><div class="concept-box"><span class="eyebrow">CONTROL THE CONDITIONS</span><p>默认无重力。你可以添加重力、阻尼和碰撞，逐步构建需要的实验条件。</p></div><p class="input-hint" style="margin-top:18px">更改物理参数后，仿真将从初始条件重新计时。时间倍率只改变播放速度。</p>`;return;
+    el.innerHTML=hero('sliders','环境设置','所有器具共享的物理空间')+`<div class="section-label">物理环境</div>${parameter('gravity',{label:'重力加速度',unit:'m/s²',min:0,max:25,step:.01},d.environment.gravity,true)}${parameter('damping',{label:'线性环境阻尼',unit:'kg/s',min:0,max:5,step:.01},d.environment.damping,true)}<label class="toggle-row">地面与刚体碰撞<input class="toggle" type="checkbox" id="collisions" ${d.environment.collisions?'checked':''}></label><hr class="section-rule"><div class="section-label">数值计算</div><div class="overview-row"><span>基础步长</span><strong>1/480 s</strong></div><div class="overview-row"><span>刚体 / 音圈 / 电路</span><strong>Cannon / RK4 / 节点法</strong></div><div class="overview-row"><span>空间边界</span><strong>${d.components.some(c=>c.kind==='floor_slab')?'有限地面器具':'默认地面 y = 0'}</strong></div><div class="concept-box"><span class="eyebrow">CONTROL THE CONDITIONS</span><p>默认无重力。你可以添加重力、阻尼和碰撞，逐步构建需要的实验条件。</p></div><p class="input-hint" style="margin-top:18px">切换电路开关可在当前时刻观察通断；调整初始条件会重新计时。时间倍率改变播放速度。</p>`;return;
   }
   if(inspectorTab==='connections'){
     el.innerHTML=hero('link','物理过程连接','把不同领域的器具联系起来')+`<button class="outline-button full" id="connect-btn">${icon('plus')}添加连接</button>`+d.connections.map(l=>`<div class="connection-card"><h4>${esc(COUPLINGS[l.kind].name)}<button class="icon-button small" data-remove-link="${l.id}" aria-label="删除连接">${icon('close')}</button></h4><p>${esc(d.components.find(c=>c.id===l.source)?.name)} ${l.kind==='wire'?l.sourcePort.toUpperCase():''}<br><span style="color:#c6a485">↓</span> ${esc(d.components.find(c=>c.id===l.target)?.name)} ${l.kind==='wire'?l.targetPort.toUpperCase():''}</p>${l.kind==='wire'?'<div class="gain">IDEAL WIRE · 理想导线</div>':'<div class="gain">GAIN '+l.gain.toFixed(2)+'</div>'}</div>`).join('')+(!d.connections.length?'<div class="empty-selection"><span>'+icon('link')+'</span><p>让物理发生联系</p><small>点击电路器具的 A/B 端子接线，或在这里选择连接。</small></div>':'')+`<hr class="section-rule"><div class="section-label">可用连接</div>${Object.values(COUPLINGS).map(k=>`<div class="connection-card"><h4>${k.name}</h4><p>${esc(k.description)}</p></div>`).join('')}<p class="input-hint">机械连接器具的两端在属性中设置。电路导线直接连接 A/B 端子，参考地定义零电位。电场和磁场通过空间位置自动作用，不需要接线。换能连接采用单向线性模型。</p>`;return;
@@ -131,6 +145,11 @@ function renderInspector(){
   }
   const def=CATALOG[c.kind];
   el.innerHTML=hero(def.icon,c.name,DOMAINS[def.domain].name+' · '+def.description)+`<label class="section-label" for="component-name">器具名称</label><input class="component-name" id="component-name" value="${esc(c.name)}" maxlength="60"><hr class="section-rule"><div class="section-label">初始位置 <span class="muted">/ m</span></div>${scene.isBound(c)?'<p class="bound-hint">此器具的位置由两端决定。移动端点即可调整它的位置。</p>':''}<div class="position-grid">${['X','Y','Z'].map((axis,i)=>`<label><span>${axis}</span><input type="number" data-axis="${i}" value="${c.position[i]}" min="-30" max="30" step="0.1" aria-label="${axis} 位置" ${scene.isBound(c)||d.mode==='2d'&&i===normalAxis(d)?'disabled':''}></label>`).join('')}</div>${RIGID_KINDS.includes(c.kind)?`<label class="toggle-row">固定在空间中<input class="toggle" id="fixed" type="checkbox" ${c.fixed?'checked':''}></label>`:''}${(LINK_KINDS.includes(c.kind)||c.kind==='distance_sensor')?'<hr class="section-rule"><div class="section-label">连接端点</div>'+['a','b'].map(key=>`<label class="section-label">端点 ${key.toUpperCase()}</label><select class="field-select" data-ref="${key}"><option value="">请选择器具</option>${d.components.filter(o=>o.id!==c.id&&(c.kind==='distance_sensor'||ENDPOINT_KINDS.includes(o.kind))).map(o=>`<option value="${o.id}" ${o.id===c.refs[key]?'selected':''}>${esc(o.name)}</option>`).join('')}</select>`).join('')+(!c.refs.a||!c.refs.b?'<p class="warning-note">选择两个端点后，连接器具才会施加作用。</p>':''):''}${['force','drag','expression_force','harmonic_force','motion_sensor'].includes(c.kind)?'<hr class="section-rule"><label class="section-label">目标刚体</label><select class="field-select" data-ref="target"><option value="">请选择目标</option>'+d.components.filter(o=>RIGID_KINDS.includes(o.kind)).map(o=>'<option value="'+o.id+'" '+(o.id===c.refs.target?'selected':'')+'>'+esc(o.name)+'</option>').join('')+'</select>':''}${CIRCUIT_KINDS.includes(c.kind)?'<hr class="section-rule"><div class="section-label">电路端子 · 点击接线</div><div class="port-actions">'+def.terminals.map(port=>'<button data-wire-port="'+port+'">端子 '+port.toUpperCase()+(c.kind==='battery'?(port==='a'?' +':' −'):'')+'</button>').join('')+'</div><p class="input-hint">选中端子，再选中另一器具的端子建立导线。</p><div class="circuit-live" id="circuit-live"></div>':''}${colliderEditor(c)}<hr class="section-rule"><div class="section-label">物理参数</div>${Object.entries(def.params).map(([key,spec])=>parameter(key,spec,c.params[key])).join('')||'<p class="input-hint">此器具无额外参数，改变位置即可。</p>'}${c.kind==='coil'?'<p class="warning-note">音圈需置于 Z 方向磁场范围内，并通过「连接」接入信号电源，才能受到电磁驱动。</p>':''}<hr class="section-rule"><div class="inspector-actions"><button id="save-design">${icon('save')}保存为器具</button><button id="duplicate-component">${icon('copy')}复制</button><button id="delete-component" class="danger" aria-label="删除器具">${icon('trash')}</button></div>`;
+  for(const slot of el.querySelectorAll('[data-choice-slot]')){
+    const key=slot.dataset.choiceSlot;
+    slot.append(createChoice(key,def.params[key],choiceSpec(key).label,c.params[key],'inspector-choice-'+key));
+    if(focusedChoice===key)slot.querySelector('input:checked, input[type=checkbox], select')?.focus({preventScroll:true});
+  }
 }
 const tuning=setupTuning({
   getDoc:doc,
@@ -321,6 +340,11 @@ $('inspector-content').addEventListener('input',e=>{
 });
 function changeCollider(c,edit){const experimentId=doc().id,componentId=c.id;return command('update_component',()=>{const current=workspace.experiments.find(d=>d.id===experimentId)?.components.find(c=>c.id===componentId);if(!current)throw new Error('器具已被移除');const collider=colliderConfig(current);edit(collider,current);return {experimentId,componentId,collider};}).then(result=>{if(!result)render();});}
 function commitInspectorInput(e){const el=e.target,c=doc().components.find(c=>c.id===selected);
+  const field=el.closest('.parameter-choice');
+  if(field){
+    if(e.type==='change'&&c)command('update_component',{experimentId:doc().id,componentId:c.id,params:{[field.dataset.choice]:choiceValue(el)}}).then(result=>{if(!result)render();});
+    return;
+  }
   if(sliderPreview?.element===el){applySliderPreview();sliderPreview=null;}
   if(!el.matches('input,textarea,select')||el.disabled)return;const valueKey=el.type==='checkbox'?String(el.checked):el.value;if(el.dataset.committed===valueKey)return;el.dataset.committed=valueKey;
   if(el.id==='goal-input'&&el.value!==doc().goal)return command('update_experiment',{goal:el.value});

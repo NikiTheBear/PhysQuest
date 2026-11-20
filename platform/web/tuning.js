@@ -1,3 +1,4 @@
+import {choiceSpec,choiceValue,createChoice,updateChoice} from './choice-controls.js';
 import {CATALOG} from '../shared/catalog.js';
 import {sliderTarget} from '../shared/sliders.js';
 
@@ -51,6 +52,8 @@ export function setupTuning({getDoc,onPreview,onCommit,onCancel}){
   const group=document.getElementById('tuning-group'),rows=document.getElementById('tuning-rows');
   let experimentId,optionSignature,rowSignature,editingRow=null,bindings=[];
   function update(row,s,value){
+    const choice=row.querySelector('.parameter-choice');
+    if(choice){updateChoice(choice,value);return;}
     const input=row.querySelector('[type=number]'),range=row.querySelector('[type=range]');
     input.value=value;
     range.value=trackPosition(s,value);
@@ -74,10 +77,17 @@ export function setupTuning({getDoc,onPreview,onCommit,onCancel}){
       editingRow=null;
       const controls=bindings.map((s,i)=>{
         const row=document.createElement('div');row.className='tuning-row';row.dataset.index=i;
+        const {spec,value}=sliderTarget(doc,s),component=doc.components.find(c=>c.id===s.componentId);
+        const discrete=choiceSpec(s.parameter);
+        const title=discrete&&s.label===spec.label?discrete.label:s.label;
+        const caption=group.value==='common'&&component?component.name+' · '+title:title;
+        if(discrete){
+          row.append(createChoice(s.parameter,s,caption,value,'tuning-choice-'+i));
+          return row;
+        }
         row.innerHTML='<div class="tuning-line"><label></label><input type="number"><span class="tuning-unit"></span></div><input type="range"><div class="tuning-limits"><span></span><span></span></div>';
         const label=row.querySelector('label'),number=row.querySelector('[type=number]'),range=row.querySelector('[type=range]');
-        const {spec}=sliderTarget(doc,s),component=doc.components.find(c=>c.id===s.componentId);
-        label.textContent=group.value==='common'&&component?component.name+' · '+s.label:s.label;
+        label.textContent=caption;
         label.htmlFor=range.id='tuning-range-'+i;
         number.setAttribute('aria-label',label.textContent+'数值');
         row.querySelector('.tuning-unit').textContent=spec.unit;
@@ -96,7 +106,7 @@ export function setupTuning({getDoc,onPreview,onCommit,onCancel}){
   }
   group.onchange=()=>{onCancel();editingRow=null;render();};
   rows.oninput=e=>{
-    const el=e.target,row=el.closest('.tuning-row');if(!row)return;
+    const el=e.target,row=el.closest('.tuning-row');if(!row||el.closest('.parameter-choice'))return;
     const s=bindings[row.dataset.index],value=el.type==='range'?physicalValue(s,el.valueAsNumber):el.valueAsNumber;
     editingRow=row;
     if(!el.validity.valid)return;
@@ -108,6 +118,7 @@ export function setupTuning({getDoc,onPreview,onCommit,onCancel}){
     const el=e.target,row=el.closest('.tuning-row');if(!row||experimentId!==getDoc().id)return;
     const s=bindings[row.dataset.index];
     editingRow=null;
+    if(el.closest('.parameter-choice')){onCommit(experimentId,s,choiceValue(el));return;}
     if(!el.validity.valid){el.reportValidity();onCancel();render();return;}
     const value=el.type==='range'?physicalValue(s,el.valueAsNumber):el.valueAsNumber;
     onCommit(experimentId,s,value);

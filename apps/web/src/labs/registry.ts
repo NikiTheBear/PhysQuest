@@ -15,9 +15,13 @@ function idsOf(prefixes: string[]): string[] {
   return out;
 }
 
+/** 从力学搬去声学的振动与波 5 条 —— 力学不再包含它们 */
+const MOVED_TO_ACOUSTICS = ['K-M3-14', 'K-M3-15', 'K-M3-16', 'K-M4-05', 'K-M4-06'];
+
 const KNOWLEDGE_IDS_OPTICS = idsOf(['K-O']);
-const KNOWLEDGE_IDS_MECH = idsOf(['K-M']);
+const KNOWLEDGE_IDS_MECH = idsOf(['K-M']).filter((id) => !MOVED_TO_ACOUSTICS.includes(id));
 const KNOWLEDGE_IDS_EM = idsOf(['K-E']);
+const KNOWLEDGE_IDS_ACOUSTICS = [...idsOf(['K-A']), ...MOVED_TO_ACOUSTICS];
 import { DEFAULT_LENS_PARAMS } from '../core/contracts';
 
 /**
@@ -53,6 +57,32 @@ export interface LabMeta {
   knowledgeIds?: string[];
 }
 
+/* 卡片数量、挑战数量都从真实数据算，不写死 —— 加了知识点卡片自动跟上 */
+import CARDS_JSON from '@knowledge/knowledge-cards.json';
+import AUTO_JSON from '@knowledge/labs/mechanics-challenges.json';
+import CIRCUIT_JSON from '@knowledge/labs/circuits-challenges.json';
+import OPTICS_JSON from '@knowledge/labs/optics-lens-challenges.json';
+import ACOUSTIC_JSON from '@knowledge/labs/acoustics-challenges.json';
+
+const ALL_CARD_IDS = new Set(
+  (CARDS_JSON as { cards: Array<{ id: string }> }).cards.map((c) => c.id),
+);
+
+type ChallengeFile = { challenges?: Array<{ labId?: string }> };
+const AUTO_ALL: Array<{ labId?: string }> = [
+  ...((AUTO_JSON as ChallengeFile).challenges ?? []),
+  ...((CIRCUIT_JSON as ChallengeFile).challenges ?? []),
+  ...((OPTICS_JSON as ChallengeFile).challenges ?? []),
+  ...((ACOUSTIC_JSON as ChallengeFile).challenges ?? []),
+];
+
+/** 手写挑战（凸透镜那 5 关）+ 自动挑战，按模块数一数 */
+function statsOf(labId: string, knowledgeIds: string[], handwritten: number): string[] {
+  const cards = knowledgeIds.filter((id) => ALL_CARD_IDS.has(id)).length;
+  const auto = AUTO_ALL.filter((c) => c.labId === labId).length;
+  return [`${handwritten + auto} 个挑战`, `${knowledgeIds.length} 个知识点`, `${cards} 张卡`];
+}
+
 export const LABS: LabMeta[] = [
   {
     id: 'optics-lens',
@@ -64,7 +94,7 @@ export const LABS: LabMeta[] = [
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
-    stats: ['5 个挑战', '21 个知识点', '26 张卡'],
+    stats: statsOf('optics-lens', KNOWLEDGE_IDS_OPTICS, 5),
     knowledgeIds: KNOWLEDGE_IDS_OPTICS,
   },
   {
@@ -77,7 +107,7 @@ export const LABS: LabMeta[] = [
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
-    stats: ['29 个挑战', '46 个知识点', '46 张卡'],
+    stats: statsOf('mechanics', KNOWLEDGE_IDS_MECH, 0),
     knowledgeIds: KNOWLEDGE_IDS_MECH,
   },
   {
@@ -90,7 +120,7 @@ export const LABS: LabMeta[] = [
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
-    stats: ['21 个挑战', '42 个知识点', '42 张卡'],
+    stats: statsOf('circuits', KNOWLEDGE_IDS_EM, 0),
     knowledgeIds: KNOWLEDGE_IDS_EM,
   },
   {
@@ -104,8 +134,8 @@ export const LABS: LabMeta[] = [
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
-    stats: ['5 个挑战', '4 个知识点', '2 张卡'],
-    knowledgeIds: ['K-M3-15', 'K-M3-16'],
+    stats: statsOf('acoustics', KNOWLEDGE_IDS_ACOUSTICS, 0),
+    knowledgeIds: KNOWLEDGE_IDS_ACOUSTICS,
   },
 ];
 

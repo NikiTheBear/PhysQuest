@@ -4425,7 +4425,7 @@ html[data-theme='dark'] .pq-toast {
   align-items: flex-start;
   text-align: left;
   background: var(--surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--separator);
   border-radius: var(--r-card);
   padding: 16px 18px;
   cursor: pointer;
@@ -4464,7 +4464,7 @@ html[data-theme='dark'] .pq-toast {
   text-align: left;
   padding: 12px 14px;
   border-radius: var(--r-ctrl);
-  border: 1px solid var(--line);
+  border: 1px solid var(--separator);
   background: var(--surface);
   cursor: pointer;
   font-family: inherit;
@@ -4481,7 +4481,7 @@ html[data-theme='dark'] .pq-toast {
   width: 18px;
   height: 18px;
   border-radius: 5px;
-  border: 1.5px solid var(--line);
+  border: 1.5px solid var(--separator);
   background: var(--surface);
   display: grid;
   place-items: center;
@@ -4529,7 +4529,7 @@ html[data-theme='dark'] .pq-toast {
   margin: 0 -20px -20px;
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: saturate(180%) blur(20px);
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--separator);
 }
 .quiz-pick-bar > div:first-child {
   display: flex;
@@ -4554,7 +4554,7 @@ html[data-theme='dark'] .pq-toast {
   gap: 12px;
   margin: 30px 0 14px;
   padding-bottom: 10px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--separator);
   flex-wrap: wrap;
 }
 .help-section-title h4 {
@@ -4580,7 +4580,7 @@ html[data-theme='dark'] .pq-toast {
   padding: 14px 16px;
   border-radius: var(--r-card);
   background: var(--surface-2);
-  border: 1px solid var(--line);
+  border: 1px solid var(--separator);
 }
 .hp-no {
   font-family: var(--font-mono);
@@ -4631,7 +4631,7 @@ html[data-theme='dark'] .pq-toast {
 }
 .hf-group {
   border-radius: var(--r-card);
-  border: 1px solid var(--line);
+  border: 1px solid var(--separator);
   background: var(--surface);
   padding: 14px 18px 16px;
 }
@@ -4696,4 +4696,203 @@ html[data-theme='dark'] .pq-toast {
 }
 .help-compare.two {
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* ============================================================
+   知识卡加厚内容
+   ============================================================ */
+.fc-more {
+  margin-top: 12px;
+  border-radius: var(--r-ctrl);
+  background: var(--surface-2);
+  border: 1px solid var(--separator);
+  padding: 10px 13px;
+}
+.fc-more summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+  list-style: none;
+  user-select: none;
+}
+.fc-more summary::-webkit-details-marker {
+  display: none;
+}
+.fc-more summary::before {
+  content: '▸ ';
+  font-size: 10px;
+}
+.fc-more[open] summary::before {
+  content: '▾ ';
+}
+.fc-more p {
+  margin: 9px 0 0;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--label-2);
+}
+.fc-more p:first-of-type {
+  margin-top: 10px;
+}
+
+/* 易混对比 */
+.fc-compare {
+  margin-top: 12px;
+  padding: 11px 13px;
+  border-radius: var(--r-ctrl);
+  background: var(--orange-soft);
+}
+.fc-compare .fc-k {
+  color: var(--orange);
+}
+.fc-cmp-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+  padding-left: 9px;
+  border-left: 2px solid color-mix(in srgb, var(--orange) 40%, transparent);
+}
+.fc-cmp-row b {
+  font-size: 12.5px;
+  color: var(--label);
+  font-weight: 600;
+}
+.fc-cmp-row span {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--label-2);
+}
+
+/* 生活里 */
+.fc-everyday {
+  margin-top: 12px;
+}
+.fc-everyday ul {
+  margin: 7px 0 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.fc-everyday li {
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--label-2);
+}
+.fc-everyday li::marker {
+  color: var(--label-3);
+}
+
+/* 自检三问 */
+.fc-check {
+  margin-top: 12px;
+}
+.fc-q {
+  border-radius: 9px;
+  background: var(--fill);
+  padding: 8px 11px;
+  margin-top: 6px;
+}
+.fc-q summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--label);
+  list-style: none;
+  user-select: none;
+}
+.fc-q summary::-webkit-details-marker {
+  display: none;
+}
+.fc-q summary b {
+  color: var(--accent);
+  font-weight: 600;
+}
+.fc-q[open] {
+  background: var(--accent-soft);
+}
+.fc-q p {
+  margin: 8px 0 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--separator);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--label-2);
+}
+
+/* 深入讲解在弹层里默认展开时，别太占地方 */
+.know-card.compact .fc-more p {
+  font-size: 12.5px;
+}
+
+/* 题库：逐项解析 */
+.quiz-notes {
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--separator);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.qn-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--label-3);
+  text-transform: uppercase;
+}
+.qn-row {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r-ctrl);
+  background: var(--surface-2);
+  border-left: 3px solid var(--separator);
+}
+.qn-row.right {
+  border-left-color: var(--green);
+  background: var(--green-soft);
+}
+.qn-row.wrong {
+  border-left-color: var(--red);
+  background: var(--red-soft);
+}
+.qn-mark {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--fill-2);
+  display: grid;
+  place-items: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--label-2);
+}
+.qn-row.right .qn-mark {
+  background: var(--green);
+  color: #fff;
+}
+.qn-row.wrong .qn-mark {
+  background: var(--red);
+  color: #fff;
+}
+.qn-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.qn-body b {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label);
+  line-height: 1.5;
+}
+.qn-body span {
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--label-2);
 }

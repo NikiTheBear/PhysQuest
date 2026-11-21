@@ -32,6 +32,11 @@ export interface CardData {
   misconceptions: string[];
   prerequisites: string[];
   difficulty: string;
+  /** ★ 加厚内容（可能为空数组，界面要判断） */
+  detail?: string[];
+  compare?: Array<{ with: string; diff: string }>;
+  everyday?: string[];
+  selfCheck?: Array<{ q: string; a: string }>;
 }
 
 const STAGE_LABEL: Record<string, string> = {
@@ -129,6 +134,41 @@ export default function KnowledgeCard({
             </div>
           )}
 
+          {/* ===== 深入讲解 ===== */}
+          {card.detail && card.detail.length > 0 && (
+            <details className="fc-more" open={!compact}>
+              <summary>讲透一点（{card.detail.length} 段）</summary>
+              {card.detail.map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </details>
+          )}
+
+          {/* ===== 易混对比 ===== */}
+          {card.compare && card.compare.length > 0 && (
+            <div className="fc-compare">
+              <span className="fc-k">别搞混</span>
+              {card.compare.map((c) => (
+                <div className="fc-cmp-row" key={c.with}>
+                  <b>{c.with}</b>
+                  <span>{c.diff}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ===== 生活里在哪见 ===== */}
+          {card.everyday && card.everyday.length > 0 && (
+            <div className="fc-everyday">
+              <span className="fc-k">生活里</span>
+              <ul>
+                {card.everyday.map((e, i) => (
+                  <li key={i}>{e}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {mis.length > 0 && (
             <div className="mis">
               <b>最容易错在：</b>
@@ -163,6 +203,21 @@ export default function KnowledgeCard({
                   </span>
                 );
               })}
+            </div>
+          )}
+
+          {/* ===== 自检三问 ===== */}
+          {card.selfCheck && card.selfCheck.length > 0 && (
+            <div className="fc-check">
+              <span className="fc-k">自己考自己</span>
+              {card.selfCheck.map((s2, i) => (
+                <details key={i} className="fc-q">
+                  <summary>
+                    <b>{i + 1}.</b> {s2.q}
+                  </summary>
+                  <p>{s2.a}</p>
+                </details>
+              ))}
             </div>
           )}
 

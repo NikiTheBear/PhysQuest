@@ -1,6 +1,12 @@
 import { useMemo, useState } from 'react';
 import type { Stage } from '../../core/contracts';
-import { ALL_CARDS, CHALLENGES, MISCONCEPTIONS, promptById } from '../../data/content';
+import {
+  ALL_CARDS,
+  AUTO_CHALLENGES,
+  CHALLENGES,
+  MISCONCEPTIONS,
+  promptById,
+} from '../../data/content';
 import { LABS } from '../../labs/registry';
 import KnowledgeCard, { STAGE_LABEL, type CardData } from '../knowledge-cards/KnowledgeCard';
 import PLATFORM_MAP from '@knowledge/PLATFORM-MAP.json';
@@ -28,7 +34,7 @@ const STAGE_DESC: Record<Stage, string> = {
  * 之前分成两页（地图 = 目录，知识点 = 卡片集），现在合成一页，两种视图：
  *
  *   ① 模块视图 —— 大卡片，先选一个实验模块去做挑战
- *   ② 卡片视图 —— 166 张双面知识点卡，按学段分组，能直接读、直接翻面、直接去搭
+ *   ② 卡片视图 —— 176 张双面知识点卡，按学段分组，能直接读、直接翻面、直接去搭
  *
  * 顶部一个切换器。为什么合成一页：因为学生对"我去哪"只有一个心智模型，
  * 分成两个顶级导航会让他每次都要先想"这是地图还是卡片"。
@@ -94,7 +100,7 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge, onBuild }:
         <span className="eyebrow">Knowledge · 从这里开始</span>
         <h2>先选一个模块，或者直接翻知识点</h2>
         <p>
-          这个平台把物理学成一条路：<b>{totals.all} 个知识点</b>，横跨五个领域、四个学段。
+          这个平台把物理学成一条路：<b>{totals.all} 个知识点</b>，横跨六个领域、四个学段。
           你可以从模块进去做挑战，也可以直接翻卡片看某一条到底讲什么。
         </p>
       </div>
@@ -149,7 +155,7 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge, onBuild }:
               <div className="k">已写好的卡片</div>
             </div>
             <div className="stat">
-              <div className="v">{CHALLENGES.length + 51}</div>
+              <div className="v">{CHALLENGES.length + AUTO_CHALLENGES.length}</div>
               <div className="k">可做的挑战</div>
             </div>
             <div className="stat">
@@ -162,8 +168,8 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge, onBuild }:
             <div>
               <h3>或者不选模块，直接翻知识点</h3>
               <p>
-                166 张双面卡片，按学段排。正面读知识点，背面写清这条怎么做成实验，
-                能一键交给 AI 现场搭。
+                176 张双面卡片，按学段排。正面读知识点（含深入讲解、易混对比、
+                生活场景、自检三问），背面写清这条怎么做成实验，能一键交给 AI 现场搭。
               </p>
             </div>
             <span className="go">去翻卡片 →</span>

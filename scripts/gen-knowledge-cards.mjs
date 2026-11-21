@@ -19,7 +19,7 @@ const MAP = JSON.parse(
 
 /* 手写的卡面文字：四个领域各一个文件 */
 const DOMAIN_TEXT = {};
-for (const dom of ['mechanics', 'electromagnetism', 'thermodynamics', 'modern', 'optics-university']) {
+for (const dom of ['mechanics', 'electromagnetism', 'thermodynamics', 'modern', 'acoustics', 'optics-university']) {
   try {
     const raw = await readFile(
       new URL(`../shared/knowledge-data/card-text/${dom}.json`, import.meta.url),
@@ -28,6 +28,20 @@ for (const dom of ['mechanics', 'electromagnetism', 'thermodynamics', 'modern', 
     Object.assign(DOMAIN_TEXT, JSON.parse(raw));
   } catch {
     console.warn(`  ⚠ 没找到 card-text/${dom}.json，这一领域用生成兜底`);
+  }
+}
+
+/* 加厚内容：detail / compare / everyday / selfCheck，按领域一个文件 */
+const CARD_DETAIL = {};
+for (const dom of ['mechanics', 'electromagnetism', 'thermodynamics', 'modern', 'optics', 'acoustics']) {
+  try {
+    const raw = await readFile(
+      new URL(`../shared/knowledge-data/card-detail/${dom}.json`, import.meta.url),
+      'utf8',
+    );
+    Object.assign(CARD_DETAIL, JSON.parse(raw));
+  } catch {
+    /* 没有就没有，卡片正面少这一段 */
   }
 }
 
@@ -88,6 +102,8 @@ for (const disc of MAP.disciplines) {
             .join('\n')
         : DOMAIN_WHY[disc.key]);
 
+      const more = CARD_DETAIL[item.id] ?? {};
+
       cards.push({
         id: item.id,
         stage: band.stage,
@@ -104,6 +120,11 @@ for (const disc of MAP.disciplines) {
         misconceptions: [],
         prerequisites: [],
         difficulty: p?.support === 'conceptual' ? 'advanced' : 'beginner',
+        /** ★ 加厚内容（可能为空，界面要判断） */
+        detail: more.detail ?? [],
+        compare: more.compare ?? [],
+        everyday: more.everyday ?? [],
+        selfCheck: more.selfCheck ?? [],
       });
     }
   }

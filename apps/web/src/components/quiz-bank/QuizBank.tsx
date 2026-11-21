@@ -278,10 +278,37 @@ export default function QuizBank({ onDone, onBack, knowledgeIds }: Props) {
             })}
 
             {revealed && (
-              <div className={`quiz-explain ${sel === question.answerIndex ? 'ok' : 'bad'}`}>
-                <b>{sel === question.answerIndex ? '答对了。' : '这题不对。'}</b>
-                {question.explanation}
-              </div>
+              <>
+                <div className={`quiz-explain ${sel === question.answerIndex ? 'ok' : 'bad'}`}>
+                  <b>{sel === question.answerIndex ? '答对了。' : '这题不对。'}</b>
+                  {question.explanation}
+                </div>
+
+                {/* 逐项解析：每个选项为什么对、为什么错 */}
+                {question.optionNotes && (
+                  <div className="quiz-notes">
+                    <span className="qn-title">逐项解析</span>
+                    {question.options.map((opt, i) => (
+                      <div
+                        key={i}
+                        className={`qn-row ${
+                          i === question.answerIndex
+                            ? 'right'
+                            : i === sel
+                              ? 'wrong'
+                              : ''
+                        }`}
+                      >
+                        <span className="qn-mark">{String.fromCharCode(65 + i)}</span>
+                        <div className="qn-body">
+                          <b>{opt}</b>
+                          <span>{question.optionNotes?.[i] ?? ''}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
 
             <div className="quiz-actions">

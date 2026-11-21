@@ -20,7 +20,7 @@ export const CHALLENGES: Challenge[] = challenges.challenges as unknown as Chall
 export const QUIZ: QuizItem[] = quiz.items as unknown as QuizItem[];
 export const DEMOS = demos.scripts;
 
-/** 全平台 166 张知识卡（26 手写 + 140 生成） */
+/** 全平台 176 张知识卡（光学 32 手写 + 其余生成，全部带加厚内容） */
 export const ALL_CARDS = (allCards as { cards: unknown[] }).cards as Array<{
   id: string;
   title: string;
@@ -37,9 +37,17 @@ export const ALL_CARDS = (allCards as { cards: unknown[] }).cards as Array<{
   misconceptions: string[];
   prerequisites: string[];
   difficulty: string;
+  /** 加厚内容：深入讲解 */
+  detail?: string[];
+  /** 加厚内容：易混对比 */
+  compare?: Array<{ with: string; diff: string }>;
+  /** 加厚内容：生活里在哪见 */
+  everyday?: string[];
+  /** 加厚内容：自检三问 */
+  selfCheck?: Array<{ q: string; a: string }>;
 }>;
 
-/** 全平台 140 条 AI 搭建提示词（知识卡的背面） */
+/** 全平台 150 条 AI 搭建提示词（知识卡的背面） */
 export const ALL_PROMPTS = allPrompts as Array<{
   id: string;
   title: string;

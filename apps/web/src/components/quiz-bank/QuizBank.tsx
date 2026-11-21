@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 import { ALL_CARDS, promptById } from '../../data/content';
-import { BANK, bankStats, quizSetFor, type BankQuestion, type QuizLevel } from '../../data/question-bank';
+import { BANK, bankForKnowledge, bankStats, type QuizLevel } from '../../data/question-bank';
 
 interface Props {
   onDone: (result: { answered: number; correct: number; wrongIds: string[] }) => void;
   onBack: () => void;
-  /** 只考这些知识点（从当前挑战带过来）；不传就是全平台 */
-  focusKnowledgeIds?: string[];
+  /** 学生挑好的知识点（从选题页传进来） */
+  knowledgeIds: string[];
 }
 
 const LEVEL_LABEL: Record<QuizLevel, string> = {
@@ -27,15 +27,14 @@ const LEVEL_DESC: Record<QuizLevel, string> = {
  * 每个知识点三道题：简单 / 中等 / 困难。
  * 做完才能生成学习报告——这是报告闸门的一部分。
  */
-export default function QuizBank({ onDone, onBack, focusKnowledgeIds }: Props) {
+export default function QuizBank({ onDone, onBack, knowledgeIds }: Props) {
   const stats = useMemo(() => bankStats(), []);
 
-  // 要考的知识点：有 focus 就只考那些，否则全平台
+  // 只考学生挑的这些
   const targets = useMemo(() => {
-    if (!focusKnowledgeIds?.length) return ALL_CARDS;
-    const set = new Set(focusKnowledgeIds);
+    const set = new Set(knowledgeIds);
     return ALL_CARDS.filter((c) => set.has(c.id));
-  }, [focusKnowledgeIds]);
+  }, [knowledgeIds]);
 
   const [idx, setIdx] = useState(0);
   const [level, setLevel] = useState<QuizLevel>('easy');
@@ -47,8 +46,26 @@ export default function QuizBank({ onDone, onBack, focusKnowledgeIds }: Props) {
   const [finished, setFinished] = useState(false);
 
   const card = targets[idx];
-  const set = useMemo(() => (card ? quizSetFor(card.id) : []), [card]);
-  const question = set.find((q) => q.level === level) ?? set[0];
+
+  // 这个知识点的全部题目，按 简单 → 中等 → 困难 排好
+  const set = useMemo(() => {
+    if (!card) return [];
+    const order: QuizLevel[] = ['easy', 'medium', 'hard'];
+    return [...bankForKnowledge(card.id)].sort(
+      (a, b) => order.indexOf(a.level) - order.indexOf(b.level),
+    );
+  }, [card]);
+
+  /** 当前难度里还没答的题优先，都答完了就显示这一档的第一道 */
+  const question =
+    set.find((q) => q.level === level && !answers[q.id]) ??
+    set.find((q) => q.level === level) ??
+    set[0];
+
+  const totalQ = useMemo(
+    () => targets.reduce((n, c) => n + bankForKnowledge(c.id).length, 0),
+    [targets],
+  );
 
   if (!card) {
     return (
@@ -134,22 +151,27 @@ export default function QuizBank({ onDone, onBack, focusKnowledgeIds }: Props) {
     setRevealed(false);
     setSel(null);
 
-    // 依次 easy → medium → hard，然后下一个知识点
     const order: QuizLevel[] = ['easy', 'medium', 'hard'];
-    const pos = order.indexOf(level);
-    const available = order.filter((lv) => set.some((q) => q.level === lv));
-    const cur = available.indexOf(level);
+    const answeredIds = new Set(Object.keys(answers));
 
-    if (cur >= 0 && cur < available.length - 1) {
-      setLevel(available[cur + 1]);
-      return;
+    // ① 这一档还有没答的题 → 留着继续做
+    const sameLevelLeft = set.some((q) => q.level === level && !answeredIds.has(q.id));
+    if (sameLevelLeft) return;
+
+    // ② 换到下一个还有题的档
+    const cur = order.indexOf(level);
+    for (let i = cur + 1; i < order.length; i += 1) {
+      if (set.some((q) => q.level === order[i])) {
+        setLevel(order[i]);
+        return;
+      }
     }
+
+    // ③ 这个知识点做完了 → 下一个知识点
     if (idx < targets.length - 1) {
       setIdx(idx + 1);
-      const nextSet = quizSetFor(targets[idx + 1].id);
-      const firstLevel = (['easy', 'medium', 'hard'] as QuizLevel[]).find((lv) =>
-        nextSet.some((q) => q.level === lv),
-      );
+      const nextSet = bankForKnowledge(targets[idx + 1].id);
+      const firstLevel = order.find((lv) => nextSet.some((q) => q.level === lv));
       setLevel(firstLevel ?? 'easy');
       return;
     }
@@ -165,20 +187,16 @@ export default function QuizBank({ onDone, onBack, focusKnowledgeIds }: Props) {
         <span className="eyebrow">Question Bank · 报告前的检验</span>
         <h2>先做几道题，再出报告</h2>
         <p>
-          共 {stats.total} 道题，覆盖 {stats.knowledgeCovered} 个知识点（简单 {stats.byLevel.easy} / 中等{' '}
-          {stats.byLevel.medium} / 困难 {stats.byLevel.hard}）。
-          {focusKnowledgeIds?.length
-            ? ` 这一轮只考你刚才做的 ${total} 个知识点。`
-            : ` 这一轮会走一遍全部 ${total} 个知识点。`}
+          {`这一轮考你挑的 ${total} 个知识点，共 ${totalQ} 道题。每个知识点从简单做到困难，做完就换下一个。`}
         </p>
       </div>
 
       <div className="quiz-progress">
         <div className="qp-bar">
-          <i style={{ width: `${(idx / total) * 100}%` }} />
+          <i style={{ width: `${(done / Math.max(totalQ, 1)) * 100}%` }} />
         </div>
         <span className="qp-text">
-          第 {idx + 1} / {total} 个知识点 · 已答 {done} 题
+          第 {idx + 1} / {total} 个知识点 · 已答 {done} / {totalQ} 题
         </span>
       </div>
 
@@ -205,14 +223,16 @@ export default function QuizBank({ onDone, onBack, focusKnowledgeIds }: Props) {
 
           <div className="quiz-levels">
             {(['easy', 'medium', 'hard'] as QuizLevel[]).map((lv) => {
-              const has = set.some((q) => q.level === lv);
-              const answered = set.find((q) => q.level === lv);
-              const rec = answered ? answers[answered.id] : undefined;
+              const pool = set.filter((q) => q.level === lv);
+              const has = pool.length > 0;
+              const answeredN = pool.filter((q) => answers[q.id]).length;
+              const correctN = pool.filter((q) => answers[q.id]?.correct).length;
+              const allDone = has && answeredN === pool.length;
               return (
                 <button
                   key={lv}
                   className={`quiz-level ${level === lv ? 'active' : ''} ${
-                    rec ? (rec.correct ? 'done-ok' : 'done-bad') : ''
+                    allDone ? (correctN === pool.length ? 'done-ok' : 'done-bad') : ''
                   }`}
                   onClick={() => {
                     if (!has) return;
@@ -223,8 +243,10 @@ export default function QuizBank({ onDone, onBack, focusKnowledgeIds }: Props) {
                   disabled={!has}
                 >
                   <b>{LEVEL_LABEL[lv]}</b>
-                  <span>{LEVEL_DESC[lv]}</span>
-                  {rec && <i>{rec.correct ? '✓' : '✗'}</i>}
+                  <span>
+                    {has ? `${answeredN} / ${pool.length} 题` : LEVEL_DESC[lv]}
+                  </span>
+                  {allDone && <i>{correctN === pool.length ? '✓' : '✗'}</i>}
                 </button>
               );
             })}

@@ -27,13 +27,13 @@ import CurveChart from './components/lab-workspace/CurveChart';
 import ObservationPanel from './components/lab-workspace/ObservationPanel';
 import SatisfactionGate from './components/lab-workspace/SatisfactionGate';
 import PredictionPanel from './components/prediction/PredictionPanel';
-import KnowledgeCards from './components/knowledge-cards/KnowledgeCards';
 import { QuizModal, QuizResult } from './components/knowledge-cards/Quiz';
 import ReportView from './components/report/ReportView';
 import AITutor from './components/ai-tutor/AITutor';
 import AISettings from './components/ai-tutor/AISettings';
 import HelpGuide from './components/common/HelpGuide';
 import QuizBank from './components/quiz-bank/QuizBank';
+import QuizPicker from './components/quiz-bank/QuizPicker';
 import MechanicsLab from './labs/mechanics/MechanicsLab';
 import CircuitsLab from './labs/circuits/CircuitsLab';
 import AcousticsLab from './labs/acoustics/AcousticsLab';
@@ -53,7 +53,7 @@ import { LABS, labById, type LabId } from './labs/registry';
 import { EmptyPickLab, EmptyReport } from './components/common/EmptyStates';
 import ResetPanel from './components/common/ResetPanel';
 
-type View = 'map' | 'hub' | 'lab' | 'free' | 'cards' | 'quiz-bank' | 'report';
+type View = 'map' | 'hub' | 'lab' | 'quiz-bank' | 'report';
 type Phase = 'predict' | 'explore' | 'gate' | 'quiz' | 'quizResult' | 'done';
 
 const LAB_KEY = 'physquest.currentLab.v1';
@@ -65,11 +65,12 @@ function readDeepLink() {
     return {
       lab: q.get('lab'),
       challenge: q.get('challenge'),
-      view: q.get('view') as 'map' | 'hub' | 'lab' | 'cards' | 'report' | null,
+      view: q.get('view'),
       clean: q.get('clean') === '1',
+      help: q.get('help'),
     };
   } catch {
-    return { lab: null, challenge: null, view: null, clean: false };
+    return { lab: null, challenge: null, view: null, clean: false, help: null };
   }
 }
 
@@ -81,7 +82,11 @@ export default function App() {
 
   const [learner, setLearner] = useState(() => loadLearner());
   const [view, setView] = useState<View>(() => {
-    if (DEEP.view) return DEEP.view;
+    const v = DEEP.view as string | null;
+    if (v === 'cards') return 'map'; // 知识卡已并入知识地图
+    if (v === 'map' || v === 'hub' || v === 'lab' || v === 'quiz-bank' || v === 'report') {
+      return v as View;
+    }
     if (DEEP.challenge) return 'lab';
     return 'map';
   });
@@ -143,7 +148,11 @@ export default function App() {
   const [soundParams, setSoundParams] = useState<SoundParams>(DEFAULT_SOUND);
   /** 全站唯一的 AI 设置入口（顶栏齿轮打开） */
   const [showAISettings, setShowAISettings] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
+  // ?help=1 可以直接打开教程页（方便分享链接）
+  const [showHelp, setShowHelp] = useState(() => DEEP.help === '1');
+  /** 题库：选题 or 做题 */
+  const [quizStage, setQuizStage] = useState<'pick' | 'doing'>('pick');
+  const [quizPicked, setQuizPicked] = useState<string[]>([]);
   /** 题库完成情况，报告闸门要用 */
   const [quizCompleted, setQuizCompleted] = useState<{
     answered: number;
@@ -401,9 +410,7 @@ export default function App() {
                 挑战导览
               </button>
               <button
-                className={
-                  view === 'lab' || view === 'cards' || view === 'report' ? 'active' : ''
-                }
+                className={view === 'lab' ? 'active' : ''}
                 onClick={() => {
                   // 直接进实验台：不挂挑战，从空白开始自己搭
                   setChallenge(null);
@@ -513,7 +520,11 @@ export default function App() {
                 </button>
               </div>
             )}
-            <KnowledgeMap onOpenModule={openModule} onOpenKnowledge={openKnowledge} />
+            <KnowledgeMap
+              onOpenModule={openModule}
+              onOpenKnowledge={openKnowledge}
+              onBuild={handleBuildKnowledge}
+            />
           </>
         )}
 
@@ -584,26 +595,29 @@ export default function App() {
           />
         )}
 
-        {view === 'cards' && (
-          <>
-            <div className="hub-head" style={{ paddingBottom: 16 }}>
-              <span className="eyebrow">Knowledge Cards · 166 张</span>
-              <h2>知识卡</h2>
-              <p>
-                每张卡两面：<b>正面</b>是给你读的知识点，<b>背面</b>是「怎么把它搭出来」。
-                背面可以一键交给自由搭建工作台，让 AI 帮你搭好再去改。
-              </p>
-            </div>
-            <KnowledgeCards onBuild={handleBuildKnowledge} />
-          </>
-        )}
-
-        {view === 'quiz-bank' && (
-          <QuizBank
+        {view === 'quiz-bank' && quizStage === 'pick' && (
+          <QuizPicker
             focusKnowledgeIds={challenge?.knowledgeIds}
-            onBack={() => setView('cards')}
+            previous={quizCompleted}
+            onBack={() => setView('map')}
+            onStart={(ids) => {
+              setQuizPicked(ids);
+              setQuizStage('doing');
+            }}
             onDone={(r) => {
               setQuizCompleted(r);
+              setView('report');
+            }}
+          />
+        )}
+
+        {view === 'quiz-bank' && quizStage === 'doing' && (
+          <QuizBank
+            knowledgeIds={quizPicked}
+            onBack={() => setQuizStage('pick')}
+            onDone={(r) => {
+              setQuizCompleted(r);
+              setQuizStage('pick');
               setView('report');
             }}
           />
@@ -634,7 +648,10 @@ export default function App() {
                 challengeTitle={challenge?.title ?? '（未选择挑战）'}
                 quizDone={quizCompleted !== null}
                 quizResult={quizCompleted}
-                onGoQuiz={() => setView('quiz-bank')}
+                onGoQuiz={() => {
+                  setQuizStage('pick');
+                  setView('quiz-bank');
+                }}
                 onReflection={(t) => {
                   setReflectionDraft(t);
                   if (challenge) setLearner((s) => persistReflection(s, challenge.id, t));

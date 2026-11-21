@@ -1,0 +1,239 @@
+import { useState } from 'react';
+import { promptById } from '../../data/content';
+
+/**
+ * 单张知识点卡片（双面，可翻转）
+ *
+ * 这是整个平台最基础的展示单元：
+ *   正面 —— 读的（一句话 / 打个比方 / 为什么 / 易错 / 可调什么）
+ *   背面 —— 做的（用哪些器具 / 调哪些参数 / 看什么 / 模型边界 / 给 AI 的完整提示词）
+ *
+ * 三个地方都用它：
+ *   ① 知识地图的详情弹层
+ *   ② 知识地图的卡片视图
+ *   ③ 挑战导览里的知识点回顾
+ *
+ * 所以它必须自带翻面状态，不能依赖外部。
+ */
+
+export interface CardData {
+  id: string;
+  title: string;
+  stage: string;
+  domain: string;
+  domainLabel: string;
+  oneLine: string;
+  analogy: string;
+  formula: string;
+  why: string;
+  variables: string[];
+  observations: string[];
+  support: 'direct' | 'approximation' | 'conceptual';
+  misconceptions: string[];
+  prerequisites: string[];
+  difficulty: string;
+}
+
+const STAGE_LABEL: Record<string, string> = {
+  primary: '小学',
+  junior: '初中',
+  senior: '高中',
+  university: '大学',
+};
+
+const SUPPORT_LABEL: Record<string, { text: string; cls: string; why: string }> = {
+  direct: {
+    text: '可计算',
+    cls: 'pass',
+    why: '这一条平台有真实的物理求解器，拖参数会得到真结果。',
+  },
+  approximation: {
+    text: '近似',
+    cls: 'warn',
+    why: '这一条是近似或类比模型，结论在边界内成立，越过边界就不准了。',
+  },
+  conceptual: {
+    text: '仅示意',
+    cls: 'off',
+    why: '这一条目前只能做示意图，平台还没有对应的数值求解器——所以它讲的是趋势和关系，不是精确数字。',
+  },
+};
+
+interface Props {
+  card: CardData;
+  /** 误区库，用于把 misconception id 翻成中文 */
+  misconceptions: Array<{ id: string; belief: string; truth: string }>;
+  /** 前置知识，用于把 id 翻成标题 */
+  resolveKnowledge?: (id: string) => { title: string } | undefined;
+  /** 点「去搭建」 */
+  onBuild?: (prompt: string, title: string, knowledgeId: string) => void;
+  /** 点前置知识 */
+  onJumpKnowledge?: (id: string) => void;
+  /** 紧凑模式（弹层里用，字号小一点） */
+  compact?: boolean;
+  /** 初始是否翻开 */
+  defaultFlipped?: boolean;
+}
+
+export default function KnowledgeCard({
+  card,
+  misconceptions,
+  resolveKnowledge,
+  onBuild,
+  onJumpKnowledge,
+  compact = false,
+  defaultFlipped = false,
+}: Props) {
+  const [isBack, setIsBack] = useState(defaultFlipped);
+  const prompt = promptById(card.id);
+  const sup = SUPPORT_LABEL[card.support] ?? SUPPORT_LABEL.conceptual;
+
+  const mis = card.misconceptions
+    .map((id) => misconceptions.find((m) => m.id === id))
+    .filter(Boolean);
+
+  return (
+    <div className={`know-card flip-card ${isBack ? 'flipped' : ''} ${compact ? 'compact' : ''}`}>
+      <span className="flip-mark" aria-hidden />
+
+      <div className="fc-head">
+        <span className="kid">{card.id}</span>
+        <span className={`badge ${sup.cls}`} title={sup.why}>
+          {sup.text}
+        </span>
+        <span className="fc-stage">
+          {card.domainLabel} · {STAGE_LABEL[card.stage] ?? card.stage}
+        </span>
+      </div>
+
+      {!isBack ? (
+        <>
+          <h4>{card.title}</h4>
+          <div className="oneline">{card.oneLine}</div>
+
+          {card.formula && (
+            <div className="formula-box" style={{ marginBottom: 0, fontSize: compact ? 13 : 14 }}>
+              {card.formula}
+            </div>
+          )}
+
+          <div className="body">
+            <b>打个比方：</b>
+            {card.analogy}
+          </div>
+
+          {card.why && (
+            <div className="fc-why">
+              <span className="fc-k">为什么</span>
+              <p>{card.why}</p>
+            </div>
+          )}
+
+          {mis.length > 0 && (
+            <div className="mis">
+              <b>最容易错在：</b>
+              {mis.map((m) => m!.belief).join(' / ')}
+            </div>
+          )}
+
+          {card.variables.length > 0 && (
+            <div className="fc-vars">
+              <span className="fc-vars-label">可调</span>
+              {card.variables.map((v) => (
+                <span className="chip static" key={v}>
+                  {v}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {card.prerequisites.length > 0 && resolveKnowledge && onJumpKnowledge && (
+            <div className="fc-vars">
+              <span className="fc-vars-label">先会</span>
+              {card.prerequisites.map((pid) => {
+                const p = resolveKnowledge(pid);
+                return (
+                  <span
+                    className="chip"
+                    key={pid}
+                    onClick={() => onJumpKnowledge(pid)}
+                    title={p?.title}
+                  >
+                    {pid} {p?.title ?? ''}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="fc-actions">
+            <button className="btn-ghost btn-small" onClick={() => setIsBack(true)}>
+              翻到背面：怎么搭 →
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h4>怎么把它搭出来</h4>
+
+          {prompt ? (
+            <>
+              <div className="fc-goal">{prompt.objective}</div>
+
+              <div className="fc-block">
+                <span className="fc-k">器具与步骤</span>
+                <p>{prompt.construction}</p>
+              </div>
+
+              {prompt.variables.length > 0 && (
+                <div className="fc-block">
+                  <span className="fc-k">可以调什么</span>
+                  <p>{prompt.variables.join('；')}</p>
+                </div>
+              )}
+
+              {prompt.observations.length > 0 && (
+                <div className="fc-block">
+                  <span className="fc-k">看什么</span>
+                  <p>{prompt.observations.join('；')}</p>
+                </div>
+              )}
+
+              {prompt.limitations && (
+                <div className="fc-block warn">
+                  <span className="fc-k">模型边界</span>
+                  <p>{prompt.limitations}</p>
+                </div>
+              )}
+
+              <details className="fc-prompt">
+                <summary>看完整提示词（交给 AI 的原话）</summary>
+                <pre>{prompt.prompt}</pre>
+              </details>
+            </>
+          ) : (
+            <div className="fc-empty">
+              这一条还没有搭建方案。可以去实验台从空白开始自己搭，或者让 AI 帮你设计。
+            </div>
+          )}
+
+          <div className="fc-actions">
+            <button className="btn-ghost btn-small" onClick={() => setIsBack(false)}>
+              ← 翻回正面
+            </button>
+            {prompt && onBuild && (
+              <button
+                className="btn-primary btn-small"
+                onClick={() => onBuild(prompt.prompt, card.title, card.id)}
+              >
+                去搭建 →
+              </button>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+export { STAGE_LABEL, SUPPORT_LABEL };

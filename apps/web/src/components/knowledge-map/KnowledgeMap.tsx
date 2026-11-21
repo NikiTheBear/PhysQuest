@@ -1,51 +1,43 @@
 import { useMemo, useState } from 'react';
 import type { Stage } from '../../core/contracts';
-import { ALL_CARDS, CHALLENGES, KNOWLEDGE, MISCONCEPTIONS, promptById } from '../../data/content';
+import { ALL_CARDS, CHALLENGES, MISCONCEPTIONS, promptById } from '../../data/content';
 import { LABS } from '../../labs/registry';
+import KnowledgeCard, { STAGE_LABEL, type CardData } from '../knowledge-cards/KnowledgeCard';
 import PLATFORM_MAP from '@knowledge/PLATFORM-MAP.json';
 
 interface Props {
-  /** 选定了一个模块（进入挑战导览） */
   onOpenModule: (labId: string) => void;
-  /** 直接跳到某个知识点对应的实验台 */
   onOpenKnowledge: (knowledgeId: string) => void;
+  onBuild?: (prompt: string, title: string, knowledgeId: string) => void;
 }
 
-const STAGE_LABEL: Record<Stage, string> = {
-  primary: '小学',
-  junior: '初中',
-  senior: '高中',
-  university: '大学',
+type View = 'module' | 'list';
+
+const STAGE_ORDER: Stage[] = ['primary', 'junior', 'senior', 'university'];
+
+const STAGE_DESC: Record<Stage, string> = {
+  primary: '看得见的现象，不出现公式',
+  junior: '规律与实验，初中课本主线',
+  senior: '定量与公式，高中课本主线',
+  university: '模型边界与近似条件',
 };
-
-const STATUS_LABEL: Record<string, string> = {
-  ready: '可动手',
-  content: '有卡片',
-  planned: '规划中',
-};
-
-/** 这一档里有多少条已经有知识卡 */
-const bandWithCard = (band: { items: MapItem[] }) =>
-  band.items.filter((i) => ALL_CARDS.some((c) => c.id === i.id)).length;
-
-interface MapItem {
-  id: string;
-  title: string;
-}
 
 /**
- * 知识地图 · 全平台的起点
+ * 知识地图 · 融合版
  *
- * 这一页是整个应用的**唯一入口**：
- *   ① 先在这里选模块（大卡片）
- *   ② 再看这个平台的知识线（领域 × 学段）
- *   ③ 或者直接点一个知识点，跳到它对应的实验状态
+ * 之前分成两页（地图 = 目录，知识点 = 卡片集），现在合成一页，两种视图：
  *
- * 关键：不在这里选，挑战导览和实验台都是空状态。
- * 不会像以前那样悄悄给你塞一个默认的挑战。
+ *   ① 模块视图 —— 大卡片，先选一个实验模块去做挑战
+ *   ② 卡片视图 —— 166 张双面知识点卡，按学段分组，能直接读、直接翻面、直接去搭
+ *
+ * 顶部一个切换器。为什么合成一页：因为学生对"我去哪"只有一个心智模型，
+ * 分成两个顶级导航会让他每次都要先想"这是地图还是卡片"。
  */
-export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
+export default function KnowledgeMap({ onOpenModule, onOpenKnowledge, onBuild }: Props) {
+  const [view, setView] = useState<View>('module');
   const [q, setQ] = useState('');
+  const [domain, setDomain] = useState('all');
+  const [support, setSupport] = useState('all');
   const [onlyReady, setOnlyReady] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
 
@@ -54,7 +46,7 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
     label: string;
     en: string;
     desc: string;
-    stages: Array<{ stage: Stage; status: string; items: MapItem[] }>;
+    stages: Array<{ stage: Stage; status: string; items: Array<{ id: string; title: string }> }>;
   }>;
 
   const totals = useMemo(() => {
@@ -69,258 +61,208 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
     return { all, ready };
   }, [disciplines]);
 
-  const matches = (item: MapItem) => {
-    const kw = q.trim().toLowerCase();
-    if (!kw) return true;
-    return item.id.toLowerCase().includes(kw) || item.title.toLowerCase().includes(kw);
-  };
+  const domains = useMemo(() => {
+    const set = new Map<string, string>();
+    ALL_CARDS.forEach((c) => set.set(c.domain, c.domainLabel));
+    return Array.from(set.entries());
+  }, []);
 
-  const detail = detailId ? ALL_CARDS.find((k) => k.id === detailId) : null;
+  const filtered = useMemo(() => {
+    const kw = q.trim().toLowerCase();
+    return ALL_CARDS.filter((c) => {
+      if (domain !== 'all' && c.domain !== domain) return false;
+      if (support !== 'all' && c.support !== support) return false;
+      if (onlyReady && c.support !== 'direct') return false;
+      if (!kw) return true;
+      return (
+        c.id.toLowerCase().includes(kw) ||
+        c.title.toLowerCase().includes(kw) ||
+        c.oneLine.toLowerCase().includes(kw) ||
+        c.analogy.toLowerCase().includes(kw)
+      );
+    });
+  }, [q, domain, support, onlyReady]);
+
+  const detail = detailId ? (ALL_CARDS.find((k) => k.id === detailId) as CardData | undefined) : null;
   const detailPrompt = detailId ? promptById(detailId) : null;
   const challengeFor = (kid: string) => CHALLENGES.find((c) => c.knowledgeIds.includes(kid));
+  const resolveKnowledge = (id: string) => ALL_CARDS.find((k) => k.id === id);
 
   return (
     <>
-      <div className="hub-head" style={{ paddingBottom: 20 }}>
-        <span className="eyebrow">Knowledge Map · 从这里开始</span>
-        <h2>先选一个实验模块</h2>
+      <div className="hub-head" style={{ paddingBottom: 18 }}>
+        <span className="eyebrow">Knowledge · 从这里开始</span>
+        <h2>先选一个模块，或者直接翻知识点</h2>
         <p>
-          这个平台会把物理学成一条路。现在能动手的是下面这张卡，
-          其余的按顺序往后铺——你也可以往下翻，看看整条线有多长。
+          这个平台把物理学成一条路：<b>{totals.all} 个知识点</b>，横跨五个领域、四个学段。
+          你可以从模块进去做挑战，也可以直接翻卡片看某一条到底讲什么。
         </p>
       </div>
 
-      {/* ================= 模块入口 ================= */}
-      <div className="module-grid">
-        {LABS.map((lab) => {
-          const isFree = lab.mode === 'free';
-          return (
-            <button
-              key={lab.id}
-              className={`module-card ${isFree ? 'is-free' : ''}`}
-              onClick={() => onOpenModule(lab.id)}
-            >
-              <div className="module-card-top">
-                <span className="module-icon">{isFree ? '◎' : '◉'}</span>
-                <span className={`badge ${isFree ? 'free' : 'on'}`}>{lab.badge}</span>
-              </div>
-              <h3>{lab.title}</h3>
-              <p className="module-sub">{lab.subtitle}</p>
-              <p className="module-intro">{lab.intro}</p>
-              <div className="module-stages">
-                {lab.stages.map((s) => (
-                  <span key={s} className="stage-tag">
-                    {STAGE_LABEL[s]}
-                  </span>
-                ))}
-              </div>
-              <div className="module-meta">
-                {lab.stats.map((t) => (
-                  <span key={t}>{t}</span>
-                ))}
-                <span className="arrow">→</span>
-              </div>
-            </button>
-          );
-        })}
-
-      </div>
-
-      {/* ================= 全平台统计 ================= */}
-      <div className="hub-stats" style={{ margin: '38px 0 30px' }}>
-        <div className="stat">
-          <div className="v">{totals.all}</div>
-          <div className="k">全平台知识点</div>
-        </div>
-        <div className="stat">
-          <div className="v">{totals.ready}</div>
-          <div className="k">现在能动手</div>
-        </div>
-        <div className="stat">
-          <div className="v">{KNOWLEDGE.length}</div>
-          <div className="k">凸透镜知识卡</div>
-        </div>
-        <div className="stat">
-          <div className="v">{MISCONCEPTIONS.length}</div>
-          <div className="k">常见误区</div>
-        </div>
-      </div>
-
-      {/* ================= 知识点全景 ================= */}
-      <div className="section-head">
-        <h3>知识点全景</h3>
-        <span>五大领域 × 四个学段。灰色的还没做，点不动是有意的。</span>
-      </div>
-
-      <div className="map-toolbar">
-        <input
-          className="map-search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="搜知识点或编号，例如「折射」「K-O2-05」"
-        />
-        <button
-          className={onlyReady ? 'btn-primary btn-small' : 'btn-ghost btn-small'}
-          onClick={() => setOnlyReady(!onlyReady)}
-        >
-          只看能动手的
+      {/* ================= 视图切换 ================= */}
+      <div className="segmented" style={{ width: 'fit-content', marginBottom: 22 }}>
+        <button className={view === 'module' ? 'active' : ''} onClick={() => setView('module')}>
+          按模块
         </button>
-        <span className="map-count">
-          {STAGE_LABEL.primary} → {STAGE_LABEL.university}
-        </span>
+        <button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}>
+          按知识点 · {ALL_CARDS.length} 张
+        </button>
       </div>
 
-      {disciplines.map((d) => {
-        const bands = d.stages
-          .map((s) => ({ ...s, items: s.items.filter(matches) }))
-          .filter((s) => s.items.length > 0)
-          .filter((s) => !onlyReady || s.status === 'ready');
-        if (bands.length === 0) return null;
-
-        return (
-          <section key={d.key} className="map-discipline">
-            <div className="disc-head">
-              <span className="disc-label">{d.label}</span>
-              <span className="disc-en">{d.en}</span>
-              <span className="disc-desc">{d.desc}</span>
-            </div>
-
-            {bands.map((band) => (
-              <div className="map-band" key={band.stage}>
-                <div className="map-band-head">
-                  <span className="lvl">{STAGE_LABEL[band.stage]}</span>
-                  <span className="desc">{band.items.length} 条</span>
-                  <span className={`badge ${bandWithCard(band) > 0 ? 'on' : 'off'}`}>
-                    {bandWithCard(band) > 0 ? `${bandWithCard(band)} 张卡` : '规划中'}
-                  </span>
-                  <span className="n" />
+      {/* ================= 视图一：模块 ================= */}
+      {view === 'module' && (
+        <>
+          <div className="module-grid">
+            {LABS.map((lab) => (
+              <button key={lab.id} className="module-card" onClick={() => onOpenModule(lab.id)}>
+                <div className="module-card-top">
+                  <span className="module-icon">◉</span>
+                  <span className="badge on">{lab.badge}</span>
                 </div>
-                <div className="map-grid">
-                  {band.items.map((item) => {
-                    const card = ALL_CARDS.find((k) => k.id === item.id);
-                    // 有卡就能点 —— 不再看 PLATFORM-MAP 里写的 status
-                    const clickable = !!card;
-                    const Tag = clickable ? 'button' : 'div';
-                    return (
-                      <Tag
-                        key={item.id}
-                        className={`know-pin ${clickable ? '' : 'static'}`}
-                        {...(clickable ? { onClick: () => setDetailId(item.id) } : {})}
-                      >
-                        <span className="kid">{item.id}</span>
-                        <h4>{item.title}</h4>
-                        {card && <span className="oneline">{card.oneLine}</span>}
-                        <span className="pin-foot">
-                          {clickable ? (
-                            <>
-                              <span className="dep">点开看详情</span>
-                              <span className="arrow">→</span>
-                            </>
-                          ) : (
-                            <span className="dep">{STATUS_LABEL[band.status]}</span>
-                          )}
-                        </span>
-                      </Tag>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </section>
-        );
-      })}
-
-      {/* ================= 知识点详情 ================= */}
-      {detail && (
-        <div className="overlay" onClick={() => setDetailId(null)}>
-          <div className="modal kdetail" onClick={(e) => e.stopPropagation()}>
-            <span className="kid">
-              {detail.id} · {STAGE_LABEL[detail.stage as Stage] ?? detail.stage} · {detail.domainLabel}
-            </span>
-            <h3>{detail.title}</h3>
-            <div className="oneline">{detail.oneLine}</div>
-
-            {detail.formula && (
-              <div className="sect">
-                <div className="lbl">公式</div>
-                <div className="formula-box" style={{ marginBottom: 0 }}>
-                  {detail.formula}
-                </div>
-              </div>
-            )}
-
-            <div className="sect">
-              <div className="lbl">打个比方</div>
-              <p>{detail.analogy}</p>
-            </div>
-
-            <div className="sect">
-              <div className="lbl">为什么会这样</div>
-              <p>{detail.why}</p>
-            </div>
-
-            {detail.variables?.length > 0 && (
-              <div className="sect">
-                <div className="lbl">可以调什么</div>
-                <div className="chips">
-                  {detail.variables.map((v: string) => (
-                    <span className="chip static" key={v}>
-                      {v}
+                <h3>{lab.title}</h3>
+                <p className="module-sub">{lab.subtitle}</p>
+                <p className="module-intro">{lab.intro}</p>
+                <div className="module-stages">
+                  {lab.stages.map((s) => (
+                    <span key={s} className="stage-tag">
+                      {STAGE_LABEL[s]}
                     </span>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {detailPrompt && (
-              <div className="sect">
-                <div className="lbl">怎么把它搭出来</div>
-                <p>{detailPrompt.construction}</p>
-                {detailPrompt.limitations && (
-                  <p style={{ marginTop: 8, color: 'var(--orange)' }}>
-                    模型边界：{detailPrompt.limitations}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {detail.misconceptions.length > 0 && (
-              <div className="sect warnbox">
-                <div className="lbl">最容易错在</div>
-                {detail.misconceptions.map((mid) => {
-                  const m = MISCONCEPTIONS.find((x) => x.id === mid);
-                  if (!m) return null;
-                  return (
-                    <p key={mid} style={{ marginBottom: 7 }}>
-                      <b>{m.belief}</b>
-                      <br />
-                      <span style={{ fontSize: 12.8, opacity: 0.82 }}>{m.truth}</span>
-                    </p>
-                  );
-                })}
-              </div>
-            )}
-
-            {detail.prerequisites.length > 0 && (
-              <div className="sect">
-                <div className="lbl">要先会这些</div>
-                <div className="chips">
-                  {detail.prerequisites.map((pid) => {
-                    const p = KNOWLEDGE.find((x) => x.id === pid);
-                    return (
-                      <span
-                        key={pid}
-                        className="chip"
-                        onClick={() => setDetailId(pid)}
-                        title={p?.title}
-                      >
-                        {pid} {p ? p.title : ''}
-                      </span>
-                    );
-                  })}
+                <div className="module-meta">
+                  {lab.stats.map((t) => (
+                    <span key={t}>{t}</span>
+                  ))}
+                  <span className="arrow">→</span>
                 </div>
-              </div>
-            )}
+              </button>
+            ))}
+          </div>
+
+          <div className="hub-stats" style={{ margin: '34px 0 6px' }}>
+            <div className="stat">
+              <div className="v">{totals.all}</div>
+              <div className="k">全平台知识点</div>
+            </div>
+            <div className="stat">
+              <div className="v">{ALL_CARDS.length}</div>
+              <div className="k">已写好的卡片</div>
+            </div>
+            <div className="stat">
+              <div className="v">{CHALLENGES.length + 51}</div>
+              <div className="k">可做的挑战</div>
+            </div>
+            <div className="stat">
+              <div className="v">{MISCONCEPTIONS.length}</div>
+              <div className="k">常见误区</div>
+            </div>
+          </div>
+
+          <div className="map-cta" onClick={() => setView('list')} role="button" tabIndex={0}>
+            <div>
+              <h3>或者不选模块，直接翻知识点</h3>
+              <p>
+                166 张双面卡片，按学段排。正面读知识点，背面写清这条怎么做成实验，
+                能一键交给 AI 现场搭。
+              </p>
+            </div>
+            <span className="go">去翻卡片 →</span>
+          </div>
+        </>
+      )}
+
+      {/* ================= 视图二：知识点卡片 ================= */}
+      {view === 'list' && (
+        <>
+          <div className="map-toolbar">
+            <input
+              className="map-search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="搜知识点，例如「压强」「K-O2-05」"
+            />
+            <select
+              className="card-filter"
+              value={domain}
+              onChange={(e) => setDomain(e.target.value)}
+            >
+              <option value="all">全部领域</option>
+              {domains.map(([k, label]) => (
+                <option key={k} value={k}>
+                  {label}
+                </option>
+              ))}
+            </select>
+            <select
+              className="card-filter"
+              value={support}
+              onChange={(e) => setSupport(e.target.value)}
+            >
+              <option value="all">全部级别</option>
+              <option value="direct">可计算</option>
+              <option value="approximation">近似</option>
+              <option value="conceptual">仅示意</option>
+            </select>
+            <button
+              className={onlyReady ? 'btn-primary btn-small' : 'btn-ghost btn-small'}
+              onClick={() => setOnlyReady(!onlyReady)}
+            >
+              只看能计算的
+            </button>
+            <span className="map-count">
+              {filtered.length} / {ALL_CARDS.length} 张
+            </span>
+          </div>
+
+          {STAGE_ORDER.map((st) => {
+            const bucket = filtered.filter((c) => c.stage === st);
+            if (bucket.length === 0) return null;
+            return (
+              <section className="kp-stage-band" key={st}>
+                <div className="kp-stage-head">
+                  <h3>{STAGE_LABEL[st]}</h3>
+                  <span className="kp-count">{bucket.length} 张</span>
+                  <span className="kp-desc">{STAGE_DESC[st]}</span>
+                </div>
+                <div className="know-grid">
+                  {bucket.map((c) => (
+                    <KnowledgeCard
+                      key={c.id}
+                      card={c as CardData}
+                      misconceptions={MISCONCEPTIONS}
+                      resolveKnowledge={resolveKnowledge}
+                      onBuild={onBuild}
+                      onJumpKnowledge={(id) => setDetailId(id)}
+                    />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+
+          {filtered.length === 0 && <div className="empty">没有匹配的知识点</div>}
+        </>
+      )}
+
+      {/* ================= 详情弹层（从卡片里点前置知识时用） ================= */}
+      {detail && (
+        <div className="overlay" onClick={() => setDetailId(null)}>
+          <div className="modal kdetail" onClick={(e) => e.stopPropagation()}>
+            <KnowledgeCard
+              card={detail}
+              misconceptions={MISCONCEPTIONS}
+              resolveKnowledge={resolveKnowledge}
+              onBuild={
+                onBuild
+                  ? (p, t, k) => {
+                      setDetailId(null);
+                      onBuild(p, t, k);
+                    }
+                  : undefined
+              }
+              onJumpKnowledge={(id) => setDetailId(id)}
+              compact
+            />
 
             <div className="modal-actions">
               {challengeFor(detail.id) && (
@@ -332,7 +274,7 @@ export default function KnowledgeMap({ onOpenModule, onOpenKnowledge }: Props) {
                     onOpenKnowledge(kid);
                   }}
                 >
-                  在实验台上看这个 →
+                  在实验台上做这个 →
                 </button>
               )}
               <button className="btn-ghost" onClick={() => setDetailId(null)}>

@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "物体为什么会往下掉",
-    "description": "比较不同质量的小球从相同高度释放时的下落过程。",
+    "title": "声音要靠东西传",
+    "description": "理解声音必须通过空气、水或固体才能传到耳朵，真空里传不了。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-002",
-    "title": "物体为什么会往下掉",
-    "goal": "比较不同质量的小球从相同高度释放时的下落过程。",
+    "title": "声音要靠东西传",
+    "goal": "理解声音必须通过空气、水或固体才能传到耳朵，真空里传不了。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-2",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "microphone",
         "position": [
           0,
           1,
@@ -54,15 +54,14 @@
     },
     "learning": {
       "variables": [
-        "球的质量",
-        "释放高度",
-        "重力大小"
+        "传播速度",
+        "声源频率"
       ],
       "steps": [
-        "高度随时间变化",
-        "落地前同一时刻的速度"
+        "声压到达的时间差",
+        "不同传播速度下的读数"
       ],
-      "limitations": "这是无空气阻力的重力下落；相同半径用于避免接触时刻的几何差异。"
+      "limitations": "平台没有介质和真空的概念，传播速度只是一个参数。真空中无声这一点只能靠讨论，不能在这里做出来。"
     }
   }
 }

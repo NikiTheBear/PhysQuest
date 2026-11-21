@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "交流电与有效值",
-    "description": "区分正弦交流的瞬时值、峰值和有效值。",
+    "title": "牛顿第三定律",
+    "description": "用两自由物体之间的弹簧作用说明作用力与反作用力成对出现。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-047",
-    "title": "交流电与有效值",
-    "goal": "区分正弦交流的瞬时值、峰值和有效值。",
+    "title": "牛顿第三定律",
+    "goal": "用两自由物体之间的弹簧作用说明作用力与反作用力成对出现。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "ac_source-1",
-        "kind": "ac_source",
-        "name": "ac_source",
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "resistor-2",
-        "kind": "resistor",
-        "name": "resistor",
+        "id": "dynamometer-2",
+        "kind": "dynamometer",
+        "name": "dynamometer",
         "position": [
           0,
           1,
@@ -48,24 +48,11 @@
         "fixed": false
       },
       {
-        "id": "ammeter-3",
-        "kind": "ammeter",
-        "name": "ammeter",
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
         "position": [
           2,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "voltmeter-4",
-        "kind": "voltmeter",
-        "name": "voltmeter",
-        "position": [
-          4,
           1,
           0
         ],
@@ -80,16 +67,15 @@
     },
     "learning": {
       "variables": [
-        "交流幅值",
-        "频率",
-        "负载电阻"
+        "两物体质量",
+        "初始伸长",
+        "弹簧刚度"
       ],
       "steps": [
-        "瞬时电压和电流",
-        "整数周期的 RMS 后处理",
-        "理论峰值与有效值关系"
+        "测力计轴向力",
+        "两球加速度和速度增量"
       ],
-      "limitations": "仪表显示瞬时值，不是内置真有效值仪表；RMS 需另算，受采样率、源内阻和采样区间影响。不要用低采样率证明高频波形。"
+      "limitations": "连接两端受到等大反向力，作用在不同物体上；测力计只有一个带符号轴向读数，另一端力由方向取反得出。"
     }
   }
 }

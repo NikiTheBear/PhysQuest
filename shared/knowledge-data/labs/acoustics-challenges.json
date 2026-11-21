@@ -3,11 +3,11 @@
   "auto": true,
   "challenges": [
     {
-      "id": "CH-AC-01",
+      "id": "CH-AUTO-001",
       "labId": "acoustics",
-      "title": "同样的声源，走远一倍会小多少",
-      "brief": "一个点声源、一支麦克风。把麦克风从 1 m 挪到 2 m、4 m，看声压怎么变。",
-      "hint": "不是线性变小——距离翻倍，声压降到大约一半。",
+      "title": "声音是怎么来的",
+      "brief": "让一个物体振动起来，看它是不是同时在发声。",
+      "hint": "放一个刚体球当振动物，连一根弹簧让它上下弹；在球旁边放一个点声源和一支测量麦克风，把声源和球用「振动发声」连起来，增益调到 1，然后把球拉起来松手，看麦克风读数。",
       "winCondition": {
         "metric": "m",
         "op": "<",
@@ -16,17 +16,353 @@
       "auto": true,
       "multiAnswer": true,
       "knowledgeIds": [
-        "K-M3-15"
+        "K-A1-01"
       ],
       "misconceptionIds": [],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
-        "prompt": "一个点声源、一支麦克风。把麦克风从 1 m 挪到 2 m、4 m，看声压怎么变。",
+        "prompt": "让一个物体振动起来，看它是不是同时在发声。",
         "options": [
-          "会和我预期的一样",
-          "会有出乎意料的规律",
-          "看不出明显变化"
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "body",
+          "spring",
+          "anchor",
+          "speaker",
+          "microphone"
+        ],
+        "variables": [
+          "振动幅度",
+          "振动快慢",
+          "到麦克风的距离"
+        ],
+        "observations": [
+          "麦克风读到的声压",
+          "球是不是在动"
+        ],
+        "construction": "放一个刚体球当振动物，连一根弹簧让它上下弹；在球旁边放一个点声源和一支测量麦克风，把声源和球用「振动发声」连起来，增益调到 1，然后把球拉起来松手，看麦克风读数。",
+        "prompt": "在 Fieldlab 里搭一个「振动发声」实验：用 anchor + spring 挂一个 body 当振子，旁边放 speaker 和 microphone，用 acoustic 耦合把 body 连到 speaker（gain 1），把球拉到 y=3 松手，读 microphone 的声压随时间变化。",
+        "stage": "primary",
+        "domain": "声学"
+      }
+    },
+    {
+      "id": "CH-AUTO-002",
+      "labId": "acoustics",
+      "title": "声音要靠东西传",
+      "brief": "理解声音必须通过空气、水或固体才能传到耳朵，真空里传不了。",
+      "hint": "这个平台不能真的抽真空。放一个点声源和一支麦克风，改「传播速度」参数（空气 343、水 1500、钢 5000），观察同样的振动在不同介质里跑得多快，再讨论为什么没有介质就没有声音。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-A1-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "理解声音必须通过空气、水或固体才能传到耳朵，真空里传不了。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "speaker",
+          "microphone"
+        ],
+        "variables": [
+          "传播速度",
+          "声源频率"
+        ],
+        "observations": [
+          "声压到达的时间差",
+          "不同传播速度下的读数"
+        ],
+        "construction": "这个平台不能真的抽真空。放一个点声源和一支麦克风，改「传播速度」参数（空气 343、水 1500、钢 5000），观察同样的振动在不同介质里跑得多快，再讨论为什么没有介质就没有声音。",
+        "prompt": "在 Fieldlab 里放 speaker + microphone，把 speaker 的 speed 参数改成 343 / 1500 / 5000，分别记录麦克风读到的相位或延迟差异，用来对比不同介质里的声速。",
+        "stage": "primary",
+        "domain": "声学"
+      }
+    },
+    {
+      "id": "CH-AUTO-003",
+      "labId": "acoustics",
+      "title": "声音的高低和大小",
+      "brief": "分别改频率和幅度，听出「高低」和「大小」是两个不同的东西。",
+      "hint": "放一个点声源和一支麦克风。先把幅度固定，只改频率（100 → 400 → 1000 Hz），记下「高低」的变化；再把频率固定，只改幅度（0.2 → 0.5 → 1.0 Pa），记下「大小」的变化。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-A1-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "分别改频率和幅度，听出「高低」和「大小」是两个不同的东西。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "speaker",
+          "microphone"
+        ],
+        "variables": [
+          "声源频率",
+          "声源幅度"
+        ],
+        "observations": [
+          "麦克风读到的声压幅值",
+          "频率变化时的听感"
+        ],
+        "construction": "放一个点声源和一支麦克风。先把幅度固定，只改频率（100 → 400 → 1000 Hz），记下「高低」的变化；再把频率固定，只改幅度（0.2 → 0.5 → 1.0 Pa），记下「大小」的变化。",
+        "prompt": "在 Fieldlab 里放 speaker + microphone，先固定 amplitude=0.5 把 frequency 依次改成 100/400/1000 Hz 读数，再固定 frequency=440 把 amplitude 改成 0.2/0.5/1.0 Pa 读数，对比两组结果。",
+        "stage": "primary",
+        "domain": "声学"
+      }
+    },
+    {
+      "id": "CH-AUTO-004",
+      "labId": "acoustics",
+      "title": "音调、响度、音色",
+      "brief": "分清音调、响度、音色分别由什么决定。",
+      "hint": "用点声源和麦克风。频率决定音调、幅度决定响度，这两个能直接拖。音色需要泛音，平台的正弦声没有泛音，所以只能把两个不同频率的源叠起来，模拟「听起来不一样」的效果。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-A2-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "分清音调、响度、音色分别由什么决定。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "speaker",
+          "microphone"
+        ],
+        "variables": [
+          "频率",
+          "幅度",
+          "第二个声源的频率与相位"
+        ],
+        "observations": [
+          "叠加后的声压波形",
+          "两个源频率比"
+        ],
+        "construction": "用点声源和麦克风。频率决定音调、幅度决定响度，这两个能直接拖。音色需要泛音，平台的正弦声没有泛音，所以只能把两个不同频率的源叠起来，模拟「听起来不一样」的效果。",
+        "prompt": "在 Fieldlab 里放两个 speaker（频率设成 440 和 660）加一个 microphone，观察叠加后的声压波形，再用单个源对比，说明为什么单频正弦听起来「空」。",
+        "stage": "junior",
+        "domain": "声学"
+      }
+    },
+    {
+      "id": "CH-AUTO-005",
+      "labId": "acoustics",
+      "title": "声音的传播速度",
+      "brief": "测量声速，并确认声速只由介质决定、与频率无关。",
+      "hint": "放一个点声源和一支麦克风，把麦克风放在 2 m 处。先把传播速度设成 343，记下相位；再把频率从 120 Hz 改到 800 Hz，确认相位差按频率等比变化，但「速度」这个参数一直没变。最后把速度改成 1500，看同样的频率下相位怎么变。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-A2-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "测量声速，并确认声速只由介质决定、与频率无关。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "speaker",
+          "microphone"
+        ],
+        "variables": [
+          "传播速度",
+          "声源频率",
+          "麦克风距离"
+        ],
+        "observations": [
+          "麦克风读到的相位",
+          "相同距离下的延迟"
+        ],
+        "construction": "放一个点声源和一支麦克风，把麦克风放在 2 m 处。先把传播速度设成 343，记下相位；再把频率从 120 Hz 改到 800 Hz，确认相位差按频率等比变化，但「速度」这个参数一直没变。最后把速度改成 1500，看同样的频率下相位怎么变。",
+        "prompt": "在 Fieldlab 里放 speaker + microphone，麦克风固定在 2 m。先把 speed 设 343、频率 120/400/800 Hz 各读一次相位，再把 speed 改 1500 重复一遍，比较相位差。",
+        "stage": "junior",
+        "domain": "声学"
+      }
+    },
+    {
+      "id": "CH-AUTO-006",
+      "labId": "acoustics",
+      "title": "回声与测距",
+      "brief": "理解回声是声音被反射回来，以及怎么用回声测距离。",
+      "hint": "平台没有声音反射面。可以用点声源 + 麦克风 + 测距仪，把「去一趟再回来」的路程用距离参数代替：距离 d 对应路程 2d，除以声速就是延迟。手动算，不靠仿真。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-A2-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "理解回声是声音被反射回来，以及怎么用回声测距离。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "speaker",
+          "microphone",
+          "distance_sensor"
+        ],
+        "variables": [
+          "到反射面的距离",
+          "声速"
+        ],
+        "observations": [
+          "往返路程 2d",
+          "算出来的延迟时间"
+        ],
+        "construction": "平台没有声音反射面。可以用点声源 + 麦克风 + 测距仪，把「去一趟再回来」的路程用距离参数代替：距离 d 对应路程 2d，除以声速就是延迟。手动算，不靠仿真。",
+        "prompt": "在 Fieldlab 里放 speaker + microphone + distance_sensor，用测距仪读出到「假想墙面」的距离 d，自己按 d = v·t/2 算延迟。这个实验只能算，不能听。",
+        "stage": "junior",
+        "domain": "声学"
+      }
+    },
+    {
+      "id": "CH-AUTO-007",
+      "labId": "acoustics",
+      "title": "噪声与降噪",
+      "brief": "用两个反相声源把声音抵消掉。",
+      "hint": "放两个点声源在同一位置，频率都设 200 Hz、幅度都设 0.5 Pa，一个相位 0°、一个相位 180°，中间放一支麦克风。先关掉第二个源读一次，再打开读一次，看声压怎么变。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-A2-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "用两个反相声源把声音抵消掉。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "speaker",
+          "microphone"
+        ],
+        "variables": [
+          "第二个声源的相位",
+          "两个声源的幅度"
+        ],
+        "observations": [
+          "麦克风读到的合成声压",
+          "相位差 0° 与 180° 的对比"
+        ],
+        "construction": "放两个点声源在同一位置，频率都设 200 Hz、幅度都设 0.5 Pa，一个相位 0°、一个相位 180°，中间放一支麦克风。先关掉第二个源读一次，再打开读一次，看声压怎么变。",
+        "prompt": "在 Fieldlab 里放两个 speaker（同位置、同频率 200 Hz、同幅度 0.5 Pa）加一个 microphone，把第二个源的 phase 从 0° 逐步调到 180°，记录麦克风声压幅值的变化。",
+        "stage": "junior",
+        "domain": "声学"
+      }
+    },
+    {
+      "id": "CH-AUTO-008",
+      "labId": "acoustics",
+      "title": "声音的响度与距离",
+      "brief": "验证点声源的声压随距离衰减的规律。",
+      "hint": "放一个点声源，把麦克风依次放在 1 m、2 m、4 m、8 m，每处读一次声压。把读数画出来，看它是按 1/d 还是 1/d² 变。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-A3-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "验证点声源的声压随距离衰减的规律。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
         ],
         "answerIndex": 1
       },
@@ -37,17 +373,111 @@
         ],
         "variables": [
           "麦克风距离",
-          "声源频率",
-          "参考声压"
+          "声源幅度"
         ],
         "observations": [
-          "1 m / 2 m / 4 m 处的声压读数"
+          "1/2/4/8 m 处的声压读数"
         ],
-        "construction": "放一个点声源（默认 120 Hz、0.5 Pa）和一支测量麦克风，把麦克风依次放在 1 m、2 m、4 m，每次读一次声压。",
-        "prompt": "在 Fieldlab 里搭一个声波传播实验：放点声源 speaker 和测量麦克风 microphone，把麦克风分别放在距声源 1 m、2 m、4 m 的位置，读取三处的声压值，观察随距离的衰减规律。",
+        "construction": "放一个点声源，把麦克风依次放在 1 m、2 m、4 m、8 m，每处读一次声压。把读数画出来，看它是按 1/d 还是 1/d² 变。",
+        "prompt": "在 Fieldlab 里放 speaker + microphone，把 microphone 依次放在距 speaker 1/2/4/8 m 处，各读一次声压，验证 p ∝ 1/d。",
         "stage": "senior",
-        "domain": "acoustics",
-        "limitations": "球面波在自由空间中的衰减；不含反射与吸收。"
+        "domain": "声学"
+      }
+    },
+    {
+      "id": "CH-AUTO-009",
+      "labId": "acoustics",
+      "title": "声压级与分贝",
+      "brief": "把线性声压换算成对数分贝，理解为什么用分贝。",
+      "hint": "放一个点声源和一支麦克风，读出声压 p（Pa）。按 SPL = 20·lg(p/p₀) 自己算分贝，p₀ = 2×10⁻⁵ Pa。然后把幅度调 10 倍，看分贝加了多少。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-A4-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "把线性声压换算成对数分贝，理解为什么用分贝。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "speaker",
+          "microphone"
+        ],
+        "variables": [
+          "声源幅度",
+          "麦克风距离"
+        ],
+        "observations": [
+          "麦克风读到的声压（Pa）",
+          "换算出来的 SPL（dB）"
+        ],
+        "construction": "放一个点声源和一支麦克风，读出声压 p（Pa）。按 SPL = 20·lg(p/p₀) 自己算分贝，p₀ = 2×10⁻⁵ Pa。然后把幅度调 10 倍，看分贝加了多少。",
+        "prompt": "在 Fieldlab 里放 speaker + microphone 读声压，把它当幅值按 SPL = 20·lg(p/p₀) 手算分贝；再把 amplitude 调成 10 倍，验证分贝只加 20。",
+        "stage": "university",
+        "domain": "声学"
+      }
+    },
+    {
+      "id": "CH-AUTO-010",
+      "labId": "acoustics",
+      "title": "多普勒效应",
+      "brief": "理解声源或观察者移动时，接收到的频率为什么会变。",
+      "hint": "平台不模拟运动声源的多普勒频移。可以用点声源 + motion_sensor 让声源真的动起来，观察麦克风读数在靠近和远离时的差异，但频率不会自动变——这一条只能讲公式、自己算。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-A4-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "理解声源或观察者移动时，接收到的频率为什么会变。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "speaker",
+          "motion_sensor",
+          "microphone"
+        ],
+        "variables": [
+          "声源速度",
+          "声速",
+          "声源频率"
+        ],
+        "observations": [
+          "声源移动时的距离变化",
+          "按公式算出的接收频率"
+        ],
+        "construction": "平台不模拟运动声源的多普勒频移。可以用点声源 + motion_sensor 让声源真的动起来，观察麦克风读数在靠近和远离时的差异，但频率不会自动变——这一条只能讲公式、自己算。",
+        "prompt": "在 Fieldlab 里放 speaker + motion_sensor + microphone，让 speaker 以一定速度移动，读运动传感器给的速度，自己按多普勒公式算接收频率。注意：平台不会真的改变频率。",
+        "stage": "university",
+        "domain": "声学"
       }
     },
     {

@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "弹性",
-    "description": "探究弹簧越拉长，弹性作用是否越大。",
+    "title": "声音的传播速度",
+    "description": "测量声速，并确认声速只由介质决定、与频率无关。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-005",
-    "title": "弹性",
-    "goal": "探究弹簧越拉长，弹性作用是否越大。",
+    "title": "声音的传播速度",
+    "goal": "测量声速，并确认声速只由介质决定、与频率无关。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "anchor-1",
-        "kind": "anchor",
-        "name": "anchor",
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
         "position": [
           -2,
           1,
@@ -35,24 +35,11 @@
         "fixed": false
       },
       {
-        "id": "body-2",
-        "kind": "body",
-        "name": "body",
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "microphone",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "dynamometer-3",
-        "kind": "dynamometer",
-        "name": "dynamometer",
-        "position": [
-          2,
           1,
           0
         ],
@@ -67,14 +54,15 @@
     },
     "learning": {
       "variables": [
-        "伸长量",
-        "劲度系数"
+        "传播速度",
+        "声源频率",
+        "麦克风距离"
       ],
       "steps": [
-        "测力计轴向读数",
-        "长度与原长之差"
+        "麦克风读到的相位",
+        "相同距离下的延迟"
       ],
-      "limitations": "线性理想弹簧不模拟塑性变形、断裂或材料弹性极限；固定端用于避免振动干扰。"
+      "limitations": "速度是手动设的常数，平台不会自己按介质算声速，也没有温度、湿度的影响。"
     }
   }
 }

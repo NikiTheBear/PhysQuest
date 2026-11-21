@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "带电粒子在磁场中的运动",
-    "description": "观察匀强磁场内带电粒子的弯曲轨迹并比较回旋尺度。",
+    "title": "牛顿第二定律",
+    "description": "分别控制质量和恒力，检验加速度与合力及质量的关系。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-046",
-    "title": "带电粒子在磁场中的运动",
-    "goal": "观察匀强磁场内带电粒子的弯曲轨迹并比较回旋尺度。",
+    "title": "牛顿第二定律",
+    "goal": "分别控制质量和恒力，检验加速度与合力及质量的关系。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "charge-1",
-        "kind": "charge",
-        "name": "charge",
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "field-2",
-        "kind": "field",
-        "name": "field",
+        "id": "force-2",
+        "kind": "force",
+        "name": "force",
         "position": [
           0,
           1,
@@ -67,17 +67,15 @@
     },
     "learning": {
       "variables": [
-        "电荷量",
-        "质量",
-        "磁场强度",
-        "初速度大小"
+        "恒力大小",
+        "球的质量"
       ],
       "steps": [
-        "轨迹弯曲",
-        "速度大小",
-        "理论半径和周期"
+        "速度增量除以时间",
+        "外力加速度读数",
+        "F/m 对照"
       ],
-      "limitations": "参数范围对应教学宏观粒子，示例周期约 126 s；单次 MCP 最长 20 s 只能看到部分圆弧。球形场外磁场直接归零，不模拟边缘场。"
+      "limitations": "必须排除其他外力和约束；加速度读数不包含接触求解器的冲量，因此本实验关闭碰撞。"
     }
   }
 }

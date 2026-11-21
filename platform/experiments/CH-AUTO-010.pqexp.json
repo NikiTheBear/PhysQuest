@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "机械能",
-    "description": "观察运动状态、高度和弹性伸长如何影响机械能。",
+    "title": "多普勒效应",
+    "description": "理解声源或观察者移动时，接收到的频率为什么会变。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-010",
-    "title": "机械能",
-    "goal": "观察运动状态、高度和弹性伸长如何影响机械能。",
+    "title": "多普勒效应",
+    "goal": "理解声源或观察者移动时，接收到的频率为什么会变。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "anchor-2",
-        "kind": "anchor",
-        "name": "anchor",
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
         "position": [
           0,
           1,
@@ -48,24 +48,11 @@
         "fixed": false
       },
       {
-        "id": "spring-3",
-        "kind": "spring",
-        "name": "spring",
+        "id": "microphone-3",
+        "kind": "microphone",
+        "name": "microphone",
         "position": [
           2,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "motion_sensor-4",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
-        "position": [
-          4,
           1,
           0
         ],
@@ -80,15 +67,15 @@
     },
     "learning": {
       "variables": [
-        "质量与初速度",
-        "高度",
-        "弹簧伸长"
+        "声源速度",
+        "声速",
+        "声源频率"
       ],
       "steps": [
-        "机械能总读数",
-        "由参数分解的动能与势能"
+        "声源移动时的距离变化",
+        "按公式算出的接收频率"
       ],
-      "limitations": "总机械能含平动、转动、重力和线性弹性部分；不同组实验的势能零点必须一致。"
+      "limitations": "平台不做多普勒频移。声源移动只会改变距离和相位，接收频率不会变。这是平台的真实现状。"
     }
   }
 }

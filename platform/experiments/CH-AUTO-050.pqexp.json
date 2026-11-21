@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "看见声波的传播",
-    "description": "一个点声源、一个麦克风。改变频率和距离，看声压怎么变。",
+    "title": "动能定理",
+    "description": "比较恒力做功和质点动能的增量。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,22 +11,22 @@
   },
   "experiment": {
     "id": "exp-ch-auto-050",
-    "title": "看见声波的传播",
-    "goal": "一个点声源、一个麦克风。改变频率和距离，看声压怎么变。",
+    "title": "动能定理",
+    "goal": "比较恒力做功和质点动能的增量。",
     "mode": "2d",
     "environment": {
-      "gravity": 0,
+      "gravity": 9.8,
       "damping": 0,
       "speed": 1,
-      "collisions": false
+      "collisions": true
     },
     "components": [
       {
-        "id": "speaker-1",
-        "kind": "speaker",
-        "name": "speaker",
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
         "position": [
-          -1,
+          -2,
           1,
           0
         ],
@@ -35,11 +35,24 @@
         "fixed": false
       },
       {
-        "id": "microphone-2",
-        "kind": "microphone",
-        "name": "microphone",
+        "id": "force-2",
+        "kind": "force",
+        "name": "force",
         "position": [
+          0,
           1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          2,
           1,
           0
         ],
@@ -54,15 +67,16 @@
     },
     "learning": {
       "variables": [
-        "频率",
-        "声压幅值",
-        "麦克风距离"
+        "恒力",
+        "质量",
+        "初速度"
       ],
       "steps": [
-        "声压随时间的变化",
-        "不同距离下的幅值"
+        "位移",
+        "速度",
+        "功与动能增量的误差"
       ],
-      "limitations": "声波用线性声场叠加，不含反射与吸收。"
+      "limitations": "仅比较平动且无其他做功机制的球；公式计算应与求解器采样区间一致。"
     }
   }
 }

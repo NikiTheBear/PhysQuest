@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "title": "组合透镜",
+    "description": "把两片透镜串起来，验证「第一个的像就是第二个的物」。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-069",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-069",
+    "title": "组合透镜",
+    "goal": "把两片透镜串起来，验证「第一个的像就是第二个的物」。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "laser-1",
+        "kind": "laser",
+        "name": "laser",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lens-2",
+        "kind": "lens",
+        "name": "lens",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "detector-3",
+        "kind": "detector",
+        "name": "detector",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "两片透镜的间距",
+        "两片透镜的焦距",
+        "第二片的类型"
+      ],
+      "steps": [
+        "出射光束是否会聚",
+        "会聚点相对第二片的位置"
+      ],
+      "limitations": "近轴薄透镜逐级计算；不含透镜厚度、主平面位置和两片之间的多次反射。"
+    }
+  }
+}

@@ -86,11 +86,11 @@ function statsOf(labId: string, knowledgeIds: string[], handwritten: number): st
 export const LABS: LabMeta[] = [
   {
     id: 'optics-lens',
-    title: '凸透镜成像',
-    subtitle: '光学 · 几何光学',
+    title: '光学',
+    subtitle: '从光的直线传播到薄透镜成像',
     discipline: 'optics',
-    stages: ['junior', 'senior'],
-    intro: '五个小目标，每个都先猜一句再动手。猜错了不要紧——那一下才是真正记得的时候。',
+    stages: ['primary', 'junior', 'senior', 'university'],
+    intro: '光怎么走、怎么拐弯、怎么被透镜收拢。从小学的影子和放大镜，一路到大学的 ABCD 矩阵。',
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
@@ -103,7 +103,7 @@ export const LABS: LabMeta[] = [
     subtitle: '力学 · 从推小车到能量守恒',
     discipline: 'mechanics',
     stages: ['junior', 'senior'],
-    intro: '刚体、弹簧、斜面、音叉与麦穗——从推小车到声波叠加，能真算的都在这儿。',
+    intro: '刚体、弹簧、斜面、滑轮——从推小车到能量守恒。每个都先猜一句再动手。',
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,
@@ -130,7 +130,7 @@ export const LABS: LabMeta[] = [
     discipline: 'acoustics',
     stages: ['junior', 'senior'],
     intro:
-      '一个点声源、一支麦克风。改频率、挪距离、再加一个源，看声压怎么变——声波看不见，但能测。',
+      '点声源、指向性声源、测量麦克风。改频率、挪距离、加第二个源，看声压怎么变——声波看不见，但能测。',
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,

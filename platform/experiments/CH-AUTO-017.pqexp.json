@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "平抛运动",
-    "description": "将平抛运动分解为水平方向匀速和竖直方向下落。",
+    "title": "欧姆定律",
+    "description": "用控制变量法验证欧姆元件的电流与端电压成正比。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-017",
-    "title": "平抛运动",
-    "goal": "将平抛运动分解为水平方向匀速和竖直方向下落。",
+    "title": "欧姆定律",
+    "goal": "用控制变量法验证欧姆元件的电流与端电压成正比。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
         "position": [
           -2,
           1,
@@ -35,11 +35,37 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-2",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "resistor",
         "position": [
           0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ammeter-3",
+        "kind": "ammeter",
+        "name": "ammeter",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-4",
+        "kind": "voltmeter",
+        "name": "voltmeter",
+        "position": [
+          4,
           1,
           0
         ],
@@ -54,16 +80,14 @@
     },
     "learning": {
       "variables": [
-        "水平初速度",
-        "释放高度",
-        "重力"
+        "电源电压",
+        "负载电阻"
       ],
       "steps": [
-        "vx 保持",
-        "vy 的线性变化",
-        "抛物线形轨迹"
+        "成对 U、I 数据",
+        "U/I 与设定阻值的比较"
       ],
-      "limitations": "不含空气阻力，不能在长时间穿过地面后继续解释真实落地运动。"
+      "limitations": "需考虑电源内阻和仪表内阻；只验证线性欧姆电阻，不外推至灯丝温变或半导体。"
     }
   }
 }

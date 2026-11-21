@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "简谐振动",
-    "description": "验证弹簧振子的周期对质量和刚度的依赖。",
+    "title": "电容",
+    "description": "研究电容储能以及 RC 充电过程中电压与电流的变化。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-023",
-    "title": "简谐振动",
-    "goal": "验证弹簧振子的周期对质量和刚度的依赖。",
+    "title": "电容",
+    "goal": "研究电容储能以及 RC 充电过程中电压与电流的变化。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "anchor-1",
-        "kind": "anchor",
-        "name": "anchor",
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "spring-2",
-        "kind": "spring",
-        "name": "spring",
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "resistor",
         "position": [
           0,
           1,
@@ -48,9 +48,9 @@
         "fixed": false
       },
       {
-        "id": "body-3",
-        "kind": "body",
-        "name": "body",
+        "id": "capacitor-3",
+        "kind": "capacitor",
+        "name": "capacitor",
         "position": [
           2,
           1,
@@ -61,9 +61,9 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-4",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "voltmeter-4",
+        "kind": "voltmeter",
+        "name": "voltmeter",
         "position": [
           4,
           1,
@@ -80,15 +80,17 @@
     },
     "learning": {
       "variables": [
-        "质量",
-        "弹簧劲度",
-        "初始小伸长"
+        "电容量",
+        "串联电阻",
+        "电源电压",
+        "初始电容电压"
       ],
       "steps": [
-        "振动周期",
-        "位移与速度相位关系"
+        "电容电压随时间变化",
+        "充电电流衰减",
+        "理论储能"
       ],
-      "limitations": "这是中心弹簧的单向初始运动，避免横向扰动和撞到支点；周期由足够长的记录测量，短验证调用不能覆盖全部周期。"
+      "limitations": "模型为线性理想电容，后向 Euler 积分有数值耗散；没有漏电、击穿、介质非线性或极板空间场。"
     }
   }
 }

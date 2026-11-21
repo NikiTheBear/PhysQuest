@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "title": "光会反射",
+    "description": "转动镜面，看反射光跟着改变方向。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-060",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-060",
+    "title": "光会反射",
+    "goal": "转动镜面，看反射光跟着改变方向。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "laser-1",
+        "kind": "laser",
+        "name": "laser",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "mirror-2",
+        "kind": "mirror",
+        "name": "mirror",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "detector-3",
+        "kind": "detector",
+        "name": "detector",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "平面镜法线角度",
+        "激光入射角度",
+        "探测器位置"
+      ],
+      "steps": [
+        "探测器能否接到光",
+        "反射光相对法线的角度"
+      ],
+      "limitations": "理想的镜面反射，遵循反射定律；不含漫反射、吸收和多次反射的能量损失。"
+    }
+  }
+}

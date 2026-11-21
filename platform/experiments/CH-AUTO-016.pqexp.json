@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "牛顿第三定律",
-    "description": "用两自由物体之间的弹簧作用说明作用力与反作用力成对出现。",
+    "title": "电阻",
+    "description": "研究电阻改变时电压与电流的关系，以及滑动变阻器的调节作用。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-016",
-    "title": "牛顿第三定律",
-    "goal": "用两自由物体之间的弹簧作用说明作用力与反作用力成对出现。",
+    "title": "电阻",
+    "goal": "研究电阻改变时电压与电流的关系，以及滑动变阻器的调节作用。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "dynamometer-2",
-        "kind": "dynamometer",
-        "name": "dynamometer",
+        "id": "rheostat-2",
+        "kind": "rheostat",
+        "name": "rheostat",
         "position": [
           0,
           1,
@@ -48,11 +48,24 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-3",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "ammeter-3",
+        "kind": "ammeter",
+        "name": "ammeter",
         "position": [
           2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-4",
+        "kind": "voltmeter",
+        "name": "voltmeter",
+        "position": [
+          4,
           1,
           0
         ],
@@ -67,15 +80,15 @@
     },
     "learning": {
       "variables": [
-        "两物体质量",
-        "初始伸长",
-        "弹簧刚度"
+        "最大阻值 resistance",
+        "滑片比例 ratio"
       ],
       "steps": [
-        "测力计轴向力",
-        "两球加速度和速度增量"
+        "电流",
+        "变阻器端电压",
+        "有效电阻"
       ],
-      "limitations": "连接两端受到等大反向力，作用在不同物体上；测力计只有一个带符号轴向读数，另一端力由方向取反得出。"
+      "limitations": "变阻器只有两个端子，有效阻值等于最大阻值乘比例；没有实际电阻丝几何或温度效应。"
     }
   }
 }

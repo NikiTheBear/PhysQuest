@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "洛伦兹力",
-    "description": "检验运动电荷在磁场中的洛伦兹力方向与速度垂直关系。",
+    "title": "牛顿第一定律",
+    "description": "检验合外力为零时静止或匀速直线运动的保持。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-045",
-    "title": "洛伦兹力",
-    "goal": "检验运动电荷在磁场中的洛伦兹力方向与速度垂直关系。",
+    "title": "牛顿第一定律",
+    "goal": "检验合外力为零时静止或匀速直线运动的保持。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "charge-1",
-        "kind": "charge",
-        "name": "charge",
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "field-2",
-        "kind": "field",
-        "name": "field",
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
         "position": [
           0,
           1,
@@ -48,9 +48,9 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-3",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "force-3",
+        "kind": "force",
+        "name": "force",
         "position": [
           2,
           1,
@@ -67,16 +67,14 @@
     },
     "learning": {
       "variables": [
-        "电荷量符号",
-        "磁场强度与符号",
-        "初速度"
+        "初速度",
+        "是否施加外力"
       ],
       "steps": [
-        "初始偏转方向",
-        "加速度与速度的垂直关系",
-        "速度大小"
+        "速度是否恒定",
+        "无外力时的直线轨迹"
       ],
-      "limitations": "使用非相对论宏观带电粒子，电荷单位 μC、质量单位 kg；不能套用电子质量等超出范围的值，也不含辐射损失。"
+      "limitations": "这里主动移除了环境阻力；不能用现实中物体自然停下来否定无合力条件下的惯性定律。"
     }
   }
 }

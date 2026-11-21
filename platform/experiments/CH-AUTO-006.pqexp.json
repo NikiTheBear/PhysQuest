@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "速度与平均速度",
-    "description": "从位置和时间数据区分瞬时速度与一段过程的平均速度。",
+    "title": "回声与测距",
+    "description": "理解回声是声音被反射回来，以及怎么用回声测距离。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-006",
-    "title": "速度与平均速度",
-    "goal": "从位置和时间数据区分瞬时速度与一段过程的平均速度。",
+    "title": "回声与测距",
+    "goal": "理解回声是声音被反射回来，以及怎么用回声测距离。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-2",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "microphone",
         "position": [
           0,
           1,
@@ -48,9 +48,9 @@
         "fixed": false
       },
       {
-        "id": "force-3",
-        "kind": "force",
-        "name": "force",
+        "id": "distance_sensor-3",
+        "kind": "distance_sensor",
+        "name": "distance_sensor",
         "position": [
           2,
           1,
@@ -67,15 +67,14 @@
     },
     "learning": {
       "variables": [
-        "初速度",
-        "恒力大小",
-        "取样时间段"
+        "到反射面的距离",
+        "声速"
       ],
       "steps": [
-        "端点位移除以时间",
-        "各采样点速度"
+        "往返路程 2d",
+        "算出来的延迟时间"
       ],
-      "limitations": "单向运动时位移大小等于路程；若反向运动，不能把位移平均速度误称为路程平均速率。"
+      "limitations": "平台不模拟声波反射，回声只能靠计算器算，不能真的听到。这是真话。"
     }
   }
 }

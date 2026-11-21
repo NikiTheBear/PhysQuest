@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "电源效率",
-    "description": "研究电源输出功率与效率随负载改变的不同趋势。",
+    "title": "匀变速直线运动",
+    "description": "用恒定合力验证直线匀加速运动的位置与速度关系。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-044",
-    "title": "电源效率",
-    "goal": "研究电源输出功率与效率随负载改变的不同趋势。",
+    "title": "匀变速直线运动",
+    "goal": "用恒定合力验证直线匀加速运动的位置与速度关系。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "battery-1",
-        "kind": "battery",
-        "name": "battery",
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
         "position": [
           -2,
           1,
@@ -35,11 +35,24 @@
         "fixed": false
       },
       {
-        "id": "resistor-2",
-        "kind": "resistor",
-        "name": "resistor",
+        "id": "force-2",
+        "kind": "force",
+        "name": "force",
         "position": [
           0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          2,
           1,
           0
         ],
@@ -54,15 +67,15 @@
     },
     "learning": {
       "variables": [
-        "负载电阻",
-        "电源内阻"
+        "初速度",
+        "力与质量",
+        "观察时间"
       ],
       "steps": [
-        "负载功率",
-        "电源提供的理论总功率",
-        "效率与电流的权衡"
+        "v−t 线性关系",
+        "x−t 二次关系"
       ],
-      "limitations": "这是电阻内耗下的电路效率，不代表电池化学或电机系统效率；避免用电源端口净功率代替 εI。"
+      "limitations": "只在力恒定、没有接触与阻尼时使用匀变速公式；数值积分会产生小误差。"
     }
   }
 }

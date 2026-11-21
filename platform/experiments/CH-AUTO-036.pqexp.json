@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "并联电路",
-    "description": "验证并联支路电压相同及总电流等于各支路电流之和。",
+    "title": "弹性",
+    "description": "探究弹簧越拉长，弹性作用是否越大。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-036",
-    "title": "并联电路",
-    "goal": "验证并联支路电压相同及总电流等于各支路电流之和。",
+    "title": "弹性",
+    "goal": "探究弹簧越拉长，弹性作用是否越大。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "battery-1",
-        "kind": "battery",
-        "name": "battery",
+        "id": "anchor-1",
+        "kind": "anchor",
+        "name": "anchor",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "resistor-2",
-        "kind": "resistor",
-        "name": "resistor",
+        "id": "body-2",
+        "kind": "body",
+        "name": "body",
         "position": [
           0,
           1,
@@ -48,9 +48,9 @@
         "fixed": false
       },
       {
-        "id": "ammeter-3",
-        "kind": "ammeter",
-        "name": "ammeter",
+        "id": "dynamometer-3",
+        "kind": "dynamometer",
+        "name": "dynamometer",
         "position": [
           2,
           1,
@@ -67,15 +67,14 @@
     },
     "learning": {
       "variables": [
-        "支路电阻 R1、R2",
-        "电源电压"
+        "伸长量",
+        "劲度系数"
       ],
       "steps": [
-        "支路电压",
-        "支路电流之和",
-        "总电流"
+        "测力计轴向读数",
+        "长度与原长之差"
       ],
-      "limitations": "电源有内阻，因此改变负载会轻微改变路端电压；并联关系以实际端电压比较。"
+      "limitations": "线性理想弹簧不模拟塑性变形、断裂或材料弹性极限；固定端用于避免振动干扰。"
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "电磁振荡",
-    "description": "研究预充电电容与电感之间的能量交换及电阻造成的振荡衰减。",
+    "title": "平抛运动",
+    "description": "将平抛运动分解为水平方向匀速和竖直方向下落。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-048",
-    "title": "电磁振荡",
-    "goal": "研究预充电电容与电感之间的能量交换及电阻造成的振荡衰减。",
+    "title": "平抛运动",
+    "goal": "将平抛运动分解为水平方向匀速和竖直方向下落。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "capacitor-1",
-        "kind": "capacitor",
-        "name": "capacitor",
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
         "position": [
           -2,
           1,
@@ -35,24 +35,11 @@
         "fixed": false
       },
       {
-        "id": "inductor-2",
-        "kind": "inductor",
-        "name": "inductor",
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "resistor-3",
-        "kind": "resistor",
-        "name": "resistor",
-        "position": [
-          2,
           1,
           0
         ],
@@ -67,17 +54,16 @@
     },
     "learning": {
       "variables": [
-        "电容 C",
-        "电感 L",
-        "串联电阻 R",
-        "初始电容电压"
+        "水平初速度",
+        "释放高度",
+        "重力"
       ],
       "steps": [
-        "电容电压与电感电流",
-        "衰减振荡趋势",
-        "理论电场和磁场储能"
+        "vx 保持",
+        "vy 的线性变化",
+        "抛物线形轨迹"
       ],
-      "limitations": "后向 Euler 有额外数值耗散，不能声称无阻电路严格守恒；无电磁辐射、互感和分布参数。观察完整周期需要较长运行。"
+      "limitations": "不含空气阻力，不能在长时间穿过地面后继续解释真实落地运动。"
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "功率",
-    "description": "比较相同恒力在不同速度下做功快慢。",
+    "title": "声压级与分贝",
+    "description": "把线性声压换算成对数分贝，理解为什么用分贝。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-009",
-    "title": "功率",
-    "goal": "比较相同恒力在不同速度下做功快慢。",
+    "title": "声压级与分贝",
+    "goal": "把线性声压换算成对数分贝，理解为什么用分贝。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
         "position": [
           -2,
           1,
@@ -35,24 +35,11 @@
         "fixed": false
       },
       {
-        "id": "force-2",
-        "kind": "force",
-        "name": "force",
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "microphone",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "motion_sensor-3",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
-        "position": [
-          2,
           1,
           0
         ],
@@ -67,15 +54,14 @@
     },
     "learning": {
       "variables": [
-        "力大小",
-        "初速度",
-        "观测区间"
+        "声源幅度",
+        "麦克风距离"
       ],
       "steps": [
-        "速度随时间",
-        "公式计算的瞬时与平均功率"
+        "麦克风读到的声压（Pa）",
+        "换算出来的 SPL（dB）"
       ],
-      "limitations": "机械功率由力和速度推算，平台电路功率通道不能当成机械功率表。"
+      "limitations": "平台只给线性声压，不给分贝。换算是你自己算的，不是平台算的。另外这里用的是瞬时幅值，不是有效值。"
     }
   }
 }

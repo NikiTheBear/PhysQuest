@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "阻尼振动",
-    "description": "比较弱阻尼、临界附近与强阻尼弹簧振子的衰减行为。",
+    "title": "R = r 时输出功率最大",
+    "description": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-026",
-    "title": "阻尼振动",
-    "goal": "比较弱阻尼、临界附近与强阻尼弹簧振子的衰减行为。",
+    "title": "R = r 时输出功率最大",
+    "goal": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "anchor-1",
-        "kind": "anchor",
-        "name": "anchor",
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
         "position": [
           -2,
           1,
@@ -35,50 +35,11 @@
         "fixed": false
       },
       {
-        "id": "body-2",
-        "kind": "body",
-        "name": "body",
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "resistor",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "spring-3",
-        "kind": "spring",
-        "name": "spring",
-        "position": [
-          2,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "damper-4",
-        "kind": "damper",
-        "name": "damper",
-        "position": [
-          4,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "motion_sensor-5",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
-        "position": [
-          6,
           1,
           0
         ],
@@ -93,16 +54,16 @@
     },
     "learning": {
       "variables": [
-        "阻尼器系数",
-        "质量",
-        "刚度"
+        "外电阻 R",
+        "内阻 r",
+        "电动势 ε"
       ],
       "steps": [
-        "位移衰减包络",
-        "是否越过平衡位置",
-        "机械能下降"
+        "外电阻功率",
+        "匹配点两侧功率",
+        "匹配时的端电压"
       ],
-      "limitations": "阻尼器只沿连接轴作用；参数改变后重置初始伸长以公平比较，临界判定适用于该一维线性系统。"
+      "limitations": "只适用于固定电动势和正线性内阻的直流戴维南模型；最大功率不等于最高效率。"
     }
   }
 }

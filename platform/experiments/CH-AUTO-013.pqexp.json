@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "匀变速直线运动",
-    "description": "用恒定合力验证直线匀加速运动的位置与速度关系。",
+    "title": "电池的正负",
+    "description": "识别电池极性反转时电压和约定电流方向的改变。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-013",
-    "title": "匀变速直线运动",
-    "goal": "用恒定合力验证直线匀加速运动的位置与速度关系。",
+    "title": "电池的正负",
+    "goal": "识别电池极性反转时电压和约定电流方向的改变。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "force-2",
-        "kind": "force",
-        "name": "force",
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "resistor",
         "position": [
           0,
           1,
@@ -48,11 +48,24 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-3",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "ammeter-3",
+        "kind": "ammeter",
+        "name": "ammeter",
         "position": [
           2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-4",
+        "kind": "voltmeter",
+        "name": "voltmeter",
+        "position": [
+          4,
           1,
           0
         ],
@@ -67,15 +80,15 @@
     },
     "learning": {
       "variables": [
-        "初速度",
-        "力与质量",
-        "观察时间"
+        "电源电动势符号",
+        "负载电阻"
       ],
       "steps": [
-        "v−t 线性关系",
-        "x−t 二次关系"
+        "有符号电压",
+        "有符号支路电流",
+        "负载功率"
       ],
-      "limitations": "只在力恒定、没有接触与阻尼时使用匀变速公式；数值积分会产生小误差。"
+      "limitations": "显示的是约定电流方向；不模拟导线中电子的微观迁移。电源含内阻。"
     }
   }
 }

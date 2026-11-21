@@ -7229,8 +7229,15 @@
       "analogy": "手电筒照墙，光是直的射过去的。你用手一挡，后面就黑了——因为光被挡住了，过不去。",
       "formula": "",
       "why": "光在同一种物质里总是沿直线传播。所有关于光的作图，第一句都要先默认这一条。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "光阑的横向位置",
+        "光阑通光孔径",
+        "激光光轴角度"
+      ],
+      "observations": [
+        "探测器读到的光功率",
+        "光阑偏离光轴后是否还有光"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [],
@@ -7287,8 +7294,13 @@
       "analogy": "树荫下的圆形小光斑，其实是太阳的像——不是树叶的影子。",
       "formula": "",
       "why": "每个物点发出的光只能穿过小孔中的一条，所以各点各就各位，在另一侧拼出一个倒立的像。这是人类最早的成像方式。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "光阑孔径",
+        "遮挡物位置"
+      ],
+      "observations": [
+        "探测器功率随孔径的变化"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -7347,8 +7359,15 @@
       "analogy": "往墙上扔球，球会弹回来。光的反射也是这个意思，只不过它是射出去的角等于射进来的角。",
       "formula": "",
       "why": "反射不会改变光的行进方向所在的平面，只是把它掉个头。所以镜子里的字母会左右颠倒。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "平面镜法线角度",
+        "激光入射角度",
+        "探测器位置"
+      ],
+      "observations": [
+        "探测器能否接到光",
+        "反射光相对法线的角度"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -7411,8 +7430,15 @@
       "analogy": "推着购物车斜着从地板冲进泥地，一边轮子先慢下来，车头就歪了。光进水也是这个道理。",
       "formula": "",
       "why": "光在不同物质里跑的速度不一样。速度一变，方向就跟着变。这一条是整个透镜模块的地基——凸透镜之所以能会聚光，就是靠玻璃和空气的速度差。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "透镜焦距",
+        "激光入射高度",
+        "透镜类型（凸/凹）"
+      ],
+      "observations": [
+        "出射光束的走向",
+        "探测器功率随位置的变化"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -7471,8 +7497,16 @@
       "analogy": "用放大镜看手指，凑近了是正着的大的手指；慢慢抬远，忽然就变成一个倒过来的手指，再远就全糊了。",
       "formula": "",
       "why": "放大镜就是一个凸透镜。东西离它比焦距近的时候成虚像（正立、放大，接不住）；一旦超过焦距，就变成倒立的实像了。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "焦距 f",
+        "物体高度 h"
+      ],
+      "observations": [
+        "放大率 m 的正负与大小",
+        "光屏上有没有像",
+        "像距 v 的正负"
+      ],
       "support": "direct",
       "misconceptions": [
         "MIS-O2-01"
@@ -7537,8 +7571,14 @@
       "analogy": "斜着走进水里比垂直走进去吃力得多，所以方向歪得更厉害。",
       "formula": "",
       "why": "折射角小于入射角，是因为水比空气「光密」。垂直入射时不发生偏折，因为整束光的对称性没有被打断。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "透镜焦距（等效折射本领）",
+        "入射高度",
+        "入射角度"
+      ],
+      "observations": [
+        "出射角度相对入射角的变化"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -7597,8 +7637,15 @@
       "analogy": "凸透镜像一个个小棱镜拼起来，越靠上越把光往下压，越靠下越把光往上抬，最后都挤到一点。",
       "formula": "",
       "why": "镜片各处的厚度不一样，光穿过后偏折的角度也不一样，叠起来就形成了会聚或发散。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "透镜类型（凸/凹）",
+        "焦距",
+        "探测器位置"
+      ],
+      "observations": [
+        "出射光线的收拢或散开",
+        "探测器功率峰值位置"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -7657,8 +7704,15 @@
       "analogy": "正午把放大镜对准太阳，最亮的那个点就是焦点。它到镜片的距离就是焦距——这是你唯一能用一把尺子量出来的镜头参数。",
       "formula": "",
       "why": "焦点是凸透镜的「性格」。焦距越短，会聚得越凶，成像越容易被推近；焦距越长，越像望远镜。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "透镜焦距",
+        "探测器位置",
+        "激光束宽"
+      ],
+      "observations": [
+        "探测器功率随位置的变化",
+        "功率峰值出现的位置"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -7721,8 +7775,16 @@
       "analogy": "这三条就像三条「作弊路线」——因为已经知道它们怎么走，随便选两条交点就是像的位置，不用算。",
       "formula": "",
       "why": "三条光线能确定像的位置，是因为它们各自有一个已知的「出口约束」。两条就够，第三条用来校验。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "焦距 f",
+        "物体形状"
+      ],
+      "observations": [
+        "平行于主光轴的光如何出射",
+        "过光心的光是否偏折",
+        "三条光线是否交于像点"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -7781,8 +7843,16 @@
       "analogy": "这就是照相机。拍一棵大树，镜头离树几十米，底片上的树只有指甲盖那么大。",
       "formula": "",
       "why": "物远，光线夹角小，被透镜会聚后很快收拢，所以像又近又小。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "光屏位置",
+        "焦距 f"
+      ],
+      "observations": [
+        "放大率 m",
+        "像距 v",
+        "光屏上像的清晰程度"
+      ],
       "support": "direct",
       "misconceptions": [
         "MIS-O2-05"
@@ -7843,8 +7913,16 @@
       "analogy": "这是唯一一个「不好也不小」的位置，也是初中实验里最常用的分界线。",
       "formula": "",
       "why": "u = 2f 时，公式给出 v = 2f，放大率恰好是 −1。这就是「大」和「小」的分水岭。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "光屏位置",
+        "焦距 f"
+      ],
+      "observations": [
+        "放大率 m 是否等于 −1",
+        "像高是否等于物高",
+        "像距 v 是否等于 u"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -7903,8 +7981,16 @@
       "analogy": "这就是投影仪。幻灯片那么小，投到墙上比你人还大。",
       "formula": "",
       "why": "物近，光线张角大，透镜要把它压回一点就得拖到更远的地方，所以像既远又大。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "光屏位置",
+        "焦距 f"
+      ],
+      "observations": [
+        "放大率 m 的绝对值是否大于 1",
+        "像距 v 是否大于 2f",
+        "光屏上像的清晰程度"
+      ],
       "support": "direct",
       "misconceptions": [
         "MIS-O2-05"
@@ -7969,8 +8055,16 @@
       "analogy": "像一条被拉得笔直的橡皮筋，永远碰不到一起去。",
       "formula": "",
       "why": "所有出射光线互相平行，平行线不相交，交点跑到无穷远去了。所以不是「像很大」，而是「没有像」。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "光屏位置",
+        "透镜口径"
+      ],
+      "observations": [
+        "光屏上是否有清晰的像",
+        "弥散圆大小",
+        "像距 v 的数值"
+      ],
       "support": "direct",
       "misconceptions": [
         "MIS-O2-02"
@@ -8031,8 +8125,16 @@
       "analogy": "拿放大镜看字，字变大，但你没法把它「投」到纸上去。",
       "formula": "",
       "why": "折射后的光线仍然是发散的，它们不会在透镜后面相交，只有反向延长才交于一点——所以叫虚像。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "物体高度 h",
+        "焦距 f"
+      ],
+      "observations": [
+        "放大率 m 的正负与大小",
+        "像距 v 的正负",
+        "光屏可见像是否为 0"
+      ],
       "support": "direct",
       "misconceptions": [
         "MIS-O2-01",
@@ -8095,8 +8197,15 @@
       "analogy": "实像像投影仪打在墙上的画，虚像像镜子里的你——你伸手过去，那边什么也没有。",
       "formula": "",
       "why": "实像是光线真的在那个位置相交；虚像是你在「顺着光线往回看」的方向上以为有东西。这个区别不是文学修辞，是能不能被光屏承接。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "光屏位置"
+      ],
+      "observations": [
+        "光屏可见像（1/0）",
+        "像距 v 的正负",
+        "成像是正立还是倒立"
+      ],
       "support": "direct",
       "misconceptions": [
         "MIS-O2-03",
@@ -8162,8 +8271,15 @@
       "analogy": "像和物像翘翘板的两头：你把它那头压近焦点，它这头就翘得又高又远。",
       "formula": "",
       "why": "公式 1/f = 1/u + 1/v 里，u 变小，1/v 就变大，v 跟着变大。u 逼近 f 时 v 冲向无穷远。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "光屏位置",
+        "焦距 f"
+      ],
+      "observations": [
+        "像距 v 随 u 的变化",
+        "放大率 |m| 随 u 的变化"
+      ],
       "support": "direct",
       "misconceptions": [
         "MIS-O2-06"
@@ -8229,8 +8345,14 @@
       "analogy": "三个人站成一排拍合照，谁站歪了，谁的脑袋就出画面。",
       "formula": "",
       "why": "只有三心同高，像才能落在光屏中央。否则像会偏出屏外，你会以为「没成像」，其实只是掉下去了。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "遮挡开关",
+        "光屏位置"
+      ],
+      "observations": [
+        "遮挡后像的完整度",
+        "像的位置是否改变"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -8289,8 +8411,16 @@
       "analogy": "调焦就像戴眼镜找清楚的那一下——过了和不够都模糊，只有一个位置最尖锐。",
       "formula": "",
       "why": "不在像的位置时，光锥截面上是一个圆（弥散圆）。偏离越多圆越大，看起来越糊。所以对焦就是把弥散圆压到最小。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "光屏位置",
+        "物距 u",
+        "透镜口径"
+      ],
+      "observations": [
+        "弥散圆直径",
+        "相对照度",
+        "光屏上像的清晰程度"
+      ],
       "support": "direct",
       "misconceptions": [
         "MIS-O2-07"
@@ -8351,8 +8481,14 @@
       "analogy": "近视眼是「会聚太猛」，像落在视网膜前面；凹透镜先让光散一散，把它推回视网膜上。",
       "formula": "",
       "why": "晶状体加厚变薄就是在改焦距。改不动了（或者眼球太长），就得靠外加一块透镜来补偿。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "焦距（等效眼睛调节）",
+        "光屏位置（等效视网膜）"
+      ],
+      "observations": [
+        "像是否落在光屏上",
+        "弥散圆大小"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -8415,8 +8551,16 @@
       "analogy": "一块镜片，换一下距离，就变成四种东西。",
       "formula": "",
       "why": "凸透镜本身永远不会变，变的是物体放在哪一段。u>2f 是相机，f<u<2f 是投影仪，u<f 是放大镜，眼睛的成像位置永远是 u>2f 那一档。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "光屏位置",
+        "焦距 f"
+      ],
+      "observations": [
+        "三种情况下的放大率",
+        "像的正倒",
+        "光屏能否接到"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -8481,8 +8625,15 @@
       "analogy": "一把「三个量只能定两个」的尺子：知道焦距和物距，像距就唯一确定。",
       "formula": "1/f = 1/u + 1/v",
       "why": "它是近轴光线几何的近似结果。把 u、v、f 都限定在光轴附近，正弦可以换成角度本身，方程才变成这么干净的样子。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "焦距 f",
+        "光屏位置"
+      ],
+      "observations": [
+        "像距 v",
+        "弥散圆最小的光屏位置"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -8545,8 +8696,15 @@
       "analogy": "像距除以物距，就是把「远近」换成「大小」。",
       "formula": "m = −v/u",
       "why": "因为物点和像点在同一条过光心的直线上，所以横向放缩和纵向距离成严格比例。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "焦距 f",
+        "物体高度 h"
+      ],
+      "observations": [
+        "放大率 m 的数值与符号",
+        "像高"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -8609,8 +8767,14 @@
       "analogy": "约定就是「谁站哪边谁记正号」。没约定清楚，公式就会自相矛盾。",
       "formula": "",
       "why": "符号约定不是装饰，它决定了公式能不能对虚像也成立。用这套约定，一条公式同时管实像和虚像。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "光屏位置"
+      ],
+      "observations": [
+        "像距 v 的正负",
+        "光屏上有没有像"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -8669,8 +8833,14 @@
       "analogy": "三条特殊光线是「公务员通道」，好走；但其他光线也都能走到同一个目的地。",
       "formula": "",
       "why": "如果只有三条光线能成像，透镜就不成其为透镜了。所有从同一点发出的光线，出射后必须交于同一点——这是成像的定义。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "物距 u",
+        "焦距 f"
+      ],
+      "observations": [
+        "所有出射光线是否交于同一点",
+        "交点位置是否等于算出的像距"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -8729,8 +8899,15 @@
       "analogy": "望远镜和显微镜都是这么搭出来的。",
       "formula": "",
       "why": "把前一个透镜算出的像点当作下一段的物点，依次算下去。难点在交界的符号和虚实转换。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "两片透镜的间距",
+        "两片透镜的焦距",
+        "第二片的类型"
+      ],
+      "observations": [
+        "出射光束是否会聚",
+        "会聚点相对第二片的位置"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [
@@ -8793,8 +8970,15 @@
       "analogy": "理想模型假设所有光线都贴着光轴走，真实镜片做不到。",
       "formula": "",
       "why": "近轴近似在边缘失效，这就是为什么好镜头要好几片玻璃叠起来互相补偿。",
-      "variables": [],
-      "observations": [],
+      "variables": [
+        "光阑孔径",
+        "透镜口径",
+        "激光波长"
+      ],
+      "observations": [
+        "探测器上光斑的大小",
+        "收小孔径后的功率"
+      ],
       "support": "direct",
       "misconceptions": [],
       "prerequisites": [

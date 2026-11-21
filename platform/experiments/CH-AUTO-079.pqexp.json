@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "title": "近轴光学与 ABCD 矩阵",
+    "description": "比较自由传播与两片薄透镜组成的近轴系统，验证矩阵预测的光线高度与倾角。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-AUTO-079",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-auto-079",
+    "title": "近轴光学与 ABCD 矩阵",
+    "goal": "比较自由传播与两片薄透镜组成的近轴系统，验证矩阵预测的光线高度与倾角。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "laser-1",
+        "kind": "laser",
+        "name": "laser",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lens-2",
+        "kind": "lens",
+        "name": "lens",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "detector-3",
+        "kind": "detector",
+        "name": "detector",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false
+    },
+    "learning": {
+      "variables": [
+        "透镜焦距",
+        "镜间距",
+        "入射小角度"
+      ],
+      "steps": [
+        "出射光束趋势",
+        "探测器接收功率",
+        "理论像面位置"
+      ],
+      "limitations": "仅近轴几何光学；有限的五条采样光线不能给出完整光强分布，ABCD 矩阵由参数另行计算。"
+    }
+  }
+}

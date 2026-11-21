@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "牛顿第二定律",
-    "description": "分别控制质量和恒力，检验加速度与合力及质量的关系。",
+    "title": "电压",
+    "description": "理解电压是两点之间的电势差，并比较并联测量与错误接法。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-015",
-    "title": "牛顿第二定律",
-    "goal": "分别控制质量和恒力，检验加速度与合力及质量的关系。",
+    "title": "电压",
+    "goal": "理解电压是两点之间的电势差，并比较并联测量与错误接法。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "force-2",
-        "kind": "force",
-        "name": "force",
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "resistor",
         "position": [
           0,
           1,
@@ -48,9 +48,9 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-3",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "voltmeter-3",
+        "kind": "voltmeter",
+        "name": "voltmeter",
         "position": [
           2,
           1,
@@ -67,15 +67,14 @@
     },
     "learning": {
       "variables": [
-        "恒力大小",
-        "球的质量"
+        "电源电压",
+        "电压表接线方向"
       ],
       "steps": [
-        "速度增量除以时间",
-        "外力加速度读数",
-        "F/m 对照"
+        "端电压及符号",
+        "电源电动势与路端电压差"
       ],
-      "limitations": "必须排除其他外力和约束；加速度读数不包含接触求解器的冲量，因此本实验关闭碰撞。"
+      "limitations": "电压表内阻为 10 MΩ，读数有负载影响；这里是电路节点电压，不是空间电势场图。"
     }
   }
 }

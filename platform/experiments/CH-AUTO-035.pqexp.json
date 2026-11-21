@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "串联电路",
-    "description": "验证串联电路电流相等、总电压等于各电阻电压之和。",
+    "title": "斜面",
+    "description": "比较不同倾斜程度对物体沿斜面滑动的影响。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-035",
-    "title": "串联电路",
-    "goal": "验证串联电路电流相等、总电压等于各电阻电压之和。",
+    "title": "斜面",
+    "goal": "比较不同倾斜程度对物体沿斜面滑动的影响。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "battery-1",
-        "kind": "battery",
-        "name": "battery",
+        "id": "ramp-1",
+        "kind": "ramp",
+        "name": "ramp",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "resistor-2",
-        "kind": "resistor",
-        "name": "resistor",
+        "id": "box-2",
+        "kind": "box",
+        "name": "box",
         "position": [
           0,
           1,
@@ -48,9 +48,9 @@
         "fixed": false
       },
       {
-        "id": "voltmeter-3",
-        "kind": "voltmeter",
-        "name": "voltmeter",
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
         "position": [
           2,
           1,
@@ -67,15 +67,14 @@
     },
     "learning": {
       "variables": [
-        "两个电阻的阻值",
-        "电源电压"
+        "斜面倾角",
+        "摩擦系数"
       ],
       "steps": [
-        "两电阻支路电流",
-        "各端电压之和",
-        "分压比例"
+        "滑块速度与位置",
+        "同一时段滑动距离"
       ],
-      "limitations": "导线理想，电源内阻和仪表负载需单独计入；元件为线性电阻。"
+      "limitations": "斜面是固定刚体，边缘掉落属于另一运动阶段；理想无摩擦公式只用于仍接触斜面的时段。"
     }
   }
 }

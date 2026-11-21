@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "路端电压随外阻变化",
-    "description": "绘制外电阻变化时路端电压与电流的关系。",
+    "title": "动能与势能的转化",
+    "description": "追踪下落时重力势能向动能的转化。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-042",
-    "title": "路端电压随外阻变化",
-    "goal": "绘制外电阻变化时路端电压与电流的关系。",
+    "title": "动能与势能的转化",
+    "goal": "追踪下落时重力势能向动能的转化。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "battery-1",
-        "kind": "battery",
-        "name": "battery",
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
         "position": [
           -2,
           1,
@@ -35,24 +35,11 @@
         "fixed": false
       },
       {
-        "id": "rheostat-2",
-        "kind": "rheostat",
-        "name": "rheostat",
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "voltmeter-3",
-        "kind": "voltmeter",
-        "name": "voltmeter",
-        "position": [
-          2,
           1,
           0
         ],
@@ -67,15 +54,15 @@
     },
     "learning": {
       "variables": [
-        "变阻器有效外阻",
-        "电源内阻"
+        "释放高度",
+        "初速度"
       ],
       "steps": [
-        "路端电压 U",
-        "电流 I",
-        "U−I 变化趋势"
+        "重力势能下降",
+        "动能增加",
+        "总能量的数值误差"
       ],
-      "limitations": "理想电源加固定串联内阻模型，不包含电量下降、温度、极化和短路保护行为。"
+      "limitations": "只讨论未发生碰撞的过程；碰撞关闭后穿越地面是模型设置，不代表真实物体穿地。"
     }
   }
 }

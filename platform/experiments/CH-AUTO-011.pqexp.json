@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "动能与势能的转化",
-    "description": "追踪下落时重力势能向动能的转化。",
+    "title": "电路的通与断",
+    "description": "比较开关闭合与断开时闭合回路的电流变化。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-011",
-    "title": "动能与势能的转化",
-    "goal": "追踪下落时重力势能向动能的转化。",
+    "title": "电路的通与断",
+    "goal": "比较开关闭合与断开时闭合回路的电流变化。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
         "position": [
           -2,
           1,
@@ -35,11 +35,37 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-2",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "switch-2",
+        "kind": "switch",
+        "name": "switch",
         "position": [
           0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lamp-3",
+        "kind": "lamp",
+        "name": "lamp",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-4",
+        "kind": "voltmeter",
+        "name": "voltmeter",
+        "position": [
+          4,
           1,
           0
         ],
@@ -54,15 +80,14 @@
     },
     "learning": {
       "variables": [
-        "释放高度",
-        "初速度"
+        "开关 closed=0/1",
+        "电源电压"
       ],
       "steps": [
-        "重力势能下降",
-        "动能增加",
-        "总能量的数值误差"
+        "支路电流",
+        "灯泡电功率与亮度"
       ],
-      "limitations": "只讨论未发生碰撞的过程；碰撞关闭后穿越地面是模型设置，不代表真实物体穿地。"
+      "limitations": "开关以高低电阻近似，断开仍有极小漏电流；不模拟接触火花。"
     }
   }
 }

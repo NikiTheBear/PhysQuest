@@ -22,8 +22,23 @@ const DOMAIN_TO_LAB = {
   力学: 'mechanics',
   电磁: 'circuits',
   光学: 'optics-lens',
-  // 声学并入力学：平台只有 2 种声学器具，撑不起独立模块
-  声学: 'mechanics',
+  // 声学已独立成模块（2026-11 起），不再并进力学
+  声学: 'acoustics',
+};
+
+/**
+ * 已经被「手写关」覆盖的知识点 —— 不再生成自动挑战，避免同一件事出两关。
+ *
+ * 光学 5 关在 shared/knowledge-data/optics-lens/challenges.json；
+ * 声学 5 关在本文件下面的 WAVE 数组里。
+ */
+const COVERED_BY_HANDWRITTEN = {
+  'optics-lens': [
+    'K-O2-04', 'K-O2-06', 'K-O2-07', 'K-O2-08',
+    'K-O2-09', 'K-O2-10', 'K-O2-11', 'K-O2-13', 'K-O2-15',
+  ],
+  // 声学：WAVE 手写 5 关覆盖了这两条，不再派生自动关
+  acoustics: ['K-M3-14', 'K-M3-15', 'K-M3-16', 'K-M4-05', 'K-M4-06'],
 };
 
 /** 每个知识点生成 1 个挑战；能真算的才生成 */
@@ -36,7 +51,7 @@ const experiments = [];
 const groups = new Map(); // key -> prompts[]
 
 for (const p of PROMPTS) {
-  // 声学的两条虽标 approximation，但平台真有扬声器和麦克风，能做
+  // 声学虽标 approximation，但平台真有扬声器和麦克风，能做
   const allowed = p.support === 'direct' || p.domainLabel === '声学';
   if (!allowed) continue;
   const domain = p.domainLabel;
@@ -55,6 +70,7 @@ for (const [key, list] of groups) {
 
   // 一个知识点一个挑战
   for (const first of list) {
+    if ((COVERED_BY_HANDWRITTEN[labId] ?? []).includes(first.id)) continue;
     const chunk = [first];
     seq += 1;
     const id = `CH-AUTO-${String(seq).padStart(3, '0')}`;
@@ -135,22 +151,6 @@ for (const [key, list] of groups) {
  * 每一关都能真的拖参数、真的读出不同数字。
  * ========================================================== */
 const WAVE = [
-  {
-    id: 'AC-01',
-    knowledgeId: 'K-M3-15',
-    title: '同样的声源，走远一倍会小多少',
-    brief: '一个点声源、一支麦克风。把麦克风从 1 m 挪到 2 m、4 m，看声压怎么变。',
-    hint: '不是线性变小——距离翻倍，声压降到大约一半。',
-    models: ['speaker', 'microphone'],
-    variables: ['麦克风距离', '声源频率', '参考声压'],
-    observations: ['1 m / 2 m / 4 m 处的声压读数'],
-    construction:
-      '放一个点声源（默认 120 Hz、0.5 Pa）和一支测量麦克风，把麦克风依次放在 1 m、2 m、4 m，每次读一次声压。',
-    limitations: '球面波在自由空间中的衰减；不含反射与吸收。',
-    limitationMismatch: false,
-    prompt:
-      '在 Fieldlab 里搭一个声波传播实验：放点声源 speaker 和测量麦克风 microphone，把麦克风分别放在距声源 1 m、2 m、4 m 的位置，读取三处的声压值，观察随距离的衰减规律。',
-  },
   {
     id: 'AC-02',
     knowledgeId: 'K-M3-15',

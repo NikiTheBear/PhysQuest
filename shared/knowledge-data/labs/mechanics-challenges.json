@@ -3,7 +3,7 @@
   "auto": true,
   "challenges": [
     {
-      "id": "CH-AUTO-001",
+      "id": "CH-AUTO-032",
       "labId": "mechanics",
       "title": "推和拉",
       "brief": "观察向相反方向推拉同一物体时，运动如何改变。",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "id": "CH-AUTO-002",
+      "id": "CH-AUTO-033",
       "labId": "mechanics",
       "title": "物体为什么会往下掉",
       "brief": "比较不同质量的小球从相同高度释放时的下落过程。",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "id": "CH-AUTO-003",
+      "id": "CH-AUTO-034",
       "labId": "mechanics",
       "title": "摩擦力",
       "brief": "观察滑块接触面的摩擦设置如何影响滑行。",
@@ -147,7 +147,7 @@
       }
     },
     {
-      "id": "CH-AUTO-004",
+      "id": "CH-AUTO-035",
       "labId": "mechanics",
       "title": "斜面",
       "brief": "比较不同倾斜程度对物体沿斜面滑动的影响。",
@@ -195,7 +195,7 @@
       }
     },
     {
-      "id": "CH-AUTO-005",
+      "id": "CH-AUTO-036",
       "labId": "mechanics",
       "title": "弹性",
       "brief": "探究弹簧越拉长，弹性作用是否越大。",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "id": "CH-AUTO-006",
+      "id": "CH-AUTO-037",
       "labId": "mechanics",
       "title": "速度与平均速度",
       "brief": "从位置和时间数据区分瞬时速度与一段过程的平均速度。",
@@ -292,7 +292,7 @@
       }
     },
     {
-      "id": "CH-AUTO-007",
+      "id": "CH-AUTO-038",
       "labId": "mechanics",
       "title": "二力平衡",
       "brief": "验证同一物体受到大小相等方向相反的两力时合力为零。",
@@ -340,7 +340,7 @@
       }
     },
     {
-      "id": "CH-AUTO-008",
+      "id": "CH-AUTO-039",
       "labId": "mechanics",
       "title": "功",
       "brief": "在恒力直线运动中计算力做的功并辨别零功情况。",
@@ -388,7 +388,7 @@
       }
     },
     {
-      "id": "CH-AUTO-009",
+      "id": "CH-AUTO-040",
       "labId": "mechanics",
       "title": "功率",
       "brief": "比较相同恒力在不同速度下做功快慢。",
@@ -437,7 +437,7 @@
       }
     },
     {
-      "id": "CH-AUTO-010",
+      "id": "CH-AUTO-041",
       "labId": "mechanics",
       "title": "机械能",
       "brief": "观察运动状态、高度和弹性伸长如何影响机械能。",
@@ -487,7 +487,7 @@
       }
     },
     {
-      "id": "CH-AUTO-011",
+      "id": "CH-AUTO-042",
       "labId": "mechanics",
       "title": "动能与势能的转化",
       "brief": "追踪下落时重力势能向动能的转化。",
@@ -535,7 +535,7 @@
       }
     },
     {
-      "id": "CH-AUTO-012",
+      "id": "CH-AUTO-043",
       "labId": "mechanics",
       "title": "位移与速度",
       "brief": "比较位移向量、路程与各方向速度的含义。",
@@ -583,7 +583,7 @@
       }
     },
     {
-      "id": "CH-AUTO-013",
+      "id": "CH-AUTO-044",
       "labId": "mechanics",
       "title": "匀变速直线运动",
       "brief": "用恒定合力验证直线匀加速运动的位置与速度关系。",
@@ -632,7 +632,7 @@
       }
     },
     {
-      "id": "CH-AUTO-014",
+      "id": "CH-AUTO-045",
       "labId": "mechanics",
       "title": "牛顿第一定律",
       "brief": "检验合外力为零时静止或匀速直线运动的保持。",
@@ -680,7 +680,7 @@
       }
     },
     {
-      "id": "CH-AUTO-015",
+      "id": "CH-AUTO-046",
       "labId": "mechanics",
       "title": "牛顿第二定律",
       "brief": "分别控制质量和恒力，检验加速度与合力及质量的关系。",
@@ -729,7 +729,7 @@
       }
     },
     {
-      "id": "CH-AUTO-016",
+      "id": "CH-AUTO-047",
       "labId": "mechanics",
       "title": "牛顿第三定律",
       "brief": "用两自由物体之间的弹簧作用说明作用力与反作用力成对出现。",
@@ -778,7 +778,7 @@
       }
     },
     {
-      "id": "CH-AUTO-017",
+      "id": "CH-AUTO-048",
       "labId": "mechanics",
       "title": "平抛运动",
       "brief": "将平抛运动分解为水平方向匀速和竖直方向下落。",
@@ -827,7 +827,7 @@
       }
     },
     {
-      "id": "CH-AUTO-018",
+      "id": "CH-AUTO-049",
       "labId": "mechanics",
       "title": "圆周运动",
       "brief": "用中心距离约束研究圆周运动的速度与向心加速度。",
@@ -878,7 +878,7 @@
       }
     },
     {
-      "id": "CH-AUTO-019",
+      "id": "CH-AUTO-050",
       "labId": "mechanics",
       "title": "动能定理",
       "brief": "比较恒力做功和质点动能的增量。",
@@ -928,7 +928,7 @@
       }
     },
     {
-      "id": "CH-AUTO-020",
+      "id": "CH-AUTO-051",
       "labId": "mechanics",
       "title": "机械能守恒",
       "brief": "检查保守弹性系统的机械能守恒及数值误差。",
@@ -978,7 +978,7 @@
       }
     },
     {
-      "id": "CH-AUTO-021",
+      "id": "CH-AUTO-052",
       "labId": "mechanics",
       "title": "动量定理",
       "brief": "用恒力作用时间检验冲量与动量改变量。",
@@ -1028,7 +1028,7 @@
       }
     },
     {
-      "id": "CH-AUTO-022",
+      "id": "CH-AUTO-053",
       "labId": "mechanics",
       "title": "动量守恒",
       "brief": "检查一维两球碰撞前后总动量及动能的不同表现。",
@@ -1076,7 +1076,7 @@
       }
     },
     {
-      "id": "CH-AUTO-023",
+      "id": "CH-AUTO-054",
       "labId": "mechanics",
       "title": "简谐振动",
       "brief": "验证弹簧振子的周期对质量和刚度的依赖。",
@@ -1126,7 +1126,7 @@
       }
     },
     {
-      "id": "CH-AUTO-024",
+      "id": "CH-AUTO-055",
       "labId": "mechanics",
       "title": "刚体与转动惯量",
       "brief": "比较长方体质量分布对绕主轴转动响应的影响。",
@@ -1174,7 +1174,7 @@
       }
     },
     {
-      "id": "CH-AUTO-025",
+      "id": "CH-AUTO-056",
       "labId": "mechanics",
       "title": "角动量守恒",
       "brief": "观察无外力矩长方体绕主轴旋转时角动量是否保持。",
@@ -1223,7 +1223,7 @@
       }
     },
     {
-      "id": "CH-AUTO-026",
+      "id": "CH-AUTO-057",
       "labId": "mechanics",
       "title": "阻尼振动",
       "brief": "比较弱阻尼、临界附近与强阻尼弹簧振子的衰减行为。",
@@ -1275,7 +1275,7 @@
       }
     },
     {
-      "id": "CH-AUTO-027",
+      "id": "CH-AUTO-058",
       "labId": "mechanics",
       "title": "受迫振动与共振",
       "brief": "扫描周期驱动力频率，比较阻尼下的受迫振幅与相位。",

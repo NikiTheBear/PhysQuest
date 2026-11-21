@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "动量定理",
-    "description": "用恒力作用时间检验冲量与动量改变量。",
+    "title": "磁场与磁感线",
+    "description": "用场强探针比较磁铁附近不同位置的磁场强弱。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-021",
-    "title": "动量定理",
-    "goal": "用恒力作用时间检验冲量与动量改变量。",
+    "title": "磁场与磁感线",
+    "goal": "用场强探针比较磁铁附近不同位置的磁场强弱。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "bar_magnet-1",
+        "kind": "bar_magnet",
+        "name": "bar_magnet",
         "position": [
           -2,
           1,
@@ -35,24 +35,11 @@
         "fixed": false
       },
       {
-        "id": "force-2",
-        "kind": "force",
-        "name": "force",
+        "id": "probe-2",
+        "kind": "probe",
+        "name": "probe",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "motion_sensor-3",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
-        "position": [
-          2,
           1,
           0
         ],
@@ -67,16 +54,15 @@
     },
     "learning": {
       "variables": [
-        "恒力",
-        "作用时长",
-        "质量"
+        "探针位置",
+        "磁偶极矩",
+        "磁铁软化半径"
       ],
       "steps": [
-        "速度增量",
-        "理论冲量",
-        "动量变化"
+        "磁场幅值",
+        "轴向与侧向分布趋势"
       ],
-      "limitations": "恒力持续作用，改变模拟结束时刻代表不同作用时长；不把接触碰撞的瞬时力从传感器外力通道中反推。"
+      "limitations": "使用软化磁偶极子场，近磁芯不是真实条形磁铁内部场；probe 返回幅值，无法单凭数值恢复方向。"
     }
   }
 }

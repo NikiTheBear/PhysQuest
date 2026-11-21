@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "近轴光学与 ABCD 矩阵",
-    "description": "比较自由传播与两片薄透镜组成的近轴系统，验证矩阵预测的光线高度与倾角。",
+    "title": "圆周运动",
+    "description": "用中心距离约束研究圆周运动的速度与向心加速度。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-049",
-    "title": "近轴光学与 ABCD 矩阵",
-    "goal": "比较自由传播与两片薄透镜组成的近轴系统，验证矩阵预测的光线高度与倾角。",
+    "title": "圆周运动",
+    "goal": "用中心距离约束研究圆周运动的速度与向心加速度。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "laser-1",
-        "kind": "laser",
-        "name": "laser",
+        "id": "anchor-1",
+        "kind": "anchor",
+        "name": "anchor",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "lens-2",
-        "kind": "lens",
-        "name": "lens",
+        "id": "body-2",
+        "kind": "body",
+        "name": "body",
         "position": [
           0,
           1,
@@ -48,11 +48,37 @@
         "fixed": false
       },
       {
-        "id": "detector-3",
-        "kind": "detector",
-        "name": "detector",
+        "id": "rod-3",
+        "kind": "rod",
+        "name": "rod",
         "position": [
           2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "distance_sensor-4",
+        "kind": "distance_sensor",
+        "name": "distance_sensor",
+        "position": [
+          4,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-5",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          6,
           1,
           0
         ],
@@ -67,16 +93,15 @@
     },
     "learning": {
       "variables": [
-        "透镜焦距",
-        "镜间距",
-        "入射小角度"
+        "连杆长度",
+        "切向初速度"
       ],
       "steps": [
-        "出射光束趋势",
-        "探测器接收功率",
-        "理论像面位置"
+        "球到支点距离",
+        "轨迹与速率",
+        "由 v²/r 计算的向心加速度"
       ],
-      "limitations": "仅近轴几何光学；有限的五条采样光线不能给出完整光强分布，ABCD 矩阵由参数另行计算。"
+      "limitations": "连杆是中心间距离约束；外力加速度通道不含约束冲量，不能用该通道直接读向心加速度。"
     }
   }
 }

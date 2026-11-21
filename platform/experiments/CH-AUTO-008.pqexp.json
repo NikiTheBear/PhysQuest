@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "功",
-    "description": "在恒力直线运动中计算力做的功并辨别零功情况。",
+    "title": "声音的响度与距离",
+    "description": "验证点声源的声压随距离衰减的规律。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-008",
-    "title": "功",
-    "goal": "在恒力直线运动中计算力做的功并辨别零功情况。",
+    "title": "声音的响度与距离",
+    "goal": "验证点声源的声压随距离衰减的规律。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
         "position": [
           -2,
           1,
@@ -35,24 +35,11 @@
         "fixed": false
       },
       {
-        "id": "force-2",
-        "kind": "force",
-        "name": "force",
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "microphone",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "motion_sensor-3",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
-        "position": [
-          2,
           1,
           0
         ],
@@ -67,14 +54,13 @@
     },
     "learning": {
       "variables": [
-        "恒力大小与方向",
-        "所选时间区间"
+        "麦克风距离",
+        "声源幅度"
       ],
       "steps": [
-        "位移向量",
-        "由恒力点积计算的功"
+        "1/2/4/8 m 处的声压读数"
       ],
-      "limitations": "功不是独立仪表读数，需从已知力与位移计算；持续垂直速度的情形不能用固定方向力代替。"
+      "limitations": "自由空间的球面波，不含反射、吸收和空气衰减。房间里的真实情况会更复杂。"
     }
   }
 }

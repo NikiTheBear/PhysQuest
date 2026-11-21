@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "二力平衡",
-    "description": "验证同一物体受到大小相等方向相反的两力时合力为零。",
+    "title": "噪声与降噪",
+    "description": "用两个反相声源把声音抵消掉。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-007",
-    "title": "二力平衡",
-    "goal": "验证同一物体受到大小相等方向相反的两力时合力为零。",
+    "title": "噪声与降噪",
+    "goal": "用两个反相声源把声音抵消掉。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
         "position": [
           -2,
           1,
@@ -35,24 +35,11 @@
         "fixed": false
       },
       {
-        "id": "force-2",
-        "kind": "force",
-        "name": "force",
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "microphone",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "motion_sensor-3",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
-        "position": [
-          2,
           1,
           0
         ],
@@ -67,14 +54,14 @@
     },
     "learning": {
       "variables": [
-        "两力大小",
-        "初速度"
+        "第二个声源的相位",
+        "两个声源的幅度"
       ],
       "steps": [
-        "X 速度是否保持",
-        "合力变化后的加速"
+        "麦克风读到的合成声压",
+        "相位差 0° 与 180° 的对比"
       ],
-      "limitations": "两力均作用质心，避免讨论力偶；平衡表示加速度为零，不必然表示静止。"
+      "limitations": "这是理想的点对点抵消，只在那个位置、那个频率成立。真实的降噪耳机要实时算、只能压住低频，而且戴不严就失效。"
     }
   }
 }

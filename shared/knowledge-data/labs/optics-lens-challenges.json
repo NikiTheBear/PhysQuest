@@ -3,7 +3,535 @@
   "auto": true,
   "challenges": [
     {
-      "id": "CH-AUTO-049",
+      "id": "CH-AUTO-059",
+      "labId": "optics-lens",
+      "title": "光走直线",
+      "brief": "确认光在同一个介质里沿直线传播，挡住就过不去。",
+      "hint": "把激光光源放在 x=−3、光阑放在 x=0、探测器放在 x=3，三者中心对齐，探测器能读到光功率；然后把光阑的通光孔径调到很小，再把光阑整体移到偏离光轴的位置（例如 y 方向挪 1 m），看探测器读数怎么变。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O1-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "确认光在同一个介质里沿直线传播，挡住就过不去。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "laser",
+          "aperture",
+          "detector"
+        ],
+        "variables": [
+          "光阑的横向位置",
+          "光阑通光孔径",
+          "激光光轴角度"
+        ],
+        "observations": [
+          "探测器读到的光功率",
+          "光阑偏离光轴后是否还有光"
+        ],
+        "construction": "把激光光源放在 x=−3、光阑放在 x=0、探测器放在 x=3，三者中心对齐，探测器能读到光功率；然后把光阑的通光孔径调到很小，再把光阑整体移到偏离光轴的位置（例如 y 方向挪 1 m），看探测器读数怎么变。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「光走直线」的可编辑实验空间。\n知识点：K-O1-01；领域：光学；学段：小学。\n模型级别：可计算实验。\n探索目标\n确认光在同一个介质里沿直线传播，挡住就过不去。\n搭建方案\n把激光光源放在 x=−3、光阑放在 x=0、探测器放在 x=3，三者中心对齐，探测器能读到光功率；然后把光阑的通光孔径调到很小，再把光阑整体移到偏离光轴的位置（例如 y 方向挪 1 m），看探测器读数怎么变。\n建议器具模型：laser、aperture、detector。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 光阑的横向位置\n• 光阑通光孔径\n• 激光光轴角度\n观测与比较\n• 探测器读到的光功率\n• 光阑偏离光轴后是否还有光\n模型边界\n这是几何光学的直线传播；不含衍射和散射。光阑偏离光轴后读数为零，是因为光束被挡住，不是因为光「拐不过弯」。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O1-01\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「光走直线 · 小学」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-060",
+      "labId": "optics-lens",
+      "title": "光会反射",
+      "brief": "转动镜面，看反射光跟着改变方向。",
+      "hint": "激光光源放在 x=−3 朝 +x 方向，平面镜放在 x=0、法线角度设 30°，探测器放在反射方向能接到光的位置。把平面镜的法线角度从 30° 改到 60°、90°，每次移动探测器找回光束，观察反射角始终等于入射角。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O1-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "转动镜面，看反射光跟着改变方向。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "laser",
+          "mirror",
+          "detector"
+        ],
+        "variables": [
+          "平面镜法线角度",
+          "激光入射角度",
+          "探测器位置"
+        ],
+        "observations": [
+          "探测器能否接到光",
+          "反射光相对法线的角度"
+        ],
+        "construction": "激光光源放在 x=−3 朝 +x 方向，平面镜放在 x=0、法线角度设 30°，探测器放在反射方向能接到光的位置。把平面镜的法线角度从 30° 改到 60°、90°，每次移动探测器找回光束，观察反射角始终等于入射角。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「光会反射」的可编辑实验空间。\n知识点：K-O1-03；领域：光学；学段：小学。\n模型级别：可计算实验。\n探索目标\n转动镜面，看反射光跟着改变方向。\n搭建方案\n激光光源放在 x=−3 朝 +x 方向，平面镜放在 x=0、法线角度设 30°，探测器放在反射方向能接到光的位置。把平面镜的法线角度从 30° 改到 60°、90°，每次移动探测器找回光束，观察反射角始终等于入射角。\n建议器具模型：laser、mirror、detector。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 平面镜法线角度\n• 激光入射角度\n• 探测器位置\n观测与比较\n• 探测器能否接到光\n• 反射光相对法线的角度\n理论参考：反射角 = 入射角\n模型边界\n理想的镜面反射，遵循反射定律；不含漫反射、吸收和多次反射的能量损失。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O1-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「光会反射 · 小学」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-061",
+      "labId": "optics-lens",
+      "title": "放大镜",
+      "brief": "把物距调到小于焦距，看到正立放大的虚像；再拉到大于焦距，看它翻成倒立。",
+      "hint": "用凸透镜光具座，焦距设 10 cm。先把物距设成 5 cm（小于 f），观察放大率 m 为正、像距 v 为负（虚像，光屏接不到）；再把物距调到 15 cm（f 与 2f 之间），观察像变成倒立放大、光屏上能接到。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O1-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "把物距调到小于焦距，看到正立放大的虚像；再拉到大于焦距，看它翻成倒立。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "lens_bench"
+        ],
+        "variables": [
+          "物距 u",
+          "焦距 f",
+          "物体高度 h"
+        ],
+        "observations": [
+          "放大率 m 的正负与大小",
+          "光屏上有没有像",
+          "像距 v 的正负"
+        ],
+        "construction": "用凸透镜光具座，焦距设 10 cm。先把物距设成 5 cm（小于 f），观察放大率 m 为正、像距 v 为负（虚像，光屏接不到）；再把物距调到 15 cm（f 与 2f 之间），观察像变成倒立放大、光屏上能接到。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「放大镜」的可编辑实验空间。\n知识点：K-O1-05；领域：光学；学段：小学。\n模型级别：可计算实验。\n探索目标\n把物距调到小于焦距，看到正立放大的虚像；再拉到大于焦距，看它翻成倒立。\n搭建方案\n用凸透镜光具座，焦距设 10 cm。先把物距设成 5 cm（小于 f），观察放大率 m 为正、像距 v 为负（虚像，光屏接不到）；再把物距调到 15 cm（f 与 2f 之间），观察像变成倒立放大、光屏上能接到。\n建议器具模型：lens_bench。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 物距 u\n• 焦距 f\n• 物体高度 h\n观测与比较\n• 放大率 m 的正负与大小\n• 光屏上有没有像\n• 像距 v 的正负\n理论参考：1/f = 1/u + 1/v；u < f 时成正立放大虚像\n模型边界\n近轴薄透镜模型；虚像只能靠眼睛看，光屏接不到，平台用「光屏可见像」这个读数表示。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O1-05\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「放大镜 · 小学」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-062",
+      "labId": "optics-lens",
+      "title": "凸透镜会聚，凹透镜发散",
+      "brief": "把凸透镜和凹透镜放在同一条光路上，比较出射光是收拢还是散开。",
+      "hint": "激光光源在 x=−4，探测器在 x=4。先放一片凸透镜（焦距 1.5 m）在 x=0，观察五条采样光线在镜后向光轴收拢；再把凸透镜换成凹透镜（焦距 −1.5 m），观察光线向外散开。最后把探测器沿 x 移动，看两种情况下功率峰值出现的位置。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O2-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "把凸透镜和凹透镜放在同一条光路上，比较出射光是收拢还是散开。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "laser",
+          "lens",
+          "diverging_lens",
+          "detector"
+        ],
+        "variables": [
+          "透镜类型（凸/凹）",
+          "焦距",
+          "探测器位置"
+        ],
+        "observations": [
+          "出射光线的收拢或散开",
+          "探测器功率峰值位置"
+        ],
+        "construction": "激光光源在 x=−4，探测器在 x=4。先放一片凸透镜（焦距 1.5 m）在 x=0，观察五条采样光线在镜后向光轴收拢；再把凸透镜换成凹透镜（焦距 −1.5 m），观察光线向外散开。最后把探测器沿 x 移动，看两种情况下功率峰值出现的位置。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「凸透镜会聚，凹透镜发散」的可编辑实验空间。\n知识点：K-O2-02；领域：光学；学段：初中。\n模型级别：可计算实验。\n探索目标\n把凸透镜和凹透镜放在同一条光路上，比较出射光是收拢还是散开。\n搭建方案\n激光光源在 x=−4，探测器在 x=4。先放一片凸透镜（焦距 1.5 m）在 x=0，观察五条采样光线在镜后向光轴收拢；再把凸透镜换成凹透镜（焦距 −1.5 m），观察光线向外散开。最后把探测器沿 x 移动，看两种情况下功率峰值出现的位置。\n建议器具模型：laser、lens、diverging_lens、detector。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 透镜类型（凸/凹）\n• 焦距\n• 探测器位置\n观测与比较\n• 出射光线的收拢或散开\n• 探测器功率峰值位置\n理论参考：凸透镜 f > 0；凹透镜 f < 0\n模型边界\n近轴薄透镜；凹透镜的焦点是虚焦点，光线反向延长才交于一点，平台上看到的是散开的光线。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O2-02\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「凸透镜会聚，凹透镜发散 · 初中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-063",
+      "labId": "optics-lens",
+      "title": "焦点、焦距、主光轴、光心",
+      "brief": "用平行光找到焦点，再把焦点到透镜的距离量出来，确认它就是焦距。",
+      "hint": "激光光源放在 x=−5、光轴角度 0°（平行于主光轴），薄透镜放在 x=0。把探测器沿 x 轴从 0 挪到 3 m，每 0.1 m 读一次光功率，找到功率最大（光斑最集中）的位置——那个位置就是焦点，它到透镜的距离就是焦距。再把透镜的焦距参数改掉，重找一次。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O2-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "用平行光找到焦点，再把焦点到透镜的距离量出来，确认它就是焦距。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "laser",
+          "lens",
+          "detector"
+        ],
+        "variables": [
+          "透镜焦距",
+          "探测器位置",
+          "激光束宽"
+        ],
+        "observations": [
+          "探测器功率随位置的变化",
+          "功率峰值出现的位置"
+        ],
+        "construction": "激光光源放在 x=−5、光轴角度 0°（平行于主光轴），薄透镜放在 x=0。把探测器沿 x 轴从 0 挪到 3 m，每 0.1 m 读一次光功率，找到功率最大（光斑最集中）的位置——那个位置就是焦点，它到透镜的距离就是焦距。再把透镜的焦距参数改掉，重找一次。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「焦点、焦距、主光轴、光心」的可编辑实验空间。\n知识点：K-O2-03；领域：光学；学段：初中。\n模型级别：可计算实验。\n探索目标\n用平行光找到焦点，再把焦点到透镜的距离量出来，确认它就是焦距。\n搭建方案\n激光光源放在 x=−5、光轴角度 0°（平行于主光轴），薄透镜放在 x=0。把探测器沿 x 轴从 0 挪到 3 m，每 0.1 m 读一次光功率，找到功率最大（光斑最集中）的位置——那个位置就是焦点，它到透镜的距离就是焦距。再把透镜的焦距参数改掉，重找一次。\n建议器具模型：laser、lens、detector。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 透镜焦距\n• 探测器位置\n• 激光束宽\n观测与比较\n• 探测器功率随位置的变化\n• 功率峰值出现的位置\n理论参考：焦点到光心的距离 = 焦距 f\n模型边界\n近轴平行光；真实透镜的焦点是一个很小的弥散斑，不是几何点。平台上「功率最大」也只是近似焦点的位置。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O2-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「焦点、焦距、主光轴、光心 · 初中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-064",
+      "labId": "optics-lens",
+      "title": "物距大于二倍焦距：倒立缩小的实像",
+      "brief": "把物距调到二倍焦距以外，验证像倒立、缩小、且落在 f 与 2f 之间。",
+      "hint": "凸透镜光具座，焦距 10 cm。把物距设成 30 cm（> 2f = 20 cm），把光屏挪到 15 cm 附近找到清晰的像，读出放大率（应小于 1 且为负）、像距（应在 10–20 cm 之间）。再把物距改到 25 cm、40 cm，看像怎么变。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O2-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "把物距调到二倍焦距以外，验证像倒立、缩小、且落在 f 与 2f 之间。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "lens_bench"
+        ],
+        "variables": [
+          "物距 u",
+          "光屏位置",
+          "焦距 f"
+        ],
+        "observations": [
+          "放大率 m",
+          "像距 v",
+          "光屏上像的清晰程度"
+        ],
+        "construction": "凸透镜光具座，焦距 10 cm。把物距设成 30 cm（> 2f = 20 cm），把光屏挪到 15 cm 附近找到清晰的像，读出放大率（应小于 1 且为负）、像距（应在 10–20 cm 之间）。再把物距改到 25 cm、40 cm，看像怎么变。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「物距大于二倍焦距：倒立缩小的实像」的可编辑实验空间。\n知识点：K-O2-05；领域：光学；学段：初中。\n模型级别：可计算实验。\n探索目标\n把物距调到二倍焦距以外，验证像倒立、缩小、且落在 f 与 2f 之间。\n搭建方案\n凸透镜光具座，焦距 10 cm。把物距设成 30 cm（> 2f = 20 cm），把光屏挪到 15 cm 附近找到清晰的像，读出放大率（应小于 1 且为负）、像距（应在 10–20 cm 之间）。再把物距改到 25 cm、40 cm，看像怎么变。\n建议器具模型：lens_bench。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 物距 u\n• 光屏位置\n• 焦距 f\n观测与比较\n• 放大率 m\n• 像距 v\n• 光屏上像的清晰程度\n理论参考：u > 2f → f < v < 2f，0 < |m| < 1，倒立缩小实像\n模型边界\n近轴薄透镜；u 取 30 cm 时 v = 15 cm，正好落在 f 与 2f 之间，与照相机的工作区间一致。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O2-05\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「物距大于二倍焦距：倒立缩小的实像 · 初中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-065",
+      "labId": "optics-lens",
+      "title": "薄透镜成像公式",
+      "brief": "用三组不同的物距验证 1/f = 1/u + 1/v。",
+      "hint": "凸透镜光具座，焦距固定 10 cm。把物距分别设成 15 cm、20 cm、30 cm，每次把光屏挪到像最清晰的位置，读像距 v，自己算 1/u + 1/v 看是否都等于 1/10。再改焦距到 12 cm，重复一遍。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O3-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "用三组不同的物距验证 1/f = 1/u + 1/v。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "lens_bench"
+        ],
+        "variables": [
+          "物距 u",
+          "焦距 f",
+          "光屏位置"
+        ],
+        "observations": [
+          "像距 v",
+          "弥散圆最小的光屏位置"
+        ],
+        "construction": "凸透镜光具座，焦距固定 10 cm。把物距分别设成 15 cm、20 cm、30 cm，每次把光屏挪到像最清晰的位置，读像距 v，自己算 1/u + 1/v 看是否都等于 1/10。再改焦距到 12 cm，重复一遍。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「薄透镜成像公式」的可编辑实验空间。\n知识点：K-O3-01；领域：光学；学段：高中。\n模型级别：可计算实验。\n探索目标\n用三组不同的物距验证 1/f = 1/u + 1/v。\n搭建方案\n凸透镜光具座，焦距固定 10 cm。把物距分别设成 15 cm、20 cm、30 cm，每次把光屏挪到像最清晰的位置，读像距 v，自己算 1/u + 1/v 看是否都等于 1/10。再改焦距到 12 cm，重复一遍。\n建议器具模型：lens_bench。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 物距 u\n• 焦距 f\n• 光屏位置\n观测与比较\n• 像距 v\n• 弥散圆最小的光屏位置\n理论参考：1/f = 1/u + 1/v\n模型边界\n近轴薄透镜公式；厚透镜、球差、色差都不在模型里。u 接近 f 时 v 会趋于无穷，读数会失真。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O3-01\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「薄透镜成像公式 · 高中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-066",
+      "labId": "optics-lens",
+      "title": "放大率",
+      "brief": "验证 m = −v/u，并看清负号表示倒立。",
+      "hint": "凸透镜光具座，焦距 10 cm。物距设 30 cm，读像距 v = 15 cm、放大率 m，验证 m 是否等于 −15/30 = −0.5。再把物距改成 15 cm，读 v = 30 cm、m = −2，确认绝对值翻倍、符号仍是负。最后把物距调到 5 cm（< f），看 m 变成正数。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O3-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "验证 m = −v/u，并看清负号表示倒立。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "lens_bench"
+        ],
+        "variables": [
+          "物距 u",
+          "焦距 f",
+          "物体高度 h"
+        ],
+        "observations": [
+          "放大率 m 的数值与符号",
+          "像高"
+        ],
+        "construction": "凸透镜光具座，焦距 10 cm。物距设 30 cm，读像距 v = 15 cm、放大率 m，验证 m 是否等于 −15/30 = −0.5。再把物距改成 15 cm，读 v = 30 cm、m = −2，确认绝对值翻倍、符号仍是负。最后把物距调到 5 cm（< f），看 m 变成正数。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「放大率」的可编辑实验空间。\n知识点：K-O3-02；领域：光学；学段：高中。\n模型级别：可计算实验。\n探索目标\n验证 m = −v/u，并看清负号表示倒立。\n搭建方案\n凸透镜光具座，焦距 10 cm。物距设 30 cm，读像距 v = 15 cm、放大率 m，验证 m 是否等于 −15/30 = −0.5。再把物距改成 15 cm，读 v = 30 cm、m = −2，确认绝对值翻倍、符号仍是负。最后把物距调到 5 cm（< f），看 m 变成正数。\n建议器具模型：lens_bench。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 物距 u\n• 焦距 f\n• 物体高度 h\n观测与比较\n• 放大率 m 的数值与符号\n• 像高\n理论参考：m = −v/u = −h像/h物\n模型边界\n横向放大率；纵向（轴向）放大率是 m²，平台不单独给这个量。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O3-02\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「放大率 · 高中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-067",
+      "labId": "optics-lens",
+      "title": "符号约定",
+      "brief": "看清虚像时 v 取负值，以及为什么这样约定能让一条公式管两种情况。",
+      "hint": "凸透镜光具座，焦距 10 cm。物距设 30 cm 读 v（正值、实像）；再把物距设 5 cm 读 v（负值、虚像）。把两个 v 都代进 1/f = 1/u + 1/v，确认两次算出来的 f 都是 10 cm——说明同一套符号让公式对实像和虚像都成立。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O3-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "看清虚像时 v 取负值，以及为什么这样约定能让一条公式管两种情况。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "lens_bench"
+        ],
+        "variables": [
+          "物距 u",
+          "光屏位置"
+        ],
+        "observations": [
+          "像距 v 的正负",
+          "光屏上有没有像"
+        ],
+        "construction": "凸透镜光具座，焦距 10 cm。物距设 30 cm 读 v（正值、实像）；再把物距设 5 cm 读 v（负值、虚像）。把两个 v 都代进 1/f = 1/u + 1/v，确认两次算出来的 f 都是 10 cm——说明同一套符号让公式对实像和虚像都成立。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「符号约定」的可编辑实验空间。\n知识点：K-O3-03；领域：光学；学段：高中。\n模型级别：可计算实验。\n探索目标\n看清虚像时 v 取负值，以及为什么这样约定能让一条公式管两种情况。\n搭建方案\n凸透镜光具座，焦距 10 cm。物距设 30 cm 读 v（正值、实像）；再把物距设 5 cm 读 v（负值、虚像）。把两个 v 都代进 1/f = 1/u + 1/v，确认两次算出来的 f 都是 10 cm——说明同一套符号让公式对实像和虚像都成立。\n建议器具模型：lens_bench。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 物距 u\n• 光屏位置\n观测与比较\n• 像距 v 的正负\n• 光屏上有没有像\n理论参考：实像 v > 0；虚像 v < 0；u 恒正（实物）\n模型边界\n平台用的是 u 恒正的实物约定；虚物（u < 0）在光具座上做不出来，那需要组合透镜。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O3-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「符号约定 · 高中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-068",
+      "labId": "optics-lens",
+      "title": "任意光线作图",
+      "brief": "确认不只三条特殊光线，任何一条从物点发出的光线出射后都过像点。",
+      "hint": "凸透镜光具座，焦距 10 cm、物距 30 cm。看图上的采样光线：除了三条特殊光线，还有若干条非特殊光线，它们出射后全部交于同一个像点。把物距改成 15 cm 再看一次，确认交点随像点一起移动。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O3-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "确认不只三条特殊光线，任何一条从物点发出的光线出射后都过像点。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "lens_bench"
+        ],
+        "variables": [
+          "物距 u",
+          "焦距 f"
+        ],
+        "observations": [
+          "所有出射光线是否交于同一点",
+          "交点位置是否等于算出的像距"
+        ],
+        "construction": "凸透镜光具座，焦距 10 cm、物距 30 cm。看图上的采样光线：除了三条特殊光线，还有若干条非特殊光线，它们出射后全部交于同一个像点。把物距改成 15 cm 再看一次，确认交点随像点一起移动。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「任意光线作图」的可编辑实验空间。\n知识点：K-O3-04；领域：光学；学段：高中。\n模型级别：可计算实验。\n探索目标\n确认不只三条特殊光线，任何一条从物点发出的光线出射后都过像点。\n搭建方案\n凸透镜光具座，焦距 10 cm、物距 30 cm。看图上的采样光线：除了三条特殊光线，还有若干条非特殊光线，它们出射后全部交于同一个像点。把物距改成 15 cm 再看一次，确认交点随像点一起移动。\n建议器具模型：lens_bench。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 物距 u\n• 焦距 f\n观测与比较\n• 所有出射光线是否交于同一点\n• 交点位置是否等于算出的像距\n理论参考：任意物点发出的光线出射后交于像点\n模型边界\n平台只画有限条采样光线（5 条），不是连续光束；近轴近似下才严格交于一点。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O3-04\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「任意光线作图 · 高中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-069",
+      "labId": "optics-lens",
+      "title": "组合透镜",
+      "brief": "把两片透镜串起来，验证「第一个的像就是第二个的物」。",
+      "hint": "激光光源在 x=−5、第一片凸透镜（f=1.5 m）在 x=−1、第二片凸透镜（f=1 m）在 x=2、探测器在最右。改变两片透镜的间距，观察光束是否还能重新会聚；把第二片换成凹透镜，看会聚点怎么移。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O3-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "把两片透镜串起来，验证「第一个的像就是第二个的物」。",
+        "options": [
+          "做出来会和我预期的一样",
+          "不完全一样，需要调整",
+          "完全不一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "laser",
+          "lens",
+          "detector"
+        ],
+        "variables": [
+          "两片透镜的间距",
+          "两片透镜的焦距",
+          "第二片的类型"
+        ],
+        "observations": [
+          "出射光束是否会聚",
+          "会聚点相对第二片的位置"
+        ],
+        "construction": "激光光源在 x=−5、第一片凸透镜（f=1.5 m）在 x=−1、第二片凸透镜（f=1 m）在 x=2、探测器在最右。改变两片透镜的间距，观察光束是否还能重新会聚；把第二片换成凹透镜，看会聚点怎么移。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「组合透镜」的可编辑实验空间。\n知识点：K-O3-05；领域：光学；学段：高中。\n模型级别：可计算实验。\n探索目标\n把两片透镜串起来，验证「第一个的像就是第二个的物」。\n搭建方案\n激光光源在 x=−5、第一片凸透镜（f=1.5 m）在 x=−1、第二片凸透镜（f=1 m）在 x=2、探测器在最右。改变两片透镜的间距，观察光束是否还能重新会聚；把第二片换成凹透镜，看会聚点怎么移。\n建议器具模型：laser、lens、lens、detector。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 两片透镜的间距\n• 两片透镜的焦距\n• 第二片的类型\n观测与比较\n• 出射光束是否会聚\n• 会聚点相对第二片的位置\n理论参考：逐级计算：u₂ = d − v₁，v₁ 带符号代入\n模型边界\n近轴薄透镜逐级计算；不含透镜厚度、主平面位置和两片之间的多次反射。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O3-05\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「组合透镜 · 高中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-AUTO-070",
       "labId": "optics-lens",
       "title": "近轴光学与 ABCD 矩阵",
       "brief": "比较自由传播与两片薄透镜组成的近轴系统，验证矩阵预测的光线高度与倾角。",

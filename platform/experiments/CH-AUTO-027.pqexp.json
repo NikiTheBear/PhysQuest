@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "受迫振动与共振",
-    "description": "扫描周期驱动力频率，比较阻尼下的受迫振幅与相位。",
+    "title": "电源效率",
+    "description": "研究电源输出功率与效率随负载改变的不同趋势。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-027",
-    "title": "受迫振动与共振",
-    "goal": "扫描周期驱动力频率，比较阻尼下的受迫振幅与相位。",
+    "title": "电源效率",
+    "goal": "研究电源输出功率与效率随负载改变的不同趋势。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "anchor-1",
-        "kind": "anchor",
-        "name": "anchor",
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
         "position": [
           -2,
           1,
@@ -35,63 +35,11 @@
         "fixed": false
       },
       {
-        "id": "body-2",
-        "kind": "body",
-        "name": "body",
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "resistor",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "spring-3",
-        "kind": "spring",
-        "name": "spring",
-        "position": [
-          2,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "damper-4",
-        "kind": "damper",
-        "name": "damper",
-        "position": [
-          4,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "harmonic_force-5",
-        "kind": "harmonic_force",
-        "name": "harmonic_force",
-        "position": [
-          6,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "motion_sensor-6",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
-        "position": [
-          8,
           1,
           0
         ],
@@ -106,16 +54,15 @@
     },
     "learning": {
       "variables": [
-        "驱动频率",
-        "驱动幅值",
-        "阻尼"
+        "负载电阻",
+        "电源内阻"
       ],
       "steps": [
-        "稳态位移幅度",
-        "与驱动力的相位差",
-        "共振峰形"
+        "负载功率",
+        "电源提供的理论总功率",
+        "效率与电流的权衡"
       ],
-      "limitations": "需要等瞬态衰减后比较，短验证只检查配置；单次求解最长 20 s，不把尚未稳定的最大位移当稳态共振幅度。"
+      "limitations": "这是电阻内耗下的电路效率，不代表电池化学或电机系统效率；避免用电源端口净功率代替 εI。"
     }
   }
 }

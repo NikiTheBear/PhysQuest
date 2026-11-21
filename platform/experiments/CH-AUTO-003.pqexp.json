@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "摩擦力",
-    "description": "观察滑块接触面的摩擦设置如何影响滑行。",
+    "title": "声音的高低和大小",
+    "description": "分别改频率和幅度，听出「高低」和「大小」是两个不同的东西。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-003",
-    "title": "摩擦力",
-    "goal": "观察滑块接触面的摩擦设置如何影响滑行。",
+    "title": "声音的高低和大小",
+    "goal": "分别改频率和幅度，听出「高低」和「大小」是两个不同的东西。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "box-1",
-        "kind": "box",
-        "name": "box",
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
         "position": [
           -2,
           1,
@@ -35,24 +35,11 @@
         "fixed": false
       },
       {
-        "id": "ramp-2",
-        "kind": "ramp",
-        "name": "ramp",
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "microphone",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "motion_sensor-3",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
-        "position": [
-          2,
           1,
           0
         ],
@@ -67,14 +54,14 @@
     },
     "learning": {
       "variables": [
-        "接触双方的 friction",
-        "初速度"
+        "声源频率",
+        "声源幅度"
       ],
       "steps": [
-        "滑块速度衰减",
-        "滑行距离"
+        "麦克风读到的声压幅值",
+        "频率变化时的听感"
       ],
-      "limitations": "接触摩擦由刚体求解器近似，采用双方摩擦系数较小值；不含表面磨损，传感器加速度不含接触冲量。"
+      "limitations": "平台只有正弦声，没有泛音，所以「音色」这一层做不出来。频率和幅度是真的。"
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "让小灯泡亮起来",
-    "description": "探索电源、灯泡与完整导线回路怎样共同决定灯泡是否发光。",
+    "title": "带电粒子在磁场中的运动",
+    "description": "观察匀强磁场内带电粒子的弯曲轨迹并比较回旋尺度。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-029",
-    "title": "让小灯泡亮起来",
-    "goal": "探索电源、灯泡与完整导线回路怎样共同决定灯泡是否发光。",
+    "title": "带电粒子在磁场中的运动",
+    "goal": "观察匀强磁场内带电粒子的弯曲轨迹并比较回旋尺度。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "battery-1",
-        "kind": "battery",
-        "name": "battery",
+        "id": "charge-1",
+        "kind": "charge",
+        "name": "charge",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "lamp-2",
-        "kind": "lamp",
-        "name": "lamp",
+        "id": "field-2",
+        "kind": "field",
+        "name": "field",
         "position": [
           0,
           1,
@@ -48,9 +48,9 @@
         "fixed": false
       },
       {
-        "id": "switch-3",
-        "kind": "switch",
-        "name": "switch",
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
         "position": [
           2,
           1,
@@ -67,16 +67,17 @@
     },
     "learning": {
       "variables": [
-        "开关状态",
-        "电源电压",
-        "灯泡工作电阻"
+        "电荷量",
+        "质量",
+        "磁场强度",
+        "初速度大小"
       ],
       "steps": [
-        "灯泡功率",
-        "灯泡亮度",
-        "电路电流"
+        "轨迹弯曲",
+        "速度大小",
+        "理论半径和周期"
       ],
-      "limitations": "灯泡是定值电阻，亮度按功率映射，不模拟灯丝升温、熔断及真实光谱。"
+      "limitations": "参数范围对应教学宏观粒子，示例周期约 126 s；单次 MCP 最长 20 s 只能看到部分圆弧。球形场外磁场直接归零，不模拟边缘场。"
     }
   }
 }

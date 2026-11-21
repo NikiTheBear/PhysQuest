@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "两列声波叠在一起会怎样",
-    "description": "两个点声源对着放，改变它们的频率差和位置，看麦克风读到的声压怎么变。",
+    "title": "机械能守恒",
+    "description": "检查保守弹性系统的机械能守恒及数值误差。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,22 +11,22 @@
   },
   "experiment": {
     "id": "exp-ch-auto-051",
-    "title": "两列声波叠在一起会怎样",
-    "goal": "两个点声源对着放，改变它们的频率差和位置，看麦克风读到的声压怎么变。",
+    "title": "机械能守恒",
+    "goal": "检查保守弹性系统的机械能守恒及数值误差。",
     "mode": "2d",
     "environment": {
-      "gravity": 0,
+      "gravity": 9.8,
       "damping": 0,
       "speed": 1,
-      "collisions": false
+      "collisions": true
     },
     "components": [
       {
-        "id": "speaker-1",
-        "kind": "speaker",
-        "name": "speaker",
+        "id": "anchor-1",
+        "kind": "anchor",
+        "name": "anchor",
         "position": [
-          -1,
+          -2,
           1,
           0
         ],
@@ -35,11 +35,11 @@
         "fixed": false
       },
       {
-        "id": "speaker-2",
-        "kind": "speaker",
-        "name": "speaker",
+        "id": "spring-2",
+        "kind": "spring",
+        "name": "spring",
         "position": [
-          1,
+          0,
           1,
           0
         ],
@@ -48,11 +48,24 @@
         "fixed": false
       },
       {
-        "id": "microphone-3",
-        "kind": "microphone",
-        "name": "microphone",
+        "id": "body-3",
+        "kind": "body",
+        "name": "body",
         "position": [
-          3,
+          2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-4",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
+        "position": [
+          4,
           1,
           0
         ],
@@ -67,15 +80,15 @@
     },
     "learning": {
       "variables": [
-        "两个声源的频率",
-        "源间距",
-        "麦克风位置"
+        "劲度系数",
+        "质量",
+        "初始伸长"
       ],
       "steps": [
-        "不同位置的声压强弱",
-        "移动麦克风时的起伏"
+        "机械能随时间",
+        "动能与弹性势能互换"
       ],
-      "limitations": "声波用线性声场叠加，不含反射与吸收。"
+      "limitations": "不加入周期驱动或耗散；有限步长产生能量误差，不能要求每个浮点采样值绝对相等。"
     }
   }
 }

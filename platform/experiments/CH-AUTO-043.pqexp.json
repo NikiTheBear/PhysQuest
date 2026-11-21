@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "R = r 时输出功率最大",
-    "description": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
+    "title": "位移与速度",
+    "description": "比较位移向量、路程与各方向速度的含义。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-043",
-    "title": "R = r 时输出功率最大",
-    "goal": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
+    "title": "位移与速度",
+    "goal": "比较位移向量、路程与各方向速度的含义。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "battery-1",
-        "kind": "battery",
-        "name": "battery",
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "resistor-2",
-        "kind": "resistor",
-        "name": "resistor",
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
         "position": [
           0,
           1,
@@ -54,16 +54,15 @@
     },
     "learning": {
       "variables": [
-        "外电阻 R",
-        "内阻 r",
-        "电动势 ε"
+        "初速度方向",
+        "取样时刻"
       ],
       "steps": [
-        "外电阻功率",
-        "匹配点两侧功率",
-        "匹配时的端电压"
+        "坐标分量",
+        "速度分量与速率",
+        "端点位移"
       ],
-      "limitations": "只适用于固定电动势和正线性内阻的直流戴维南模型；最大功率不等于最高效率。"
+      "limitations": "传感器位置相对于世界原点，需自行减去初始位置；总路程需沿采样轨迹累加，不能用端点距离代替。"
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "位移与速度",
-    "description": "比较位移向量、路程与各方向速度的含义。",
+    "title": "让小灯泡亮起来",
+    "description": "探索电源、灯泡与完整导线回路怎样共同决定灯泡是否发光。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-012",
-    "title": "位移与速度",
-    "goal": "比较位移向量、路程与各方向速度的含义。",
+    "title": "让小灯泡亮起来",
+    "goal": "探索电源、灯泡与完整导线回路怎样共同决定灯泡是否发光。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "battery",
         "position": [
           -2,
           1,
@@ -35,11 +35,24 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-2",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "lamp-2",
+        "kind": "lamp",
+        "name": "lamp",
         "position": [
           0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "switch-3",
+        "kind": "switch",
+        "name": "switch",
+        "position": [
+          2,
           1,
           0
         ],
@@ -54,15 +67,16 @@
     },
     "learning": {
       "variables": [
-        "初速度方向",
-        "取样时刻"
+        "开关状态",
+        "电源电压",
+        "灯泡工作电阻"
       ],
       "steps": [
-        "坐标分量",
-        "速度分量与速率",
-        "端点位移"
+        "灯泡功率",
+        "灯泡亮度",
+        "电路电流"
       ],
-      "limitations": "传感器位置相对于世界原点，需自行减去初始位置；总路程需沿采样轨迹累加，不能用端点距离代替。"
+      "limitations": "灯泡是定值电阻，亮度按功率映射，不模拟灯丝升温、熔断及真实光谱。"
     }
   }
 }

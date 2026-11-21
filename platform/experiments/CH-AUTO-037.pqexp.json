@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "电功与电功率",
-    "description": "区分电功率与一段时间内转化的电能。",
+    "title": "速度与平均速度",
+    "description": "从位置和时间数据区分瞬时速度与一段过程的平均速度。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-037",
-    "title": "电功与电功率",
-    "goal": "区分电功率与一段时间内转化的电能。",
+    "title": "速度与平均速度",
+    "goal": "从位置和时间数据区分瞬时速度与一段过程的平均速度。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "battery-1",
-        "kind": "battery",
-        "name": "battery",
+        "id": "body-1",
+        "kind": "body",
+        "name": "body",
         "position": [
           -2,
           1,
@@ -35,9 +35,9 @@
         "fixed": false
       },
       {
-        "id": "resistor-2",
-        "kind": "resistor",
-        "name": "resistor",
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "motion_sensor",
         "position": [
           0,
           1,
@@ -48,24 +48,11 @@
         "fixed": false
       },
       {
-        "id": "voltmeter-3",
-        "kind": "voltmeter",
-        "name": "voltmeter",
+        "id": "force-3",
+        "kind": "force",
+        "name": "force",
         "position": [
           2,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "ammeter-4",
-        "kind": "ammeter",
-        "name": "ammeter",
-        "position": [
-          4,
           1,
           0
         ],
@@ -80,16 +67,15 @@
     },
     "learning": {
       "variables": [
-        "负载电阻",
-        "电源电压",
-        "理论计时长度"
+        "初速度",
+        "恒力大小",
+        "取样时间段"
       ],
       "steps": [
-        "负载功率",
-        "U·I 交叉核对",
-        "由功率推算的电能"
+        "端点位移除以时间",
+        "各采样点速度"
       ],
-      "limitations": "求解器直接返回瞬时功率；电能积算属于明确注明的公式后处理，不是温度或热量传感器读数。"
+      "limitations": "单向运动时位移大小等于路程；若反向运动，不能把位移平均速度误称为路程平均速率。"
     }
   }
 }

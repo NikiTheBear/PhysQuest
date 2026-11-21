@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "斜面",
-    "description": "比较不同倾斜程度对物体沿斜面滑动的影响。",
+    "title": "音调、响度、音色",
+    "description": "分清音调、响度、音色分别由什么决定。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-004",
-    "title": "斜面",
-    "goal": "比较不同倾斜程度对物体沿斜面滑动的影响。",
+    "title": "音调、响度、音色",
+    "goal": "分清音调、响度、音色分别由什么决定。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "ramp-1",
-        "kind": "ramp",
-        "name": "ramp",
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "speaker",
         "position": [
           -2,
           1,
@@ -35,24 +35,11 @@
         "fixed": false
       },
       {
-        "id": "box-2",
-        "kind": "box",
-        "name": "box",
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "microphone",
         "position": [
           0,
-          1,
-          0
-        ],
-        "params": {},
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "motion_sensor-3",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
-        "position": [
-          2,
           1,
           0
         ],
@@ -67,14 +54,15 @@
     },
     "learning": {
       "variables": [
-        "斜面倾角",
-        "摩擦系数"
+        "频率",
+        "幅度",
+        "第二个声源的频率与相位"
       ],
       "steps": [
-        "滑块速度与位置",
-        "同一时段滑动距离"
+        "叠加后的声压波形",
+        "两个源频率比"
       ],
-      "limitations": "斜面是固定刚体，边缘掉落属于另一运动阶段；理想无摩擦公式只用于仍接触斜面的时段。"
+      "limitations": "正弦叠加不等于真实音色。真实乐器的音色来自基频加一串泛音的配比，平台只有单频正弦，音色只能讲概念不能真做。"
     }
   }
 }

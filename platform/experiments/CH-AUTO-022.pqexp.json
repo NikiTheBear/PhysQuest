@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "动量守恒",
-    "description": "检查一维两球碰撞前后总动量及动能的不同表现。",
+    "title": "电场强度",
+    "description": "通过试探电荷受力与场强读数理解电场强度的定义。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -11,8 +11,8 @@
   },
   "experiment": {
     "id": "exp-ch-auto-022",
-    "title": "动量守恒",
-    "goal": "检查一维两球碰撞前后总动量及动能的不同表现。",
+    "title": "电场强度",
+    "goal": "通过试探电荷受力与场强读数理解电场强度的定义。",
     "mode": "2d",
     "environment": {
       "gravity": 9.8,
@@ -22,9 +22,9 @@
     },
     "components": [
       {
-        "id": "body-1",
-        "kind": "body",
-        "name": "body",
+        "id": "charge-1",
+        "kind": "charge",
+        "name": "charge",
         "position": [
           -2,
           1,
@@ -35,11 +35,24 @@
         "fixed": false
       },
       {
-        "id": "motion_sensor-2",
-        "kind": "motion_sensor",
-        "name": "motion_sensor",
+        "id": "probe-2",
+        "kind": "probe",
+        "name": "probe",
         "position": [
           0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "electric_field-3",
+        "kind": "electric_field",
+        "name": "electric_field",
+        "position": [
+          2,
           1,
           0
         ],
@@ -54,15 +67,16 @@
     },
     "learning": {
       "variables": [
-        "两球质量",
-        "初速度",
-        "双方恢复系数"
+        "源电荷量",
+        "试探电荷量",
+        "探针与场源距离"
       ],
       "steps": [
-        "总 X 动量",
-        "碰撞前后总动能"
+        "probe 电场幅值",
+        "试探粒子外力加速度",
+        "F/q 与场强比较"
       ],
-      "limitations": "求解器按双方恢复系数较小值处理接触；只比较系统无外部接触的时段，并允许有限数值误差。"
+      "limitations": "点电荷场使用 0.04 m 软化半径，近距离偏离理想库仑场；试探电荷也会参与相互作用，应固定源并选较小试探量。"
     }
   }
 }

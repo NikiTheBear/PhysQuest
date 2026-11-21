@@ -173,6 +173,7 @@ node shared/knowledge-data/schema/validate.mjs
 | 文件 | 内容 |
 |---|---|
 | [`docs/TEAM.md`](./docs/TEAM.md) | **谁做了什么、谁还要做什么**（分工与进度，改代码后请更新） |
+| [`docs/TASK-FOR-C.md`](./docs/TASK-FOR-C.md) | **给内容负责人 C 的任务书**：做什么、什么顺序、怎么用 AI 助手 |
 | [`PLAN.md`](./PLAN.md) | 完整计划书：架构、知识体系、分工、路线图、验收清单 |
 | [`docs/STUDENT-FLOW.md`](./docs/STUDENT-FLOW.md) | **学生从打开网页到导出报告的九步**，知识点在哪儿学 |
 | [`docs/LAUNCHER.md`](./docs/LAUNCHER.md) | 本地启动器：为什么需要、怎么用、两种配 Key 方式 |

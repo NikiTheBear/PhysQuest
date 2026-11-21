@@ -248,11 +248,13 @@ node scripts/gen-challenges.mjs        # 从提示词生成挑战和实验文件
 
 ## 开发者
 
-| 角色 | 负责 |
-|---|---|
-| **@NikiTheBear** | 网页主体、学习流程、题库、知识卡、AI 接入、启动器、部署、文档 |
-| **@FCZ19** | Fieldlab 平台、46 种器具库、24 个 MCP 工具、全屏工作台 |
-| **@yoyosiqidai-cpu** | 知识卡文案、题库、老师手册、一线测试 |
+| | GitHub | 做了什么 |
+|---|---|---|
+| **A** | [@NikiTheBear](https://github.com/NikiTheBear) | 网页主体（5 个页面 / 23 个组件 / 16,353 行）、物理引擎、**176 张知识卡文案**、**1,416 道题**、**176 条 AI 提示词**、AI 接入、本地启动器、CI 部署、中英文档 |
+| **B** | [@FCZ19](https://github.com/FCZ19) | Fieldlab 平台（8,254 行）：物理求解器、**47 种器具**、**25 个 MCP 工具**、全屏工作台、109 条测试 |
+| **C** | [@yoyosiqidai-cpu](https://github.com/yoyosiqidai-cpu) | 公式实验室（97 条）、误区库、实验文件、手写题、老师手册、交付测试 |
+
+详细的已做 / 待做清单见 [贡献指南](./CONTRIBUTING.md)。
 
 想参与的话先读 [贡献指南](./CONTRIBUTING.md)。
 

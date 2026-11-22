@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Challenge } from '../../core/contracts';
 import {
   ALL_CARDS,
@@ -9,6 +9,8 @@ import {
   type AutoChallenge,
 } from '../../data/content';
 import type { LabMeta } from '../../labs/registry';
+import DemoPlayer from '../demo/DemoPlayer';
+import { demoDurationSec, demoScriptsFor } from '../demo/scripts';
 
 interface Props {
   /** 当前选定的实验模块。null = 还没从知识地图选过 */
@@ -36,6 +38,17 @@ export default function Hub({
   );
   /** 自动挑战：从提示词生成的 */
   const autoOnes = useMemo(() => autoChallengesFor(lab.id), [lab]);
+
+  /**
+   * 快速演示：AI 剧本是这个模块（光学）专属的，所以入口放在挑战导览顶部。
+   * 注意 demo-scripts.json 的 labId 在文件顶层，不能用 d.labId 直接比（见 demo/scripts.ts）。
+   */
+  const demos = useMemo(() => demoScriptsFor(lab.id), [lab.id]);
+  /** 正在播哪个剧本；null = 没在播 */
+  const [playingDemo, setPlayingDemo] = useState<string | null>(null);
+  /** 这个剧本对应的挑战 —— 播完可以「去实验台亲手调」 */
+  const challengeOf = (scriptId: string) =>
+    CHALLENGES.find((c) => c.demoScriptId === scriptId && c.labId === lab.id);
 
   const cards = useMemo(() => {
     const ids = new Set(lab.knowledgeIds ?? []);
@@ -104,6 +117,38 @@ export default function Hub({
         </div>
       )}
 
+      {demos.length > 0 && (
+        <>
+          <div style={{ height: 30 }} />
+          <div className="section-head demo-section-head">
+            <h3>快速演示</h3>
+            <span>
+              先看一遍再动手：跟着解说把凸透镜走一圈。这是<b>讲解</b>，不会自动改实验台。
+            </span>
+          </div>
+          <div className="demo-list">
+            {demos.map((d) => (
+              <button
+                key={d.id}
+                className="demo-card"
+                onClick={() => setPlayingDemo(d.id)}
+                title={`播放演示：${d.title}`}
+              >
+                <span className="demo-card-play" aria-hidden>
+                  ▶
+                </span>
+                <span className="demo-card-main">
+                  <span className="demo-card-title">{d.title}</span>
+                  <span className="demo-card-meta">
+                    {d.steps.length} 步 · {demoDurationSec(d)} 秒
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
       <div style={{ height: 30 }} />
 
       <div className="challenge-grid">
@@ -155,6 +200,27 @@ export default function Hub({
 
       {challenges.length === 0 && autoOnes.length === 0 && (
         <div className="empty">这个模块还没有挑战，先去看知识点。</div>
+      )}
+
+      {playingDemo && (
+        <DemoPlayer
+          scriptId={playingDemo}
+          /**
+           * 光具座在 Fieldlab 的全屏 iframe 里，那边的 bridge 还没有「设参数」这条消息，
+           * 所以这里只能记一笔，不动任何实验台状态（原因见 DemoPlayer 顶部注释）。
+           * 等平台加了 set-params，把这里换成转发给工作台即可，DemoPlayer 不用改。
+           */
+          onApplyParams={(p) =>
+            console.log('[demo] 本步目标参数', playingDemo, p, '（演示只讲解，不改实验台）')
+          }
+          onHighlight={(ids) => console.log('[demo] 高亮器材', ids)}
+          onClose={() => setPlayingDemo(null)}
+          onGoLab={
+            challengeOf(playingDemo)
+              ? () => onPick(challengeOf(playingDemo)!)
+              : undefined
+          }
+        />
       )}
     </div>
   );

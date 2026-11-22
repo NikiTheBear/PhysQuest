@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type {
   Challenge,
+  LearnerState,
   LensMetrics,
   LensParams,
   LockedRun,
@@ -27,7 +28,7 @@ import ObservationPanel from './components/lab-workspace/ObservationPanel';
 import SatisfactionGate from './components/lab-workspace/SatisfactionGate';
 import PredictionPanel from './components/prediction/PredictionPanel';
 import { QuizModal, QuizResult } from './components/knowledge-cards/Quiz';
-import ReportView from './components/report/ReportView';
+import ReportView, { LearnerBackupPanel } from './components/report/ReportView';
 import AITutor from './components/ai-tutor/AITutor';
 import AISettings from './components/ai-tutor/AISettings';
 import HelpGuide from './components/common/HelpGuide';
@@ -346,6 +347,18 @@ export default function App() {
     [patchParams],
   );
 
+  /**
+   * 导入学习记录之后：换上合并后的记录，并把当前挑战的反思草稿对齐。
+   * localStorage 已由 importLearner 写好，这里只管界面状态。
+   */
+  const handleImported = useCallback(
+    (next: LearnerState) => {
+      setLearner(next);
+      if (challenge) setReflectionDraft(next.reflections[challenge.id]?.text ?? '');
+    },
+    [challenge],
+  );
+
   const confirmPrediction = (chosen: number) => {
     if (!challenge) return;
     setPrediction(chosen);
@@ -656,6 +669,13 @@ export default function App() {
               <p>报告是根据你的探索记录生成的。先去做一次实验。</p>
             </div>
             <EmptyReport onGoMap={() => setView('map')} />
+            <div style={{ marginTop: 18 }}>
+              <LearnerBackupPanel
+                learner={learner}
+                onImported={handleImported}
+                onToast={setToast}
+              />
+            </div>
           </>
         )}
 
@@ -681,6 +701,8 @@ export default function App() {
                   setReflectionDraft(t);
                   if (challenge) setLearner((s) => persistReflection(s, challenge.id, t));
                 }}
+                onImported={handleImported}
+                onToast={setToast}
               />
               <div className="panel">
                 <h4>探索记录</h4>

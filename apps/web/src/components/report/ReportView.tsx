@@ -1,5 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { LearnerState } from '../../core/contracts';
+import {
+  describeImport,
+  exportLearner,
+  importLearner,
+  previewImport,
+  type LearnerImportSummary,
+} from '../../core/persistence';
 import { CHALLENGES, KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
 import { MarkdownLite } from './MarkdownLite';
 
@@ -13,6 +20,10 @@ interface Props {
   quizResult?: { answered: number; correct: number } | null;
   /** 去题库 */
   onGoQuiz?: () => void;
+  /** 导入成功后把新记录交给 App（localStorage 已由 persistence 写好） */
+  onImported: (next: LearnerState) => void;
+  /** 提示条，App 顶层的 pq-toast 显示 */
+  onToast: (msg: string) => void;
 }
 
 export function buildReport(
@@ -99,6 +110,8 @@ export default function ReportView({
   quizDone = true,
   quizResult = null,
   onGoQuiz,
+  onImported,
+  onToast,
 }: Props & { challengeTitle: string }) {
   const [show, setShow] = useState(false);
   const report = useMemo(
@@ -183,6 +196,166 @@ export default function ReportView({
           </div>
         )}
       </div>
+
+      <LearnerBackupPanel learner={learner} onImported={onImported} onToast={onToast} />
+    </>
+  );
+}
+
+/* ============================================================
+ * 学习记录的导出 / 导入
+ * ========================================================== */
+
+interface BackupProps {
+  learner: LearnerState;
+  onImported: (next: LearnerState) => void;
+  onToast: (msg: string) => void;
+}
+
+/** 带日期戳的文件名，例如 physquest-learner-2026-11-22.json */
+function exportFileName(): string {
+  return `physquest-learner-${new Date().toISOString().slice(0, 10)}.json`;
+}
+
+function triggerDownload(text: string, name: string) {
+  const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+
+/** 挑战 id → 人看得懂的标题（找不到就退回 id，不能空着） */
+function challengeLabel(id: string): string {
+  return CHALLENGES.find((c) => c.id === id)?.title ?? id;
+}
+
+/**
+ * 备份面板：导出学习记录 / 导入学习记录。
+ *
+ * 单独抽出来是因为「报告为空」的页面也要能用 —— 新电脑上一条记录都没有，
+ * 学生正是那时候最需要把旧电脑倒的文件导进来。
+ */
+export function LearnerBackupPanel({ learner, onImported, onToast }: BackupProps) {
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  /** 待确认的导入：只有真的会覆盖反思时才弹层，不覆盖就直接导 */
+  const [pending, setPending] = useState<{ text: string; summary: LearnerImportSummary } | null>(
+    null,
+  );
+
+  const doExport = () => {
+    triggerDownload(exportLearner(learner), exportFileName());
+    onToast(`学习记录已导出：${exportFileName()}`);
+  };
+
+  /**
+   * 真的写入。这里再预览一次而不是直接用弹层里的旧小结：
+   * 弹层打开期间学生可能又改了反思，覆盖条数会变，toast 必须说真实的那份。
+   */
+  const apply = (text: string) => {
+    try {
+      const preview = previewImport(text, learner);
+      const next = importLearner(text, learner);
+      onImported(next);
+      onToast(describeImport(preview.summary));
+    } catch (e) {
+      onToast(`导入失败：${e instanceof Error ? e.message : '文件读不出来。'}`);
+    }
+  };
+
+  const readFile = async (file: File | undefined) => {
+    if (!file) return;
+    let text: string;
+    try {
+      text = await file.text();
+    } catch {
+      onToast('导入失败：文件读不出来，可能是权限或文件已损坏。');
+      return;
+    }
+    try {
+      const preview = previewImport(text, learner);
+      // 会覆盖反思就问一句，否则直接合并
+      if (preview.summary.overwrittenReflections > 0) {
+        setPending({ text, summary: preview.summary });
+        return;
+      }
+      apply(text);
+    } catch (e) {
+      onToast(`导入失败：${e instanceof Error ? e.message : '这个文件不是 PhysQuest 导出的记录。'}`);
+    }
+  };
+
+  return (
+    <>
+      <div className="panel">
+        <h4>备份与迁移</h4>
+        <p style={{ fontSize: 13, color: 'var(--label-2)', marginBottom: 10 }}>
+          学习记录只存在这台电脑的浏览器里。换电脑、换浏览器、清缓存之前，先导出一份带过去。
+        </p>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button className="btn-primary btn-small" onClick={doExport}>
+            导出学习记录
+          </button>
+          <button className="btn-ghost btn-small" onClick={() => fileRef.current?.click()}>
+            导入学习记录
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              // 清空 value，否则同一个文件选第二次不触发 onChange
+              e.target.value = '';
+              void readFile(file);
+            }}
+          />
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--label-2)', marginTop: 8, lineHeight: 1.6 }}>
+          导入是合并，不会清掉现在的东西：参数记录按时间取并集、重复的跳过；
+          反思如果两边写的不一样，用文件里的那份。
+        </div>
+      </div>
+
+      {pending && (
+        <div className="overlay" onClick={() => setPending(null)}>
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: 'min(560px,100%)' }}
+          >
+            <h3>有 {pending.summary.overwrittenReflections} 条反思会被覆盖</h3>
+            <p className="sub">
+              这些挑战你自己写过反思，文件里的内容不一样。导入会换成文件里的那份，
+              现在写的这段会被替掉。其它记录是合并，不会丢。
+            </p>
+            <ul style={{ fontSize: 13.5, lineHeight: 1.9, paddingLeft: 20 }}>
+              {pending.summary.overwrittenReflectionIds.map((id) => (
+                <li key={id}>{challengeLabel(id)}</li>
+              ))}
+            </ul>
+            <div className="gate">覆盖之后没法撤回。拿不准就先「导出学习记录」留一份当前的。</div>
+            <div className="modal-actions">
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  const p = pending;
+                  setPending(null);
+                  apply(p.text);
+                }}
+              >
+                确定导入
+              </button>
+              <button className="btn-ghost" onClick={() => setPending(null)}>
+                取消
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

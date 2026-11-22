@@ -17,6 +17,7 @@
     "goal": "区分电功率与一段时间内转化的电能。",
     "observation": "先按搭建方案把器具摆好，然后只改「负载电阻」，观察：负载功率；U·I 交叉核对；由功率推算的电能。",
     "mode": "2d",
+    "plane2d": "xz",
     "environment": {
       "gravity": 0,
       "damping": 0,
@@ -60,9 +61,9 @@
         "kind": "voltmeter",
         "name": "电压表",
         "position": [
-          1.1,
+          -1.1,
           1,
-          0
+          2.2
         ],
         "params": {},
         "refs": {},
@@ -80,9 +81,77 @@
         "params": {},
         "refs": {},
         "fixed": false
+      },
+      {
+        "id": "ground-5",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -3.3000000000000003,
+          1,
+          -2.2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
       }
     ],
-    "connections": [],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "a",
+        "target": "resistor-2",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "ammeter-4",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "ammeter-4",
+        "sourcePort": "b",
+        "target": "battery-1",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w4",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "a",
+        "target": "voltmeter-3",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w5",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "voltmeter-3",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "b",
+        "target": "ground-5",
+        "targetPort": "a"
+      }
+    ],
     "control": {
       "running": false,
       "reset": 0

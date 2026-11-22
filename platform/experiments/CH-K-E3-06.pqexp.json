@@ -17,6 +17,7 @@
     "goal": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
     "observation": "先按搭建方案把器具摆好，然后只改「外电阻 R」，观察：外电阻功率；匹配点两侧功率；匹配时的端电压。",
     "mode": "2d",
+    "plane2d": "xz",
     "environment": {
       "gravity": 0,
       "damping": 0,
@@ -34,8 +35,8 @@
           0
         ],
         "params": {
-          "voltage": 12,
-          "resistance": 0.1
+          "voltage": 6,
+          "resistance": 10
         },
         "refs": {},
         "fixed": false
@@ -50,13 +51,54 @@
           0
         ],
         "params": {
-          "resistance": 100
+          "resistance": 10
         },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground-5",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -1.1,
+          1,
+          -2.2
+        ],
+        "params": {},
         "refs": {},
         "fixed": false
       }
     ],
-    "connections": [],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "a",
+        "target": "resistor-2",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "battery-1",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "b",
+        "target": "ground-5",
+        "targetPort": "a"
+      }
+    ],
     "control": {
       "running": false,
       "reset": 0

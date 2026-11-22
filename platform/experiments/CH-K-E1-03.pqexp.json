@@ -17,6 +17,7 @@
     "goal": "探索电源、灯泡与完整导线回路怎样共同决定灯泡是否发光。",
     "observation": "先按搭建方案把器具摆好，然后只改「开关状态」，观察：灯泡功率；灯泡亮度；电路电流。",
     "mode": "2d",
+    "plane2d": "xz",
     "environment": {
       "gravity": 0,
       "damping": 0,
@@ -70,9 +71,59 @@
         },
         "refs": {},
         "fixed": false
+      },
+      {
+        "id": "ground-5",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -2.2,
+          1,
+          -2.2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
       }
     ],
-    "connections": [],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "a",
+        "target": "lamp-2",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "lamp-2",
+        "sourcePort": "b",
+        "target": "switch-3",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "switch-3",
+        "sourcePort": "b",
+        "target": "battery-1",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "b",
+        "target": "ground-5",
+        "targetPort": "a"
+      }
+    ],
     "control": {
       "running": false,
       "reset": 0

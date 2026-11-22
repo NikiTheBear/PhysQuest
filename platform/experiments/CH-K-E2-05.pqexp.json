@@ -17,6 +17,7 @@
     "goal": "验证串联电路电流相等、总电压等于各电阻电压之和。",
     "observation": "先按搭建方案把器具摆好，然后只改「两个电阻的阻值」，观察：两电阻支路电流；各端电压之和；分压比例。",
     "mode": "2d",
+    "plane2d": "xz",
     "environment": {
       "gravity": 0,
       "damping": 0,
@@ -60,16 +61,99 @@
         "kind": "voltmeter",
         "name": "电压表",
         "position": [
+          0,
+          1,
+          2.2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "resistor-4",
+        "kind": "resistor",
+        "name": "电阻 R₂",
+        "position": [
           2.2,
           1,
           0
+        ],
+        "params": {
+          "resistance": 300
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground-5",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -2.2,
+          1,
+          -2.2
         ],
         "params": {},
         "refs": {},
         "fixed": false
       }
     ],
-    "connections": [],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "a",
+        "target": "resistor-2",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "resistor-4",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "resistor-4",
+        "sourcePort": "b",
+        "target": "battery-1",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w4",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "a",
+        "target": "voltmeter-3",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w5",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "voltmeter-3",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "b",
+        "target": "ground-5",
+        "targetPort": "a"
+      }
+    ],
     "control": {
       "running": false,
       "reset": 0

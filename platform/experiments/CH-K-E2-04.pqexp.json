@@ -17,6 +17,7 @@
     "goal": "用控制变量法验证欧姆元件的电流与端电压成正比。",
     "observation": "先按搭建方案把器具摆好，然后只改「电源电压」，观察：成对 U、I 数据；U/I 与设定阻值的比较。",
     "mode": "2d",
+    "plane2d": "xz",
     "environment": {
       "gravity": 0,
       "damping": 0,
@@ -73,16 +74,84 @@
         "kind": "voltmeter",
         "name": "电压表",
         "position": [
-          3.3000000000000003,
+          -1.1,
           1,
-          0
+          2.2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground-5",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -3.3000000000000003,
+          1,
+          -2.2
         ],
         "params": {},
         "refs": {},
         "fixed": false
       }
     ],
-    "connections": [],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "a",
+        "target": "resistor-2",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "ammeter-3",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "ammeter-3",
+        "sourcePort": "b",
+        "target": "battery-1",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w4",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "a",
+        "target": "voltmeter-4",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w5",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "voltmeter-4",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "b",
+        "target": "ground-5",
+        "targetPort": "a"
+      }
+    ],
     "control": {
       "running": false,
       "reset": 0

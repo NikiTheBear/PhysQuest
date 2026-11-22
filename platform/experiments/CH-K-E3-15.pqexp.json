@@ -19,6 +19,7 @@
     "goal": "两个绕组加一个铁芯只是结构标记：平台没有互感，二次侧不会自动出电压。（概念示意：器具只做标注，读数不参与结论）",
     "observation": "这是概念示意：圆柱只是标出两个绕组的位置，方块标出共同铁芯。平台没有互感、没有铁芯磁通，二次侧不会自动产生电压。请把匝数比代进 U₁/U₂ = n₁/n₂ 自己算。",
     "mode": "2d",
+    "plane2d": "xz",
     "environment": {
       "gravity": 0,
       "damping": 0,
@@ -111,15 +112,71 @@
         "params": {
           "amplitude": 5,
           "frequency": 50,
-          "phase": 0,
+          "phase": 90,
           "offset": 0,
           "resistance": 0.1
         },
         "refs": {},
         "fixed": true
+      },
+      {
+        "id": "resistor-1",
+        "kind": "resistor",
+        "name": "一次侧电阻（示意）",
+        "position": [
+          -4.8,
+          1,
+          0
+        ],
+        "params": {
+          "resistance": 100
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground-5",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -2.6,
+          1,
+          -2.2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
       }
     ],
-    "connections": [],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "src",
+        "sourcePort": "a",
+        "target": "resistor-1",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "resistor-1",
+        "sourcePort": "b",
+        "target": "src",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "src",
+        "sourcePort": "b",
+        "target": "ground-5",
+        "targetPort": "a"
+      }
+    ],
     "control": {
       "running": false,
       "reset": 0

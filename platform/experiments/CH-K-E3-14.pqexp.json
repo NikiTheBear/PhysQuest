@@ -17,6 +17,7 @@
     "goal": "区分正弦交流的瞬时值、峰值和有效值。",
     "observation": "先按搭建方案把器具摆好，然后只改「交流幅值」，观察：瞬时电压和电流；整数周期的 RMS 后处理；理论峰值与有效值关系。",
     "mode": "2d",
+    "plane2d": "xz",
     "environment": {
       "gravity": 0,
       "damping": 0,
@@ -35,8 +36,8 @@
         ],
         "params": {
           "amplitude": 5,
-          "frequency": 10,
-          "phase": 0,
+          "frequency": 1,
+          "phase": 90,
           "offset": 0,
           "resistance": 0.1
         },
@@ -76,16 +77,84 @@
         "kind": "voltmeter",
         "name": "电压表",
         "position": [
-          3.3000000000000003,
+          -1.1,
           1,
-          0
+          2.2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground-5",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -3.3000000000000003,
+          1,
+          -2.2
         ],
         "params": {},
         "refs": {},
         "fixed": false
       }
     ],
-    "connections": [],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "ac_source-1",
+        "sourcePort": "a",
+        "target": "resistor-2",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "ammeter-3",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "ammeter-3",
+        "sourcePort": "b",
+        "target": "ac_source-1",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w4",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "a",
+        "target": "voltmeter-4",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w5",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "voltmeter-4",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "ac_source-1",
+        "sourcePort": "b",
+        "target": "ground-5",
+        "targetPort": "a"
+      }
+    ],
     "control": {
       "running": false,
       "reset": 0

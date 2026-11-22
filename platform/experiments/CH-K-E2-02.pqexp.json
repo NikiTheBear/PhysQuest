@@ -17,6 +17,7 @@
     "goal": "理解电压是两点之间的电势差，并比较并联测量与错误接法。",
     "observation": "先按搭建方案把器具摆好，然后只改「电源电压」，观察：端电压及符号；电源电动势与路端电压差。",
     "mode": "2d",
+    "plane2d": "xz",
     "environment": {
       "gravity": 0,
       "damping": 0,
@@ -60,16 +61,75 @@
         "kind": "voltmeter",
         "name": "电压表",
         "position": [
-          2.2,
+          0.0,
           1,
-          0
+          2.2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground-5",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -2.2,
+          1,
+          -2.2
         ],
         "params": {},
         "refs": {},
         "fixed": false
       }
     ],
-    "connections": [],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "a",
+        "target": "resistor-2",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "battery-1",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "a",
+        "target": "voltmeter-3",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w4",
+        "kind": "wire",
+        "source": "resistor-2",
+        "sourcePort": "b",
+        "target": "voltmeter-3",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "battery-1",
+        "sourcePort": "b",
+        "target": "ground-5",
+        "targetPort": "a"
+      }
+    ],
     "control": {
       "running": false,
       "reset": 0

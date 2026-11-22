@@ -4896,3 +4896,358 @@ html[data-theme='dark'] .pq-toast {
   line-height: 1.65;
   color: var(--label-2);
 }
+
+/* ============================================================
+   细节打磨（2026-11）
+   只调间距、层级、动效与反馈。不改设计变量、不改主题配色、
+   不碰实验台内部（那是 B 的部分）。
+   ============================================================ */
+
+/* ---------- 1. 键盘可达性：所有可点元素都有统一焦点环 ---------- */
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* 鼠标点击不要留焦点环，键盘才要 */
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ---------- 2. 按下反馈：所有卡片“按得动” ---------- */
+.challenge-card:active,
+.know-card:active,
+.module-card:active,
+.quiz-level:active,
+.ib-btn:active,
+.map-cta:active {
+  transform: scale(0.988);
+  transition-duration: 0.08s;
+}
+
+/* ---------- 3. 知识地图（按知识点视图）：分组层级 + 网格密度 ---------- */
+/* 注：.know-pin / .map-grid / .map-band / .disc-head 是旧版遗留样式，
+   现在的知识地图用 .kp-stage-* + .know-grid + .know-card，故一并不碰。 */
+.kp-stage-band {
+  margin-bottom: 28px;
+}
+.kp-stage-head {
+  /* 2px 实线太重，改成细线 + 更清楚的层级 */
+  border-bottom: var(--hairline);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  gap: 10px;
+}
+.kp-stage-head h3 {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+.kp-stage-head .kp-count {
+  font-size: 12px;
+  color: var(--label-3);
+}
+.map-toolbar {
+  gap: 10px;
+}
+.map-count {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 4. 挑战卡：视觉层级 ---------- */
+.challenge-card {
+  padding: 24px 22px 20px;
+  gap: 9px;
+  transition: transform 0.24s var(--ease), box-shadow 0.24s var(--ease),
+    background var(--dur) var(--ease);
+}
+/* 用 inset 阴影做左侧强调线，hover 时不产生布局位移 */
+.challenge-card:hover {
+  box-shadow: var(--shadow-2), inset 3px 0 0 var(--accent);
+}
+.challenge-card .idx {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.challenge-card h3 {
+  font-size: 19px;
+}
+.challenge-card .brief {
+  font-size: 13.5px;
+}
+.challenge-card.done:hover {
+  box-shadow: var(--shadow-2), inset 3px 0 0 var(--green);
+}
+
+/* ---------- 5. 知识卡：翻面动效 ---------- */
+.fc-face {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  animation: fc-face-in 0.3s var(--ease);
+}
+.know-card.compact .fc-face {
+  gap: 8px;
+}
+@keyframes fc-face-in {
+  from {
+    opacity: 0;
+    transform: perspective(900px) rotateY(-7deg) translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* 网格更密：1280 宽屏 4 列 */
+.know-grid {
+  grid-template-columns: repeat(auto-fill, minmax(316px, 1fr));
+  gap: 14px;
+}
+/* 右上角的翻面角标稍微明显一点，提示这张卡能翻 */
+.flip-mark {
+  border-top-color: var(--separator-strong);
+  transition: border-top-color 0.2s var(--ease);
+}
+.know-card:hover .flip-mark {
+  border-top-color: var(--accent);
+}
+
+/* ---------- 6. 题库：选中态与对错反馈 ---------- */
+.opt {
+  transition: background 0.16s, border-color 0.16s, transform 0.12s var(--ease);
+}
+.opt:hover {
+  border-color: var(--separator-strong);
+}
+.opt.sel .mark {
+  transform: scale(1.08);
+}
+.opt .mark {
+  transition: background 0.16s, color 0.16s, transform 0.16s var(--ease);
+}
+/* 答对轻轻放大一下，答错左右晃一下——不用红绿之外再加色 */
+.opt.right {
+  animation: opt-pop 0.34s var(--ease);
+}
+.opt.wrong {
+  animation: opt-shake 0.34s ease;
+}
+@keyframes opt-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.016);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes opt-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  70% {
+    transform: translateX(4px);
+  }
+}
+/* 难度按钮的选中态更明确 */
+.quiz-level.active {
+  box-shadow: var(--shadow-1), inset 0 0 0 1px var(--accent);
+}
+
+/* ---------- 7. 报告：把 Markdown 渲染成能读的版式 ---------- */
+/* .report 容器已经从 <pre> 改成块级容器，正文排版交给 .md-* */
+.report {
+  background: var(--surface-2);
+  border-radius: var(--r-ctrl);
+  padding: 24px 26px;
+  max-height: 640px;
+  overflow-y: auto;
+}
+.md-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.md-h4 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--label);
+  margin-top: 14px;
+  padding-bottom: 7px;
+  border-bottom: var(--hairline);
+}
+.md-h4:first-child {
+  margin-top: 0;
+}
+.md-h5 {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--label);
+  margin-top: 6px;
+}
+.md-p {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--label-2);
+}
+.md-list {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13.5px;
+  line-height: 1.72;
+  color: var(--label-2);
+}
+.md-list li::marker {
+  color: var(--label-4);
+}
+/* 表格：窄屏可横向滑动，不再把长表格挤成一条 */
+.md-table-wrap {
+  overflow-x: auto;
+  border: var(--hairline);
+  border-radius: var(--r-ctrl);
+  background: var(--surface);
+}
+.md-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.md-table th,
+.md-table td {
+  padding: 9px 12px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: var(--hairline);
+}
+.md-table th {
+  font-weight: 600;
+  color: var(--label-3);
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  background: var(--surface-3);
+}
+.md-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.md-table tbody tr:hover td {
+  background: var(--fill);
+}
+.md-table td {
+  color: var(--label-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 8. 实验台顶栏：按钮分组与状态指示 ---------- */
+.ib-right {
+  gap: 7px;
+}
+/* 主按钮和前面的次级按钮之间留一道视觉间隔 */
+.ib-btn.primary {
+  margin-left: 5px;
+  box-shadow: 0 1px 2px rgba(0, 113, 227, 0.24);
+}
+.ib-btn.primary:hover {
+  box-shadow: 0 2px 6px rgba(0, 113, 227, 0.3);
+}
+/* 连接状态用一个小圆点，扫一眼就知道通没通 */
+.ib-ready.on::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  vertical-align: middle;
+  animation: ib-pulse 2.4s var(--ease) infinite;
+}
+@keyframes ib-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ---------- 9. 窄屏（1280）微调 ---------- */
+@media (max-width: 1440px) {
+  .map-grid {
+    grid-template-columns: repeat(auto-fill, minmax(262px, 1fr));
+  }
+  .know-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+  .challenge-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+/* ---------- 10. 尊重「减少动效」系统设置 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- 11. 模块卡（知识地图「按模块」）：比例与悬停 ---------- */
+.module-grid {
+  /* 340 → 320：1280 宽屏能稳定排 3 列，卡片不再被拉得过宽 */
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+.module-card {
+  /* 统一最小高度，让同排卡片底部对齐，扫读时不跳 */
+  min-height: 250px;
+  padding: 24px 24px 20px;
+}
+/* 悬停时强调色从左下浮出一层很淡的底色，和已有的右上渐变互补 */
+.module-card::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.3s var(--ease);
+  pointer-events: none;
+}
+.module-card:hover:not(.disabled)::after {
+  transform: scaleX(1);
+}
+.module-card.disabled {
+  cursor: default;
+}
+.module-card.disabled::after {
+  display: none;
+}
+@media (max-width: 1440px) {
+  .module-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}

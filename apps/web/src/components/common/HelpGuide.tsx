@@ -1,3 +1,12 @@
+import { ALL_CARDS, AUTO_CHALLENGES, CHALLENGES } from '../../data/content';
+import { BANK } from '../../data/question-bank';
+
+const STATS = {
+  cards: ALL_CARDS.length,
+  challenges: CHALLENGES.length + AUTO_CHALLENGES.length,
+  questions: BANK.length,
+};
+
 interface Props {
   onClose: () => void;
   /** 从某些地方打开始终显示「先看一遍」的分寸 —— 目前只是文案差异 */
@@ -40,7 +49,7 @@ export default function HelpGuide({ onClose }: Props) {
             它不给你标准答案，而是让你<b>先猜一句</b>，再<b>自己动手把实验调出来</b>，
             看看猜对没猜对——猜错的那一下，才是真正记住的时候。
             <br />
-            全平台 <b>176 个知识点</b>、<b>79 个挑战</b>、<b>1416 道题</b>，
+            全平台 <b>{STATS.cards} 个知识点</b>、<b>{STATS.challenges} 个挑战</b>、<b>{STATS.questions} 道题</b>，
             从小学的「光走直线」一直排到大学的「麦克斯韦方程组」。
           </div>
 
@@ -97,7 +106,7 @@ export default function HelpGuide({ onClose }: Props) {
               <div className="hp-body">
                 <b>题库</b>
                 <p>
-                  1416 道题，覆盖全部 176 个知识点。每个知识点 5–10 道，从简单到困难，
+                  {STATS.questions} 道题，覆盖全部 {STATS.cards} 个知识点。每个知识点 5–10 道，从简单到困难，
                   <b>每道题都有逐项解析</b>——不光告诉你对的是哪个，还告诉你每个错项错在哪。
                   <b>你自己挑要做哪些知识点</b>，不用从头刷到尾。
                 </p>

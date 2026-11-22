@@ -1,3 +1,5 @@
+import { EXTRA_HANDWRITTEN } from './question-bank-extra';
+
 /**
  * 题库：按知识点 + 三个难度
  *
@@ -39,7 +41,7 @@ export interface BankQuestion {
  * 手写题：凸透镜 26 个知识点里的核心部分
  * 题目参考中考真题风格，答案由我们的引擎验证过
  */
-export const HANDWRITTEN: BankQuestion[] = [
+const OPTICS_HANDWRITTEN: BankQuestion[] = [
   {
     id: 'BQ-O2-05-easy',
     knowledgeId: 'K-O2-05',
@@ -1008,6 +1010,12 @@ export const HANDWRITTEN: BankQuestion[] = [
       '放大率主要由焦距决定，多片叠加并不提高放大率，反而常要靠组合来保持总焦距。',
     ],
   },
+];
+
+/* 第 6 件任务：力学 / 电磁 / 热学 / 近代 各 30+ 道手写题（共 131 道） */
+export const HANDWRITTEN: BankQuestion[] = [
+  ...OPTICS_HANDWRITTEN,
+  ...EXTRA_HANDWRITTEN,
 ];
 
 /* ============================================================

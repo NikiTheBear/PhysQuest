@@ -28,3 +28,19 @@ test('explicit ground supports bodies on the slab and allows a fall beyond its e
   assert.ok(Math.abs(sim.bodies.get(box.id).position[1]-box.params.height/2)<.02);
   assert.ok(sim.bodies.get(outside.id).position[1]<-1);
 });
+
+test('ground friction actually resists sliding and makes a pushed body stay put',()=>{
+  // 回归：平台曾把 world.gravity 设为 0、重力靠外力施加，
+  // Cannon 用 world.gravity.length() 算摩擦上限 → 摩擦恒为 0，所有斜面/轮子实验都失效。
+  const ground=component('floor_slab',{position:[0,-.08,0]});ground.params.friction=.6;
+  const box=component('box',{position:[0,.25,0]});box.params.friction=.6;box.params.mass=1;
+  const push=component('force',{refs:{target:box.id}});push.params.fx=2;
+  const d=blankExperiment();d.mode='2d';d.components=[ground,box,push];
+  d.environment={gravity:9.8,damping:0,speed:1,collisions:true};
+  const sim=new Simulation(d);sim.advance(1);
+  assert.ok(sim.mechanics.world.frictionGravity.length()>9,'frictionGravity 必须随重力设置');
+  assert.ok(Math.abs(sim.bodies.get(box.id).position[0])<.01,'2 N 推不动 μ=0.6 的 1 kg 箱子');
+  push.params.fx=12;
+  const hard=new Simulation(d);hard.advance(1);
+  assert.ok(hard.bodies.get(box.id).position[0]>1,'12 N 应该推得动');
+});

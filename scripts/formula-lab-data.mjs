@@ -1,0 +1,1329 @@
+/**
+ * 生成公式实验室定义 shared/knowledge-data/formula-lab.json
+ *
+ * 规则（与 A 的接口约定一致）：
+ * - kind: 'formula' → inputs/outputs，expr 只能四则运算 + Math 函数（沙箱可跑）
+ * - kind: 'diagram' → 示意图说明（平台算不出数字时用）
+ * - 每条必须有 note（边界条件）和 example（生活例子）
+ *
+ * 生成后跑脚本自带的沙箱校验：每条 expr 代入默认值必须算出有限数字。
+ * 用法：bun scripts/gen-formula-lab.mjs
+ */
+
+// 覆盖 97 条（approximation 25 + conceptual 72）。键顺序按领域排，方便 A 审。
+const LABS = {
+
+  /* ===================== 声学 ===================== */
+  'K-A1-01': {
+    kind: 'formula',
+    title: '声音是怎么来的',
+    formula: '声压 ∝ 振动速度 × 增益',
+    inputs: [
+      { key: 'v', label: '振动速度', unit: 'm/s', min: 0.01, max: 2, default: 0.5 },
+      { key: 'gain', label: '增益', unit: '', min: 0, max: 5, default: 1 },
+      { key: 'k', label: '换能系数', unit: 'Pa·s/m', min: 0.01, max: 2, default: 0.5 },
+    ],
+    outputs: [
+      { key: 'p', label: '声压幅值', unit: 'Pa', expr: 'k * v * gain' },
+    ],
+    note: '这是平台「振动发声」的线性换能模型：振动速度按比例换成声压，不含共振腔和指向性。',
+    example: '敲桌越重（振动速度越大），声压越高；同样的敲法离远一点，听到的声音变小是几何衰减，不是换能变弱。',
+  },
+  'K-A1-02': {
+    kind: 'formula',
+    title: '声音要靠东西传',
+    formula: 'v = s / t（声速 = 距离 ÷ 传播时间）',
+    inputs: [
+      { key: 's', label: '距离', unit: 'm', min: 1, max: 3400, default: 340 },
+      { key: 't', label: '传播时间', unit: 's', min: 0.05, max: 10, default: 1 },
+    ],
+    outputs: [
+      { key: 'v', label: '声速', unit: 'm/s', expr: 's / t' },
+    ],
+    note: '不同介质声速不同：空气约 340、水约 1500、钢铁约 5200 m/s。真空中没有传声的介质，声音传不过去。',
+    example: '看到闪电后约 3 秒听到雷声：声音 3 秒走了约 1000 m，所以雷离你约一公里。',
+  },
+  'K-A2-01': {
+    kind: 'diagram',
+    title: '音调、响度、音色',
+    draw: '画三列对比：音调（波峰密度，密=高音）、响度（波峰高度，高=大声）、音色（波形形状，锯齿/圆润/带毛刺三种不同波形）。',
+    marks: ['音调 = 每秒振动次数（频率）', '响度 = 振幅大小', '音色 = 泛音配比决定的波形形状'],
+    watch: '频率、振幅、泛音配比三件事互不相干：同一响度可以高音也可以低音；同一音高可以像钢琴也可以像小提琴。',
+    note: '这一条没有可算的单一数字——音色本来就是波形形状，不是标量。',
+  },
+  'K-A2-03': {
+    kind: 'formula',
+    title: '回声与测距',
+    formula: 'd = v·t / 2',
+    inputs: [
+      { key: 'v', label: '声速', unit: 'm/s', min: 100, max: 1500, default: 343 },
+      { key: 't', label: '发声到听到回声', unit: 's', min: 0.02, max: 2, default: 0.5 },
+    ],
+    outputs: [
+      { key: 'd', label: '障碍物距离', unit: 'm', expr: 'v * t / 2' },
+    ],
+    note: '除以 2 是因为声音走了「去 + 回」两趟。回声和环境混在一起要超过约 0.1 秒（距离约 17 m）才能分辨。',
+    example: '对着山谷喊一声，0.5 秒后听到回声：山壁离你约 86 m——声呐和蝙蝠用的都是这个原理。',
+  },
+  'K-A4-03': {
+    kind: 'formula',
+    title: '声压级与分贝',
+    formula: 'SPL = 20·lg(p / p₀)，p₀ = 2×10⁻⁵ Pa',
+    inputs: [
+      { key: 'p', label: '声压', unit: 'Pa', min: 0.00002, max: 20, default: 0.02 },
+    ],
+    outputs: [
+      { key: 'spl', label: '声压级', unit: 'dB', expr: '20 * Math.log10(p / 0.00002)' },
+    ],
+    note: 'p₀ = 2×10⁻⁵ Pa 是人耳刚好能听到的阈值。每 +20 dB 声压放大 10 倍；120 dB 附近开始觉得痛。',
+    example: '耳语约 30 dB，正常交谈约 60 dB，摇滚音乐会前排约 110 dB——每升 10 dB 感觉响了一倍。',
+  },
+  'K-A4-04': {
+    kind: 'formula',
+    title: '多普勒效应',
+    formula: "f' = f·(v ± v观察者) / (v ∓ v声源)",
+    inputs: [
+      { key: 'f', label: '声源原频率', unit: 'Hz', min: 20, max: 2000, default: 500 },
+      { key: 'v', label: '声速', unit: 'm/s', min: 100, max: 1500, default: 343 },
+      { key: 'vo', label: '观察者速度（接近为正）', unit: 'm/s', min: -50, max: 50, default: 0 },
+      { key: 'vs', label: '声源速度（接近为正）', unit: 'm/s', min: -50, max: 50, default: 30 },
+    ],
+    outputs: [
+      { key: 'fp', label: '听到的频率', unit: 'Hz', expr: 'f * (v + vo) / (v - vs)' },
+    ],
+    note: '以「相互接近」为正方向：驶近时频率变高、驶远时变低。声源速度接近声速时结果发散，超音速要另算（激波）。',
+    example: '救护车 500 Hz 鸣笛以 30 m/s 驶近：你听到约 548 Hz（偏高），驶远后立刻变回 458 Hz——音调先高后低。',
+  },
+
+  /* ===================== 力学 ===================== */
+  'K-M1-04': {
+    kind: 'formula',
+    title: '沉和浮',
+    formula: 'F浮 = ρ液·g·V排',
+    inputs: [
+      { key: 'rho', label: '液体密度', unit: 'kg/m³', min: 100, max: 1300, default: 1000 },
+      { key: 'V', label: '排开液体体积', unit: 'm³', min: 0.0001, max: 1, default: 0.001 },
+      { key: 'g', label: '重力加速度', unit: 'm/s²', min: 1, max: 25, default: 9.8 },
+    ],
+    outputs: [
+      { key: 'F', label: '浮力', unit: 'N', expr: 'rho * g * V' },
+    ],
+    note: '完全浸没时 V排 = 物体体积；漂浮时 V排 只等于浸在水里的那部分。浮力与物体质量无关，只由排开的液体决定。',
+    example: '1 L（0.001 m³）水被排开，浮力约 9.8 N——正好托得住约 1 kg 的物体。',
+  },
+  'K-M1-05': {
+    kind: 'formula',
+    title: '杠杆',
+    formula: '垂直施力时 F₁l₁ = F₂l₂',
+    inputs: [
+      { key: 'f1', label: '动力', unit: 'N', min: 1, max: 500, default: 100 },
+      { key: 'l1', label: '动力臂', unit: 'm', min: 0.1, max: 10, default: 1 },
+      { key: 'l2', label: '阻力臂', unit: 'm', min: 0.1, max: 10, default: 2 },
+    ],
+    outputs: [
+      { key: 'f2', label: '能撬起的阻力', unit: 'N', expr: 'f1 * l1 / l2' },
+    ],
+    note: '力臂是支点到力的作用线的垂直距离，不是到施力点的距离；力不垂直于杆时要用垂直分量。',
+    example: '撬棍：手压 1 m 长的一端用 100 N，另一头 0.5 m 处能撬起 200 N——省力不省功。',
+  },
+  'K-M1-07': {
+    kind: 'diagram',
+    title: '轮子为什么省力',
+    draw: '画并排两个物体：一个长方体滑块贴着地面，一个圆柱滚轮贴着地面；下方标同样的推力箭头，滑块上方标「滑动摩擦 μ₀」，滚轮上方标「滚动摩擦 μ_滚（小得多）」。',
+    marks: ['滑块要克服 μ₀·mg 的滑动摩擦', '滚轮几乎只克服微小的滚动阻力', '同一推力：滑块不动、滚轮滚走'],
+    watch: '滚动时接触点在每一瞬间都换新的，摩擦以滚动阻力的形式出现，比滑动摩擦小一两个量级。',
+    note: '平台可以真的比（见实验台「轮子省力」关）；这里给的是数量级对比，不含轮轴轴承损耗。',
+  },
+  'K-M2-02': {
+    kind: 'formula',
+    title: '质量与密度',
+    formula: 'ρ = m / (宽×高×深)',
+    inputs: [
+      { key: 'm', label: '质量', unit: 'kg', min: 0.001, max: 100, default: 1 },
+      { key: 'w', label: '宽', unit: 'm', min: 0.01, max: 2, default: 0.1 },
+      { key: 'h', label: '高', unit: 'm', min: 0.01, max: 2, default: 0.1 },
+      { key: 'd', label: '深', unit: 'm', min: 0.01, max: 2, default: 0.1 },
+    ],
+    outputs: [
+      { key: 'rho', label: '密度', unit: 'kg/m³', expr: 'm / (w * h * d)' },
+    ],
+    note: '质量是「有多少东西」，密度是「挤得多紧」：同样体积下密度大就重，同样质量下密度大就小。',
+    example: '1 kg 的东西做成 10 cm 的方块，密度正好 1000 kg/m³——和水一样；做成 5 cm 的方块就是 8000 kg/m³，接近铁。',
+  },
+  'K-M2-03': {
+    kind: 'formula',
+    title: '力的三要素',
+    formula: 'τz = rx·Fy − ry·Fx',
+    inputs: [
+      { key: 'rx', label: '施力点相对质心 X', unit: 'm', min: -2, max: 2, default: 0.3 },
+      { key: 'ry', label: '施力点相对质心 Y', unit: 'm', min: -2, max: 2, default: 0 },
+      { key: 'fx', label: '力 X 分量', unit: 'N', min: -100, max: 100, default: 2 },
+      { key: 'fy', label: '力 Y 分量', unit: 'N', min: -100, max: 100, default: 0 },
+    ],
+    outputs: [
+      { key: 'tz', label: '绕 Z 轴的力矩', unit: 'N·m', expr: 'rx * fy - ry * fx' },
+    ],
+    note: '力通过质心（r=0）时力矩为 0，只平动不转动；偏在边上推就会转。平台里偏心力用「质心的力 + 等效力矩」近似。',
+    example: '推箱子：正对中心推它直走；推靠边的那只角，箱子就会打转——同样大小的力，效果完全不同。',
+  },
+  'K-M2-05': {
+    kind: 'formula',
+    title: '重力与支持力',
+    formula: '静止且无其他竖直力时 N = mg',
+    inputs: [
+      { key: 'm', label: '质量', unit: 'kg', min: 0.01, max: 100, default: 1 },
+      { key: 'g', label: '重力加速度', unit: 'm/s²', min: 1, max: 25, default: 9.8 },
+    ],
+    outputs: [
+      { key: 'N', label: '支持力', unit: 'N', expr: 'm * g' },
+    ],
+    note: '只在静止、且没有其他竖直力（电梯加速、吊绳同时拉）时成立；匀速运动时也成立（合力为零）。',
+    example: '体重 50 kg 站在地上，地面用约 490 N 的力托着你——你踩它，它推你，一对作用力反作用力。',
+  },
+  'K-M2-06': {
+    kind: 'formula',
+    title: '压强',
+    formula: 'p = F / A',
+    inputs: [
+      { key: 'f', label: '压力', unit: 'N', min: 1, max: 10000, default: 100 },
+      { key: 'a', label: '接触面积', unit: 'm²', min: 0.0001, max: 10, default: 0.01 },
+    ],
+    outputs: [
+      { key: 'p', label: '压强', unit: 'Pa', expr: 'f / a' },
+    ],
+    note: '压强是「每单位面积分摊多少力」。同样压力，面积小一半压强大一倍；这里的压力垂直于接触面才算。',
+    example: '100 N 踩在 1 cm² 上压强 1 MPa（针尖扎手疼）；同样 100 N 踩在 0.1 m² 雪地上只有 1 kPa，雪鞋就是这么防陷的。',
+  },
+  'K-M2-07': {
+    kind: 'formula',
+    title: '液体压强',
+    formula: 'p = p表面 + ρgh',
+    inputs: [
+      { key: 'p0', label: '表面压强', unit: 'Pa', min: 0, max: 200000, default: 101300 },
+      { key: 'rho', label: '液体密度', unit: 'kg/m³', min: 500, max: 1400, default: 1000 },
+      { key: 'h', label: '深度', unit: 'm', min: 0.01, max: 100, default: 10 },
+      { key: 'g', label: '重力加速度', unit: 'm/s²', min: 1, max: 25, default: 9.8 },
+    ],
+    outputs: [
+      { key: 'p', label: '该深度总压强', unit: 'Pa', expr: 'p0 + rho * g * h' },
+    ],
+    note: '液体压强只和深度、密度有关，和容器的形状、液体总量无关；越深越大，同一深度处处相等。',
+    example: '潜水每下 10 m，压强增加约一个大气压；10 m 深处总共约 2 个大气压——所以深潜要慢慢上来，防减压病。',
+  },
+  'K-M2-08': {
+    kind: 'formula',
+    title: '阿基米德原理',
+    formula: 'F浮 = ρ液·g·V排',
+    inputs: [
+      { key: 'rho', label: '液体密度', unit: 'kg/m³', min: 500, max: 2500, default: 1000 },
+      { key: 'V', label: '排开液体体积', unit: 'm³', min: 0.0001, max: 1, default: 0.005 },
+      { key: 'g', label: '重力加速度', unit: 'm/s²', min: 1, max: 25, default: 9.8 },
+    ],
+    outputs: [
+      { key: 'F', label: '浮力', unit: 'N', expr: 'rho * g * V' },
+    ],
+    note: '浮力等于「被排开的液体的重量」，与被浮物体的材料无关。物体密度小于液体就浮，大于就沉。',
+    example: '船吃水越深，排开的水越多，浮力越大——货船装货后下沉，靠的就是多排开的水托住更多的重量。',
+  },
+  'K-M2-13': {
+    kind: 'formula',
+    title: '杠杆平衡条件',
+    formula: 'Στ = 0',
+    inputs: [
+      { key: 'f1', label: '左侧力', unit: 'N', min: 1, max: 500, default: 100 },
+      { key: 'l1', label: '左侧力臂', unit: 'm', min: 0.1, max: 10, default: 1.5 },
+      { key: 'f2', label: '右侧力', unit: 'N', min: 1, max: 500, default: 200 },
+      { key: 'l2', label: '右侧力臂', unit: 'm', min: 0.1, max: 10, default: 1 },
+    ],
+    outputs: [
+      { key: 'left', label: '左侧力矩', unit: 'N·m', expr: 'f1 * l1' },
+      { key: 'right', label: '右侧力矩', unit: 'N·m', expr: 'f2 * l2' },
+      { key: 'diff', label: '力矩差（0=平衡）', unit: 'N·m', expr: 'f1 * l1 - f2 * l2' },
+    ],
+    note: '平衡比的是力矩（力×力臂）不是力本身：小力配长臂能平衡大力配短臂。差值为正左侧下沉，为负右侧下沉。',
+    example: '跷跷板：体重轻的小朋友坐远一点，就能平衡体重重的大人——远的那头力臂长，力矩照样够。',
+  },
+  'K-M2-14': {
+    kind: 'formula',
+    title: '机械效率',
+    formula: 'η = 有用输出功 / 输入功',
+    inputs: [
+      { key: 'wo', label: '有用功', unit: 'J', min: 1, max: 10000, default: 100 },
+      { key: 'wt', label: '输入总功', unit: 'J', min: 1, max: 10000, default: 200 },
+    ],
+    outputs: [
+      { key: 'eta', label: '机械效率', unit: '', expr: 'wo / wt' },
+    ],
+    note: '输入功 = 有用功 + 损失（摩擦等），所以效率永远小于 1。平台没有独立的效率表，这里用功的比值算。',
+    example: '用滑轮把 100 J 的货提上去，手却做了 200 J 的功：效率 50%，另一半被摩擦和滑轮本身吃掉了。',
+  },
+  'K-M3-08': {
+    kind: 'formula',
+    title: '万有引力定律',
+    formula: 'F = G·m₁·m₂ / r²',
+    inputs: [
+      { key: 'm1', label: '天体质量', unit: 'kg', min: 1e20, max: 2e30, default: 5.97e24 },
+      { key: 'm2', label: '物体质量', unit: 'kg', min: 1, max: 1e6, default: 70 },
+      { key: 'r', label: '到天体中心的距离', unit: 'm', min: 1e6, max: 1e11, default: 6.371e6 },
+    ],
+    outputs: [
+      { key: 'F', label: '引力', unit: 'N', expr: '6.674e-11 * m1 * m2 / (r * r)' },
+    ],
+    note: 'r 是到中心的距离：在地面就是地球半径 6.37×10⁶ m。距离翻倍，引力降到四分之一。',
+    example: '70 kg 的人站在地球表面：代入得到约 686 N——这就是你的体重，地心引力从脚下 6000 多公里外把你拽住。',
+  },
+  'K-M3-09': {
+    kind: 'formula',
+    title: '卫星与宇宙速度',
+    formula: 'v圆 = √(GM/r)，v逃 = √(2GM/r)',
+    inputs: [
+      { key: 'm', label: '天体质量', unit: 'kg', min: 1e20, max: 2e30, default: 5.97e24 },
+      { key: 'r', label: '轨道半径（到中心）', unit: 'm', min: 6.4e6, max: 1e9, default: 6.6e6 },
+    ],
+    outputs: [
+      { key: 'vc', label: '圆轨道速度', unit: 'm/s', expr: 'Math.sqrt(6.674e-11 * m / r)' },
+      { key: 've', label: '逃逸速度', unit: 'm/s', expr: 'Math.sqrt(2 * 6.674e-11 * m / r)' },
+    ],
+    note: '圆轨道速度让卫星不掉下来也飞不走；逃逸速度是飞出引力影响的最小速度，正好是前者的 √2 倍。',
+    example: '近地轨道（半径约 6600 km）圆轨道速度约 7.7 km/s，逃逸约 10.9 km/s——长征火箭就是奔着这个速度去的。',
+  },
+  'K-M3-15': {
+    kind: 'formula',
+    title: '机械波',
+    formula: 'λ = c / f',
+    inputs: [
+      { key: 'c', label: '波速', unit: 'm/s', min: 50, max: 6000, default: 343 },
+      { key: 'f', label: '频率', unit: 'Hz', min: 20, max: 20000, default: 440 },
+    ],
+    outputs: [
+      { key: 'lambda', label: '波长', unit: 'm', expr: 'c / f' },
+    ],
+    note: '频率由波源决定，波速由介质决定；频率越高波长越短。声波靠介质传播，没有介质（真空）就没有声波。',
+    example: '标准音 A（440 Hz）在空气中的波长约 0.78 m——比你的臂展短一点；人耳能听到的最低声波长约 17 m，接近一辆公交车。',
+  },
+  'K-M3-16': {
+    kind: 'formula',
+    title: '波的干涉与衍射',
+    formula: '相位差 = 路径差产生的相位差（2π·ΔL/λ）',
+    inputs: [
+      { key: 'dL', label: '路径差', unit: 'm', min: 0.001, max: 10, default: 0.5 },
+      { key: 'lambda', label: '波长', unit: 'm', min: 0.0001, max: 10, default: 0.343 },
+    ],
+    outputs: [
+      { key: 'phase', label: '相位差', unit: 'rad', expr: '2 * Math.PI * dL / lambda' },
+      { key: 'deg', label: '相位差', unit: '°', expr: '360 * dL / lambda' },
+    ],
+    note: '路径差是整数个波长 → 加强（亮/响），半波长的奇数倍 → 减弱（暗/静）。这里只算相位差，叠加幅度要看两波源相位。',
+    example: '两个同频音箱，某点到一个比到另一个远 0.34 m（一个波长）：这点的声波同相叠加，听起来特别响。',
+  },
+  'K-M4-03': {
+    kind: 'formula',
+    title: '拉格朗日量',
+    formula: 'L = m·q̇²/2 − k·q²/2',
+    inputs: [
+      { key: 'm', label: '质量', unit: 'kg', min: 0.01, max: 10, default: 1 },
+      { key: 'v', label: '广义速度 q̇', unit: 'm/s', min: 0, max: 10, default: 2 },
+      { key: 'k', label: '刚度', unit: 'N/m', min: 0.1, max: 100, default: 20 },
+      { key: 'q', label: '广义坐标（位移）', unit: 'm', min: -2, max: 2, default: 0.5 },
+    ],
+    outputs: [
+      { key: 'T', label: '动能 T = m q̇²/2', unit: 'J', expr: '0.5 * m * v * v' },
+      { key: 'V', label: '势能 V = k q²/2', unit: 'J', expr: '0.5 * k * q * q' },
+      { key: 'L', label: '拉格朗日量 L = T − V', unit: 'J', expr: '0.5 * m * v * v - 0.5 * k * q * q' },
+    ],
+    note: 'L 不是能量，是「动能减势能」，符号可以正可以负。运动方程 L 的变分（最小作用量）给出，这只是代入计算。',
+    example: '弹簧振子：快推慢拉时 L 为正（动能占优），拉到极限静止时 L 为负——L 的变化方向藏着运动方程。',
+  },
+  'K-M4-04': {
+    kind: 'diagram',
+    title: '最小作用量原理',
+    draw: '画两条从 A 到 B 的路径：一条平滑曲线（真实路径），一条折线（备选路径）；下方画作用量 S 随路径变化的示意图，真实路径处取最小。',
+    marks: ['作用量 S = ∫L dt', '真实路径使 S 取极值（最小）', '备选路径的 S 都比真实路径大'],
+    watch: '光走「时间最短」路径（费马原理）、小球滚「最快到达」的曲线，都是同一个原理在不同系统里的表现。',
+    note: '这是变分原理，平台没有泛函求解器，只能画示意图说明「极值」这件事。',
+  },
+  'K-M4-07': {
+    kind: 'formula',
+    title: '伯努利方程',
+    formula: 'p + ρv²/2 + ρgh = 常量（同一流线）',
+    inputs: [
+      { key: 'p', label: '该点压强', unit: 'Pa', min: 10000, max: 500000, default: 100000 },
+      { key: 'rho', label: '流体密度', unit: 'kg/m³', min: 1, max: 1400, default: 1000 },
+      { key: 'v', label: '流速', unit: 'm/s', min: 0, max: 100, default: 10 },
+      { key: 'h', label: '高度（相对参考面）', unit: 'm', min: 0, max: 100, default: 5 },
+      { key: 'g', label: '重力加速度', unit: 'm/s²', min: 1, max: 25, default: 9.8 },
+    ],
+    outputs: [
+      { key: 'C', label: '流线常量', unit: 'Pa', expr: 'p + 0.5 * rho * v * v + rho * g * h' },
+    ],
+    note: '只对同一条流线上理想（无黏、不可压缩）流体成立；实际流体有黏性损耗，流动快的边上压强确实低，但定量会有偏差。',
+    example: '机翼上方气流快、压强低，下方慢、压强高——上下压强差就是升力；吹纸条上方流速快，纸条飘起来。',
+  },
+  'K-M4-08': {
+    kind: 'formula',
+    title: '粘滞流体',
+    formula: 'v(t) = v₀·e^(−ct/m)',
+    inputs: [
+      { key: 'v0', label: '初速度', unit: 'm/s', min: 0.1, max: 100, default: 10 },
+      { key: 'c', label: '阻力系数', unit: 'kg/s', min: 0.1, max: 100, default: 2 },
+      { key: 'm', label: '质量', unit: 'kg', min: 0.01, max: 100, default: 1 },
+      { key: 't', label: '经过时间', unit: 's', min: 0, max: 60, default: 5 },
+    ],
+    outputs: [
+      { key: 'v', label: '此时速度', unit: 'm/s', expr: 'v0 * Math.exp(-c * t / m)' },
+      { key: 'frac', label: '剩余比例', unit: '', expr: 'Math.exp(-c * t / m)' },
+    ],
+    note: '这是线性阻力（与速度成正比）的解：速度按指数衰减，永不真正到零。平台「流体阻力」器具用的就是这条。',
+    example: '水上滑行停止划桨：阻力系数 2 kg/s 的 1 kg 船，5 秒后速度只剩初值的约 1/22000——几乎停了。',
+  },
+
+  /* ===================== 电磁 ===================== */
+  'K-E1-02': {
+    kind: 'formula',
+    title: '导体与绝缘体',
+    formula: 'I = U / R',
+    inputs: [
+      { key: 'u', label: '电压', unit: 'V', min: 0.1, max: 1000, default: 6 },
+      { key: 'r', label: '电阻', unit: 'Ω', min: 0.01, max: 1e7, default: 2 },
+    ],
+    outputs: [
+      { key: 'I', label: '电流', unit: 'A', expr: 'u / r' },
+    ],
+    note: '导体的电阻小（铜约 10⁻⁸ Ω·m），绝缘体大得惊人（塑料 10¹³ 量级）。同样电压，电流差了亿倍——这就是「通」和「不通」的区别。',
+    example: '6 V 加在 2 Ω 上电流 3 A（灯泡亮）；加在 10⁷ Ω 上只有 0.6 µA（塑料、橡胶——手摸上去没感觉）。',
+  },
+  'K-E1-05': {
+    kind: 'diagram',
+    title: '磁铁的两极',
+    draw: '画一块条形磁铁，左端标 N 右端标 S；下方画三幅小图：异名极靠近（相吸）、同名极靠近（相斥）、从中间掰断（断口处各长出新的一对 N/S）。',
+    marks: ['两极吸力最强', '同名相斥、异名相吸', '掰断后每段仍是完整磁铁'],
+    watch: '磁极永远成对出现：把磁铁掰成两半，断口立刻长出新的 N 和 S，至今没发现单独的一个磁极。',
+    note: '没有可算的数字；磁学里平台能算的只有匀强磁场和安培力（见 K-E3-08）。',
+  },
+  'K-E1-06': {
+    kind: 'diagram',
+    title: '磁铁能吸什么',
+    draw: '画三列材料：铁、钴、镍（被吸）；铝、铜、金、银（不吸）；塑料、木头、陶瓷（不吸）。每列配一个小物件图标。',
+    marks: ['能吸的是铁磁材料（铁钴镍及其合金）', '铜铝金都是金属，但不吸', '吸力随距离迅速衰减'],
+    watch: '判断「能不能吸」不是看是不是金属，而是看原子磁矩能不能被外场整齐排列（铁磁）。',
+    note: '平台没有磁铁吸引材料的模型，这里只给材料的分类判断。',
+  },
+  'K-E2-08': {
+    kind: 'formula',
+    title: '焦耳定律',
+    formula: 'Q = I²Rt',
+    inputs: [
+      { key: 'I', label: '电流', unit: 'A', min: 0.01, max: 100, default: 2 },
+      { key: 'r', label: '电阻', unit: 'Ω', min: 0.1, max: 10000, default: 10 },
+      { key: 't', label: '通电时间', unit: 's', min: 0.1, max: 3600, default: 60 },
+    ],
+    outputs: [
+      { key: 'Q', label: '发热量', unit: 'J', expr: 'I * I * r * t' },
+    ],
+    note: '电流是平方项：电流翻倍发热变四倍。这个式子算的是电阻上的发热；电动机等有机械输出时不能用 UIt 直接算热。',
+    example: '2 A 过 10 Ω 电阻一分钟：Q = 4×10×60 = 2400 J——老式电热毯一档大概就是这个量级。',
+  },
+  'K-E2-09': {
+    kind: 'diagram',
+    title: '家庭电路',
+    draw: '画一个电源，分出两条并联支路，每条支路上串一个开关和一个灯泡；下方并列标出「电压相同」「电流独立」「开关各管一路」。',
+    marks: ['各支路电压都等于电源电压', '各支路电流互不影响', '断开一路，其余照常工作'],
+    watch: '并联是家庭电路的骨架：一盏灯坏了其他灯照亮，因为每条支路都是独立的回路。',
+    note: '这一条没有可算的数字（家庭电路是结构知识）：只画并联示意，且是低压直流类比，没有火零线制度、漏电保护和断路器。',
+  },
+  'K-E2-10': {
+    kind: 'diagram',
+    title: '安全用电',
+    draw: '画「电源 → 总开关（断开点）→ 用电器」的示意图，断开点画得特别大并标红；旁边画一个小方块标注「保护装置」并用虚线框住。',
+    marks: ['检修前先断开总开关', '保护装置装在能切断整条回路的位置', '不接触带电部分，也不湿手碰开关'],
+    watch: '断电是第一步：断开了，电流回路就断了，用电器不再带电。保护装置（熔断器/漏保）的作用是异常时自动切断。',
+    note: '平台没有人体的触电模型，这里只讲原则，不做任何真实电压的指导。',
+  },
+  'K-E2-12': {
+    kind: 'formula',
+    title: '电流的磁效应',
+    formula: 'B = μ₀·I / (2πr)（无限长直导线）',
+    inputs: [
+      { key: 'I', label: '电流', unit: 'A', min: 0.01, max: 100, default: 10 },
+      { key: 'r', label: '到导线距离', unit: 'm', min: 0.001, max: 1, default: 0.05 },
+    ],
+    outputs: [
+      { key: 'B', label: '磁感应强度', unit: 'T', expr: '4 * Math.PI * 1e-7 * I / (2 * Math.PI * r)' },
+    ],
+    note: '磁场绕着导线转圈（右手螺旋定则），离得越近越强。μ₀ = 4π×10⁻⁷ T·m/A。',
+    example: '10 A 电流在 5 cm 处产生约 4×10⁻⁵ T——和地球磁场同一个量级；这就是电磁铁、电动机的起点。',
+  },
+  'K-E2-13': {
+    kind: 'diagram',
+    title: '电磁铁',
+    draw: '画一个线圈绕在铁芯上，两端标 N/S；旁边一个开关控制电流通断；电流通时铁芯吸起小铁钉，断时掉下。',
+    marks: ['通电才有磁性，断电即消失', '电流方向换，磁极就换', '铁芯把磁场「收集」起来，吸力大增'],
+    watch: '电磁铁 = 电流磁效应 + 铁磁材料：线圈产生磁场，铁芯被磁化后成倍增强。',
+    note: '平台没有电磁铁器具，这里只画原理图。',
+  },
+  'K-E2-14': {
+    kind: 'formula',
+    title: '电动机与发电机',
+    formula: 'F = Bz·L·I（电流受的安培力）',
+    inputs: [
+      { key: 'b', label: '磁感应强度', unit: 'T', min: 0.01, max: 10, default: 0.5 },
+      { key: 'l', label: '有效导线长度', unit: 'm', min: 0.1, max: 10, default: 2 },
+      { key: 'i', label: '电流', unit: 'A', min: 0.01, max: 100, default: 2 },
+    ],
+    outputs: [
+      { key: 'F', label: '安培力', unit: 'N', expr: 'b * l * i' },
+    ],
+    note: '力、磁场、电流三者互相垂直（左手定则）。电动机靠这个力转动；反过来导线在磁场里动，就感应出电流（发电机）。',
+    example: '0.5 T 的磁场里一段 2 m 导线通 2 A：受力 2 N——电动车电机里几十根导线同时受力，合起来就是驱动力。',
+  },
+  'K-E3-02': {
+    kind: 'formula',
+    title: '电势与电势差',
+    formula: 'Uab = E·(rb − ra)（匀强电场沿场线方向）',
+    inputs: [
+      { key: 'e', label: '电场强度', unit: 'N/C', min: 1, max: 1e6, default: 1000 },
+      { key: 'd', label: '沿电场方向的间距', unit: 'm', min: 0.01, max: 100, default: 1 },
+    ],
+    outputs: [
+      { key: 'U', label: '电势差', unit: 'V', expr: 'e * d' },
+    ],
+    note: '电势沿电场方向降低：从低电势到高电势是「逆着电场走」。电压表量的是两点电势差，不是某点的电势。',
+    example: '匀强电场 1000 V/m 里，沿场方向相距 1 m 的两点差 1000 V——闪电前云层到地面的电场就类似这样拉开几亿伏。',
+  },
+  'K-E3-08': {
+    kind: 'formula',
+    title: '磁场与安培力',
+    formula: 'F = B·L·I；平衡时 kx ≈ F',
+    inputs: [
+      { key: 'b', label: '磁感应强度', unit: 'T', min: 0.01, max: 10, default: 2 },
+      { key: 'l', label: '有效导线长度', unit: 'm', min: 0.1, max: 10, default: 2 },
+      { key: 'i', label: '电流', unit: 'A', min: 0.01, max: 100, default: 1 },
+      { key: 'k', label: '悬挂刚度', unit: 'N/m', min: 0.1, max: 1000, default: 20 },
+    ],
+    outputs: [
+      { key: 'F', label: '安培力', unit: 'N', expr: 'b * l * i' },
+      { key: 'x', label: '弹簧平衡位移', unit: 'm', expr: 'b * l * i / k' },
+    ],
+    note: '电流反向或磁场反向，力就反向（平台音圈实验里能真的看到）。有效导线固定沿一个方向，只取垂直分量。',
+    example: '2 T 磁场、2 m 导线、1 A 电流：力 4 N，挂在 k=20 N/m 的弹簧上位移 0.2 m——平台「安培力」实验就是这个装置。',
+  },
+  'K-E3-11': {
+    kind: 'formula',
+    title: '法拉第电磁感应定律',
+    formula: 'ε = −N·ΔΦ/Δt',
+    inputs: [
+      { key: 'n', label: '匝数', unit: '匝', min: 1, max: 1000, default: 100 },
+      { key: 'dphi', label: '磁通变化量', unit: 'Wb', min: 0.001, max: 10, default: 0.1 },
+      { key: 'dt', label: '变化所用时间', unit: 's', min: 0.01, max: 10, default: 0.5 },
+    ],
+    outputs: [
+      { key: 'emf', label: '感应电动势大小', unit: 'V', expr: 'n * dphi / dt' },
+    ],
+    note: '这里给大小；负号表示方向（楞次定律）。关键是「变」：磁通不变，不管磁铁多强都没有感应。',
+    example: '100 匝线圈在 0.5 s 内磁通变化 0.1 Wb：感应电动势 20 V——发电机就是让线圈在磁场里不停转，磁通不断变。',
+  },
+  'K-E3-12': {
+    kind: 'diagram',
+    title: '楞次定律',
+    draw: '画一个磁铁 N 极向下插入线圈：线圈上方标「感应电流产生的磁场向上（排斥来磁）」，下方画磁铁抽出时「磁场向下（挽留去磁）」。',
+    marks: ['感应电流的磁场阻碍磁通变化', '来则拒（排斥）、去则留（吸引）', '方向判断：右手定则'],
+    watch: '楞次定律说的是「阻碍变化」不是「反对磁铁」：插入时排斥，拔出时反而挽留——永远是给变化踩刹车。',
+    note: '这一条没有可算的数字：方向判断，数值用 K-E3-11 的公式。',
+  },
+  'K-E3-13': {
+    kind: 'formula',
+    title: '自感与互感',
+    formula: 'uL = L·di/dt；τ = L/R',
+    inputs: [
+      { key: 'l', label: '电感', unit: 'H', min: 0.001, max: 100, default: 1 },
+      { key: 'di', label: '电流变化量', unit: 'A', min: 0.01, max: 100, default: 1 },
+      { key: 'dt', label: '变化时间', unit: 's', min: 0.001, max: 10, default: 0.1 },
+      { key: 'r', label: '回路电阻', unit: 'Ω', min: 0.1, max: 10000, default: 10 },
+    ],
+    outputs: [
+      { key: 'u', label: '自感电动势', unit: 'V', expr: 'l * di / dt' },
+      { key: 'tau', label: 'RL 时间常数', unit: 's', expr: 'l / r' },
+    ],
+    note: '自感阻碍电流自己变化：断电瞬间 di/dt 很大，能打出很高的尖峰电压（开关火花）。互感是变压器的原理，平台只有理论。',
+    example: '1 H 电感在 0.1 s 内电流变 1 A：自感电动势 10 V——拔插头时火花就是瞬间大 di/dt 打出来的。',
+  },
+  'K-E3-15': {
+    kind: 'formula',
+    title: '变压器',
+    formula: 'U₂/U₁ = N₂/N₁（理想变压器）',
+    inputs: [
+      { key: 'u1', label: '一次电压', unit: 'V', min: 1, max: 100000, default: 220 },
+      { key: 'n1', label: '一次匝数', unit: '匝', min: 10, max: 10000, default: 1000 },
+      { key: 'n2', label: '二次匝数', unit: '匝', min: 10, max: 10000, default: 100 },
+    ],
+    outputs: [
+      { key: 'u2', label: '二次电压', unit: 'V', expr: 'u1 * n2 / n1' },
+    ],
+    note: '只对交变电压成立（直流不变压）；升压的同时电流按反比变小，功率守恒。平台没有互感模型，这是纯公式。',
+    example: '充电头：220 V 从 1000 匝降到 100 匝，输出 22 V——你手机充电器里那个黑色方块干的就是这件事。',
+  },
+  'K-E4-01': {
+    kind: 'diagram',
+    title: '麦克斯韦方程组',
+    draw: '画四行小图：①电荷发散电场线 ②磁场无单极（磁感线闭合）③变化的磁场产生涡旋电场 ④变化的电场产生磁场。每行配方程的符号版。',
+    marks: ['∇·E = ρ/ε₀（电荷产生电场）', '∇·B = 0（没有磁单极）', '∇×E = −∂B/∂t（变化的磁场生电场）', '∇×B = μ₀J + μ₀ε₀∂E/∂t（电流和变化电场生磁场）'],
+    watch: '四个方程把电和磁统一成一个整体：变化的电场和变化的磁场互相产生，于是电磁波自己传播起来。',
+    note: '这是微分方程系统，平台没有场求解器，只画四幅示意图。',
+  },
+  'K-E4-02': {
+    kind: 'formula',
+    title: '电磁波谱',
+    formula: '真空中 c = f·λ',
+    inputs: [
+      { key: 'f', label: '频率', unit: 'Hz', min: 1e3, max: 1e20, default: 1e8 },
+    ],
+    outputs: [
+      { key: 'lambda', label: '波长', unit: 'm', expr: '3e8 / f' },
+    ],
+    note: '频率决定波长，也决定它在谱上的位置：<3×10⁸ Hz 无线电、3×10⁸–3×10¹² 微波、3×10¹²–4×10¹⁴ 红外、4×10¹⁴–8×10¹⁴ 可见光、8×10¹⁴–3×10¹⁶ 紫外，更高是 X 射线和 γ 射线。',
+    example: '手机信号约 1 GHz → 波长 0.3 m；可见光约 5×10¹⁴ Hz → 波长 600 nm（橙红）——所有电磁波真空中都跑同样快。',
+  },
+  'K-E4-03': {
+    kind: 'diagram',
+    title: 'PN 结',
+    draw: '画一块半导体，左边标 P 区（空穴多），右边标 N 区（电子多），中间一条竖线标「耗尽层」；旁边画正向偏置（导通）和反向偏置（截止）两幅小图。',
+    marks: ['P 区多空穴、N 区多电子', '界面处形成耗尽层', '正向导通、反向截止——单向阀'],
+    watch: 'PN 结是二极管、太阳能电池、LED 的基础：能不能导通由偏置方向决定，这是它最重要的性质。',
+    note: '平台没有半导体器件模型，这里只画结构图。',
+  },
+  'K-E4-04': {
+    kind: 'formula',
+    title: '二极管与整流',
+    formula: '半波整流平均电压 = V峰值/π',
+    inputs: [
+      { key: 'vp', label: '输入峰值电压', unit: 'V', min: 1, max: 1000, default: 10 },
+    ],
+    outputs: [
+      { key: 'vavg', label: '半波整流平均电压', unit: 'V', expr: 'vp / Math.PI' },
+      { key: 'ratio', label: '占空比', unit: '', expr: '0.5' },
+    ],
+    note: '理想二极管无压降；实际硅管正向压降约 0.7 V 要从峰值里扣。全波整流平均是 2·Vp/π。',
+    example: '10 V 交流峰值的半波整流：平均约 3.18 V——手机充电器先整流（变直流）再稳压，就是这个流程的第一步。',
+  },
+  'K-E4-05': {
+    kind: 'formula',
+    title: '晶体管放大',
+    formula: '放大区 IC ≈ β·IB',
+    inputs: [
+      { key: 'beta', label: '电流放大倍数 β', unit: '', min: 10, max: 1000, default: 100 },
+      { key: 'ib', label: '基极电流', unit: 'A', min: 1e-6, max: 1e-3, default: 1e-5 },
+    ],
+    outputs: [
+      { key: 'ic', label: '集电极电流', unit: 'A', expr: 'beta * ib' },
+    ],
+    note: '只在小信号、放大区成立；β 随温度和工作点漂移，不是精密常数。小基极电流控制大集电极电流，这就是「放大」。',
+    example: 'β=100 的管子给基极 10 µA：集电极 1 mA——麦克风的小信号就是这么被放大成能推动喇叭的电流。',
+  },
+  'K-E4-06': {
+    kind: 'formula',
+    title: '坡印廷矢量',
+    formula: 'S = E×H，真空中 H = B/μ₀',
+    inputs: [
+      { key: 'e', label: '电场强度', unit: 'V/m', min: 1, max: 1e7, default: 1000 },
+      { key: 'b', label: '磁感应强度', unit: 'T', min: 1e-9, max: 1, default: 3.3e-6 },
+    ],
+    outputs: [
+      { key: 'S', label: '能流密度', unit: 'W/m²', expr: 'e * b / (4 * Math.PI * 1e-7)' },
+    ],
+    note: 'S 表示电磁能「朝哪个方向流、每秒每平方米流多少」：电场和磁场互相垂直时能量就沿第三方向传播——电磁波的能量就是靠它运的。',
+    example: '真空中 E=1000 V/m、B=3.3×10⁻⁶ T 的电磁波：能流约 2600 W/m²——和正午太阳的强度同一量级。',
+  },
+
+  /* ===================== 光学 ===================== */
+  'K-O4-02': {
+    kind: 'formula',
+    title: '厚透镜与主平面',
+    formula: '1/f等效 = 1/f₁ + 1/f₂ − d/(f₁·f₂)',
+    inputs: [
+      { key: 'f1', label: '第一片焦距', unit: 'm', min: 0.05, max: 2, default: 0.5 },
+      { key: 'f2', label: '第二片焦距', unit: 'm', min: 0.05, max: 2, default: 0.5 },
+      { key: 'd', label: '两片间距', unit: 'm', min: 0, max: 1, default: 0.1 },
+    ],
+    outputs: [
+      { key: 'f', label: '等效焦距', unit: 'm', expr: '1 / (1 / f1 + 1 / f2 - d / (f1 * f2))' },
+    ],
+    note: '两片间距很小才近似一片薄透镜；分母趋近零时等效焦距无穷大（望远镜式准直）。厚透镜的真实主平面位置平台做不出。',
+    example: '两片 0.5 m 焦距的镜片相距 0.1 m：等效焦距约 0.28 m——变焦镜头就是靠改变镜片间距来连续变焦的。',
+  },
+  'K-O4-03': {
+    kind: 'formula',
+    title: '衍射与艾里斑',
+    formula: '小角度第一暗环 θ ≈ 1.22λ/D',
+    inputs: [
+      { key: 'lambda', label: '波长', unit: 'm', min: 4e-7, max: 7e-7, default: 5.5e-7 },
+      { key: 'd', label: '孔径直径', unit: 'm', min: 0.001, max: 0.5, default: 0.01 },
+    ],
+    outputs: [
+      { key: 'theta', label: '第一暗环角半径', unit: 'rad', expr: '1.22 * lambda / d' },
+    ],
+    note: '光经过任何有限大小的孔都会衍射：点光源成的像不是点，而是一圈圈亮暗环（艾里斑）。孔径越小衍射越明显。',
+    example: '直径 1 cm 的透镜看绿光：第一暗环约 6.7×10⁻⁵ rad——人眼瞳孔更小，衍射更明显，这就是望远镜要做大镜子的原因。',
+  },
+  'K-O4-04': {
+    kind: 'formula',
+    title: '分辨极限',
+    formula: 'θ最小 ≈ 1.22λ/D（瑞利判据）',
+    inputs: [
+      { key: 'lambda', label: '波长', unit: 'm', min: 4e-7, max: 7e-7, default: 5.5e-7 },
+      { key: 'd', label: '孔径直径', unit: 'm', min: 0.001, max: 0.5, default: 0.01 },
+      { key: 'l', label: '观察距离', unit: 'm', min: 0.1, max: 10000, default: 100 },
+    ],
+    outputs: [
+      { key: 'theta', label: '最小可分辨角', unit: 'rad', expr: '1.22 * lambda / d' },
+      { key: 's', label: '最小可分辨间距', unit: 'm', expr: '1.22 * lambda / d * l' },
+    ],
+    note: '瑞利判据：两个点源的像靠到第一暗环重合就无法分辨。想看得更细只有两条路：更大的孔径或更短的波长。',
+    example: '1 cm 孔径在 100 m 外能分辨约 6.7 mm 的两点——显微镜换短波长（电子束）就是为了突破这个极限。',
+  },
+  'K-O4-05': {
+    kind: 'formula',
+    title: '傅里叶光学',
+    formula: '近轴焦面坐标 x ≈ λ·f·νx',
+    inputs: [
+      { key: 'lambda', label: '波长', unit: 'm', min: 4e-7, max: 7e-7, default: 5.5e-7 },
+      { key: 'f', label: '透镜焦距', unit: 'm', min: 0.1, max: 2, default: 1 },
+      { key: 'nu', label: '空间频率', unit: '1/m', min: 1, max: 1e6, default: 1000 },
+    ],
+    outputs: [
+      { key: 'x', label: '焦面位置', unit: 'm', expr: 'lambda * f * nu' },
+    ],
+    note: '透镜把「空间频率」展开到焦面的不同位置：条纹越密（ν 越大），落在焦面越远。这是全息、显微镜成像的数学基础。',
+    example: '空间频率 1000 线/m 的条纹，经 f=1 m 的透镜：在焦面距轴 0.55 mm 处成像——不同疏密的条纹自动排到不同位置。',
+  },
+  'K-O4-06': {
+    kind: 'diagram',
+    title: '激光与相干性',
+    draw: '画两幅波形对比：普通光（许多不同相位的小波乱叠，杂乱）与激光（同频率、同相位的大波，整齐）。下方画激光器的三个要素：增益介质、泵浦、两面反射镜。',
+    marks: ['相干 = 频率相同且相位关系固定', '普通光：无数独立发光的原子，相位乱', '激光：受激辐射让原子步调一致'],
+    watch: '相干让激光能聚焦成极小的点、能在远处保持细束、能用于干涉测量——普通灯泡做不到这些。',
+    note: '平台把激光当平行光源（相干性只在图上讲），没有受激辐射模型。',
+  },
+
+  /* ===================== 热学 ===================== */
+  'K-T1-01': {
+    kind: 'diagram',
+    title: '冷和热',
+    draw: '画一只手摸金属椅子和木头椅子，两把椅子标「同样温度」；手边画箭头表示热量从手流向金属更快（箭头粗），流向木头更慢（箭头细）。',
+    marks: ['手感觉的是热流快慢，不是温度数值', '金属导热快 → 感觉凉', '木头导热慢 → 感觉温'],
+    watch: '两把椅子其实一样冷：金属把热量从手里抽走得快，所以「更凉」。感觉会骗人，温度计不会。',
+    note: '平台没有皮肤和热流模型，这一条只画原理。',
+  },
+  'K-T1-02': {
+    kind: 'formula',
+    title: '温度计怎么用',
+    formula: 'T/K = t/°C + 273.15',
+    inputs: [
+      { key: 'c', label: '摄氏温度', unit: '°C', min: -273, max: 1000, default: 20 },
+    ],
+    outputs: [
+      { key: 'k', label: '开尔文温度', unit: 'K', expr: 'c + 273.15' },
+    ],
+    note: '气体定律里必须用开尔文（绝对温度），0 K 是理论下限。读数要在温度计和被测物达到热平衡、示数稳定后读。',
+    example: '冰水混合是 0 °C = 273.15 K；室温 20 °C ≈ 293 K——「乘 2 的摄氏度」在气体计算里没有意义，必须换 K。',
+  },
+  'K-T1-03': {
+    kind: 'formula',
+    title: '热会传过去',
+    formula: 'ΔT(t) = ΔT₀·e^(−t/RC)',
+    inputs: [
+      { key: 'd0', label: '初始温差', unit: '°C', min: 1, max: 100, default: 50 },
+      { key: 'rc', label: '时间常数', unit: 's', min: 10, max: 100000, default: 600 },
+      { key: 't', label: '经过时间', unit: 's', min: 10, max: 100000, default: 600 },
+    ],
+    outputs: [
+      { key: 'd', label: '剩余温差', unit: '°C', expr: 'd0 * Math.exp(-t / rc)' },
+    ],
+    note: '温差按指数衰减：过一个时间常数，温差剩约 37%。热量总是从热往冷走，走到温差为零才停。',
+    example: '刚烧开的水（和室温差 50 °C），时间常数 10 分钟：10 分钟后温差只剩约 18 °C，水摸上去还温但不烫了。',
+  },
+  'K-T1-04': {
+    kind: 'formula',
+    title: '保温',
+    formula: 'τ类比 = R·C（热阻 × 热容）',
+    inputs: [
+      { key: 'r', label: '热阻（壳越厚越大）', unit: 'K/W', min: 0.1, max: 100, default: 1 },
+      { key: 'c', label: '热容（东西越多越大）', unit: 'J/K', min: 1000, max: 1e7, default: 1e5 },
+    ],
+    outputs: [
+      { key: 'tau', label: '降温时间常数', unit: 's', expr: 'r * c' },
+    ],
+    note: '时间常数越大，凉得越慢：热阻是「挡热量」的本事（厚保温层、真空层），热容是「存热量」的本事。',
+    example: '热阻 1 K/W、热容 10⁵ J/K：时间常数 10⁵ s ≈ 28 小时——保温杯冬天早上装的热水，晚上还是温的，就是这个账。',
+  },
+  'K-T2-01': {
+    kind: 'formula',
+    title: '温度与内能',
+    formula: '单原子理想气体 U = 3nRT/2',
+    inputs: [
+      { key: 'n', label: '物质的量', unit: 'mol', min: 0.01, max: 100, default: 1 },
+      { key: 't', label: '温度', unit: 'K', min: 100, max: 1000, default: 300 },
+    ],
+    outputs: [
+      { key: 'U', label: '内能', unit: 'J', expr: '1.5 * 8.314 * n * t' },
+    ],
+    note: '内能是所有分子动能的总和（单原子气体没有转动、振动项）；温度看每个分子的平均动能，内能看总量——两者不是一回事。',
+    example: '1 mol 单原子气体在 300 K：内能约 3741 J——一瓶气体的内能听着大，但 3/2 的因子意味着它只靠分子乱动攒着。',
+  },
+  'K-T2-02': {
+    kind: 'diagram',
+    title: '热传递的三种方式',
+    draw: '画三幅小图：①勺子插在热汤里，柄端变热（传导，标「分子接力」）②暖气片旁热空气上升、冷空气下降（对流，标「流体环流」）③太阳晒到脸上（辐射，标「电磁波不靠介质」）。',
+    marks: ['传导：接触传热，金属最快', '对流：流体自身循环搬热', '辐射：电磁波，真空也能传'],
+    watch: '三种方式常同时发生：保温杯内外壁之间抽真空是断传导和对流，但银涂层是为了反辐射。',
+    note: '平台没有热流求解器，这里只画三幅示意。',
+  },
+  'K-T2-03': {
+    kind: 'formula',
+    title: '比热容',
+    formula: 'Q = m·c·ΔT',
+    inputs: [
+      { key: 'm', label: '质量', unit: 'kg', min: 0.01, max: 100, default: 1 },
+      { key: 'c', label: '比热容', unit: 'J/(kg·K)', min: 100, max: 5000, default: 4200 },
+      { key: 'dt', label: '温度变化', unit: '°C', min: 1, max: 500, default: 10 },
+    ],
+    outputs: [
+      { key: 'Q', label: '吸收的热量', unit: 'J', expr: 'm * c * dt' },
+    ],
+    note: '比热容是「升 1 K 每千克需要多少热」。水的 4200 远超大多数物质（铁约 450）——这就是沿海昼夜温差小的原因。',
+    example: '烧开 1 kg 水（升 10 °C 只要 42000 J 电热水壶几秒钟的事；但让整壶水从 20 烧到 100 °C 要 33 万 J，得等好几分钟）。',
+  },
+  'K-T2-04': {
+    kind: 'formula',
+    title: '熔化与凝固',
+    formula: 'Q相变 = m·L',
+    inputs: [
+      { key: 'm', label: '质量', unit: 'kg', min: 0.01, max: 100, default: 1 },
+      { key: 'l', label: '熔化潜热', unit: 'J/kg', min: 1000, max: 1e7, default: 334000 },
+    ],
+    outputs: [
+      { key: 'Q', label: '熔化吸收的热', unit: 'J', expr: 'm * l' },
+    ],
+    note: '熔化时温度停在熔点不动，热量全用来拆开晶体结构——这段热量叫熔化潜热。水的潜热很大（3.34×10⁵ J/kg）。',
+    example: '融化 1 kg 冰要 3.34×10⁵ J，够把同样多的水加热 80 °C——所以冰镇饮料那么持久，冰块在拼命吸热。',
+  },
+  'K-T2-05': {
+    kind: 'formula',
+    title: '汽化与液化',
+    formula: 'Q汽化 = m·L汽化',
+    inputs: [
+      { key: 'm', label: '质量', unit: 'kg', min: 0.01, max: 100, default: 1 },
+      { key: 'l', label: '汽化潜热', unit: 'J/kg', min: 10000, max: 1e7, default: 2260000 },
+    ],
+    outputs: [
+      { key: 'Q', label: '汽化吸收的热', unit: 'J', expr: 'm * l' },
+    ],
+    note: '汽化潜热比熔化潜热大得多（水 2.26×10⁶ J/kg）。沸腾时温度也停在沸点不动，热量全用来把液体变成气体。',
+    example: '烧开 1 kg 水（100 °C 后继续烧）要额外 2.26×10⁶ J——所以水烧开后要关小火，大火只是白费电，温度不会再升。',
+  },
+  'K-T2-06': {
+    kind: 'diagram',
+    title: '升华与凝华',
+    draw: '画两幅：①干冰（固态 CO₂）直接变成白雾状的气体（升华，标「不经过液态」）②冬天窗户内侧的冰花（凝华，标「水汽直接变冰」）。',
+    marks: ['升华：固态 → 气态（干冰、樟脑丸）', '凝华：气态 → 固态（窗花、霜）', '都跳过液态这一步'],
+    watch: '舞台烟雾、樟脑丸变小、冷冻食品的「冰霜」，都是跳过液态的直接相变。',
+    note: '平台没有固-气相平衡模型，这里只画两幅现象图。',
+  },
+  'K-T2-07': {
+    kind: 'formula',
+    title: '热值',
+    formula: 'Q释放 = m·q',
+    inputs: [
+      { key: 'm', label: '燃料质量', unit: 'kg', min: 0.01, max: 100, default: 1 },
+      { key: 'q', label: '热值', unit: 'J/kg', min: 1e6, max: 1e8, default: 46000000 },
+    ],
+    outputs: [
+      { key: 'Q', label: '完全燃烧放热', unit: 'J', expr: 'm * q' },
+    ],
+    note: '热值是「每千克燃料完全燃烧放多少热」。汽油约 4.6×10⁷ J/kg，干木柴约 1.2×10⁷。实际发动机效率只有两三成，大部分变热跑掉了。',
+    example: '1 kg 汽油完全燃烧放 4.6×10⁷ J，够把约 60 L 水从 0 °C 烧开——但汽车只把两三成变成动力，剩下全变废热。',
+  },
+  'K-T2-08': {
+    kind: 'formula',
+    title: '热机效率',
+    formula: 'W = Qh − Qc；η = W/Qh',
+    inputs: [
+      { key: 'qh', label: '从高温热源吸热', unit: 'J', min: 100, max: 1e6, default: 1000 },
+      { key: 'qc', label: '向低温热源放热', unit: 'J', min: 0, max: 1e6, default: 600 },
+    ],
+    outputs: [
+      { key: 'w', label: '输出功', unit: 'J', expr: 'qh - qc' },
+      { key: 'eta', label: '效率', unit: '', expr: '(qh - qc) / qh' },
+    ],
+    note: '效率 = 功 / 吸热。只要还要向低温放热（第二定律），效率就小于 1——汽车发动机三成上下，卡诺极限也到不了 100%。',
+    example: '吸 1000 J 放 600 J：功 400 J，效率 40%——好一点的内燃机就是这个水平，剩下的 600 J 从排气管和散热器走了。',
+  },
+  'K-T3-01': {
+    kind: 'formula',
+    title: '气体状态参量',
+    formula: '理想气体 pV = nRT',
+    inputs: [
+      { key: 'n', label: '物质的量', unit: 'mol', min: 0.01, max: 100, default: 1 },
+      { key: 't', label: '温度', unit: 'K', min: 100, max: 2000, default: 300 },
+      { key: 'v', label: '体积', unit: 'm³', min: 0.0001, max: 1, default: 0.0245 },
+    ],
+    outputs: [
+      { key: 'p', label: '压强', unit: 'Pa', expr: '8.314 * n * t / v' },
+    ],
+    note: 'p、V、T 三个量里给定两个再加物质的量，第三个就定了。真实气体在高压低温下会偏离理想状态。',
+    example: '1 mol 气体、300 K、装在 24.5 L 里：压强约 1.018×10⁵ Pa，正好一个大气压——「1 mol 气体 0 °C 占 22.4 L」的来历。',
+  },
+  'K-T3-02': {
+    kind: 'formula',
+    title: '玻意耳定律',
+    formula: 'p₁V₁ = p₂V₂（等温）',
+    inputs: [
+      { key: 'p1', label: '初始压强', unit: 'kPa', min: 10, max: 1000, default: 100 },
+      { key: 'v1', label: '初始体积', unit: 'L', min: 0.1, max: 100, default: 10 },
+      { key: 'v2', label: '末体积', unit: 'L', min: 0.1, max: 100, default: 20 },
+    ],
+    outputs: [
+      { key: 'p2', label: '末压强', unit: 'kPa', expr: 'p1 * v1 / v2' },
+    ],
+    note: '温度不变、气体量不变才成立。体积减半压强翻倍：分子挤得更密，撞壁更频繁。',
+    example: '打气筒：把 10 L 的气压到 5 L，压强翻倍——按轮胎时越按越费力，因为剩下能压的体积越来越小。',
+  },
+  'K-T3-03': {
+    kind: 'formula',
+    title: '查理定律',
+    formula: 'p₁/T₁ = p₂/T₂（体积不变）',
+    inputs: [
+      { key: 'p1', label: '初始压强', unit: 'kPa', min: 10, max: 1000, default: 100 },
+      { key: 't1', label: '初始温度', unit: 'K', min: 100, max: 1000, default: 300 },
+      { key: 't2', label: '末温度', unit: 'K', min: 100, max: 1000, default: 600 },
+    ],
+    outputs: [
+      { key: 'p2', label: '末压强', unit: 'kPa', expr: 'p1 * t2 / t1' },
+    ],
+    note: '体积不变时温度升高压强变大（分子更频繁撞壁）。温度必须用开尔文——用摄氏直接代入会算错。',
+    example: '夏天暴晒后的轮胎：从 300 K 升到 330 K，胎压涨 10%——厂家标「冷胎压」就是因为热胎压会虚高。',
+  },
+  'K-T3-04': {
+    kind: 'formula',
+    title: '理想气体状态方程',
+    formula: 'pV = nRT',
+    inputs: [
+      { key: 'p', label: '压强', unit: 'kPa', min: 1, max: 10000, default: 101 },
+      { key: 'v', label: '体积', unit: 'L', min: 0.1, max: 100, default: 10 },
+      { key: 't', label: '温度', unit: 'K', min: 100, max: 2000, default: 300 },
+      { key: 'mm', label: '摩尔质量', unit: 'g/mol', min: 2, max: 200, default: 29 },
+    ],
+    outputs: [
+      { key: 'n', label: '物质的量', unit: 'mol', expr: '(p * 1000 * v / 1000) / (8.314 * t)' },
+      { key: 'm', label: '气体质量', unit: 'g', expr: '((p * 1000 * v / 1000) / (8.314 * t)) * mm' },
+    ],
+    note: '把 p（kPa）、V（L）统一换算后用 nRT 求 mol，再乘摩尔质量得质量。真实气体在高压、低温、液化附近会偏离。',
+    example: '常压 300 K 下 10 L 空气：约 0.405 mol、约 12 g——一间 50 m³ 的教室空气约 60 kg，比一个成年人重。',
+  },
+  'K-T3-05': {
+    kind: 'formula',
+    title: '热力学第一定律',
+    formula: 'ΔU = Q − W（W 为系统对外做功）',
+    inputs: [
+      { key: 'q', label: '吸热（负=放热）', unit: 'J', min: -1e6, max: 1e6, default: 500 },
+      { key: 'w', label: '对外做功（负=外界做功）', unit: 'J', min: -1e6, max: 1e6, default: 200 },
+    ],
+    outputs: [
+      { key: 'du', label: '内能变化', unit: 'J', expr: 'q - w' },
+    ],
+    note: '符号约定最容易错：Q 是吸热为正，W 是对外做功为正。压缩气体时外界做功，W 为负，内能就涨。',
+    example: '气缸吸热 500 J、对外做功 200 J：内能增加 300 J——柴油机的压缩冲程是外界做功（W<0），气体温度骤升到能点燃柴油。',
+  },
+  'K-T3-06': {
+    kind: 'formula',
+    title: '等值过程',
+    formula: '等温膨胀功 W = nRT·ln(V₂/V₁)',
+    inputs: [
+      { key: 'n', label: '物质的量', unit: 'mol', min: 0.01, max: 100, default: 1 },
+      { key: 't', label: '温度', unit: 'K', min: 100, max: 1000, default: 300 },
+      { key: 'v1', label: '初始体积', unit: 'L', min: 0.1, max: 100, default: 10 },
+      { key: 'v2', label: '末体积', unit: 'L', min: 0.1, max: 100, default: 20 },
+    ],
+    outputs: [
+      { key: 'w', label: '等温膨胀对外做功', unit: 'J', expr: '8.314 * n * t * Math.log(v2 / v1)' },
+    ],
+    note: '等温过程温度不变，内能不变，吸热全部变功；等容过程体积不变，W=0，吸热全部变内能；等压过程 pΔV。',
+    example: '1 mol 气体 300 K 等温膨胀到两倍体积：对外做功约 1729 J——理想气体推动活塞，吸的热全变成这个功。',
+  },
+  'K-T3-07': {
+    kind: 'formula',
+    title: '热机循环',
+    formula: '卡诺效率 η = 1 − Tc/Th',
+    inputs: [
+      { key: 'tc', label: '低温热源温度', unit: 'K', min: 100, max: 800, default: 300 },
+      { key: 'th', label: '高温热源温度', unit: 'K', min: 300, max: 2000, default: 600 },
+    ],
+    outputs: [
+      { key: 'eta', label: '卡诺效率', unit: '', expr: '1 - tc / th' },
+    ],
+    note: '卡诺效率是任何热机在同一对热源下的理论上限：热源温差越大效率越高，Tc 不能为零所以永远小于 1。',
+    example: '300 K 和 600 K 之间：上限 50%——真实发动机只能接近它的一半，剩下的损耗来自摩擦和不可逆。',
+  },
+  'K-T3-08': {
+    kind: 'formula',
+    title: '熵与第二定律',
+    formula: 'ΔS = Q/T（可逆传热）',
+    inputs: [
+      { key: 'q', label: '转移的热量', unit: 'J', min: 1, max: 1e6, default: 1000 },
+      { key: 't', label: '温度', unit: 'K', min: 1, max: 2000, default: 300 },
+    ],
+    outputs: [
+      { key: 'ds', label: '熵变', unit: 'J/K', expr: 'q / t' },
+    ],
+    note: '热量从高温流向低温：低温端 ΔS 大、高温端 ΔS 小，总熵必增。熵增是方向的判据——热不会自己从冷流回热。',
+    example: '1000 J 从热端传到 300 K 的冷端：冷端熵增 3.33 J/K——开着的空调永远在往房间里放热，所以房间只会更热。',
+  },
+  'K-T4-01': {
+    kind: 'formula',
+    title: '麦克斯韦速率分布',
+    formula: 'v最概然 = √(2kBT/m)，v方均根 = √(3kBT/m)',
+    inputs: [
+      { key: 't', label: '温度', unit: 'K', min: 100, max: 2000, default: 300 },
+      { key: 'm', label: '分子质量', unit: 'kg', min: 1e-27, max: 1e-25, default: 4.65e-26 },
+    ],
+    outputs: [
+      { key: 'vp', label: '最概然速率', unit: 'm/s', expr: 'Math.sqrt(2 * 1.381e-23 * t / m)' },
+      { key: 'vrms', label: '方均根速率', unit: 'm/s', expr: 'Math.sqrt(3 * 1.381e-23 * t / m)' },
+    ],
+    note: '分子质量小（氢气）或温度高，速度就快；空气分子在室温下约几百 m/s。最概然 < 平均 < 方均根。',
+    example: '300 K 的氮分子：最概然约 422 m/s——比高铁快，但分子撞来撞去，闻到的香水味扩散却很慢。',
+  },
+  'K-T4-02': {
+    kind: 'formula',
+    title: '能量均分定理',
+    formula: '每个经典二次型自由度平均能量 kBT/2',
+    inputs: [
+      { key: 'f', label: '自由度', unit: '', min: 1, max: 10, default: 3 },
+      { key: 'n', label: '物质的量', unit: 'mol', min: 0.01, max: 100, default: 1 },
+      { key: 't', label: '温度', unit: 'K', min: 100, max: 1000, default: 300 },
+    ],
+    outputs: [
+      { key: 'U', label: '总内能', unit: 'J', expr: 'f * 0.5 * 8.314 * n * t' },
+    ],
+    note: '每个能「存能量」的独立方式（平动、转动、振动方向）分到同样多的能量。单原子 3 个平动自由度，双原子还有转动。',
+    example: '单原子（3 自由度）vs 双原子（5 自由度）：同样的温度和摩尔数，双原子内能多 5/3——这就是不同气体比热不同的原因。',
+  },
+  'K-T4-03': {
+    kind: 'formula',
+    title: '熵的统计意义',
+    formula: 'S = kB·ln Ω',
+    inputs: [
+      { key: 'omega', label: '微观状态数', unit: '', min: 1, max: 1e30, default: 1e20 },
+    ],
+    outputs: [
+      { key: 'S', label: '熵', unit: 'J/K', expr: '1.381e-23 * Math.log(omega)' },
+    ],
+    note: 'Ω 是「实现同一个宏观状态有多少种微观排法」。熵取对数：Ω 乘 10，熵只加一个固定值——混乱的排法远远多于整齐的排法。',
+    example: '房间的「整齐」只有一种排法，散乱有亿亿种：熵增就是系统自动滚向排法最多的状态，收拾房间要额外做功。',
+  },
+  'K-T4-04': {
+    kind: 'formula',
+    title: '黑体辐射',
+    formula: '辐射功率 P = σ·A·T⁴',
+    inputs: [
+      { key: 'a', label: '表面积', unit: 'm²', min: 1e-6, max: 1, default: 0.0001 },
+      { key: 't', label: '温度', unit: 'K', min: 300, max: 5000, default: 3000 },
+    ],
+    outputs: [
+      { key: 'P', label: '辐射功率', unit: 'W', expr: '5.67e-8 * a * t * t * t * t' },
+    ],
+    note: 'T⁴ 是四次方：温度翻倍，辐射功率变 16 倍。黑体是理想化的「什么都吸收、什么都辐射」的物体。',
+    example: '钨丝灯 1 cm² 表面 3000 K：辐射约 460 W——白炽灯把电能变成光和热全靠 T⁴，冷下来就瞬间变暗。',
+  },
+  'K-T4-05': {
+    kind: 'formula',
+    title: '斯特凡-玻尔兹曼定律',
+    formula: 'P净 = ε·σ·A·(T⁴ − T环境⁴)',
+    inputs: [
+      { key: 'eps', label: '发射率 ε', unit: '', min: 0, max: 1, default: 0.9 },
+      { key: 'a', label: '表面积', unit: 'm²', min: 1e-6, max: 1, default: 0.01 },
+      { key: 't', label: '物体温度', unit: 'K', min: 300, max: 5000, default: 1000 },
+      { key: 't0', label: '环境温度', unit: 'K', min: 200, max: 400, default: 300 },
+    ],
+    outputs: [
+      { key: 'P', label: '净辐射功率', unit: 'W', expr: 'eps * 5.67e-8 * a * (t * t * t * t - t0 * t0 * t0 * t0)' },
+    ],
+    note: '净辐射 = 自己辐射 − 吸收环境的辐射；两者温度相同就收支平衡。发射率 ε 越接近 1 越像黑体，银亮表面 ε 很小。',
+    example: '1000 K 的 0.01 m² 黑体对 300 K 环境：净辐射约 550 W——所以烧红的铁块对着人，人隔着老远都觉得烫。',
+  },
+  'K-T4-06': {
+    kind: 'formula',
+    title: '维恩位移定律',
+    formula: 'λ峰·T ≈ 2.898×10⁻³ m·K',
+    inputs: [
+      { key: 't', label: '温度', unit: 'K', min: 300, max: 10000, default: 5778 },
+    ],
+    outputs: [
+      { key: 'lmax', label: '辐射峰值波长', unit: 'm', expr: '0.002898 / t' },
+    ],
+    note: '温度越高，辐射峰值越往短波（高频）走：低温偏红外，高温偏可见光、紫外。',
+    example: '烧红的铁先暗红（峰值在红外边），再橙黄；太阳 5778 K 峰值约 500 nm（可见光）——人眼恰好进化在太阳最亮的波段。',
+  },
+
+  /* ===================== 近代 ===================== */
+  'K-N1-01': {
+    kind: 'diagram',
+    title: '万物由什么组成',
+    draw: '画一个阶梯：一杯水 → 水分子 → 原子 → 原子核 + 电子 → 质子/中子 → 夸克。每一级画小一点的图。',
+    marks: ['分子由原子组成', '原子由原子核和电子组成', '原子核由质子、中子组成，它们又由夸克组成'],
+    watch: '往下每一层都是「更小的东西按规则搭起来」；平台没有微观模型，这张阶梯图就是全部。',
+    note: '没有可算的数值；是层次的图。',
+  },
+  'K-N1-02': {
+    kind: 'diagram',
+    title: '原子有多小',
+    draw: '画三个嵌套的圈：苹果（0.1 m）里画一个地球（1.3×10⁷ m），地球旁边画一个原子（10⁻¹⁰ m），标比例。',
+    marks: ['原子半径约 10⁻¹⁰ m', '原子核比原子小 10⁵ 倍', '原子之于苹果 ≈ 苹果之于地球'],
+    watch: '把苹果放大到地球那么大，里面的原子才放得下——微观尺度比日常尺度极端得多。',
+    note: '只有数量级，没有公式；平台最小刻度是厘米，差着 8 个数量级。',
+  },
+  'K-N1-03': {
+    kind: 'formula',
+    title: '从地球到星系',
+    formula: '静态近似 d = c·t（光行距离）',
+    inputs: [
+      { key: 't', label: '光行时间', unit: '年', min: 0.000001, max: 1e10, default: 1 },
+    ],
+    outputs: [
+      { key: 'd', label: '距离', unit: 'm', expr: 't * 9.46e15' },
+    ],
+    note: '1 光年 ≈ 9.46×10¹⁵ m。看远处就是看过去：看到的仙女座是 250 万年前的它。宇宙尺度下光速有限这件事本身就是时间机器。',
+    example: '太阳光到地球 8 分 20 秒；到最近的恒星（比邻星）4.2 年——我们永远看到的是 4.2 年前的比邻星。',
+  },
+  'K-N2-01': {
+    kind: 'formula',
+    title: '原子结构',
+    formula: '中性原子的电子数 = 质子数（原子序数 Z）',
+    inputs: [
+      { key: 'z', label: '原子序数 Z', unit: '', min: 1, max: 118, default: 6 },
+    ],
+    outputs: [
+      { key: 'e', label: '电子数', unit: '', expr: 'z' },
+    ],
+    note: '中性原子正负电荷相等：Z 个质子对应 Z 个电子。失去或得到电子就成了离子。',
+    example: '碳 Z=6：6 个质子、6 个电子——所有碳基生命（包括你）的每个原子都是这么配平的。',
+  },
+  'K-N2-02': {
+    kind: 'formula',
+    title: '质子、中子、电子',
+    formula: '质量数 A = Z + N；净电荷 = (Z − 电子数)·e',
+    inputs: [
+      { key: 'z', label: '质子数 Z', unit: '', min: 1, max: 118, default: 6 },
+      { key: 'n', label: '中子数 N', unit: '', min: 0, max: 200, default: 6 },
+      { key: 'elec', label: '电子数', unit: '', min: 0, max: 118, default: 6 },
+    ],
+    outputs: [
+      { key: 'a', label: '质量数 A', unit: '', expr: 'z + n' },
+      { key: 'q', label: '净电荷', unit: 'C', expr: '(z - elec) * 1.602e-19' },
+    ],
+    note: '质量数 = 核子数（质子+中子）；电子几乎不占质量。净电荷为 0 表示中性。',
+    example: '碳-12：6 质子 6 中子，质量数 12——同位素就是中子数不同（碳-14 有 8 个中子）。',
+  },
+  'K-N2-03': {
+    kind: 'formula',
+    title: '核能',
+    formula: 'ΔE = Δm·c²',
+    inputs: [
+      { key: 'dm', label: '质量亏损', unit: 'kg', min: 1e-30, max: 1e-10, default: 1.66e-27 },
+    ],
+    outputs: [
+      { key: 'E', label: '释放能量', unit: 'J', expr: 'dm * 9e16' },
+    ],
+    note: '1 原子质量单位（1.66×10⁻²⁷ kg）亏损放出约 1.5×10⁻¹⁰ J。核反应质量亏损虽小，但每个原子都放，宏观能量巨大。',
+    example: '1 kg 铀全部裂变亏损约 0.9 g：E = 0.0009×9×10¹⁶ ≈ 8×10¹³ J——相当于 2 万吨 TNT，这就是核弹的量级。',
+  },
+  'K-N2-04': {
+    kind: 'formula',
+    title: '放射性',
+    formula: 'N(t) = N₀·2^(−t/T½)',
+    inputs: [
+      { key: 'n0', label: '初始原子数', unit: '', min: 1, max: 1e20, default: 1e12 },
+      { key: 't', label: '经过时间', unit: '年', min: 0.1, max: 1e6, default: 100 },
+      { key: 'half', label: '半衰期', unit: '年', min: 1, max: 1e6, default: 5730 },
+    ],
+    outputs: [
+      { key: 'n', label: '剩余原子数', unit: '', expr: 'n0 * Math.pow(2, -t / half)' },
+      { key: 'frac', label: '剩余比例', unit: '', expr: 'Math.pow(2, -t / half)' },
+    ],
+    note: '半衰期不是「能活多久」而是「剩一半要等多久」：每个原子何时衰变完全随机，但大量原子服从这个指数规律。',
+    example: '碳-14 半衰期 5730 年：1 万个碳-14 原子，过 5730 年剩 5000，再过 5730 年剩 2500——考古测年就靠数这个。',
+  },
+  'K-N3-01': {
+    kind: 'formula',
+    title: '光电效应',
+    formula: 'K最大 = hν − W₀（需 hν ≥ W₀）',
+    inputs: [
+      { key: 'lambda', label: '入射光波长', unit: 'm', min: 1e-9, max: 1e-6, default: 4e-7 },
+      { key: 'w0', label: '逸出功', unit: 'eV', min: 0.5, max: 6, default: 2.3 },
+    ],
+    outputs: [
+      { key: 'k', label: '电子最大动能', unit: 'eV', expr: '(6.626e-34 * 3e8 / lambda) / 1.602e-19 - w0' },
+    ],
+    note: '光强再大，频率不够（hν < W₀）也打不出电子；提高光强只增加电子数量，不增加单个电子动能。',
+    example: '400 nm 紫光照钠（W₀=2.3 eV）：电子动能 0.8 eV；换 700 nm 红光，能量不足 2.3 eV，一个电子都打不出来。',
+  },
+  'K-N3-02': {
+    kind: 'formula',
+    title: '光子能量 E = hν',
+    formula: 'E光子 = hc/λ；光子通量 = P/E',
+    inputs: [
+      { key: 'lambda', label: '波长', unit: 'm', min: 1e-9, max: 1e-5, default: 5.5e-7 },
+      { key: 'power', label: '光功率', unit: 'W', min: 0.0005, max: 100, default: 0.001 },
+    ],
+    outputs: [
+      { key: 'e', label: '单个光子能量', unit: 'eV', expr: '(6.626e-34 * 3e8 / lambda) / 1.602e-19' },
+      { key: 'flux', label: '每秒光子数', unit: '1/s', expr: 'power / (6.626e-34 * 3e8 / lambda)' },
+    ],
+    note: '光的能量是一份一份的，每份 = hν。波长越短每份越大：蓝光比红光「贵」。',
+    example: '1 mW 绿光每秒约 2.8×10¹⁵ 个光子——每个光子能量小到感觉不到，但亿万个一起来就能让照片感光。',
+  },
+  'K-N3-03': {
+    kind: 'diagram',
+    title: '光的波粒二象性',
+    draw: '画左右两半：左边一幅双缝干涉条纹（波的行为），右边一个光电子的「一打一个准」示意（粒子的行为）；中间画一个问号。',
+    marks: ['干涉、衍射 → 像波', '光电效应、单光子打到探测器 → 像粒子', '同一束光，看你怎么问它'],
+    watch: '不是「光既是波又是粒子」这么含糊：是同一个物理对象在两类实验里表现出两类行为。',
+    note: '平台只有几何光学，没有波动光学和单光子，只能画对比图。',
+  },
+  'K-N3-04': {
+    kind: 'formula',
+    title: '原子能级',
+    formula: 'hν = |E高 − E低|',
+    inputs: [
+      { key: 'ehi', label: '高能级能量', unit: 'eV', min: -20, max: 0, default: -1.51 },
+      { key: 'elo', label: '低能级能量', unit: 'eV', min: -20, max: 0, default: -13.6 },
+    ],
+    outputs: [
+      { key: 'lambda', label: '跃迁辐射波长', unit: 'm', expr: '6.626e-34 * 3e8 / ((ehi - elo) * 1.602e-19)' },
+    ],
+    note: '能级是分立的：电子只能待在某些能量上，跳一次放出的光子能量正好等于能级差。负号表示束缚态（基态氢 −13.6 eV）。',
+    example: '氢原子从 n=3（−1.51 eV）落到 n=1（−13.6 eV）：放 12.09 eV → 波长 102.6 nm（紫外），不在可见区。',
+  },
+  'K-N3-05': {
+    kind: 'formula',
+    title: '光谱线',
+    formula: 'λ = hc/ΔE',
+    inputs: [
+      { key: 'de', label: '能级差', unit: 'eV', min: 0.01, max: 20, default: 2.1 },
+    ],
+    outputs: [
+      { key: 'lambda', label: '谱线波长', unit: 'm', expr: '6.626e-34 * 3e8 / (de * 1.602e-19)' },
+    ],
+    note: '每种元素的能级不一样，所以谱线是它的「指纹」；灯里的钠、汞、氖发出的颜色都来自各自的能级差。',
+    example: '能级差 2.1 eV → 波长约 591 nm（橙黄）——钠灯的黄光就是这么来的。',
+  },
+  'K-N3-06': {
+    kind: 'formula',
+    title: '核裂变',
+    formula: 'Q = (m初 − m末)·c²',
+    inputs: [
+      { key: 'dm', label: '质量亏损', unit: 'u', min: 0.0001, max: 1, default: 0.19 },
+    ],
+    outputs: [
+      { key: 'mev', label: '释放能量', unit: 'MeV', expr: 'dm * 931.5' },
+      { key: 'j', label: '释放能量', unit: 'J', expr: 'dm * 1.6605e-27 * 9e16' },
+    ],
+    note: '铀-235 一次裂变约亏 0.19 u、放约 177 MeV。质量数 A 和电荷数 Z 守恒，能量来自质量亏损。',
+    example: '一个铀-235 原子核裂解放约 177 MeV——比化学反应（约 eV 级）大上亿倍，这就是核电站的能量密度来源。',
+  },
+  'K-N3-07': {
+    kind: 'formula',
+    title: '核聚变',
+    formula: 'Q = (m初 − m末)·c²',
+    inputs: [
+      { key: 'dm', label: '质量亏损', unit: 'u', min: 0.0001, max: 1, default: 0.0186 },
+    ],
+    outputs: [
+      { key: 'mev', label: '释放能量', unit: 'MeV', expr: 'dm * 931.5' },
+      { key: 'j', label: '释放能量', unit: 'J', expr: 'dm * 1.6605e-27 * 9e16' },
+    ],
+    note: '氘-氚聚变约亏 0.0186 u、放约 17.3 MeV。聚变要先克服库仑斥力，温度得上亿度——太阳的核心就是这个条件。',
+    example: '太阳每秒钟把约 4 亿吨氢聚变成氦——你晒到的每一点阳光，都是太阳内部聚变亏损质量换来的。',
+  },
+  'K-N4-01': {
+    kind: 'formula',
+    title: '波函数与薛定谔方程',
+    formula: 'Eₙ = n²π²ħ²/(2mL²)（无限深势阱）',
+    inputs: [
+      { key: 'n', label: '能级编号', unit: '', min: 1, max: 100, default: 1 },
+      { key: 'l', label: '势阱宽度', unit: 'm', min: 1e-10, max: 1e-6, default: 1e-9 },
+      { key: 'm', label: '粒子质量', unit: 'kg', min: 1e-31, max: 1e-27, default: 9.11e-31 },
+    ],
+    outputs: [
+      { key: 'eev', label: '能级能量', unit: 'eV', expr: '(n * n * Math.PI * Math.PI * 1.055e-34 * 1.055e-34) / (2 * m * l * l * 1.602e-19)' },
+    ],
+    note: '阱越窄能量越高（n² 增长）；能级是分立的，不是连续能量。波函数本身是复数概率幅，这里只算能级。',
+    example: '1 nm 盒子里的电子基态约 0.376 eV——做半导体量子点，就是靠「把盒子做小」来抬高能级。',
+  },
+  'K-N4-02': {
+    kind: 'formula',
+    title: '不确定关系',
+    formula: 'Δx·Δp ≥ ħ/2',
+    inputs: [
+      { key: 'dx', label: '位置不确定度', unit: 'm', min: 1e-12, max: 1e-3, default: 1e-10 },
+    ],
+    outputs: [
+      { key: 'dp', label: '动量不确定度下限', unit: 'kg·m/s', expr: '1.055e-34 / (2 * dx)' },
+    ],
+    note: '不是测量精度不够，是自然界本身：位置和动量不能同时精确。物体越宏观（动量基数大），相对不确定度越小，日常感觉不到。',
+    example: '把电子位置确定到 0.1 nm：动量至少 5.3×10⁻²⁵ kg·m/s——对电子来说不小，这就是原子里的电子「停不下来」的原因。',
+  },
+  'K-N4-03': {
+    kind: 'formula',
+    title: '量子隧穿',
+    formula: '透射系数 T ≈ e^(−2κa)，κ = √(2m(V₀−E))/ħ',
+    inputs: [
+      { key: 'm', label: '粒子质量', unit: 'kg', min: 1e-31, max: 1e-27, default: 9.11e-31 },
+      { key: 'v0', label: '势垒高度', unit: 'eV', min: 0.1, max: 100, default: 5 },
+      { key: 'e', label: '粒子能量', unit: 'eV', min: 0.01, max: 100, default: 3 },
+      { key: 'a', label: '势垒宽度', unit: 'm', min: 1e-10, max: 1e-8, default: 1e-9 },
+    ],
+    outputs: [
+      { key: 'T', label: '透射概率', unit: '', expr: 'Math.exp(-2 * Math.sqrt(2 * m * (v0 - e) * 1.602e-19) / 1.055e-34 * a)' },
+    ],
+    note: '粒子能量小于势垒也能穿过去（经典里不可能）。势垒越宽、越厚，透射指数式衰减。能量 ≥ V₀ 时是普通越过，不适用这个近似。',
+    example: '扫描隧道显微镜：探针和样品间有 1 nm 的「势垒」，电子隧穿过去形成电流——靠这个看到原子，就是因为它对距离极敏感。',
+  },
+  'K-N4-04': {
+    kind: 'formula',
+    title: '半导体带隙',
+    formula: '吸收阈值 λ = hc/Eg',
+    inputs: [
+      { key: 'eg', label: '带隙能量', unit: 'eV', min: 0.5, max: 4, default: 1.12 },
+    ],
+    outputs: [
+      { key: 'lambda', label: '吸收/发光阈值波长', unit: 'm', expr: '6.626e-34 * 3e8 / (eg * 1.602e-19)' },
+    ],
+    note: '光子能量 ≥ 带隙才能把电子从价带激发到导带。带隙决定材料「吃」什么波段的光，也决定发什么颜色的光。',
+    example: '硅带隙 1.12 eV → 阈值 1107 nm（红外），所以硅太阳能电池对红外有效、对蓝绿光「浪费」——这就是 Shockley-Queisser 极限的由来。',
+  },
+  'K-N4-05': {
+    kind: 'formula',
+    title: '费米-狄拉克分布',
+    formula: 'f(E) = 1 / [exp((E−μ)/(kBT)) + 1]',
+    inputs: [
+      { key: 'e', label: '能级能量', unit: 'eV', min: 0, max: 10, default: 1 },
+      { key: 'ef', label: '费米能级', unit: 'eV', min: 0, max: 10, default: 5 },
+      { key: 't', label: '温度', unit: 'K', min: 100, max: 3000, default: 300 },
+    ],
+    outputs: [
+      { key: 'f', label: '占据概率', unit: '', expr: '1 / (Math.exp((e - ef) * 1.602e-19 / (1.381e-23 * t)) + 1)' },
+    ],
+    note: '电子按能量从低到高填，每个能级最多两个（泡利原理）。温度越高，费米能级附近的「过渡区」越宽；E ≫ EF 时退化成玻尔兹曼分布。',
+    example: '300 K 时比费米能级高 0.2 eV 的能级，占据概率约 4×10⁻⁴——大部分电子还是挤在费米能级以下，这就是金属导电的微观图景。',
+  },
+  'K-N4-06': {
+    kind: 'diagram',
+    title: 'Shockley–Queisser 极限',
+    draw: '画一条「效率 vs 带隙」的拱形曲线，峰值约 33%（带隙约 1.3 eV），两端都向下；曲线下方标「理论单结极限」。',
+    marks: ['峰值效率约 33%，带隙约 1.3 eV', '带隙太小：低能光子浪费（能量不够跃迁）', '带隙太大：高能光子余量浪费（多余能量变热）'],
+    watch: '两头都在浪费：带隙定得低，红外的长波光子用不上；带隙定得高，蓝光光子多出的能量变成热。所以效率有个天花板。',
+    note: '没有单一公式（要数值积分），这里画效率曲线示意；平台没有太阳光谱模型。',
+  },
+};
+
+export default LABS;

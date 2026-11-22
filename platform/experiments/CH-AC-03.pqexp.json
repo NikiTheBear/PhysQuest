@@ -1,4 +1,6 @@
 {
+  "format": "physquest.experiment",
+  "version": 1,
   "metadata": {
     "title": "两列声波叠在一起",
     "description": "两个同频率的点声源，麦克风沿中间移动，找哪里最响、哪里最静。",
@@ -13,6 +15,7 @@
     "id": "exp-ac-03",
     "title": "两列声波叠在一起",
     "goal": "两个同频率的点声源，麦克风沿中间移动，找哪里最响、哪里最静。",
+    "observation": "先按搭建方案把器具摆好，然后只改「两个声源的间距」，观察：横向移动时的声压起伏；最强点与最弱点。",
     "mode": "2d",
     "environment": {
       "gravity": 0,
@@ -24,35 +27,45 @@
       {
         "id": "speaker-1",
         "kind": "speaker",
-        "name": "speaker",
+        "name": "点声源",
         "position": [
-          -1,
+          -2.2,
           1,
           0
         ],
-        "params": {},
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
         "refs": {},
         "fixed": false
       },
       {
         "id": "speaker-2",
         "kind": "speaker",
-        "name": "speaker",
+        "name": "点声源",
         "position": [
-          1,
+          0,
           1,
           0
         ],
-        "params": {},
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
         "refs": {},
         "fixed": false
       },
       {
         "id": "microphone-3",
         "kind": "microphone",
-        "name": "microphone",
+        "name": "测量麦克风",
         "position": [
-          3,
+          2.2,
           1,
           0
         ],
@@ -63,7 +76,8 @@
     ],
     "connections": [],
     "control": {
-      "running": false
+      "running": false,
+      "reset": 0
     },
     "learning": {
       "variables": [

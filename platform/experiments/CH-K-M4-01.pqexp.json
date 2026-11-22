@@ -1,0 +1,93 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "刚体与转动惯量",
+    "description": "比较长方体质量分布对绕主轴转动响应的影响。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M4-01",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m4-01",
+    "title": "刚体与转动惯量",
+    "goal": "比较长方体质量分布对绕主轴转动响应的影响。",
+    "observation": "先按搭建方案把器具摆好，然后只改「长方体质量」，观察：角速度增长率；按尺寸计算的转动惯量。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "box-1",
+        "kind": "box",
+        "name": "长方体",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.7,
+          "height": 0.7,
+          "depth": 0.7,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "force-2",
+        "kind": "force",
+        "name": "力 / 力矩源",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {
+          "fx": 1,
+          "fy": 0,
+          "fz": 0,
+          "tx": 0,
+          "ty": 0,
+          "tz": 0
+        },
+        "refs": {
+          "target": "box-1"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "长方体质量",
+        "宽高",
+        "Z 力矩"
+      ],
+      "steps": [
+        "角速度增长率",
+        "按尺寸计算的转动惯量"
+      ],
+      "limitations": "使用长方体绕质心 Z 主轴；力矩源不提供任意转轴约束，避免把圆柱多面体近似惯量当成解析圆柱精确值。"
+    }
+  }
+}

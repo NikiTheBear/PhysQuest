@@ -1,0 +1,104 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "动能定理",
+    "description": "比较恒力做功和质点动能的增量。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M3-10",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m3-10",
+    "title": "动能定理",
+    "goal": "比较恒力做功和质点动能的增量。",
+    "observation": "先按搭建方案把器具摆好，然后只改「恒力」，观察：位移；速度；功与动能增量的误差。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "刚体球",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.3,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "force-2",
+        "kind": "force",
+        "name": "力 / 力矩源",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "fx": 1,
+          "fy": 0,
+          "fz": 0,
+          "tx": 0,
+          "ty": 0,
+          "tz": 0
+        },
+        "refs": {
+          "target": "body-1"
+        },
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "body-1"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "恒力",
+        "质量",
+        "初速度"
+      ],
+      "steps": [
+        "位移",
+        "速度",
+        "功与动能增量的误差"
+      ],
+      "limitations": "仅比较平动且无其他做功机制的球；公式计算应与求解器采样区间一致。"
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "带电粒子在磁场中的运动",
+    "description": "观察匀强磁场内带电粒子的弯曲轨迹并比较回旋尺度。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-10",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-10",
+    "title": "带电粒子在磁场中的运动",
+    "goal": "观察匀强磁场内带电粒子的弯曲轨迹并比较回旋尺度。",
+    "observation": "先按搭建方案把器具摆好，然后只改「电荷量」，观察：轨迹弯曲；速度大小；理论半径和周期。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "charge-1",
+        "kind": "charge",
+        "name": "带电粒子",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "charge": 5,
+          "mass": 0.1,
+          "radius": 0.15,
+          "vx": 1,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "field-2",
+        "kind": "field",
+        "name": "匀强磁场",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "strength": 0.5,
+          "radius": 3,
+          "axis": 2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "charge-1"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "电荷量",
+        "质量",
+        "磁场强度",
+        "初速度大小"
+      ],
+      "steps": [
+        "轨迹弯曲",
+        "速度大小",
+        "理论半径和周期"
+      ],
+      "limitations": "参数范围对应教学宏观粒子，示例周期约 126 s；单次 MCP 最长 20 s 只能看到部分圆弧。球形场外磁场直接归零，不模拟边缘场。"
+    }
+  }
+}

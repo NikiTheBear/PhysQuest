@@ -1,0 +1,98 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "弹性",
+    "description": "探究弹簧越拉长，弹性作用是否越大。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M1-08",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m1-08",
+    "title": "弹性",
+    "goal": "探究弹簧越拉长，弹性作用是否越大。",
+    "observation": "先按搭建方案把器具摆好，然后只改「伸长量」，观察：测力计轴向读数；长度与原长之差。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "anchor-1",
+        "kind": "anchor",
+        "name": "固定支点",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "body-2",
+        "kind": "body",
+        "name": "刚体球",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.3,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "dynamometer-3",
+        "kind": "dynamometer",
+        "name": "弹簧测力计",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {
+          "stiffness": 20,
+          "restLength": 1,
+          "damping": 0.1
+        },
+        "refs": {
+          "a": "anchor-1",
+          "b": "body-2"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "伸长量",
+        "劲度系数"
+      ],
+      "steps": [
+        "测力计轴向读数",
+        "长度与原长之差"
+      ],
+      "limitations": "线性理想弹簧不模拟塑性变形、断裂或材料弹性极限；固定端用于避免振动干扰。"
+    }
+  }
+}

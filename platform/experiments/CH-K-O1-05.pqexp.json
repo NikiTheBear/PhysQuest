@@ -1,0 +1,68 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "放大镜",
+    "description": "把物距调到小于焦距，看到正立放大的虚像；再拉到大于焦距，看它翻成倒立。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O1-05",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o1-05",
+    "title": "放大镜",
+    "goal": "把物距调到小于焦距，看到正立放大的虚像；再拉到大于焦距，看它翻成倒立。",
+    "observation": "先按搭建方案把器具摆好，然后只改「物距 u」，观察：放大率 m 的正负与大小；光屏上有没有像；像距 v 的正负。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "lens_bench-1",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 30,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 15,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "物距 u",
+        "焦距 f",
+        "物体高度 h"
+      ],
+      "steps": [
+        "放大率 m 的正负与大小",
+        "光屏上有没有像",
+        "像距 v 的正负"
+      ],
+      "limitations": "近轴薄透镜模型；虚像只能靠眼睛看，光屏接不到，平台用「光屏可见像」这个读数表示。"
+    }
+  }
+}

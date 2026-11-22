@@ -1,0 +1,114 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "机械能",
+    "description": "观察运动状态、高度和弹性伸长如何影响机械能。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M2-11",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m2-11",
+    "title": "机械能",
+    "goal": "观察运动状态、高度和弹性伸长如何影响机械能。",
+    "observation": "先按搭建方案把器具摆好，然后只改「质量与初速度」，观察：机械能总读数；由参数分解的动能与势能。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "刚体球",
+        "position": [
+          -3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.3,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "anchor-2",
+        "kind": "anchor",
+        "name": "固定支点",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "spring-3",
+        "kind": "spring",
+        "name": "弹簧",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {
+          "stiffness": 15,
+          "restLength": 1.5,
+          "damping": 0.2
+        },
+        "refs": {
+          "a": "anchor-2",
+          "b": "body-1"
+        },
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-4",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "body-1"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "质量与初速度",
+        "高度",
+        "弹簧伸长"
+      ],
+      "steps": [
+        "机械能总读数",
+        "由参数分解的动能与势能"
+      ],
+      "limitations": "总机械能含平动、转动、重力和线性弹性部分；不同组实验的势能零点必须一致。"
+    }
+  }
+}

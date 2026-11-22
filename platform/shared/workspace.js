@@ -81,7 +81,7 @@ export function mutate(workspace,name,args) {
     }
     case 'create_experiment': {
       if(w.experiments.length>=maxExperiments)throw new Error(`最多保存 ${maxExperiments} 个实验空间`);
-      const e=blankExperiment(args.title||'未命名实验');e.goal=args.goal||'';if(args.observation!==undefined)e.observation=args.observation;e.mode=args.mode||'3d';if(args.plane2d!==undefined)e.plane2d=args.plane2d;validateExperiment(e);w.experiments.push(e);w.activeId=e.id;result=e;break;
+      const e=blankExperiment(args.title||'未命名实验');e.goal=args.goal||'';if(args.observation!==undefined)e.observation=args.observation;e.mode=args.mode||'3d';if(args.plane2d!==undefined)e.plane2d=args.plane2d;if(args.gravity!==undefined)e.environment.gravity=args.gravity;validateExperiment(e);w.experiments.push(e);w.activeId=e.id;result=e;break;
     }
     case 'activate_experiment': w.activeId=doc.id;result=doc;break;
     case 'update_experiment': {

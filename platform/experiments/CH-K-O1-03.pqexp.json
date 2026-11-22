@@ -1,0 +1,96 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "光会反射",
+    "description": "转动镜面，看反射光跟着改变方向。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O1-03",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o1-03",
+    "title": "光会反射",
+    "goal": "转动镜面，看反射光跟着改变方向。",
+    "observation": "先按搭建方案把器具摆好，然后只改「平面镜法线角度」，观察：探测器能否接到光；反射光相对法线的角度。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "laser-1",
+        "kind": "laser",
+        "name": "激光光源",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "angle": 0,
+          "power": 1,
+          "wavelength": 532,
+          "width": 0.2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "mirror-2",
+        "kind": "mirror",
+        "name": "平面镜",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "angle": 30,
+          "radius": 0.7
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "detector-3",
+        "kind": "detector",
+        "name": "光电探测器",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {
+          "radius": 0.5,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "平面镜法线角度",
+        "激光入射角度",
+        "探测器位置"
+      ],
+      "steps": [
+        "探测器能否接到光",
+        "反射光相对法线的角度"
+      ],
+      "limitations": "理想的镜面反射，遵循反射定律；不含漫反射、吸收和多次反射的能量损失。"
+    }
+  }
+}

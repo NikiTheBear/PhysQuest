@@ -1,0 +1,133 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "阻尼振动",
+    "description": "比较弱阻尼、临界附近与强阻尼弹簧振子的衰减行为。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M4-05",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m4-05",
+    "title": "阻尼振动",
+    "goal": "比较弱阻尼、临界附近与强阻尼弹簧振子的衰减行为。",
+    "observation": "先按搭建方案把器具摆好，然后只改「阻尼器系数」，观察：位移衰减包络；是否越过平衡位置；机械能下降。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "anchor-1",
+        "kind": "anchor",
+        "name": "固定支点",
+        "position": [
+          -4.4,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "body-2",
+        "kind": "body",
+        "name": "刚体球",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.3,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "spring-3",
+        "kind": "spring",
+        "name": "弹簧",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "stiffness": 15,
+          "restLength": 1.5,
+          "damping": 0.2
+        },
+        "refs": {
+          "a": "anchor-1",
+          "b": "body-2"
+        },
+        "fixed": false
+      },
+      {
+        "id": "damper-4",
+        "kind": "damper",
+        "name": "阻尼器",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {
+          "damping": 1
+        },
+        "refs": {
+          "a": "anchor-1",
+          "b": "body-2"
+        },
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-5",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          4.4,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "body-2"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "阻尼器系数",
+        "质量",
+        "刚度"
+      ],
+      "steps": [
+        "位移衰减包络",
+        "是否越过平衡位置",
+        "机械能下降"
+      ],
+      "limitations": "阻尼器只沿连接轴作用；参数改变后重置初始伸长以公平比较，临界判定适用于该一维线性系统。"
+    }
+  }
+}

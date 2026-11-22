@@ -1,0 +1,102 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "二力平衡",
+    "description": "验证同一物体受到大小相等方向相反的两力时合力为零。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M2-04",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m2-04",
+    "title": "二力平衡",
+    "goal": "验证同一物体受到大小相等方向相反的两力时合力为零。",
+    "observation": "先按搭建方案把器具摆好，然后只改「两力大小」，观察：X 速度是否保持；合力变化后的加速。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "刚体球",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.3,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "force-2",
+        "kind": "force",
+        "name": "力 / 力矩源",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "fx": 1,
+          "fy": 0,
+          "fz": 0,
+          "tx": 0,
+          "ty": 0,
+          "tz": 0
+        },
+        "refs": {
+          "target": "body-1"
+        },
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "body-1"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "两力大小",
+        "初速度"
+      ],
+      "steps": [
+        "X 速度是否保持",
+        "合力变化后的加速"
+      ],
+      "limitations": "两力均作用质心，避免讨论力偶；平衡表示加速度为零，不必然表示静止。"
+    }
+  }
+}

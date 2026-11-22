@@ -105,7 +105,7 @@ export default function App() {
     if (!DEEP.challenge) return null;
     const hand = CHALLENGES.find((c) => c.id === DEEP.challenge);
     if (hand) return hand;
-    // 自动挑战（CH-AUTO-xxx / CH-AC-xx）也能通过 URL 直接打开
+    // 自动挑战（编号由知识点派生，例如 CH-K-M2-05 / CH-AC-02）也能通过 URL 直接打开
     const auto = AUTO_CHALLENGES.find((c) => c.id === DEEP.challenge);
     if (!auto) return null;
     return {

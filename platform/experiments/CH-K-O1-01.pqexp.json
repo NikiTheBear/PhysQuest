@@ -1,0 +1,97 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "光走直线",
+    "description": "确认光在同一个介质里沿直线传播，挡住就过不去。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O1-01",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o1-01",
+    "title": "光走直线",
+    "goal": "确认光在同一个介质里沿直线传播，挡住就过不去。",
+    "observation": "先按搭建方案把器具摆好，然后只改「光阑的横向位置」，观察：探测器读到的光功率；光阑偏离光轴后是否还有光。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "laser-1",
+        "kind": "laser",
+        "name": "激光光源",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "angle": 0,
+          "power": 1,
+          "wavelength": 532,
+          "width": 0.2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "aperture-2",
+        "kind": "aperture",
+        "name": "可调光阑",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "opening": 0.15,
+          "radius": 0.8,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "detector-3",
+        "kind": "detector",
+        "name": "光电探测器",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {
+          "radius": 0.5,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "光阑的横向位置",
+        "光阑通光孔径",
+        "激光光轴角度"
+      ],
+      "steps": [
+        "探测器读到的光功率",
+        "光阑偏离光轴后是否还有光"
+      ],
+      "limitations": "这是几何光学的直线传播；不含衍射和散射。光阑偏离光轴后读数为零，是因为光束被挡住，不是因为光「拐不过弯」。"
+    }
+  }
+}

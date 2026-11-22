@@ -1,4 +1,6 @@
 {
+  "format": "physquest.experiment",
+  "version": 1,
   "metadata": {
     "title": "让干涉条纹变密",
     "description": "间距不变，只改频率，看强弱条纹的分布怎么变。",
@@ -13,6 +15,7 @@
     "id": "exp-ac-04",
     "title": "让干涉条纹变密",
     "goal": "间距不变，只改频率，看强弱条纹的分布怎么变。",
+    "observation": "先按搭建方案把器具摆好，然后只改「频率」，观察：同一段距离里出现几个强弱周期。",
     "mode": "2d",
     "environment": {
       "gravity": 0,
@@ -24,35 +27,45 @@
       {
         "id": "speaker-1",
         "kind": "speaker",
-        "name": "speaker",
+        "name": "点声源",
         "position": [
-          -1,
+          -2.2,
           1,
           0
         ],
-        "params": {},
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
         "refs": {},
         "fixed": false
       },
       {
         "id": "speaker-2",
         "kind": "speaker",
-        "name": "speaker",
+        "name": "点声源",
         "position": [
-          1,
+          0,
           1,
           0
         ],
-        "params": {},
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
         "refs": {},
         "fixed": false
       },
       {
         "id": "microphone-3",
         "kind": "microphone",
-        "name": "microphone",
+        "name": "测量麦克风",
         "position": [
-          3,
+          2.2,
           1,
           0
         ],
@@ -63,7 +76,8 @@
     ],
     "connections": [],
     "control": {
-      "running": false
+      "running": false,
+      "reset": 0
     },
     "learning": {
       "variables": [

@@ -11,15 +11,16 @@ const response=(message)=>Response.json({choices:[{message,finish_reason:message
 const task=(id='K-M3-04')=>({knowledgeId:id,messages:[{role:'user',content:getKnowledgePrompt(id).prompt}]});
 test('every planned topic has a complete, bounded, distinct and model-aware prompt',async()=>{
  const map=JSON.parse(await readFile(new URL('../physquest/shared/knowledge-data/PLATFORM-MAP.json',import.meta.url),'utf8'));
- const planned=map.disciplines.flatMap(d=>d.stages.filter(s=>s.status==='planned').flatMap(s=>s.items.map(i=>i.id)));
- assert.equal(planned.length,140);assert.deepEqual(KNOWLEDGE_PROMPTS.map(p=>p.id).sort(),planned.sort());
+ // 覆盖全部知识点（176 条），不只看 planned —— 数字从数据算，不写死
+ const planned=map.disciplines.flatMap(d=>d.stages.flatMap(s=>s.items.map(i=>i.id)));
+ assert.equal(planned.length,KNOWLEDGE_PROMPTS.length);assert.deepEqual(KNOWLEDGE_PROMPTS.map(p=>p.id).sort(),planned.sort());
  assert.equal(new Set(KNOWLEDGE_PROMPTS.map(p=>p.objective)).size,planned.length);
  for(const p of KNOWLEDGE_PROMPTS){assert.ok(p.prompt.length<=6000&&p.prompt.length>600,p.id);assert.ok(p.prompt.includes(p.id)&&p.prompt.includes(p.title));assert.match(p.prompt,/create_experiment/);assert.match(p.prompt,/simulate_experiment/);assert.ok(p.variables.length&&p.observations.length&&p.limitations.length>8);for(const model of p.models)assert.ok(CATALOG[model],p.id+' '+model);assert.ok(['direct','approximation','conceptual'].includes(p.support));}
  assert.equal(getKnowledgePrompt('K-N4-03').support,'conceptual');assert.equal(getKnowledgePrompt('K-M3-04').support,'direct');
 });
 test('MCP prompt discovery paginates and filters without changing workspace data',()=>{
- const w=blankWorkspace(),result=runTool(w,'list_knowledge_prompts',{limit:20});assert.equal(result.workspace,w);assert.equal(result.result.total,140);assert.equal(result.result.nextOffset,20);
- const ids=[];let offset=0;do{const page=listKnowledgePrompts({offset,limit:50});ids.push(...page.items.map(p=>p.id));offset=page.nextOffset;}while(offset!==null);assert.equal(new Set(ids).size,140);
+ const w=blankWorkspace(),result=runTool(w,'list_knowledge_prompts',{limit:20});assert.equal(result.workspace,w);assert.equal(result.result.total,KNOWLEDGE_PROMPTS.length);assert.equal(result.result.nextOffset,20);
+ const ids=[];let offset=0;do{const page=listKnowledgePrompts({offset,limit:50});ids.push(...page.items.map(p=>p.id));offset=page.nextOffset;}while(offset!==null);assert.equal(new Set(ids).size,KNOWLEDGE_PROMPTS.length);
  const q=listKnowledgePrompts({query:'牛顿第二',domain:'mechanics',stage:'senior',support:'direct'});assert.equal(q.items[0].id,'K-M3-04');assert.equal(q.total,1);
  assert.throws(()=>listKnowledgePrompts({limit:100}),/limit/);assert.throws(()=>getKnowledgePrompt('missing'));
  const p=runTool(w,'get_knowledge_prompt',{knowledgeId:'K-M3-04'}).result;p.prompt='modified';assert.notEqual(getKnowledgePrompt(p.id).prompt,p.prompt);assert.equal(w.revision,0);

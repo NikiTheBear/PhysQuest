@@ -1,0 +1,103 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "斜面",
+    "description": "比较不同倾斜程度对物体沿斜面滑动的影响。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M1-06",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m1-06",
+    "title": "斜面",
+    "goal": "比较不同倾斜程度对物体沿斜面滑动的影响。",
+    "observation": "先按搭建方案把器具摆好，然后只改「斜面倾角」，观察：滑块速度与位置；同一时段滑动距离。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "ramp-1",
+        "kind": "ramp",
+        "name": "可调斜面",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "length": 4,
+          "width": 2,
+          "angle": 20,
+          "friction": 0.3
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "box-2",
+        "kind": "box",
+        "name": "长方体",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.7,
+          "height": 0.7,
+          "depth": 0.7,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "box-2"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "斜面倾角",
+        "摩擦系数"
+      ],
+      "steps": [
+        "滑块速度与位置",
+        "同一时段滑动距离"
+      ],
+      "limitations": "斜面是固定刚体，边缘掉落属于另一运动阶段；理想无摩擦公式只用于仍接触斜面的时段。"
+    }
+  }
+}

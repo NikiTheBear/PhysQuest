@@ -1,0 +1,75 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "声音的响度与距离",
+    "description": "验证点声源的声压随距离衰减的规律。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-A3-05",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-a3-05",
+    "title": "声音的响度与距离",
+    "goal": "验证点声源的声压随距离衰减的规律。",
+    "observation": "先按搭建方案把器具摆好，然后只改「麦克风距离」，观察：1/2/4/8 m 处的声压读数。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "点声源",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "测量麦克风",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "麦克风距离",
+        "声源幅度"
+      ],
+      "steps": [
+        "1/2/4/8 m 处的声压读数"
+      ],
+      "limitations": "自由空间的球面波，不含反射、吸收和空气衰减。房间里的真实情况会更复杂。"
+    }
+  }
+}

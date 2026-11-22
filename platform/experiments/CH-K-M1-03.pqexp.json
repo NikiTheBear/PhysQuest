@@ -1,0 +1,103 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "摩擦力",
+    "description": "观察滑块接触面的摩擦设置如何影响滑行。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M1-03",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m1-03",
+    "title": "摩擦力",
+    "goal": "观察滑块接触面的摩擦设置如何影响滑行。",
+    "observation": "先按搭建方案把器具摆好，然后只改「接触双方的 friction」，观察：滑块速度衰减；滑行距离。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "box-1",
+        "kind": "box",
+        "name": "长方体",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.7,
+          "height": 0.7,
+          "depth": 0.7,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ramp-2",
+        "kind": "ramp",
+        "name": "可调斜面",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "length": 4,
+          "width": 2,
+          "angle": 20,
+          "friction": 0.3
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "box-1"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "接触双方的 friction",
+        "初速度"
+      ],
+      "steps": [
+        "滑块速度衰减",
+        "滑行距离"
+      ],
+      "limitations": "接触摩擦由刚体求解器近似，采用双方摩擦系数较小值；不含表面磨损，传感器加速度不含接触冲量。"
+    }
+  }
+}

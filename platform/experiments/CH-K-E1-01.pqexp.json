@@ -1,0 +1,105 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电路的通与断",
+    "description": "比较开关闭合与断开时闭合回路的电流变化。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E1-01",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e1-01",
+    "title": "电路的通与断",
+    "goal": "比较开关闭合与断开时闭合回路的电流变化。",
+    "observation": "先按搭建方案把器具摆好，然后只改「开关 closed=0/1」，观察：支路电流；灯泡电功率与亮度。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "直流电源",
+        "position": [
+          -3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {
+          "voltage": 12,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "switch-2",
+        "kind": "switch",
+        "name": "开关",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "closed": 1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lamp-3",
+        "kind": "lamp",
+        "name": "灯泡",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {
+          "resistance": 60,
+          "ratedPower": 2.4
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-4",
+        "kind": "voltmeter",
+        "name": "电压表",
+        "position": [
+          3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "开关 closed=0/1",
+        "电源电压"
+      ],
+      "steps": [
+        "支路电流",
+        "灯泡电功率与亮度"
+      ],
+      "limitations": "开关以高低电阻近似，断开仍有极小漏电流；不模拟接触火花。"
+    }
+  }
+}

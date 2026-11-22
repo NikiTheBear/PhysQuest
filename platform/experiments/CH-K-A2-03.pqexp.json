@@ -1,0 +1,92 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "回声与测距",
+    "description": "理解回声是声音被反射回来，以及怎么用回声测距离。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-A2-03",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-a2-03",
+    "title": "回声与测距",
+    "goal": "理解回声是声音被反射回来，以及怎么用回声测距离。",
+    "observation": "先按搭建方案把器具摆好，然后只改「到反射面的距离」，观察：往返路程 2d；算出来的延迟时间。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "点声源",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "测量麦克风",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "distance_sensor-3",
+        "kind": "distance_sensor",
+        "name": "测距仪",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "a": "",
+          "b": ""
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "到反射面的距离",
+        "声速"
+      ],
+      "steps": [
+        "往返路程 2d",
+        "算出来的延迟时间"
+      ],
+      "limitations": "平台不模拟声波反射，回声只能靠计算器算，不能真的听到。这是真话。"
+    }
+  }
+}

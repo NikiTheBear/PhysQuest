@@ -1,0 +1,97 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电场强度",
+    "description": "通过试探电荷受力与场强读数理解电场强度的定义。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-01",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-01",
+    "title": "电场强度",
+    "goal": "通过试探电荷受力与场强读数理解电场强度的定义。",
+    "observation": "先按搭建方案把器具摆好，然后只改「源电荷量」，观察：probe 电场幅值；试探粒子外力加速度；F/q 与场强比较。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "charge-1",
+        "kind": "charge",
+        "name": "带电粒子",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "charge": 5,
+          "mass": 0.1,
+          "radius": 0.15,
+          "vx": 1,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "probe-2",
+        "kind": "probe",
+        "name": "场强探针",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "electric_field-3",
+        "kind": "electric_field",
+        "name": "匀强电场",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {
+          "strength": 1000,
+          "radius": 3,
+          "axis": 0
+        },
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "源电荷量",
+        "试探电荷量",
+        "探针与场源距离"
+      ],
+      "steps": [
+        "probe 电场幅值",
+        "试探粒子外力加速度",
+        "F/q 与场强比较"
+      ],
+      "limitations": "点电荷场使用 0.04 m 软化半径，近距离偏离理想库仑场；试探电荷也会参与相互作用，应固定源并选较小试探量。"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "多普勒效应",
+    "description": "理解声源或观察者移动时，接收到的频率为什么会变。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-A4-04",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-a4-04",
+    "title": "多普勒效应",
+    "goal": "理解声源或观察者移动时，接收到的频率为什么会变。",
+    "observation": "先按搭建方案把器具摆好，然后只改「声源速度」，观察：声源移动时的距离变化；按公式算出的接收频率。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "点声源",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": ""
+        },
+        "fixed": false
+      },
+      {
+        "id": "microphone-3",
+        "kind": "microphone",
+        "name": "测量麦克风",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "声源速度",
+        "声速",
+        "声源频率"
+      ],
+      "steps": [
+        "声源移动时的距离变化",
+        "按公式算出的接收频率"
+      ],
+      "limitations": "平台不做多普勒频移。声源移动只会改变距离和相位，接收频率不会变。这是平台的真实现状。"
+    }
+  }
+}

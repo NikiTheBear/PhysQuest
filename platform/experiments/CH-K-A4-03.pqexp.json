@@ -1,0 +1,76 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "声压级与分贝",
+    "description": "把线性声压换算成对数分贝，理解为什么用分贝。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-A4-03",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-a4-03",
+    "title": "声压级与分贝",
+    "goal": "把线性声压换算成对数分贝，理解为什么用分贝。",
+    "observation": "先按搭建方案把器具摆好，然后只改「声源幅度」，观察：麦克风读到的声压（Pa）；换算出来的 SPL（dB）。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "点声源",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "测量麦克风",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "声源幅度",
+        "麦克风距离"
+      ],
+      "steps": [
+        "麦克风读到的声压（Pa）",
+        "换算出来的 SPL（dB）"
+      ],
+      "limitations": "平台只给线性声压，不给分贝。换算是你自己算的，不是平台算的。另外这里用的是瞬时幅值，不是有效值。"
+    }
+  }
+}

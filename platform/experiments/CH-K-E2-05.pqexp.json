@@ -1,0 +1,90 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "串联电路",
+    "description": "验证串联电路电流相等、总电压等于各电阻电压之和。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E2-05",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e2-05",
+    "title": "串联电路",
+    "goal": "验证串联电路电流相等、总电压等于各电阻电压之和。",
+    "observation": "先按搭建方案把器具摆好，然后只改「两个电阻的阻值」，观察：两电阻支路电流；各端电压之和；分压比例。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "直流电源",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "voltage": 12,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "电阻",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "resistance": 100
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-3",
+        "kind": "voltmeter",
+        "name": "电压表",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "两个电阻的阻值",
+        "电源电压"
+      ],
+      "steps": [
+        "两电阻支路电流",
+        "各端电压之和",
+        "分压比例"
+      ],
+      "limitations": "导线理想，电源内阻和仪表负载需单独计入；元件为线性电阻。"
+    }
+  }
+}

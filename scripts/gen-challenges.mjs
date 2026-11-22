@@ -16,6 +16,26 @@ import { readFile, writeFile, mkdir, rm, readdir } from 'node:fs/promises';
 import { CATALOG, RIGID_KINDS, LINK_KINDS } from '../platform/shared/catalog.js';
 import { HANDWRITTEN_LABS } from './handwritten-labs.mjs';
 
+/* 误区库：按 challengedBy 反查，给挑战挂上 misconceptionIds。
+   两张来源都读（光学在 optics-lens/ 下，其余在 misconceptions.json）。 */
+const MISCONCEPTION_BY_CHALLENGE = new Map();
+for (const path of ['optics-lens/misconceptions.json', 'misconceptions.json']) {
+  let list = [];
+  try {
+    list = JSON.parse(
+      await readFile(new URL(`../shared/knowledge-data/${path}`, import.meta.url), 'utf8'),
+    ).misconceptions ?? [];
+  } catch {
+    continue;
+  }
+  for (const m of list) {
+    if (!m.challengedBy) continue;
+    if (!MISCONCEPTION_BY_CHALLENGE.has(m.challengedBy)) MISCONCEPTION_BY_CHALLENGE.set(m.challengedBy, []);
+    MISCONCEPTION_BY_CHALLENGE.get(m.challengedBy).push(m.id);
+  }
+}
+const misconceptionsFor = (id) => MISCONCEPTION_BY_CHALLENGE.get(id) ?? [];
+
 const PROMPTS = JSON.parse(
   await readFile(new URL('../shared/knowledge-data/knowledge-prompts.json', import.meta.url), 'utf8'),
 );
@@ -159,7 +179,7 @@ for (const [key, list] of groups) {
       auto: true,
       multiAnswer: true,
       knowledgeIds: chunk.map((c) => c.id),
-      misconceptionIds: [],
+      misconceptionIds: misconceptionsFor(id),
       demoScriptId: '',
       difficulty: 'beginner',
       prediction: {
@@ -293,7 +313,7 @@ for (const w of WAVE) {
     auto: true,
     multiAnswer: true,
     knowledgeIds: [w.knowledgeId],
-    misconceptionIds: [],
+    misconceptionIds: misconceptionsFor(`CH-${w.id}`),
     demoScriptId: '',
     difficulty: 'beginner',
     prediction: {
@@ -385,7 +405,7 @@ for (const lab of HANDWRITTEN_LABS) {
     auto: true,
     multiAnswer: true,
     knowledgeIds: [lab.knowledgeId],
-    misconceptionIds: [],
+    misconceptionIds: misconceptionsFor(lab.id),
     demoScriptId: '',
     difficulty: lab.difficulty,
     prediction: lab.prediction,

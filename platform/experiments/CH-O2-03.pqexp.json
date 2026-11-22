@@ -68,7 +68,8 @@
       ],
       "misconceptionIds": [
         "MIS-O2-02",
-        "MIS-O2-07"
+        "MIS-O2-07",
+        "MIS-O2-01"
       ],
       "demoScriptId": "demo-no-image",
       "difficulty": "beginner",

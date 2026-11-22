@@ -66,7 +66,9 @@
       "knowledgeIds": [
         "K-M1-02"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M1-02"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -114,7 +116,9 @@
       "knowledgeIds": [
         "K-M1-03"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M1-03"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -162,7 +166,9 @@
       "knowledgeIds": [
         "K-M1-06"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M3-01"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -210,7 +216,9 @@
       "knowledgeIds": [
         "K-M1-08"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M3-03"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -307,7 +315,9 @@
       "knowledgeIds": [
         "K-M2-04"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M1-06"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -355,7 +365,9 @@
       "knowledgeIds": [
         "K-M2-09"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M2-06"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -647,7 +659,11 @@
       "knowledgeIds": [
         "K-M3-03"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M1-01",
+        "MIS-M2-02",
+        "MIS-M3-02"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -695,7 +711,9 @@
       "knowledgeIds": [
         "K-M3-04"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M2-01"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -744,7 +762,9 @@
       "knowledgeIds": [
         "K-M3-05"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M2-03"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -842,7 +862,9 @@
       "knowledgeIds": [
         "K-M3-07"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M2-04"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -1548,7 +1570,9 @@
       "knowledgeIds": [
         "K-M1-04"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M1-04"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -1644,7 +1668,9 @@
       "knowledgeIds": [
         "K-M2-02"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M1-05"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -1788,7 +1814,9 @@
       "knowledgeIds": [
         "K-M3-09"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-M2-05"
+      ],
       "demoScriptId": "",
       "difficulty": "intermediate",
       "prediction": {

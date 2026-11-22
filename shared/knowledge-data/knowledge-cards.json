@@ -84,7 +84,9 @@
         "不同传播速度下的读数"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-A1-02"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -146,7 +148,10 @@
         "频率变化时的听感"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-A1-01",
+        "MIS-A1-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -209,7 +214,9 @@
         "两个源频率比"
       ],
       "support": "approximation",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-A1-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -272,7 +279,9 @@
         "相同距离下的延迟"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-A1-01"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -334,7 +343,9 @@
         "算出来的延迟时间"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-A2-02"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -396,7 +407,9 @@
         "相位差 0° 与 180° 的对比"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-A2-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -457,7 +470,9 @@
         "1/2/4/8 m 处的声压读数"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-A2-01"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -519,7 +534,10 @@
         "换算出来的 SPL（dB）"
       ],
       "support": "approximation",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-A2-01",
+        "MIS-A3-01"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -582,7 +600,9 @@
         "按公式算出的接收频率"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-A3-02"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -819,7 +839,9 @@
         "负载功率"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E1-04"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -990,7 +1012,10 @@
         "各串联支路电流"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E1-01",
+        "MIS-E2-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -1109,7 +1134,9 @@
         "有效电阻"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E1-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -1166,7 +1193,9 @@
         "U/I 与设定阻值的比较"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E1-02"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -1224,7 +1253,10 @@
         "分压比例"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E1-01",
+        "MIS-E2-01"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -1282,7 +1314,9 @@
         "总电流"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E2-02"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -1341,7 +1375,10 @@
         "由功率推算的电能"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E1-02",
+        "MIS-E2-04"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -1399,7 +1436,10 @@
         "理论 Q=I²Rt"
       ],
       "support": "approximation",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E1-03",
+        "MIS-E2-04"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -1513,7 +1553,9 @@
         "保护装置概念位置"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E1-04"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -1571,7 +1613,9 @@
         "轴向与侧向分布趋势"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E3-01"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -1992,7 +2036,9 @@
         "内外电压降"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E3-02"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -2050,7 +2096,9 @@
         "U−I 变化趋势"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E3-02"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -2109,7 +2157,9 @@
         "匹配时的端电压"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E3-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -2167,7 +2217,9 @@
         "效率与电流的权衡"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E3-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -2227,7 +2279,9 @@
         "方向反转"
       ],
       "support": "approximation",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E3-01"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -2403,7 +2457,9 @@
         "理论感应电动势符号"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E3-04"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -2460,7 +2516,9 @@
         "感应磁场及电流方向的理论判断"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E3-04"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -2520,7 +2578,9 @@
         "理论时间常数"
       ],
       "support": "approximation",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E3-05"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -2637,7 +2697,9 @@
         "理想电压比和电流比推导"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-E3-05"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -3173,7 +3235,9 @@
         "落地前同一时刻的速度"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M1-02"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -3235,7 +3299,11 @@
         "滑行距离"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M1-01",
+        "MIS-M1-03",
+        "MIS-M1-06"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -3297,7 +3365,9 @@
         "示意物体相对液面位置"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M1-04"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -3421,7 +3491,9 @@
         "同一时段滑动距离"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M3-01"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -3485,7 +3557,9 @@
         "是否满足 v≈ωr"
       ],
       "support": "approximation",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M1-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -3547,7 +3621,9 @@
         "长度与原长之差"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M3-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -3672,7 +3748,9 @@
         "参数计算的密度"
       ],
       "support": "approximation",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M1-05"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -3797,7 +3875,10 @@
         "合力变化后的加速"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M1-06",
+        "MIS-M2-02"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -4047,7 +4128,9 @@
         "理论浮力与重量比较"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M1-04"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -4109,7 +4192,9 @@
         "由恒力点积计算的功"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M2-06"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -4424,7 +4509,9 @@
         "动能变化"
       ],
       "support": "approximation",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M3-01"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -4612,7 +4699,11 @@
         "无外力时的直线轨迹"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M1-01",
+        "MIS-M2-02",
+        "MIS-M3-02"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -4675,7 +4766,9 @@
         "F/m 对照"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M2-01"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -4738,7 +4831,9 @@
         "两球加速度和速度增量"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M2-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -4802,7 +4897,9 @@
         "抛物线形轨迹"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M2-04"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -4865,7 +4962,9 @@
         "由 v²/r 计算的向心加速度"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M2-04"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -4927,7 +5026,9 @@
         "公式推导的引力比值"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M2-05"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -4989,7 +5090,9 @@
         "理论圆轨道与逃逸速度比较"
       ],
       "support": "conceptual",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M2-05"
+      ],
       "prerequisites": [],
       "difficulty": "advanced",
       "detail": [
@@ -5180,7 +5283,9 @@
         "动量变化"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-M3-02"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -5432,7 +5537,9 @@
         "位置变化后的声压"
       ],
       "support": "approximation",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-A2-03"
+      ],
       "prerequisites": [],
       "difficulty": "beginner",
       "detail": [
@@ -7647,7 +7754,9 @@
         "探测器功率峰值位置"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-O2-10"
+      ],
       "prerequisites": [
         "K-O2-01"
       ],
@@ -7786,7 +7895,9 @@
         "三条光线是否交于像点"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-O2-04"
+      ],
       "prerequisites": [
         "K-O2-03"
       ],
@@ -7924,7 +8035,9 @@
         "像距 v 是否等于 u"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-O2-09"
+      ],
       "prerequisites": [
         "K-O2-04"
       ],
@@ -8209,7 +8322,8 @@
       "support": "direct",
       "misconceptions": [
         "MIS-O2-03",
-        "MIS-O2-07"
+        "MIS-O2-07",
+        "MIS-O2-09"
       ],
       "prerequisites": [
         "K-O2-09"
@@ -8282,7 +8396,8 @@
       ],
       "support": "direct",
       "misconceptions": [
-        "MIS-O2-06"
+        "MIS-O2-06",
+        "MIS-O2-08"
       ],
       "prerequisites": [
         "K-O2-05",
@@ -8423,7 +8538,8 @@
       ],
       "support": "direct",
       "misconceptions": [
-        "MIS-O2-07"
+        "MIS-O2-07",
+        "MIS-O2-04"
       ],
       "prerequisites": [
         "K-O2-05"
@@ -8635,7 +8751,9 @@
         "弥散圆最小的光屏位置"
       ],
       "support": "direct",
-      "misconceptions": [],
+      "misconceptions": [
+        "MIS-O2-08"
+      ],
       "prerequisites": [
         "K-O2-06"
       ],

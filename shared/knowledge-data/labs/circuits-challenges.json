@@ -117,7 +117,9 @@
       "knowledgeIds": [
         "K-E1-04"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E1-04"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -167,7 +169,9 @@
       "knowledgeIds": [
         "K-E2-01"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E2-03"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -263,7 +267,9 @@
       "knowledgeIds": [
         "K-E2-03"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E1-03"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -362,7 +368,10 @@
       "knowledgeIds": [
         "K-E2-05"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E1-01",
+        "MIS-E2-01"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -411,7 +420,9 @@
       "knowledgeIds": [
         "K-E2-06"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E2-02"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -460,7 +471,10 @@
       "knowledgeIds": [
         "K-E2-07"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E1-02",
+        "MIS-E2-04"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -511,7 +525,9 @@
       "knowledgeIds": [
         "K-E2-11"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E3-01"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -712,7 +728,9 @@
       "knowledgeIds": [
         "K-E3-05"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E3-02"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -761,7 +779,9 @@
       "knowledgeIds": [
         "K-E3-06"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E3-03"
+      ],
       "demoScriptId": "",
       "difficulty": "beginner",
       "prediction": {
@@ -1417,7 +1437,9 @@
       "knowledgeIds": [
         "K-E3-11"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E3-04"
+      ],
       "demoScriptId": "",
       "difficulty": "advanced",
       "prediction": {
@@ -1465,7 +1487,9 @@
       "knowledgeIds": [
         "K-E3-15"
       ],
-      "misconceptionIds": [],
+      "misconceptionIds": [
+        "MIS-E3-05"
+      ],
       "demoScriptId": "",
       "difficulty": "advanced",
       "prediction": {

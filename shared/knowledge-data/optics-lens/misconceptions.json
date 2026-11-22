@@ -23,7 +23,11 @@
       "id": "MIS-O2-04",
       "belief": "遮住透镜一半，像就只剩一半。",
       "truth": "像会完整保留，只是变暗。因为像的位置和大小由物距和焦距决定，跟透镜的通光面积无关。",
-      "challengedBy": "CH-O2-04"
+      "challengedBy": "CH-O2-04",
+      "knowledgeIds": [
+        "K-O2-04",
+        "K-O2-13"
+      ]
     },
     {
       "id": "MIS-O2-05",
@@ -47,19 +51,30 @@
       "id": "MIS-O2-08",
       "belief": "换一块焦距更长的透镜，像一定变大。",
       "truth": "要看物距落在哪一段。同样的物距下，换焦距可能会让像从实变虚。",
-      "challengedBy": "CH-O2-02"
+      "challengedBy": "CH-O2-02",
+      "knowledgeIds": [
+        "K-O2-11",
+        "K-O3-01"
+      ]
     },
     {
       "id": "MIS-O2-09",
       "belief": "实像总是放大的，虚像总是缩小的。",
       "truth": "实像可大可小（u>2f 缩小、f<u<2f 放大）；虚像一定是放大的。",
-      "challengedBy": "CH-O2-02"
+      "challengedBy": "CH-O2-02",
+      "knowledgeIds": [
+        "K-O2-10",
+        "K-O2-06"
+      ]
     },
     {
       "id": "MIS-O2-10",
       "belief": "凹透镜也能在光屏上成出像。",
       "truth": "凹透镜对任何物距都只成缩小、正立的虚像，永远接不住。",
-      "challengedBy": "CH-O2-05"
+      "challengedBy": "CH-O2-05",
+      "knowledgeIds": [
+        "K-O2-02"
+      ]
     }
   ]
 }

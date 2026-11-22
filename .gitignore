@@ -21,3 +21,6 @@ platform/physquest/
 local/
 
 # 内部分工与任务书（不进公开仓库）
+
+# bun 锁文件（本机用 bun 装依赖，CI 用 npm，不入仓库）
+bun.lock

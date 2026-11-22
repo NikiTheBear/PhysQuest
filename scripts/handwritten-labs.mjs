@@ -528,7 +528,7 @@ export const HANDWRITTEN_LABS = [
       answerIndex: 0,
     },
     observation:
-      '这是概念示意：杆和支点都是固定的，不会真的翘起来。两支测距仪分别给出左右两段力臂的长度——它们是真实测出来的几何量，但「能不能平衡」要用 F₁l₁ = F₂l₂ 自己算。',
+      '这是概念示意：杆和支点都是固定的，不会真的翘起来。两支测距仪给出的是「支点到作用点」的直线距离，是真实测量值；注意它只有在力垂直于杆时正好等于力臂。「能不能平衡」要用 F₁l₁ = F₂l₂ 自己算。',
     learning: {
       variables: ['（示意）支点与施力点位置', '（示意）两侧力的大小'],
       steps: ['左右力臂的实际长度', '按 F₁l₁ = F₂l₂ 推算另一侧需要的力'],
@@ -541,8 +541,8 @@ export const HANDWRITTEN_LABS = [
       { id: 'fulcrum', kind: 'anchor', name: '支点', pos: [0, 0.7, 0], fixed: true },
       { id: 'left', kind: 'body', name: '阻力作用点', pos: [-2, 1.2, 0], params: { mass: 1, radius: 0.16 }, fixed: true },
       { id: 'right', kind: 'body', name: '动力作用点', pos: [1, 1.2, 0], params: { mass: 1, radius: 0.16 }, fixed: true },
-      { id: 'arm-l', kind: 'distance_sensor', name: '测距仪（支点–阻力臂）', pos: [0, 1.9, 0], refs: { a: 'fulcrum', b: 'left' } },
-      { id: 'arm-r', kind: 'distance_sensor', name: '测距仪（支点–动力臂）', pos: [0, 1.6, 0], refs: { a: 'fulcrum', b: 'right' } },
+      { id: 'arm-l', kind: 'distance_sensor', name: '测距仪（支点到阻力作用点）', pos: [0, 1.9, 0], refs: { a: 'fulcrum', b: 'left' } },
+      { id: 'arm-r', kind: 'distance_sensor', name: '测距仪（支点到动力作用点）', pos: [0, 1.6, 0], refs: { a: 'fulcrum', b: 'right' } },
     ],
     connections: [],
   },
@@ -620,7 +620,7 @@ export const HANDWRITTEN_LABS = [
       answerIndex: 0,
     },
     observation:
-      '这是概念示意：杆固定不动，不会真的平衡。两支测距仪给出左右力臂的真实长度，把已知的一侧力乘上它的力臂，再除以另一侧力臂，就是另一边需要的力。',
+      '这是概念示意：杆固定不动，不会真的平衡。两支测距仪给出支点到两侧作用点的直线距离（真实的测量值，力垂直于杆时才等于力臂）。把已知一侧的力乘上它的力臂、再除以另一侧力臂，就是另一边需要的力。',
     learning: {
       variables: ['（示意）左右力臂', '（已知）一侧的力'],
       steps: ['读出两段力臂', '算左侧力矩', '反推右侧需要的力'],
@@ -633,8 +633,8 @@ export const HANDWRITTEN_LABS = [
       { id: 'fulcrum', kind: 'anchor', name: '支点', pos: [0, 0.7, 0], fixed: true },
       { id: 'load', kind: 'body', name: '左：10 N（距支点 2.5 m）', pos: [-2.5, 1.2, 0], params: { mass: 1, radius: 0.16 }, fixed: true },
       { id: 'effort', kind: 'body', name: '右：待配重（距支点 1.25 m）', pos: [1.25, 1.2, 0], params: { mass: 1, radius: 0.16 }, fixed: true },
-      { id: 'arm-l', kind: 'distance_sensor', name: '测距仪（左力臂）', pos: [0, 2, 0], refs: { a: 'fulcrum', b: 'load' } },
-      { id: 'arm-r', kind: 'distance_sensor', name: '测距仪（右力臂）', pos: [0, 1.7, 0], refs: { a: 'fulcrum', b: 'effort' } },
+      { id: 'arm-l', kind: 'distance_sensor', name: '测距仪（支点到左侧作用点）', pos: [0, 2, 0], refs: { a: 'fulcrum', b: 'load' } },
+      { id: 'arm-r', kind: 'distance_sensor', name: '测距仪（支点到右侧作用点）', pos: [0, 1.7, 0], refs: { a: 'fulcrum', b: 'effort' } },
     ],
     connections: [],
   },

@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { promptById } from '../../data/content';
+import FormulaLab from '../formula-lab/FormulaLab';
+import { hasLab } from '../formula-lab/labData';
 
 /**
  * 单张知识点卡片（双面，可翻转）
@@ -90,8 +93,11 @@ export default function KnowledgeCard({
   defaultFlipped = false,
 }: Props) {
   const [isBack, setIsBack] = useState(defaultFlipped);
+  const [showLab, setShowLab] = useState(false);
   const prompt = promptById(card.id);
   const sup = SUPPORT_LABEL[card.support] ?? SUPPORT_LABEL.conceptual;
+  /** 这一条在 formula-lab.json 里有没有实验室（97 条里有 78 条可算 + 19 条只能示意） */
+  const labEntry = hasLab(card.id);
 
   const mis = card.misconceptions
     .map((id) => misconceptions.find((m) => m.id === id))
@@ -278,6 +284,11 @@ export default function KnowledgeCard({
             <button className="btn-ghost btn-small" onClick={() => setIsBack(false)}>
               ← 翻回正面
             </button>
+            {labEntry && (
+              <button className="btn-ghost btn-small" onClick={() => setShowLab(true)}>
+                打开公式实验室 →
+              </button>
+            )}
             {prompt && onBuild && (
               <button
                 className="btn-primary btn-small"
@@ -290,6 +301,29 @@ export default function KnowledgeCard({
         </>
         )}
       </div>
+
+      {/* ===== 公式实验室（弹层）===== */}
+      {/* 放在卡片内部：三个使用点（地图详情 / 卡片视图 / 挑战回顾）就都自动有入口了，
+          不用每个调用点各自接线。
+          用 portal 挂到 body：卡片在网格 / 弹层里，祖先的 transform、overflow、
+          z-index 都可能把 position:fixed 关进去，portal 一劳永逸。 */}
+      {showLab &&
+        labEntry &&
+        createPortal(
+          <div
+            className="overlay"
+            onClick={(e) => {
+              // 只关这一层：卡片本身可能就在另一个 overlay 里，别顺着 React 树把外层也关了
+              e.stopPropagation();
+              setShowLab(false);
+            }}
+          >
+            <div className="modal formula-lab-modal" onClick={(e) => e.stopPropagation()}>
+              <FormulaLab knowledgeId={card.id} onClose={() => setShowLab(false)} />
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

@@ -1,0 +1,104 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电阻",
+    "description": "研究电阻改变时电压与电流的关系，以及滑动变阻器的调节作用。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E2-03",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e2-03",
+    "title": "电阻",
+    "goal": "研究电阻改变时电压与电流的关系，以及滑动变阻器的调节作用。",
+    "observation": "先按搭建方案把器具摆好，然后只改「最大阻值 resistance」，观察：电流；变阻器端电压；有效电阻。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "直流电源",
+        "position": [
+          -3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {
+          "voltage": 12,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "rheostat-2",
+        "kind": "rheostat",
+        "name": "滑动变阻器",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "resistance": 1000,
+          "ratio": 0.5
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ammeter-3",
+        "kind": "ammeter",
+        "name": "电流表",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-4",
+        "kind": "voltmeter",
+        "name": "电压表",
+        "position": [
+          3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "最大阻值 resistance",
+        "滑片比例 ratio"
+      ],
+      "steps": [
+        "电流",
+        "变阻器端电压",
+        "有效电阻"
+      ],
+      "limitations": "变阻器只有两个端子，有效阻值等于最大阻值乘比例；没有实际电阻丝几何或温度效应。"
+    }
+  }
+}

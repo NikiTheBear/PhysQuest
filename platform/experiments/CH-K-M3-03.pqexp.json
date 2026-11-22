@@ -1,0 +1,102 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "牛顿第一定律",
+    "description": "检验合外力为零时静止或匀速直线运动的保持。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M3-03",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m3-03",
+    "title": "牛顿第一定律",
+    "goal": "检验合外力为零时静止或匀速直线运动的保持。",
+    "observation": "先按搭建方案把器具摆好，然后只改「初速度」，观察：速度是否恒定；无外力时的直线轨迹。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "刚体球",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.3,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "body-1"
+        },
+        "fixed": false
+      },
+      {
+        "id": "force-3",
+        "kind": "force",
+        "name": "力 / 力矩源",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {
+          "fx": 1,
+          "fy": 0,
+          "fz": 0,
+          "tx": 0,
+          "ty": 0,
+          "tz": 0
+        },
+        "refs": {
+          "target": "body-1"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "初速度",
+        "是否施加外力"
+      ],
+      "steps": [
+        "速度是否恒定",
+        "无外力时的直线轨迹"
+      ],
+      "limitations": "这里主动移除了环境阻力；不能用现实中物体自然停下来否定无合力条件下的惯性定律。"
+    }
+  }
+}

@@ -22,7 +22,7 @@ test('each shipped challenge opens in the solver',async()=>{
 });
 
 test('series and parallel challenges have the expected measured branches',async()=>{
-  for(const [id,parallel] of [['CH-AUTO-035',false],['CH-AUTO-036',true]]){
+  for(const [id,parallel] of [['CH-K-E2-05',false],['CH-K-E2-06',true]]){
     const doc=await challenge(id),sim=new Simulation(doc);
     const resistors=doc.components.filter(c=>c.kind==='resistor'),reading=c=>sim.circuit.readings[c.id];
     const battery=doc.components.find(c=>c.kind==='battery');

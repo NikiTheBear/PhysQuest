@@ -1,4 +1,6 @@
 {
+  "format": "physquest.experiment",
+  "version": 1,
   "metadata": {
     "title": "频率变高，波形会变成什么样",
     "description": "保持麦克风位置不动，只改声源频率，看声压随时间怎么变。",
@@ -13,6 +15,7 @@
     "id": "exp-ac-02",
     "title": "频率变高，波形会变成什么样",
     "goal": "保持麦克风位置不动，只改声源频率，看声压随时间怎么变。",
+    "observation": "先按搭建方案把器具摆好，然后只改「频率（20–2000 Hz）」，观察：声压–时间曲线的疏密。",
     "mode": "2d",
     "environment": {
       "gravity": 0,
@@ -24,22 +27,27 @@
       {
         "id": "speaker-1",
         "kind": "speaker",
-        "name": "speaker",
+        "name": "点声源",
         "position": [
-          -1,
+          -1.1,
           1,
           0
         ],
-        "params": {},
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
         "refs": {},
         "fixed": false
       },
       {
         "id": "microphone-2",
         "kind": "microphone",
-        "name": "microphone",
+        "name": "测量麦克风",
         "position": [
-          1,
+          1.1,
           1,
           0
         ],
@@ -50,7 +58,8 @@
     ],
     "connections": [],
     "control": {
-      "running": false
+      "running": false,
+      "reset": 0
     },
     "learning": {
       "variables": [

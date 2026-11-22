@@ -1,0 +1,91 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "路端电压随外阻变化",
+    "description": "绘制外电阻变化时路端电压与电流的关系。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-05",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-05",
+    "title": "路端电压随外阻变化",
+    "goal": "绘制外电阻变化时路端电压与电流的关系。",
+    "observation": "先按搭建方案把器具摆好，然后只改「变阻器有效外阻」，观察：路端电压 U；电流 I；U−I 变化趋势。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "直流电源",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "voltage": 12,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "rheostat-2",
+        "kind": "rheostat",
+        "name": "滑动变阻器",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "resistance": 1000,
+          "ratio": 0.5
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-3",
+        "kind": "voltmeter",
+        "name": "电压表",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "变阻器有效外阻",
+        "电源内阻"
+      ],
+      "steps": [
+        "路端电压 U",
+        "电流 I",
+        "U−I 变化趋势"
+      ],
+      "limitations": "理想电源加固定串联内阻模型，不包含电量下降、温度、极化和短路保护行为。"
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "简谐振动",
+    "description": "验证弹簧振子的周期对质量和刚度的依赖。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M3-14",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m3-14",
+    "title": "简谐振动",
+    "goal": "验证弹簧振子的周期对质量和刚度的依赖。",
+    "observation": "先按搭建方案把器具摆好，然后只改「质量」，观察：振动周期；位移与速度相位关系。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "anchor-1",
+        "kind": "anchor",
+        "name": "固定支点",
+        "position": [
+          -3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "spring-2",
+        "kind": "spring",
+        "name": "弹簧",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "stiffness": 15,
+          "restLength": 1.5,
+          "damping": 0.2
+        },
+        "refs": {
+          "a": "anchor-1",
+          "b": "body-3"
+        },
+        "fixed": false
+      },
+      {
+        "id": "body-3",
+        "kind": "body",
+        "name": "刚体球",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.3,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-4",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "body-3"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "质量",
+        "弹簧劲度",
+        "初始小伸长"
+      ],
+      "steps": [
+        "振动周期",
+        "位移与速度相位关系"
+      ],
+      "limitations": "这是中心弹簧的单向初始运动，避免横向扰动和撞到支点；周期由足够长的记录测量，短验证调用不能覆盖全部周期。"
+    }
+  }
+}

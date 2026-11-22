@@ -1,0 +1,81 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "物体为什么会往下掉",
+    "description": "比较不同质量的小球从相同高度释放时的下落过程。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M1-02",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m1-02",
+    "title": "物体为什么会往下掉",
+    "goal": "比较不同质量的小球从相同高度释放时的下落过程。",
+    "observation": "先按搭建方案把器具摆好，然后只改「球的质量」，观察：高度随时间变化；落地前同一时刻的速度。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "刚体球",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.3,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "body-1"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "球的质量",
+        "释放高度",
+        "重力大小"
+      ],
+      "steps": [
+        "高度随时间变化",
+        "落地前同一时刻的速度"
+      ],
+      "limitations": "这是无空气阻力的重力下落；相同半径用于避免接触时刻的几何差异。"
+    }
+  }
+}

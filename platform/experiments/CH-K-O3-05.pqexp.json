@@ -1,0 +1,97 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "组合透镜",
+    "description": "把两片透镜串起来，验证「第一个的像就是第二个的物」。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O3-05",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o3-05",
+    "title": "组合透镜",
+    "goal": "把两片透镜串起来，验证「第一个的像就是第二个的物」。",
+    "observation": "先按搭建方案把器具摆好，然后只改「两片透镜的间距」，观察：出射光束是否会聚；会聚点相对第二片的位置。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "laser-1",
+        "kind": "laser",
+        "name": "激光光源",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "angle": 0,
+          "power": 1,
+          "wavelength": 532,
+          "width": 0.2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lens-2",
+        "kind": "lens",
+        "name": "薄透镜",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "focal": 1.5,
+          "radius": 0.7,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "detector-3",
+        "kind": "detector",
+        "name": "光电探测器",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {
+          "radius": 0.5,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "两片透镜的间距",
+        "两片透镜的焦距",
+        "第二片的类型"
+      ],
+      "steps": [
+        "出射光束是否会聚",
+        "会聚点相对第二片的位置"
+      ],
+      "limitations": "近轴薄透镜逐级计算；不含透镜厚度、主平面位置和两片之间的多次反射。"
+    }
+  }
+}

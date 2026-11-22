@@ -1,4 +1,6 @@
 {
+  "format": "physquest.experiment",
+  "version": 1,
   "metadata": {
     "title": "同样的声源，走远一倍会小多少",
     "description": "一个点声源、一支麦克风。把麦克风从 1 m 挪到 2 m、4 m，看声压怎么变。",
@@ -24,20 +26,25 @@
       {
         "id": "speaker-1",
         "kind": "speaker",
-        "name": "speaker",
+        "name": "点声源",
         "position": [
           -1,
           1,
           0
         ],
-        "params": {},
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
         "refs": {},
         "fixed": false
       },
       {
         "id": "microphone-2",
         "kind": "microphone",
-        "name": "microphone",
+        "name": "测量麦克风",
         "position": [
           1,
           1,
@@ -50,7 +57,8 @@
     ],
     "connections": [],
     "control": {
-      "running": false
+      "running": false,
+      "reset": 0
     },
     "learning": {
       "variables": [
@@ -62,6 +70,7 @@
         "1 m / 2 m / 4 m 处的声压读数"
       ],
       "limitations": "球面波在自由空间中的衰减；不含反射与吸收。"
-    }
+    },
+    "observation": "先把麦克风放在距声源 1 m 处，再挪到 2 m、4 m，观察：声压随距离怎么变（每远一倍应降到约四分之一）。"
   }
 }

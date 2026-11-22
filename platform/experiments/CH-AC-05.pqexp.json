@@ -1,4 +1,6 @@
 {
+  "format": "physquest.experiment",
+  "version": 1,
   "metadata": {
     "title": "把声源换成有指向性的",
     "description": "把点声源换成指向性声源，转到它背后，看看声压会怎样。",
@@ -13,6 +15,7 @@
     "id": "exp-ac-05",
     "title": "把声源换成有指向性的",
     "goal": "把点声源换成指向性声源，转到它背后，看看声压会怎样。",
+    "observation": "先按搭建方案把器具摆好，然后只改「麦克风绕声源的角度」，观察：正面 / 侧面 / 背面三个方向的声压。",
     "mode": "2d",
     "environment": {
       "gravity": 0,
@@ -24,22 +27,29 @@
       {
         "id": "directional_speaker-1",
         "kind": "directional_speaker",
-        "name": "directional_speaker",
+        "name": "指向性声源",
         "position": [
-          -1,
+          -1.1,
           1,
           0
         ],
-        "params": {},
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343,
+          "angle": 0,
+          "directivity": 2
+        },
         "refs": {},
         "fixed": false
       },
       {
         "id": "microphone-2",
         "kind": "microphone",
-        "name": "microphone",
+        "name": "测量麦克风",
         "position": [
-          1,
+          1.1,
           1,
           0
         ],
@@ -50,7 +60,8 @@
     ],
     "connections": [],
     "control": {
-      "running": false
+      "running": false,
+      "reset": 0
     },
     "learning": {
       "variables": [

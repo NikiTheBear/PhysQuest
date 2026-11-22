@@ -1,0 +1,103 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电池的正负",
+    "description": "识别电池极性反转时电压和约定电流方向的改变。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E1-04",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e1-04",
+    "title": "电池的正负",
+    "goal": "识别电池极性反转时电压和约定电流方向的改变。",
+    "observation": "先按搭建方案把器具摆好，然后只改「电源电动势符号」，观察：有符号电压；有符号支路电流；负载功率。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "直流电源",
+        "position": [
+          -3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {
+          "voltage": 12,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "电阻",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "resistance": 100
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ammeter-3",
+        "kind": "ammeter",
+        "name": "电流表",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-4",
+        "kind": "voltmeter",
+        "name": "电压表",
+        "position": [
+          3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "电源电动势符号",
+        "负载电阻"
+      ],
+      "steps": [
+        "有符号电压",
+        "有符号支路电流",
+        "负载功率"
+      ],
+      "limitations": "显示的是约定电流方向；不模拟导线中电子的微观迁移。电源含内阻。"
+    }
+  }
+}

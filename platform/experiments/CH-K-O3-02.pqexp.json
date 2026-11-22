@@ -1,0 +1,67 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "放大率",
+    "description": "验证 m = −v/u，并看清负号表示倒立。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O3-02",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o3-02",
+    "title": "放大率",
+    "goal": "验证 m = −v/u，并看清负号表示倒立。",
+    "observation": "先按搭建方案把器具摆好，然后只改「物距 u」，观察：放大率 m 的数值与符号；像高。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "lens_bench-1",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 30,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 15,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "物距 u",
+        "焦距 f",
+        "物体高度 h"
+      ],
+      "steps": [
+        "放大率 m 的数值与符号",
+        "像高"
+      ],
+      "limitations": "横向放大率；纵向（轴向）放大率是 m²，平台不单独给这个量。"
+    }
+  }
+}

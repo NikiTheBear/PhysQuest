@@ -1,0 +1,102 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "欧姆定律",
+    "description": "用控制变量法验证欧姆元件的电流与端电压成正比。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E2-04",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e2-04",
+    "title": "欧姆定律",
+    "goal": "用控制变量法验证欧姆元件的电流与端电压成正比。",
+    "observation": "先按搭建方案把器具摆好，然后只改「电源电压」，观察：成对 U、I 数据；U/I 与设定阻值的比较。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "直流电源",
+        "position": [
+          -3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {
+          "voltage": 12,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "电阻",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "resistance": 100
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ammeter-3",
+        "kind": "ammeter",
+        "name": "电流表",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-4",
+        "kind": "voltmeter",
+        "name": "电压表",
+        "position": [
+          3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "电源电压",
+        "负载电阻"
+      ],
+      "steps": [
+        "成对 U、I 数据",
+        "U/I 与设定阻值的比较"
+      ],
+      "limitations": "需考虑电源内阻和仪表内阻；只验证线性欧姆电阻，不外推至灯丝温变或半导体。"
+    }
+  }
+}

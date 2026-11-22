@@ -1,0 +1,114 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "机械能守恒",
+    "description": "检查保守弹性系统的机械能守恒及数值误差。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M3-11",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m3-11",
+    "title": "机械能守恒",
+    "goal": "检查保守弹性系统的机械能守恒及数值误差。",
+    "observation": "先按搭建方案把器具摆好，然后只改「劲度系数」，观察：机械能随时间；动能与弹性势能互换。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "anchor-1",
+        "kind": "anchor",
+        "name": "固定支点",
+        "position": [
+          -3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "spring-2",
+        "kind": "spring",
+        "name": "弹簧",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "stiffness": 15,
+          "restLength": 1.5,
+          "damping": 0.2
+        },
+        "refs": {
+          "a": "anchor-1",
+          "b": "body-3"
+        },
+        "fixed": false
+      },
+      {
+        "id": "body-3",
+        "kind": "body",
+        "name": "刚体球",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.3,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-4",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "body-3"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "劲度系数",
+        "质量",
+        "初始伸长"
+      ],
+      "steps": [
+        "机械能随时间",
+        "动能与弹性势能互换"
+      ],
+      "limitations": "不加入周期驱动或耗散；有限步长产生能量误差，不能要求每个浮点采样值绝对相等。"
+    }
+  }
+}

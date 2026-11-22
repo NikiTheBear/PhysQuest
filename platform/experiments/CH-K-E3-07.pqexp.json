@@ -1,0 +1,77 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电源效率",
+    "description": "研究电源输出功率与效率随负载改变的不同趋势。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-07",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-07",
+    "title": "电源效率",
+    "goal": "研究电源输出功率与效率随负载改变的不同趋势。",
+    "observation": "先按搭建方案把器具摆好，然后只改「负载电阻」，观察：负载功率；电源提供的理论总功率；效率与电流的权衡。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "直流电源",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "voltage": 12,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "电阻",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {
+          "resistance": 100
+        },
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "负载电阻",
+        "电源内阻"
+      ],
+      "steps": [
+        "负载功率",
+        "电源提供的理论总功率",
+        "效率与电流的权衡"
+      ],
+      "limitations": "这是电阻内耗下的电路效率，不代表电池化学或电机系统效率；避免用电源端口净功率代替 εI。"
+    }
+  }
+}

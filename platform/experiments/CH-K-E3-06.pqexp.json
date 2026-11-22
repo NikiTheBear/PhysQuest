@@ -1,0 +1,78 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "R = r 时输出功率最大",
+    "description": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-06",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-06",
+    "title": "R = r 时输出功率最大",
+    "goal": "比较外电阻在内阻附近变化时的负载功率，验证最大功率条件。",
+    "observation": "先按搭建方案把器具摆好，然后只改「外电阻 R」，观察：外电阻功率；匹配点两侧功率；匹配时的端电压。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "直流电源",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "voltage": 12,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "电阻",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {
+          "resistance": 100
+        },
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "外电阻 R",
+        "内阻 r",
+        "电动势 ε"
+      ],
+      "steps": [
+        "外电阻功率",
+        "匹配点两侧功率",
+        "匹配时的端电压"
+      ],
+      "limitations": "只适用于固定电动势和正线性内阻的直流戴维南模型；最大功率不等于最高效率。"
+    }
+  }
+}

@@ -12,7 +12,8 @@
  *
  * 用法：node scripts/gen-challenges.mjs
  */
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rm, readdir } from 'node:fs/promises';
+import { CATALOG, RIGID_KINDS, LINK_KINDS } from '../platform/shared/catalog.js';
 
 const PROMPTS = JSON.parse(
   await readFile(new URL('../shared/knowledge-data/knowledge-prompts.json', import.meta.url), 'utf8'),
@@ -63,7 +64,69 @@ for (const p of PROMPTS) {
   groups.get(key).push(p);
 }
 
-let seq = 0;
+/** 每个挑战的 id 由知识点 id 派生：CH-K-M2-05 ↔ 知识点 K-M2-05。
+ *  这样加删知识点时挑战编号不会漂移，外部链接永远有效。 */
+const idOf = (knowledgeId) => `CH-${knowledgeId}`;
+
+/** 按器具的实际尺寸摆位，避免透镜重叠、地面套住别的器具。 */
+function placeAt(kind, idx, total) {
+  if (kind === 'floor_slab') return [0, -0.08, 0]; // 地面永远在原点下方
+  if (kind === 'lens_bench') return [0, 1, 0]; // 光具座永远居中
+  const spacing = kind === 'lens' || kind === 'diverging_lens' ? 4 : 2.2;
+  return [(idx - (total - 1) / 2) * spacing, 1, 0];
+}
+
+/** 生成一个部件的完整定义：中文名 + 默认参数填满 + 合理位置。
+ *  refs 与 challengeScene 的自动补全保持一致，文件离开工作台也能单独载入。 */
+function buildComponent(kind, idx, total) {
+  const def = CATALOG[kind];
+  const refs = {};
+  if (def?.refs) {
+    const targets = ['a', 'b', 'target'];
+    for (const key of targets) if (def.refs.includes(key)) refs[key] = '';
+  }
+  return {
+    id: `${kind}-${idx + 1}`,
+    kind,
+    name: def?.name ?? kind,
+    position: placeAt(kind, idx, total),
+    params: Object.fromEntries(
+      Object.entries(def?.params ?? {}).map(([k, v]) => [k, v.value]),
+    ),
+    refs,
+    fixed: kind === 'floor_slab' || kind === 'lens_bench',
+  };
+}
+
+/** 按领域设定环境：力学有重力有碰撞，其余关闭。 */
+const ENV = {
+  力学: { gravity: 9.8, damping: 0, speed: 1, collisions: true },
+  电磁: { gravity: 0, damping: 0, speed: 1, collisions: false },
+  光学: { gravity: 0, damping: 0, speed: 1, collisions: false },
+  声学: { gravity: 0, damping: 0, speed: 1, collisions: false },
+};
+
+/** 填好 refs：弹簧/绳/杆连到支点与刚体，传感器/力源指向刚体。
+ *  与 challengeScene 的自动补全一致，但写进文件，保证单独导入也能用。 */
+function wireRefs(comps) {
+  const rigid = comps.find((c) => RIGID_KINDS.includes(c.kind));
+  if (!rigid) return;
+  const anchor = comps.find((c) => c.kind === 'anchor');
+  const rigids = comps.filter((c) => RIGID_KINDS.includes(c.kind));
+  for (const c of comps) {
+    const def = CATALOG[c.kind];
+    if (def?.refs?.includes('target')) c.refs.target = rigid.id;
+    if (anchor && LINK_KINDS.includes(c.kind)) {
+      c.refs.a = anchor.id;
+      c.refs.b = rigid.id;
+    }
+    if (c.kind === 'distance_sensor' && rigids.length >= 2) {
+      c.refs.a = rigids[0].id;
+      c.refs.b = rigids[1].id;
+    }
+  }
+}
+
 for (const [key, list] of groups) {
   const [domain, stage] = key.split('|');
   const labId = DOMAIN_TO_LAB[domain];
@@ -72,8 +135,7 @@ for (const [key, list] of groups) {
   for (const first of list) {
     if ((COVERED_BY_HANDWRITTEN[labId] ?? []).includes(first.id)) continue;
     const chunk = [first];
-    seq += 1;
-    const id = `CH-AUTO-${String(seq).padStart(3, '0')}`;
+    const id = idOf(first.id);
     const title = first.title;
     const brief = first.objective;
     const models = [...new Set(first.models)];
@@ -110,7 +172,12 @@ for (const [key, list] of groups) {
       },
     });
 
+    const comps = models.slice(0, 6).map((kind, idx, all) => buildComponent(kind, idx, all.length));
+    wireRefs(comps);
+
     experiments.push({
+      format: 'physquest.experiment',
+      version: 1,
       metadata: {
         title,
         description: brief,
@@ -120,19 +187,14 @@ for (const [key, list] of groups) {
         id: `exp-${id.toLowerCase()}`,
         title,
         goal: brief,
+        observation:
+          `先按搭建方案把器具摆好，然后只改「${vars[0] ?? '一个变量'}」，观察：` +
+          `${first.observations.join('；')}。`,
         mode: '2d',
-        environment: { gravity: 9.8, damping: 0, speed: 1, collisions: true },
-        components: models.slice(0, 6).map((kind, idx) => ({
-          id: `${kind}-${idx + 1}`,
-          kind,
-          name: kind,
-          position: [idx * 2 - 2, 1, 0],
-          params: {},
-          refs: {},
-          fixed: false,
-        })),
+        environment: ENV[domain] ?? { gravity: 0, damping: 0, speed: 1, collisions: false },
+        components: comps,
         connections: [],
-        control: { running: false },
+        control: { running: false, reset: 0 },
         learning: {
           variables: vars,
           steps: first.observations,
@@ -244,7 +306,12 @@ for (const w of WAVE) {
     },
   });
 
+  const comps = w.models.map((kind, idx) => buildComponent(kind, idx, w.models.length));
+  wireRefs(comps);
+
   experiments.push({
+    format: 'physquest.experiment',
+    version: 1,
     metadata: {
       title: w.title,
       description: w.brief,
@@ -254,19 +321,14 @@ for (const w of WAVE) {
       id: `exp-${w.id.toLowerCase()}`,
       title: w.title,
       goal: w.brief,
+      observation:
+        `先按搭建方案把器具摆好，然后只改「${w.variables[0] ?? '一个变量'}」，观察：` +
+        `${w.observations.join('；')}。`,
       mode: '2d',
       environment: { gravity: 0, damping: 0, speed: 1, collisions: false },
-      components: w.models.map((kind, idx) => ({
-        id: `${kind}-${idx + 1}`,
-        kind,
-        name: kind,
-        position: [idx * 2 - 1, 1, 0],
-        params: {},
-        refs: {},
-        fixed: false,
-      })),
+      components: comps,
       connections: [],
-      control: { running: false },
+      control: { running: false, reset: 0 },
       learning: {
         variables: w.variables,
         steps: w.observations,
@@ -292,12 +354,17 @@ for (const [labId, list] of Object.entries(byLab)) {
   console.log(`${labId}: ${list.length} 个挑战`);
 }
 
+const experimentsDir = new URL('../platform/experiments/', import.meta.url);
 for (const exp of experiments) {
   const cid = exp.metadata.source.challengeId;
-  await writeFile(
-    new URL(`../platform/experiments/${cid}.pqexp.json`, import.meta.url),
-    JSON.stringify(exp, null, 2) + '\n',
-  );
+  await writeFile(new URL(`${cid}.pqexp.json`, experimentsDir), JSON.stringify(exp, null, 2) + '\n');
 }
+
+// 清理旧的自动生成文件（旧编号 CH-AUTO-xxx 已废弃，避免孤儿文件留在实验目录）
+const stale = (await readdir(experimentsDir)).filter(
+  (name) => name.endsWith('.pqexp.json') && /^CH-AUTO-\d/.test(name),
+);
+for (const name of stale) await rm(new URL(name, experimentsDir), { force: true });
+if (stale.length) console.log(`清理 ${stale.length} 个旧编号实验文件`);
 
 console.log(`共生成 ${challenges.length} 个挑战、${experiments.length} 个实验文件`);

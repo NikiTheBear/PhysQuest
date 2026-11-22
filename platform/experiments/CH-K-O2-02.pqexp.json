@@ -1,0 +1,114 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "凸透镜会聚，凹透镜发散",
+    "description": "把凸透镜和凹透镜放在同一条光路上，比较出射光是收拢还是散开。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O2-02",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o2-02",
+    "title": "凸透镜会聚，凹透镜发散",
+    "goal": "把凸透镜和凹透镜放在同一条光路上，比较出射光是收拢还是散开。",
+    "observation": "先按搭建方案把器具摆好，然后只改「透镜类型（凸/凹）」，观察：出射光线的收拢或散开；探测器功率峰值位置。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "laser-1",
+        "kind": "laser",
+        "name": "激光光源",
+        "position": [
+          -3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {
+          "angle": 0,
+          "power": 1,
+          "wavelength": 532,
+          "width": 0.2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lens-2",
+        "kind": "lens",
+        "name": "薄透镜",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {
+          "focal": 1.5,
+          "radius": 0.7,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "diverging_lens-3",
+        "kind": "diverging_lens",
+        "name": "凹透镜",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {
+          "focal": -1.5,
+          "radius": 0.7,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "detector-4",
+        "kind": "detector",
+        "name": "光电探测器",
+        "position": [
+          3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {
+          "radius": 0.5,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "透镜类型（凸/凹）",
+        "焦距",
+        "探测器位置"
+      ],
+      "steps": [
+        "出射光线的收拢或散开",
+        "探测器功率峰值位置"
+      ],
+      "limitations": "近轴薄透镜；凹透镜的焦点是虚焦点，光线反向延长才交于一点，平台上看到的是散开的光线。"
+    }
+  }
+}

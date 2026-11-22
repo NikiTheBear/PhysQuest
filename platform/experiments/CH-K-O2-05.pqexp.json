@@ -1,0 +1,68 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "物距大于二倍焦距：倒立缩小的实像",
+    "description": "把物距调到二倍焦距以外，验证像倒立、缩小、且落在 f 与 2f 之间。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O2-05",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o2-05",
+    "title": "物距大于二倍焦距：倒立缩小的实像",
+    "goal": "把物距调到二倍焦距以外，验证像倒立、缩小、且落在 f 与 2f 之间。",
+    "observation": "先按搭建方案把器具摆好，然后只改「物距 u」，观察：放大率 m；像距 v；光屏上像的清晰程度。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "lens_bench-1",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 30,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 15,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "物距 u",
+        "光屏位置",
+        "焦距 f"
+      ],
+      "steps": [
+        "放大率 m",
+        "像距 v",
+        "光屏上像的清晰程度"
+      ],
+      "limitations": "近轴薄透镜；u 取 30 cm 时 v = 15 cm，正好落在 f 与 2f 之间，与照相机的工作区间一致。"
+    }
+  }
+}

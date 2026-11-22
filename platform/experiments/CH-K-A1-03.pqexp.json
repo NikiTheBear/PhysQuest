@@ -1,0 +1,76 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "声音的高低和大小",
+    "description": "分别改频率和幅度，听出「高低」和「大小」是两个不同的东西。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-A1-03",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-a1-03",
+    "title": "声音的高低和大小",
+    "goal": "分别改频率和幅度，听出「高低」和「大小」是两个不同的东西。",
+    "observation": "先按搭建方案把器具摆好，然后只改「声源频率」，观察：麦克风读到的声压幅值；频率变化时的听感。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "speaker-1",
+        "kind": "speaker",
+        "name": "点声源",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "frequency": 120,
+          "amplitude": 0.5,
+          "phase": 0,
+          "speed": 343
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "microphone-2",
+        "kind": "microphone",
+        "name": "测量麦克风",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "声源频率",
+        "声源幅度"
+      ],
+      "steps": [
+        "麦克风读到的声压幅值",
+        "频率变化时的听感"
+      ],
+      "limitations": "平台只有正弦声，没有泛音，所以「音色」这一层做不出来。频率和幅度是真的。"
+    }
+  }
+}

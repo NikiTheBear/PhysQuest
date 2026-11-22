@@ -1,0 +1,108 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电容",
+    "description": "研究电容储能以及 RC 充电过程中电压与电流的变化。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-03",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-03",
+    "title": "电容",
+    "goal": "研究电容储能以及 RC 充电过程中电压与电流的变化。",
+    "observation": "先按搭建方案把器具摆好，然后只改「电容量」，观察：电容电压随时间变化；充电电流衰减；理论储能。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "battery-1",
+        "kind": "battery",
+        "name": "直流电源",
+        "position": [
+          -3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {
+          "voltage": 12,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "resistor-2",
+        "kind": "resistor",
+        "name": "电阻",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "resistance": 100
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "capacitor-3",
+        "kind": "capacitor",
+        "name": "电容",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {
+          "capacitance": 1000,
+          "initialVoltage": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "voltmeter-4",
+        "kind": "voltmeter",
+        "name": "电压表",
+        "position": [
+          3.3000000000000003,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "电容量",
+        "串联电阻",
+        "电源电压",
+        "初始电容电压"
+      ],
+      "steps": [
+        "电容电压随时间变化",
+        "充电电流衰减",
+        "理论储能"
+      ],
+      "limitations": "模型为线性理想电容，后向 Euler 积分有数值耗散；没有漏电、击穿、介质非线性或极板空间场。"
+    }
+  }
+}

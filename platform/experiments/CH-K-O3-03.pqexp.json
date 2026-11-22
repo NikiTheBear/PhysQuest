@@ -1,0 +1,66 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "符号约定",
+    "description": "看清虚像时 v 取负值，以及为什么这样约定能让一条公式管两种情况。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O3-03",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o3-03",
+    "title": "符号约定",
+    "goal": "看清虚像时 v 取负值，以及为什么这样约定能让一条公式管两种情况。",
+    "observation": "先按搭建方案把器具摆好，然后只改「物距 u」，观察：像距 v 的正负；光屏上有没有像。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "lens_bench-1",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 30,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 15,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "物距 u",
+        "光屏位置"
+      ],
+      "steps": [
+        "像距 v 的正负",
+        "光屏上有没有像"
+      ],
+      "limitations": "平台用的是 u 恒正的实物约定；虚物（u < 0）在光具座上做不出来，那需要组合透镜。"
+    }
+  }
+}

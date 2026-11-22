@@ -1,0 +1,107 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "推和拉",
+    "description": "观察向相反方向推拉同一物体时，运动如何改变。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M1-01",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m1-01",
+    "title": "推和拉",
+    "goal": "观察向相反方向推拉同一物体时，运动如何改变。",
+    "observation": "先按搭建方案把器具摆好，然后只改「力的方向与大小」，观察：X 位移和 X 速度；加速度方向变化。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "box-1",
+        "kind": "box",
+        "name": "长方体",
+        "position": [
+          -2.2,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.7,
+          "height": 0.7,
+          "depth": 0.7,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "force-2",
+        "kind": "force",
+        "name": "力 / 力矩源",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "fx": 1,
+          "fy": 0,
+          "fz": 0,
+          "tx": 0,
+          "ty": 0,
+          "tz": 0
+        },
+        "refs": {
+          "target": "box-1"
+        },
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-3",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          2.2,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "box-1"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "力的方向与大小",
+        "物体质量"
+      ],
+      "steps": [
+        "X 位移和 X 速度",
+        "加速度方向变化"
+      ],
+      "limitations": "力源作用于质心；物体表面形变和手的接触过程未模拟。"
+    }
+  }
+}

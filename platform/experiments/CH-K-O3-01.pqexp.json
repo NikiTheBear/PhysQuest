@@ -1,0 +1,67 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "薄透镜成像公式",
+    "description": "用三组不同的物距验证 1/f = 1/u + 1/v。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O3-01",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o3-01",
+    "title": "薄透镜成像公式",
+    "goal": "用三组不同的物距验证 1/f = 1/u + 1/v。",
+    "observation": "先按搭建方案把器具摆好，然后只改「物距 u」，观察：像距 v；弥散圆最小的光屏位置。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "lens_bench-1",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 30,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 15,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "物距 u",
+        "焦距 f",
+        "光屏位置"
+      ],
+      "steps": [
+        "像距 v",
+        "弥散圆最小的光屏位置"
+      ],
+      "limitations": "近轴薄透镜公式；厚透镜、球差、色差都不在模型里。u 接近 f 时 v 会趋于无穷，读数会失真。"
+    }
+  }
+}

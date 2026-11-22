@@ -1,0 +1,81 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "动量守恒",
+    "description": "检查一维两球碰撞前后总动量及动能的不同表现。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M3-13",
+      "auto": true
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m3-13",
+    "title": "动量守恒",
+    "goal": "检查一维两球碰撞前后总动量及动能的不同表现。",
+    "observation": "先按搭建方案把器具摆好，然后只改「两球质量」，观察：总 X 动量；碰撞前后总动能。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "body-1",
+        "kind": "body",
+        "name": "刚体球",
+        "position": [
+          -1.1,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.3,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "motion_sensor-2",
+        "kind": "motion_sensor",
+        "name": "运动传感器",
+        "position": [
+          1.1,
+          1,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "body-1"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "两球质量",
+        "初速度",
+        "双方恢复系数"
+      ],
+      "steps": [
+        "总 X 动量",
+        "碰撞前后总动能"
+      ],
+      "limitations": "求解器按双方恢复系数较小值处理接触；只比较系统无外部接触的时段，并允许有限数值误差。"
+    }
+  }
+}

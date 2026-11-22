@@ -4,11 +4,17 @@ import {
   describeImport,
   exportLearner,
   importLearner,
+  loadGrade,
   previewImport,
   type LearnerImportSummary,
 } from '../../core/persistence';
 import { CHALLENGES, KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
+import type { GradeResult } from '../../core/grading/types';
+import { BAND_LABEL, DIM_LABEL, LEVEL_LABEL, W } from '../../core/grading/types';
+import { fmt } from '../../core/grading/rules';
 import { MarkdownLite } from './MarkdownLite';
+import GradingPanel, { pickGradeChallenge } from './GradingPanel';
+import { loadCaptures } from '../../core/grading/capture-store';
 
 interface Props {
   learner: LearnerState;
@@ -30,6 +36,7 @@ export function buildReport(
   learner: LearnerState,
   reflectionText: string,
   challengeTitle: string,
+  grade: GradeResult | null = null,
 ): string {
   const runs = learner.runs.slice(-8);
   const lines: string[] = [];
@@ -58,8 +65,10 @@ export function buildReport(
     runs.forEach((r, i) => {
       const ch = CHALLENGES.find((c) => c.id === r.challengeId);
       const pred = r.prediction && ch ? ch.prediction.options[r.prediction.chosenIndex] : '—';
+      // m 可能是 null（u ≈ f 时引擎给 Infinity，JSON 存回来变成 null）。直接 .toFixed 会抛错，
+      // 整页白屏 —— 这就是文档 §2.4 缺口 5 那个 bug。
       lines.push(
-        `| ${i + 1} | ${r.params.u.toFixed(1)} | ${r.params.f.toFixed(0)} | ${Math.abs(r.metrics.v).toFixed(1)} | ${r.metrics.m.toFixed(2)} | ${r.metrics.description} | ${pred} |`,
+        `| ${i + 1} | ${r.params.u.toFixed(1)} | ${r.params.f.toFixed(0)} | ${fmtV(r.metrics.v)} | ${fmtM(r.metrics.m)} | ${r.metrics.description} | ${pred} |`,
       );
     });
   }
@@ -99,7 +108,75 @@ export function buildReport(
   lines.push(reflectionText.trim() || '_（未填写）_');
   lines.push('');
 
+  /* ---------- 七、实验评分（§5.4） ----------
+     **必须是 ##** —— `#` 会触发 MarkdownLite 的老 bug（§2.4 缺口 6）。
+     只在用户点了「生成学习报告」之后出现，且评分不影响导出。 */
+  lines.push('## 七、实验评分（AI 写评语，数字由本地引擎算出）');
+  lines.push('');
+  if (!grade || grade.level === 'not_graded') {
+    lines.push('_本次没有评分。_');
+  } else {
+    lines.push(`**总分 ${grade.total} / 100 · ${LEVEL_LABEL[grade.level]}**`);
+    lines.push('');
+    lines.push('| 维度 | 权重 | 分数 | 档位 | 评语 |');
+    lines.push('|---|---|---|---|---|');
+    for (const d of grade.dimensions) {
+      lines.push(
+        `| ${DIM_LABEL[d.key]} | ${Math.round(W[d.key] * 100)}% | ${d.score ?? '—'} | ${BAND_LABEL[d.band]} | ${cell(d.comment)} |`,
+      );
+    }
+    lines.push('');
+    if (grade.refused) {
+      lines.push(`_${grade.refused.message}。_`);
+      lines.push('');
+    }
+    lines.push('### 证据');
+    lines.push('');
+    lines.push('读数表 R（引擎原值）：');
+    lines.push('');
+    if (grade.evidence.facts.length === 0) {
+      lines.push('_没有记录。_');
+    } else {
+      lines.push('| # | 物距u | 焦距f | 光屏位置 | 像距v | 放大率m | 像高 | 弥散圆 | 屏上有像 |');
+      lines.push('|---|---|---|---|---|---|---|---|---|');
+      for (const f of grade.evidence.facts) {
+        lines.push(
+          `| ${f.id} | ${f.lens?.u !== undefined ? fmt(f.lens.u, 1) : '—'} | ${
+            f.lens?.f !== undefined ? fmt(f.lens.f, 1) : '—'
+          } | ${f.lens?.screenX !== undefined ? fmt(f.lens.screenX, 1) : '—'} | ${
+            f.metrics.v !== undefined ? fmt(f.metrics.v) : '—'
+          } | ${f.metrics.m !== undefined ? fmt(f.metrics.m) : '—'} | ${
+            f.metrics.imageHeight !== undefined ? fmt(f.metrics.imageHeight) : '—'
+          } | ${f.metrics.blurDiameter !== undefined ? fmt(f.metrics.blurDiameter) : '—'} | ${
+            f.metrics.screenHasImage === true ? '是' : f.metrics.screenHasImage === false ? '否' : '—'
+          } |`,
+        );
+      }
+    }
+    lines.push('');
+    lines.push('_以上所有数字由本地物理引擎计算，AI 未参与任何计算。_');
+  }
+  lines.push('');
+
   return lines.join('\n');
+}
+
+/** 表格单元格：竖线会把列冲散，换行会把表撕开，先拍平 */
+function cell(text: string): string {
+  return text.replace(/\|/g, '｜').replace(/\s*\n+\s*/g, ' ');
+}
+
+/** m 的安全显示：null（JSON 把 Infinity 存成 null）和 1e6 都写成人话 */
+function fmtM(m: number | null | undefined): string {
+  if (m === null || m === undefined) return '无定义';
+  if (!Number.isFinite(m) || Math.abs(m) >= 1e6) return '无穷远';
+  return m.toFixed(2);
+}
+
+function fmtV(v: number | null | undefined): string {
+  if (v === null || v === undefined) return '无定义';
+  if (!Number.isFinite(v) || Math.abs(v) >= 1e6) return '无穷远';
+  return Math.abs(v).toFixed(1);
 }
 
 export default function ReportView({
@@ -114,9 +191,27 @@ export default function ReportView({
   onToast,
 }: Props & { challengeTitle: string }) {
   const [show, setShow] = useState(false);
+
+  /**
+   * 评分卡挂在这里（而不是 App.tsx）是为了不改 App.tsx：
+   * 它自己读证据、自己发请求、自己存缓存，报告页刷新一次就照常能用。
+   * 评分**只影响第七节的内容**，不影响任何按钮的可用状态（§5.3）。
+   */
+  const [grade, setGrade] = useState<GradeResult | null>(null);
+  const gradeTarget = useMemo(() => pickGradeChallenge(learner, loadCaptures()), [learner]);
+
+  // 换关卡 / 导入学习记录后，把那一关已有的缓存评分读回来
+  const cached = useMemo(
+    () => (gradeTarget ? loadGrade(gradeTarget.ref.id) : null),
+    [gradeTarget],
+  );
+  // 只认「同一关」的评分：导入学习记录或换关卡后，state 里那份可能是别的挑战的
+  const fresh = grade && gradeTarget && grade.challengeId === gradeTarget.ref.id ? grade : null;
+  const effectiveGrade = fresh ?? cached;
+
   const report = useMemo(
-    () => buildReport(learner, reflectionText, challengeTitle),
-    [learner, reflectionText, challengeTitle],
+    () => buildReport(learner, reflectionText, challengeTitle, effectiveGrade),
+    [learner, reflectionText, challengeTitle, effectiveGrade],
   );
 
   const hasReflection = reflectionText.trim().length >= 10;
@@ -196,6 +291,13 @@ export default function ReportView({
           </div>
         )}
       </div>
+
+      <GradingPanel
+        learner={learner}
+        challenge={gradeTarget?.ref ?? null}
+        grade={effectiveGrade}
+        onGrade={setGrade}
+      />
 
       <LearnerBackupPanel learner={learner} onImported={onImported} onToast={onToast} />
     </>

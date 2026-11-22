@@ -2,6 +2,16 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import type { DiagramLabSpec, FormulaLabSpec, LabInputSpec, LabSpec } from './labData';
 import { labById } from './labData';
 import { safeEval } from './safeEval';
+import {
+  POS_MAX,
+  SCALE_TITLE,
+  clamp,
+  formatNumber,
+  fromPos,
+  numText,
+  scaleKind,
+  toPos,
+} from './sliderScale';
 
 /**
  * 公式实验室
@@ -25,80 +35,8 @@ interface Props {
 }
 
 /* ============================================================
-   数值格式 & 滑杆映射
+   滑杆刻度 & 数字格式在 sliderScale.ts（纯函数，单独有 test）
    ============================================================ */
-
-const POS_MAX = 1000;
-
-function clamp(v: number, lo: number, hi: number): number {
-  if (!Number.isFinite(v)) return lo;
-  return Math.min(hi, Math.max(lo, v));
-}
-
-/** 4~6 位有效数字，非常大 / 非常小的时候用科学计数法（1e-34 那类必须这样） */
-function formatNumber(v: number): string {
-  if (!Number.isFinite(v)) return '—';
-  const a = Math.abs(v);
-  if (a === 0) return '0';
-  if (a >= 1e6 || a < 1e-3) {
-    const s = v.toExponential(3); // "6.674e-11"
-    const [mant, exp] = s.split('e');
-    return `${trimZeros(mant)}e${exp.replace('+', '')}`;
-  }
-  return trimZeros(v.toPrecision(5));
-}
-
-function trimZeros(s: string): string {
-  if (!s.includes('.')) return s;
-  return s.replace(/0+$/, '').replace(/\.$/, '');
-}
-
-/**
- * 输入框里的原文。
- * 极大 / 极小的值写成 1e12 这种，一来输入框放得下（1e20 那类整串数字有 21 位），
- * 二来这些量本来就是「量级」在起作用的，写全反而看不出数量级。
- */
-function numText(v: number): string {
-  if (!Number.isFinite(v)) return '';
-  const a = Math.abs(v);
-  if (a !== 0 && (a >= 1e9 || a < 1e-4)) {
-    const [mant, exp] = v.toExponential(3).split('e');
-    return `${trimZeros(mant)}e${exp.replace('+', '')}`;
-  }
-  return String(Number(v.toPrecision(8)));
-}
-
-/**
- * 滑杆跨几个数量级时（比如 1e20 ~ 2e30 的星体质量、1e-30 ~ 1e-10 的粒子质量），
- * 线性步长 (max-min)/100 会让默认值直接落在 0 步上、滑杆一碰就跳几个量级，
- * 所以这类输入改成对数刻度：滑杆走 0~1000 的「位置」，位置 → 值按比例映射。
- * 数量级不大的输入仍是线性刻度，行为就是普通的 (max-min)/100 步长。
- */
-function isLogScale(inp: LabInputSpec): boolean {
-  return inp.min > 0 && inp.max / inp.min >= 1000;
-}
-
-/** 值 → 滑杆位置（0~1000） */
-function toPos(v: number, inp: LabInputSpec): number {
-  const span = inp.max - inp.min;
-  if (!(span > 0)) return 0;
-  if (isLogScale(inp)) {
-    const r = clamp(v, inp.min, inp.max) / inp.min;
-    return clamp(Math.log(r) / Math.log(inp.max / inp.min), 0, 1) * POS_MAX;
-  }
-  return clamp((v - inp.min) / span, 0, 1) * POS_MAX;
-}
-
-/** 滑杆位置 → 值 */
-function fromPos(p: number, inp: LabInputSpec): number {
-  const t = clamp(p, 0, POS_MAX) / POS_MAX;
-  const raw = isLogScale(inp)
-    ? inp.min * Math.pow(inp.max / inp.min, t)
-    : inp.min + t * (inp.max - inp.min);
-  const v = Number(raw.toPrecision(6));
-  return clamp(v, inp.min, inp.max);
-}
-
 /** 输入框里现在这串字，是不是一个能用的数（空串算「还没输完」，不算错） */
 function badText(inp: LabInputSpec, raw: string | undefined): boolean {
   const t = (raw ?? '').trim();
@@ -271,7 +209,8 @@ function LabBody({ spec, onClose }: { spec: LabSpec; onClose?: () => void }) {
                       step={1}
                       value={pos}
                       aria-label={`${inp.label} 滑杆`}
-                      title={isLogScale(inp) ? '对数刻度：范围跨了多个数量级' : '线性刻度'}
+                      data-scale={scaleKind(inp)}
+                      title={SCALE_TITLE[scaleKind(inp)]}
                       onChange={(e) => onSlide(inp, Number(e.target.value))}
                     />
                     <div className="fl-range-ends">

@@ -1,3 +1,4 @@
+import { GRADE_KEY, GRADE_CACHE_MAX, type GradeResult } from './grading/types';
 import {
   STAGE_LABEL,
   type LearnerState,
@@ -586,4 +587,99 @@ export function resetProgress(): LearnerState {
 export function resetEverything(): LearnerState {
   clearAll();
   return empty();
+}
+
+
+/* ============================================================
+ * 实验评分（AI 写评语，数字全部由本地引擎算出）
+ *
+ * 铁律 2（AI 无特权）在存储上的体现：评分**单独一个 key**，
+ * **绝不**写回 LearnerState.runs / reflections / misconceptions。
+ * 这一节只 import 类型，不碰 pushRun / setReflection / hitMisconception。
+ * ========================================================== */
+
+/* 评分结果的 key 和上限统一在 core/grading/types.ts 里定义，这里只引用 */
+export { GRADE_KEY };
+
+/** 学生自报「这次看了哪几个读数」的独立 key（缺口 3 的方案 B） */
+export const SEEN_KEY = 'physquest.observed.v1';
+
+type GradeStore = Record<string, GradeResult>;
+type SeenStore = Record<string, string[]>;
+
+function readJson<T>(key: string): Record<string, T> {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    return parsed as Record<string, T>;
+  } catch {
+    return {};
+  }
+}
+
+function writeJson(key: string, value: unknown) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* 隐私模式 / 配额满：静默失败，评分丢了只影响这一次回看，不该弹错误 */
+  }
+}
+
+/** 读全部评分缓存。坏数据当空，不让它把报告页拖崩 */
+export function loadGrades(): GradeStore {
+  const raw = readJson<unknown>(GRADE_KEY);
+  const out: GradeStore = {};
+  for (const [id, v] of Object.entries(raw)) {
+    if (!v || typeof v !== 'object') continue;
+    const g = v as Partial<GradeResult>;
+    // 只认 v1 且关键字段齐全的（老版本 / 手改过的一律丢掉）
+    if (g.version !== 1 || typeof g.challengeId !== 'string' || !Array.isArray(g.dimensions)) continue;
+    out[id] = v as GradeResult;
+  }
+  return out;
+}
+
+export function loadGrade(challengeId: string): GradeResult | null {
+  return loadGrades()[challengeId] ?? null;
+}
+
+/** 存一条。超过 20 条时按时间丢掉最老的 */
+export function saveGrade(result: GradeResult): void {
+  const store = loadGrades();
+  store[result.challengeId] = result;
+  const entries = Object.entries(store).sort((a, b) => (b[1].at ?? 0) - (a[1].at ?? 0));
+  const kept: GradeStore = {};
+  for (const [k, v] of entries.slice(0, GRADE_CACHE_MAX)) kept[k] = v;
+  writeJson(GRADE_KEY, kept);
+}
+
+export function clearGrade(challengeId: string): void {
+  const store = loadGrades();
+  delete store[challengeId];
+  writeJson(GRADE_KEY, store);
+}
+
+/**
+ * 学生自报「这次实际盯了哪几个读数」。
+ *
+ * 优先读 `LearnerState.observations`（文档 §2.4 缺口 3 方案 B 的目标位置）。
+ * 那个字段要改 `contracts.ts`，这次不在允许范围内，所以先存在独立 key 里；
+ * 等 contracts.ts 补上之后，这里会**自动**优先用 LearnerState 的值，不用改调用方。
+ */
+export function loadSeenObservations(learner: LearnerState, challengeId: string): string[] {
+  const inline = (learner as LearnerState & { observations?: Record<string, string[]> }).observations;
+  const fromLearner = inline?.[challengeId];
+  if (Array.isArray(fromLearner)) return fromLearner.filter((s) => typeof s === 'string');
+  const store = readJson<string[]>(SEEN_KEY);
+  const v = store[challengeId];
+  return Array.isArray(v) ? v.filter((s) => typeof s === 'string') : [];
+}
+
+export function saveSeenObservations(challengeId: string, seen: string[]): void {
+  const store = readJson<string[]>(SEEN_KEY);
+  if (seen.length === 0) delete store[challengeId];
+  else store[challengeId] = [...new Set(seen)];
+  writeJson(SEEN_KEY, store);
 }

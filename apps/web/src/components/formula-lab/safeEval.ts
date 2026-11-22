@@ -11,7 +11,7 @@
  *   ② 关键字黑名单 —— window / document / fetch / import / require / eval / Function /
  *      constructor / prototype / this / globalThis …… 一律拒
  *   ③ Math 成员白名单 —— Math. 后面只允许 pow sqrt abs sin cos tan log log10 exp min max
- *      这几个方法，和 PI / E 两个常量
+ *      这几个方法，和 PI / E / LN10 / LN2 四个常量
  *   三层都过了，也不交给引擎：下面自己写了一个极小的递归下降求值器，
  *   只认「四则运算 + 括号 + 一元正负 + Math 函数调用」，其它任何东西都是语法错误。
  *
@@ -22,7 +22,13 @@
 /** ① 字符白名单：注意里面没有 `^` `%` `[` `]` `{` `}` `;` `'` `"` `:` 等 */
 const ALLOWED_CHARS = /^[0-9a-zA-Z_+\-*/().,\s]*$/;
 
-/** ② 关键字黑名单（大小写不敏感的子串检查） */
+/**
+ * ② 关键字黑名单（大小写不敏感的子串检查）
+ *
+ * 注意：是**子串**匹配（`lower.includes(word)`），所以将来若出现 `newton`（力的单位）、
+ * `interval`、`alerts`、`deletes` 这类变量名会被误伤成「—」。现在 193 个输入名 /
+ * 97 条表达式都没踩到（safeEval.test.ts 里有断言盯着：新数据一旦撞上，那条测试直接红）。
+ */
 const BANNED_WORDS = [
   'window',
   'document',
@@ -52,16 +58,54 @@ const BANNED_WORDS = [
   'debugger',
 ];
 
-/** ③ Math 常量白名单 */
+/**
+ * ③ Math 常量白名单
+ *
+ * PI / E 是物理公式里真会写的两个；
+ * LN10 / LN2 是给对数换算留的出口（见下面 MATH_FN 的审计注释）。
+ * 常量只是数字，多开放一个值不会多一分执行能力，所以这张表可以比方法表宽松。
+ */
 const MATH_CONST: Record<string, number> = {
   PI: Math.PI,
   E: Math.E,
+  LN10: Math.LN10,
+  LN2: Math.LN2,
 };
 
 /**
  * ③ Math 方法白名单。
- * `log10` 不在最初拟定的清单里，但 K-A4-03「声压级与分贝」的表达式就是
- * `20 * Math.log10(p / 0.00002)`，缺了它那一条会永远算不出来，所以补进来。
+ *
+ * ── 为什么会有 log10 ──
+ * 最初拟的清单是「pow sqrt abs sin cos tan log exp min max」10 项，里面没有 log10。
+ * 但 K-A4-03「声压级与分贝」的表达式就是 `20 * Math.log10(p / 0.00002)`，
+ * 缺了它那一条会永远算不出来（界面显示「—」），所以补进来。补的是标准库函数，
+ * 不引入任何新的执行能力，风险为零。
+ *
+ * ── 实际用量审计（97 条 formula 的 97 个 expr，本次改动时逐条核对）──
+ *   出现过的成员只有 6 个：
+ *     Math.PI     ×7  波的干涉 / 电流的磁效应 / 二极管 / 坡印廷 / 波函数
+ *     Math.sqrt   ×5  卫星速度 ×2 / 麦克斯韦速率 ×2 / 量子隧穿
+ *     Math.exp    ×5  粘滞流体 ×2 / 热传导 / 量子隧穿 / 费米-狄拉克
+ *     Math.log    ×2  等值过程（等温做功）/ 熵的统计意义
+ *     Math.pow    ×2  放射性（半衰期）n 与 frac
+ *     Math.log10  ×1  声压级（就是当初为它加的那个）
+ *   没用到但已在白名单：abs sin cos tan min max。留着是因为它们属于
+ *   「四则 + 初等函数」这条线，将来补知识点（交流电要 sin、光学要 tan）用得上。
+ *   结论：**没有漏项** —— 97 条里每一个 Math.* 都能被这张表覆盖（test 里有对
+ *   全量数据的断言；一旦 JSON 里出现新成员，那条断言会直接失败，而不是界面上
+ *   悄悄变成「—」）。
+ *
+ * ── 有没有等价但更安全的写法？──
+ * 有：`Math.log(x) / Math.LN10` 和 `Math.log10(x)` 数学上完全等价。但原先
+ * `Math.LN10` **不在**白名单里（MATH_CONST 只有 PI / E），所以那种写法以前会被
+ * 第三道闸门直接拒掉——「更安全的写法」当时其实写不出来。现在 LN10 / LN2 补进
+ * 常量表了，两种写法都能跑。
+ *
+ * 但**默认仍然用 Math.log10**，理由是精度：
+ *   Math.log10(1000)         → 3
+ *   Math.log(1000) / Math.LN10 → 2.9999999999999996
+ * 后者会让声压级在 60 dB 上多加一小段尾巴。另外 Math.log10 是 ES2015 标准函数，
+ * Node 12+ 和所有现代浏览器都有，没有兼容性理由绕开它。
  */
 const MATH_FN: Record<string, (...args: number[]) => number> = {
   pow: (a, b) => Math.pow(a, b),
@@ -77,6 +121,29 @@ const MATH_FN: Record<string, (...args: number[]) => number> = {
   max: (...a) => Math.max(...a),
 };
 
+/**
+ * 每个白名单函数接受几个参数（`-1` = 可变长）。
+ *
+ * 为什么需要这张表：不写的话 `Math.sqrt(4, 5)` 会被静默算成 2（sqrt 自己忽略
+ * 多余参数），`Math.pow(2)` 算成 NaN（然后被 NaN 检查拦下，返回 null——结果
+ * 是对的，但原因却是「算出来是 NaN」而不是「参数个数不对」）。现在多一个少一个
+ * 都直接当语法错误抛，错在哪一眼就能看出来。
+ */
+const MATH_ARITY: Record<string, number> = {
+  pow: 2,
+  sqrt: 1,
+  abs: 1,
+  sin: 1,
+  cos: 1,
+  tan: 1,
+  log: 1,
+  log10: 1,
+  exp: 1,
+  min: -1,
+  max: -1,
+};
+
+/** 白名单成员的名字集合（方法 + 常量），给 mathMembersAllowed 和测试用 */
 const MATH_MEMBER_NAMES = new Set<string>([...Object.keys(MATH_FN), ...Object.keys(MATH_CONST)]);
 
 /** 表达式长度 / token 数上限，挡掉「一万个括号」这类恶心输入 */
@@ -296,6 +363,10 @@ class Parser {
       const fn = Object.prototype.hasOwnProperty.call(MATH_FN, mem.v) ? MATH_FN[mem.v] : undefined;
       if (!fn) throw new ExprError(`Math.${mem.v} not allowed`);
       const argv = this.args();
+      const want = MATH_ARITY[mem.v] ?? -1;
+      if (want >= 0 && argv.length !== want) {
+        throw new ExprError(`Math.${mem.v} expects ${want} arg(s), got ${argv.length}`);
+      }
       const out = fn(...argv);
       if (typeof out !== 'number' || Number.isNaN(out)) throw new ExprError('bad math result');
       return out;
@@ -341,4 +412,4 @@ export function safeEval(expr: string, vars: Record<string, number>): number | n
   }
 }
 
-export { MATH_MEMBER_NAMES, BANNED_WORDS, ALLOWED_CHARS };
+export { MATH_MEMBER_NAMES, MATH_FN, MATH_CONST, MATH_ARITY, BANNED_WORDS, ALLOWED_CHARS };

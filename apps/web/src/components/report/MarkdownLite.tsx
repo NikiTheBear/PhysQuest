@@ -59,6 +59,20 @@ export function MarkdownLite({ text }: { text: string }) {
       continue;
     }
 
+    // 只写了一个 `#` 开头、但不是 `## ` / `### ` 的行（一级标题、`####` 之类）。
+    // 报告里本来不该出现，但历史存档和外面粘进来的文本可能有。
+    // **必须在这里吃掉 i**：否则会掉进下面的段落分支，而段落分支遇到 `#` 开头就 break、
+    // i 又不前进 → 死循环把标签页挂死（local/AI-GRADING-SPEC.md §2.4 缺口 6）。
+    if (trimmed.startsWith('#') && !trimmed.startsWith('## ') && !trimmed.startsWith('### ')) {
+      blocks.push(
+        <p key={key++} className="md-p">
+          {renderInline(trimmed.replace(/^#+\s*/, ''), `p-${key}`)}
+        </p>,
+      );
+      i++;
+      continue;
+    }
+
     // 标题
     if (trimmed.startsWith('### ')) {
       blocks.push(
@@ -138,6 +152,12 @@ export function MarkdownLite({ text }: { text: string }) {
       if (!t || t.startsWith('#') || t.startsWith('- ') || isTableRow(t)) break;
       para.push(t);
       i++;
+    }
+    // 兜底：极端情况下（例如只有一行 '###'）上面的循环一行都没吃，这里也必须前进，
+    // 否则外层 while 永远停在原地、把堆吃光。宁可丢一行，不能挂死标签页。
+    if (para.length === 0) {
+      i++;
+      continue;
     }
     blocks.push(
       <p key={key++} className="md-p">

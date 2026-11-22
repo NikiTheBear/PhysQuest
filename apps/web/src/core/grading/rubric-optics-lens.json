@@ -1,0 +1,91 @@
+{
+  "labId": "optics-lens",
+  "version": 1,
+  "challenges": {
+    "CH-O2-01": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["m", "v", "imageHeight"],
+      "optionalObservations": [],
+      "unmappableObservations": []
+    },
+    "CH-O2-02": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["m", "v", "blurDiameter"],
+      "optionalObservations": ["screenHasImage"],
+      "unmappableObservations": []
+    },
+    "CH-O2-03": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["screenHasImage", "blurDiameter", "v"],
+      "optionalObservations": ["m", "relativeIlluminance"],
+      "unmappableObservations": []
+    },
+    "CH-O2-04": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["relativeIlluminance", "blurDiameter"],
+      "optionalObservations": ["screenHasImage"],
+      "unmappableObservations": [
+        "平行于主光轴的光如何出射",
+        "过光心的光是否偏折",
+        "三条光线是否交于像点"
+      ]
+    },
+    "CH-O2-05": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["m", "v", "screenHasImage"],
+      "optionalObservations": ["real"],
+      "unmappableObservations": []
+    },
+    "CH-K-O1-05": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["m", "v", "screenHasImage"],
+      "optionalObservations": [],
+      "unmappableObservations": []
+    },
+    "CH-K-O2-05": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["m", "v", "blurDiameter"],
+      "optionalObservations": ["screenHasImage"],
+      "unmappableObservations": []
+    },
+    "CH-K-O3-01": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["v", "blurDiameter"],
+      "optionalObservations": [],
+      "unmappableObservations": []
+    },
+    "CH-K-O3-02": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["m", "imageHeight"],
+      "optionalObservations": [],
+      "unmappableObservations": []
+    },
+    "CH-K-O3-03": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["v", "screenHasImage"],
+      "optionalObservations": [],
+      "unmappableObservations": []
+    },
+    "CH-K-O3-04": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": [],
+      "optionalObservations": [],
+      "unmappableObservations": [
+        "所有出射光线是否交于同一点",
+        "交点位置是否等于算出的像距"
+      ]
+    },
+    "CH-K-O2-12": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["relativeIlluminance", "v"],
+      "optionalObservations": [],
+      "unmappableObservations": []
+    },
+    "CH-K-O2-14": {
+      "requiredKinds": ["lens_bench"],
+      "requiredObservations": ["screenHasImage", "blurDiameter"],
+      "optionalObservations": [],
+      "unmappableObservations": []
+    }
+  }
+}

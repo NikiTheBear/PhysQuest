@@ -42,6 +42,19 @@ describe('报告 Markdown 渲染', () => {
     expect(html).toContain('&lt;script&gt;');
   });
 
+  it('一级标题不会死循环（文档 §2.4 缺口 6）', () => {
+    const html = render('# 凸透镜成像 · 学习报告\n\n## 一、模型声明\n');
+    expect(html).toContain('md-body');
+    expect(html).toContain('凸透镜成像 · 学习报告');
+    expect(html).toContain('<h4');
+  });
+
+  it('孤立的 # / #### 也吃得下去，不会原地打转', () => {
+    expect(render('#')).toContain('md-body');
+    expect(render('#### 四级')).toContain('md-body');
+    expect(render('#\n#\n# 标题')).toContain('md-body');
+  });
+
   it('空行与空内容不崩', () => {
     expect(render('')).toContain('md-body');
     expect(render('\n\n\n')).toContain('md-body');

@@ -5549,3 +5549,255 @@ button:focus:not(:focus-visible) {
   border-color: var(--red);
   color: var(--red);
 }
+
+/* ---------- 9. 实验评分（AI 写评语，数字全部由本地引擎算出） ---------- */
+/* 规格见 local/AI-GRADING-SPEC.md §5.2。放在右栏「探索记录」上方。 */
+.grade-panel {
+  padding: 20px 22px;
+}
+.grade-panel .grade-head-note {
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--label-3);
+  margin-bottom: 14px;
+}
+.grade-total-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: var(--hairline);
+}
+.grade-total {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.grade-total.none {
+  font-size: 18px;
+  color: var(--label-3);
+  font-weight: 500;
+}
+.grade-level {
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--fill);
+  color: var(--label-2);
+}
+.grade-level.top,
+.grade-level.good {
+  color: var(--green);
+  background: var(--green-soft);
+}
+.grade-level.pass {
+  color: var(--label-2);
+  background: var(--fill);
+}
+.grade-level.improve {
+  color: var(--orange);
+  background: var(--orange-soft);
+}
+.grade-flag {
+  font-size: 12px;
+  color: var(--orange);
+  line-height: 1.6;
+  margin: -4px 0 12px;
+}
+.grade-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 10px;
+  padding: 10px 0;
+  border-bottom: var(--hairline);
+}
+.grade-row:last-of-type {
+  border-bottom: none;
+}
+.grade-row-name {
+  font-size: 13px;
+  color: var(--label-2);
+}
+.grade-row-weight {
+  font-size: 11px;
+  color: var(--label-4);
+  margin-left: 3px;
+}
+.grade-row-score {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--label);
+}
+.grade-row-score.muted {
+  font-weight: 500;
+  color: var(--label-3);
+}
+.grade-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: var(--r-pill);
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+.grade-badge.top,
+.grade-badge.ok {
+  color: var(--green);
+  background: var(--green-soft);
+}
+.grade-badge.weak {
+  color: var(--orange);
+  background: var(--orange-soft);
+}
+.grade-badge.zero {
+  color: var(--red);
+  background: var(--red-soft);
+}
+.grade-badge.insufficient,
+.grade-badge.engine_error {
+  color: var(--label-3);
+  background: var(--fill);
+}
+.grade-bar {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--fill);
+  overflow: hidden;
+}
+.grade-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--green);
+  transition: width var(--dur) var(--ease);
+}
+.grade-bar.weak > i {
+  background: var(--orange);
+}
+.grade-bar.zero > i {
+  background: var(--red);
+}
+.grade-bar.insufficient > i,
+.grade-bar.engine_error > i {
+  background: var(--label-4);
+}
+.grade-comment {
+  grid-column: 1 / -1;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--label-2);
+}
+.grade-comment .from-template {
+  display: block;
+  font-size: 11px;
+  color: var(--label-4);
+  margin-top: 3px;
+}
+.grade-refs {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.grade-ref {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--label-3);
+  background: var(--fill);
+  border: none;
+  border-radius: var(--r-pill);
+  padding: 2px 8px;
+  cursor: pointer;
+  line-height: 1.6;
+}
+.grade-ref:hover {
+  color: var(--label);
+  background: var(--fill-2);
+}
+.grade-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 14px;
+}
+.grade-note {
+  font-size: 12px;
+  color: var(--label-3);
+  line-height: 1.6;
+}
+.grade-refuse {
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--label-2);
+  background: var(--fill);
+  border-radius: var(--r-ctrl);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.grade-refuse b {
+  color: var(--label);
+}
+.grade-refuse code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--surface-3);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.grade-evidence {
+  margin-top: 14px;
+}
+.grade-evidence summary {
+  font-size: 12px;
+  color: var(--label-3);
+  cursor: pointer;
+  padding: 4px 0;
+  user-select: none;
+}
+.grade-evidence summary:hover {
+  color: var(--label);
+}
+.grade-evidence h5 {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--label-3);
+  margin: 14px 0 6px;
+}
+.grade-evidence .md-table td,
+.grade-evidence .md-table th {
+  font-size: 11.5px;
+  padding: 6px 9px;
+}
+.grade-evidence tr.hl td {
+  background: var(--accent-soft);
+  transition: background 1.5s var(--ease);
+}
+.grade-claims {
+  margin-top: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.grade-claim {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--label-2);
+}
+.grade-claim q {
+  color: var(--label);
+  quotes: '「' '」';
+}
+.grade-claim .ok {
+  color: var(--green);
+}
+.grade-claim .bad {
+  color: var(--red);
+}

@@ -1,4 +1,5 @@
 import { EXTRA_HANDWRITTEN } from './question-bank-extra';
+import { OPTICS_EXTRA } from './question-bank-optics-extra';
 
 /**
  * 题库：按知识点 + 三个难度
@@ -1012,9 +1013,13 @@ const OPTICS_HANDWRITTEN: BankQuestion[] = [
   },
 ];
 
-/* 第 6 件任务：力学 / 电磁 / 热学 / 近代 各 30+ 道手写题（共 131 道） */
+/* 第 6 件任务：力学 / 电磁 / 热学 / 近代 各 30+ 道手写题（共 131 道）
+ * 第 7 件任务：光学 32 个知识点补 2 道（K-O2-05 已有 3 道，跳过，实际 62 道），
+ * 在 question-bank-optics-extra.ts
+ * 顺序：光学原有 59 道 → 光学补题 62 道 → 其余四科 131 道 */
 export const HANDWRITTEN: BankQuestion[] = [
   ...OPTICS_HANDWRITTEN,
+  ...OPTICS_EXTRA,
   ...EXTRA_HANDWRITTEN,
 ];
 

@@ -14,6 +14,7 @@
  */
 import { readFile, writeFile, mkdir, rm, readdir } from 'node:fs/promises';
 import { CATALOG, RIGID_KINDS, LINK_KINDS } from '../platform/shared/catalog.js';
+import { HANDWRITTEN_LABS } from './handwritten-labs.mjs';
 
 const PROMPTS = JSON.parse(
   await readFile(new URL('../shared/knowledge-data/knowledge-prompts.json', import.meta.url), 'utf8'),
@@ -41,6 +42,12 @@ const COVERED_BY_HANDWRITTEN = {
   // 声学：WAVE 手写 5 关覆盖了这两条，不再派生自动关
   acoustics: ['K-M3-14', 'K-M3-15', 'K-M3-16', 'K-M4-05', 'K-M4-06'],
 };
+
+/* 手写实验（scripts/handwritten-labs.mjs）也要占位：
+   同一个知识点不能再被自动生成一遍，否则会出现两关同一件事。 */
+for (const lab of HANDWRITTEN_LABS) {
+  (COVERED_BY_HANDWRITTEN[lab.labId] ||= []).push(lab.knowledgeId);
+}
 
 /** 每个知识点生成 1 个挑战；能真算的才生成 */
 const challenges = [];
@@ -334,6 +341,91 @@ for (const w of WAVE) {
         steps: w.observations,
         limitations: w.limitations,
       },
+    },
+  });
+}
+
+/* ============================================================
+ * 手写实验（第 2 件任务的 b 小步）
+ *
+ * 数据在 scripts/handwritten-labs.mjs：每条都有完整器具、连线、观察指引。
+ * tier='real' 是真读数，tier='concept' 是概念示意（只做标注布局）。
+ * 这个区分既要跟进卡片，也要跟学生交代。
+ * ========================================================== */
+function handComponent(spec) {
+  const def = CATALOG[spec.kind];
+  const params = Object.fromEntries(
+    Object.entries(def?.params ?? {}).map(([k, v]) => [k, v.value]),
+  );
+  Object.assign(params, spec.params ?? {});
+  return {
+    id: spec.id,
+    kind: spec.kind,
+    name: spec.name ?? def.name,
+    position: spec.pos ?? [0, 1, 0],
+    params,
+    refs: spec.refs ?? {},
+    fixed: spec.fixed ?? false,
+  };
+}
+
+for (const lab of HANDWRITTEN_LABS) {
+  const src = PROMPTS.find((p) => p.id === lab.knowledgeId);
+  const components = lab.components.map(handComponent);
+  const concept = lab.tier === 'concept';
+
+  challenges.push({
+    id: lab.id,
+    labId: lab.labId,
+    title: lab.title,
+    brief: lab.brief,
+    hint: lab.hint,
+    // 两类都用「观察式」判定：自动生成的关卡一律不限具体数值
+    winCondition: { metric: 'm', op: '<', value: 0 },
+    auto: true,
+    multiAnswer: true,
+    knowledgeIds: [lab.knowledgeId],
+    misconceptionIds: [],
+    demoScriptId: '',
+    difficulty: lab.difficulty,
+    prediction: lab.prediction,
+    build: {
+      models: [...new Set(components.map((c) => c.kind))],
+      variables: lab.learning.variables,
+      observations: lab.learning.steps,
+      construction: lab.observation,
+      prompt: src?.prompt ?? '',
+      stage: src?.stage ?? 'senior',
+      domain: src?.domainLabel ?? '',
+    },
+  });
+
+  experiments.push({
+    format: 'physquest.experiment',
+    version: 1,
+    metadata: {
+      title: lab.title,
+      description: lab.brief,
+      source: {
+        project: 'PhysQuest',
+        license: 'MIT',
+        challengeId: lab.id,
+        auto: true,
+        handwritten: true,
+        tier: lab.tier,
+      },
+    },
+    experiment: {
+      id: `exp-${lab.id.toLowerCase()}`,
+      title: lab.title,
+      goal: `${lab.brief}${concept ? '（概念示意：器具只做标注，读数不参与结论）' : ''}`,
+      observation: lab.observation,
+      mode: '2d',
+      environment: lab.env,
+      components,
+      connections: lab.connections.map((l) => ({ gain: 1, ...l })),
+      control: { running: false, reset: 0 },
+      learning: lab.learning,
     },
   });
 }

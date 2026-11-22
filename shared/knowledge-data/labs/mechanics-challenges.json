@@ -1326,6 +1326,499 @@
         "stage": "university",
         "domain": "力学"
       }
+    },
+    {
+      "id": "CH-K-M1-07",
+      "labId": "mechanics",
+      "title": "同样推 2 N，滑块不动，滚轮滚走了",
+      "brief": "同一块地面上，给滑块和滚轮同样的水平推力，看谁动得起来。",
+      "hint": "滑动摩擦要「压着地硬拖」，滚动只是「滚过去」，阻力小得多。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-M1-07"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "同样 2 N 的水平推力，一块 1 kg 的滑块和一个 1 kg 的滚轮，谁会动起来？",
+        "options": [
+          "滑块不动，滚轮会滚起来",
+          "两个都动，一样快",
+          "两个都不动"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "floor_slab",
+          "box",
+          "cylinder",
+          "force",
+          "motion_sensor"
+        ],
+        "variables": [
+          "水平推力",
+          "地面摩擦系数",
+          "滚轮半径"
+        ],
+        "observations": [
+          "滑块位移是否为零",
+          "滚轮位移与角速度",
+          "滚轮是否满足 v ≈ ωr"
+        ],
+        "construction": "两个推力都先设成 2 N：看左边的滑块有没有动，再看右边的滚轮——滚轮已经滚走了。把推力慢慢加大，一直到 12 N 左右，滑块才开始滑动。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「轮子为什么省力」的可编辑实验空间。\n知识点：K-M1-07；领域：力学；学段：小学。\n模型级别：近似 / 类比实验。\n\n探索目标\n用滚轮与滑块比较滚动和滑动，理解轮子省力的条件。\n\n搭建方案\n同一水平斜面上分次放圆柱滚轮与等质量长方体，施加相同小水平恒力；设置重力、碰撞和非零接触摩擦，观察转动与滑移。\n建议器具模型：cylinder、box、ramp、force、motion_sensor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 接触摩擦\n• 水平力\n• 质量与滚轮半径\n\n观测与比较\n• 平动速度\n• 圆柱角速度\n• 是否满足 v≈ωr\n\n模型边界\n这里只比较自由滚轮和滑块；没有轮轴轴承、滚动阻力或车架，不可据此给出真实车辆节能比例。\n实验名称和目标须标明“近似 / 类比”，解释每个变量的映射及无法计算的效应。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-M1-07\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“轮子为什么省力 · 小学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "力学"
+      }
+    },
+    {
+      "id": "CH-K-M2-03",
+      "labId": "mechanics",
+      "title": "同一个力，推质心和推边上的区别",
+      "brief": "零重力下给同一个箱子施力：改大小、改方向、改作用点（等效力矩），看平动和转动怎么分开。",
+      "hint": "力有三件事要交代：多大、朝哪、按在哪。按偏了，物体就会转。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-M2-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "同样 2 N 的力，一次正对质心推，一次偏在边角上推，箱子会有什么不同？",
+        "options": [
+          "正对质心只平动，偏心会同时转起来",
+          "两次都只平动，转不起来",
+          "两次都会转，转速一样"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "box",
+          "force",
+          "motion_sensor"
+        ],
+        "variables": [
+          "力的大小 fx、fy",
+          "等效力矩 tz",
+          "箱子质量"
+        ],
+        "observations": [
+          "质心位移与速度",
+          "角速度是否为零",
+          "换方向后运动方向是否跟着变"
+        ],
+        "construction": "先把 fx 设成 2、tz 设成 0：箱子只往 +X 平动。再把 fx 归零、只把 tz 调成 2：箱子原地转起来。最后改 fy：运动方向跟着转 90°。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「力的三要素」的可编辑实验空间。\n知识点：K-M2-03；领域：力学；学段：初中。\n模型级别：近似 / 类比实验。\n\n探索目标\n区分力的大小、方向与作用点对平动转动的影响。\n\n搭建方案\n零重力、关闭碰撞；长方体受力源作用，先只改 fx/fy 观察平动，再按设定的偏置 r 手工填写等效 tz 来表示偏心施力。\n建议器具模型：box、force、motion_sensor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 力向量\n• 说明中的偏置距离\n• 等效力矩\n\n观测与比较\n• 质心位移速度\n• 角速度\n理论参考：τz = rxFy − ryFx\n\n模型边界\n力源不支持真实表面施力点；偏心力以质心力加独立力矩近似，必须声明映射 τ=r×F。\n实验名称和目标须标明“近似 / 类比”，解释每个变量的映射及无法计算的效应。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-M2-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“力的三要素 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "力学"
+      }
+    },
+    {
+      "id": "CH-K-M2-05",
+      "labId": "mechanics",
+      "title": "挂在测力计上的，才读得出「多重」",
+      "brief": "左边箱子放在地上「有东西托着」，右边小球挂在测力计上——读一读测力计，再对比。",
+      "hint": "静止不动并不等于不受力：地面托着箱子的力，和测力计拉着小球的力，是一回事。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-M2-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "1 kg 的小球挂在测力计下静止不动，测力计读数大约是多少？",
+        "options": [
+          "约 9.8 N",
+          "约 1 N",
+          "0 N，因为球没动"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "floor_slab",
+          "box",
+          "anchor",
+          "body",
+          "dynamometer",
+          "motion_sensor"
+        ],
+        "variables": [
+          "小球质量",
+          "重力加速度",
+          "悬挂刚度与阻尼"
+        ],
+        "observations": [
+          "箱子是否保持静止",
+          "测力计稳定后的读数",
+          "读数是否约等于 mg"
+        ],
+        "construction": "先看左边的箱子：放在地面上，位置一直不变（有支持力托着）。再看右边的小球：晃几下停住后读测力计，约等于 mg。把质量改成 2 kg，读数翻倍。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「重力与支持力」的可编辑实验空间。\n知识点：K-M2-05；领域：力学；学段：初中。\n模型级别：近似 / 类比实验。\n\n探索目标\n区分物体重量、支承作用与运动状态。\n\n搭建方案\n将长方体置于水平斜面并开启重力和碰撞，观察静止支承；另用竖直测力计悬挂球作为可读出支承力的对照，等待振动减小。\n建议器具模型：box、ramp、anchor、body、dynamometer。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 质量\n• 重力\n• 测力计刚度与阻尼\n\n观测与比较\n• 静止时高度\n• 悬挂平衡后的测力计读数\n理论参考：静止且无其他竖直力时 N = mg\n\n模型边界\n平台不直接输出接触支持力，不能把外力加速度读数当净加速度；测力计读数只代表该弹性连接的轴向力。\n实验名称和目标须标明“近似 / 类比”，解释每个变量的映射及无法计算的效应。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-M2-05\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“重力与支持力 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "力学"
+      }
+    },
+    {
+      "id": "CH-K-M2-14",
+      "labId": "mechanics",
+      "title": "抬上去的功，和花掉的功（概念示意）",
+      "brief": "斜面把重物抬高的「有用功」是固定的，但摩擦会吃掉一部分「总功」。",
+      "hint": "有用功看抬多高，总功看实际推了多远、使了多大力。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-M2-14"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "intermediate",
+      "prediction": {
+        "prompt": "用斜面把同一个箱子抬到同样高度，斜面越粗糙，机械效率会怎样？",
+        "options": [
+          "变低，因为摩擦吃掉更多功",
+          "变高，因为更费劲",
+          "不变，效率只由高度决定"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "ramp",
+          "box",
+          "distance_sensor"
+        ],
+        "variables": [
+          "斜面倾角",
+          "摩擦系数",
+          "提升高度"
+        ],
+        "observations": [
+          "几何高度 h 与坡长 s 的比值",
+          "摩擦损失随 μ 的变化",
+          "自行计算 η = W有 / W总"
+        ],
+        "construction": "这一关是概念示意：器具只标出「抬升高度 h」和「沿坡距离 s」两个几何量。有用功 W有 = mg·h 与摩擦无关，总功 W总 = mg·h + 摩擦损失，效率 η = W有 / W总。请按标注的几何量自己算，不要期待画面里的读数。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「机械效率」的可编辑实验空间。\n知识点：K-M2-14；领域：力学；学段：初中。\n模型级别：近似 / 类比实验。\n\n探索目标\n通过有摩擦斜面说明输入功、有效输出功与损失的区别。\n\n搭建方案\n重力与碰撞开启；长方体放在斜面下端，施加沿坡向上的恒力并记录位移和速度；比较摩擦为零与非零，选取仍在坡面上的时间段。\n建议器具模型：box、ramp、force、motion_sensor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 斜面摩擦\n• 施力大小\n• 提升高度\n\n观测与比较\n• 输入功 F·Δr\n• 有效重力势能增量\n• 动能变化\n理论参考：η = 有用输出功/输入功\n\n模型边界\n平台没有独立机械效率表；若速度变化，输入功还改变动能，不能把所有非势能部分均叫摩擦损失。\n实验名称和目标须标明“近似 / 类比”，解释每个变量的映射及无法计算的效应。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-M2-14\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“机械效率 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "力学"
+      }
+    },
+    {
+      "id": "CH-K-M1-04",
+      "labId": "mechanics",
+      "title": "沉和浮（概念示意）",
+      "brief": "没有浮力求解器，这一条只标出三个球相对液面的位置和它们的密度关系。",
+      "hint": "比液体密就沉，比液体稀就浮，一样就悬在中间。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-M1-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "一个物体放进水里会浮起来，说明它的密度和水相比怎样？",
+        "options": [
+          "比水小",
+          "比水大",
+          "一定和水一样"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "box",
+          "body"
+        ],
+        "variables": [
+          "（示意）物体密度",
+          "（示意）液体密度"
+        ],
+        "observations": [
+          "三个球相对液面的位置",
+          "密度大小与沉浮的对应关系"
+        ],
+        "construction": "这是概念示意：没有水、没有浸没体积、也没有浮力计算。图上三个球分别标着「下沉 / 悬浮 / 上浮」，液面由那根横条表示。请按标注的密度关系判断，不要期待读数变化。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「沉和浮」的可编辑实验空间。\n知识点：K-M1-04；领域：力学；学段：小学。\n模型级别：概念示意。\n\n探索目标\n用示意模型区分重力与浮力，解释沉浮判断需要哪些条件。\n\n搭建方案\n零重力、关闭碰撞；固定长方体标注液面，固定三个球分别标注下沉、悬浮、上浮；把浮力和重量的比较写进目标，不运行假浮力动画。\n建议器具模型：box、body。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 说明中的物体密度\n• 说明中的液体密度\n\n观测与比较\n• 浮力与重力比较表\n• 示意物体相对液面位置\n理论参考：静止浸没物体：F浮 = ρ液gV排\n\n模型边界\n没有液体、浸没体积或浮力求解；器具位置只是概念布局，不是沉浮计算结果。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-M1-04\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“沉和浮 · 小学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "力学"
+      }
+    },
+    {
+      "id": "CH-K-M1-05",
+      "labId": "mechanics",
+      "title": "杠杆：支点、动力臂、阻力臂（概念示意）",
+      "brief": "标出支点和两侧施力点，用测距仪量出两段力臂。",
+      "hint": "力臂是从支点到力的作用线的垂直距离，不是到施力点的距离。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-M1-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "同一根杠杆，把施力点从靠近支点挪到远离支点，同样的力能撬起的东西会怎样？",
+        "options": [
+          "变重，因为力臂变长了",
+          "变轻",
+          "不变"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "box",
+          "anchor",
+          "body",
+          "distance_sensor"
+        ],
+        "variables": [
+          "（示意）支点与施力点位置",
+          "（示意）两侧力的大小"
+        ],
+        "observations": [
+          "左右力臂的实际长度",
+          "按 F₁l₁ = F₂l₂ 推算另一侧需要的力"
+        ],
+        "construction": "这是概念示意：杆和支点都是固定的，不会真的翘起来。两支测距仪分别给出左右两段力臂的长度——它们是真实测出来的几何量，但「能不能平衡」要用 F₁l₁ = F₂l₂ 自己算。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「杠杆」的可编辑实验空间。\n知识点：K-M1-05；领域：力学；学段：小学。\n模型级别：概念示意。\n\n探索目标\n认识支点、动力臂和阻力臂，预测长短力臂的作用。\n\n搭建方案\n固定长方体作杠杆，固定支点标记转轴，另两固定球作施力点标记；用测距仪读取几何距离，所有器具固定并把力臂定义写入说明。\n建议器具模型：box、anchor、body、distance_sensor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 支点和标记的位置\n• 说明中的力大小\n\n观测与比较\n• 几何长度\n• 静态力矩平衡的公式预测\n理论参考：垂直施力时 F₁l₁ = F₂l₂\n\n模型边界\n没有偏置铰链或杠杆端点受力模型；测距仪给点间距离，只有力垂直杆时才等于力臂。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-M1-05\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“杠杆 · 小学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "力学"
+      }
+    },
+    {
+      "id": "CH-K-M2-02",
+      "labId": "mechanics",
+      "title": "质量和密度不是一回事（概念示意）",
+      "brief": "同样大小、不同质量；同样质量、不同大小——密度要算，不是看。",
+      "hint": "密度 = 质量 ÷ 体积。质量是「有多少东西」，密度是「东西挤得多紧」。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-M2-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "两个体积相同的小球，一个 1 kg、一个 3 kg，哪个密度大？",
+        "options": [
+          "3 kg 的那个",
+          "1 kg 的那个",
+          "一样，因为体积相同"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "box"
+        ],
+        "variables": [
+          "（标注）质量",
+          "（标注）宽高深"
+        ],
+        "observations": [
+          "按尺寸算出体积",
+          "按 m/V 算出密度",
+          "比较两组哪个密度更大"
+        ],
+        "construction": "这是概念示意：平台没有天平、没有排水法测体积。两个长方体标着质量和尺寸，密度 = m ÷ (宽×高×深) 要自己算。同体积比质量、同质量比体积，就能说清「密度」和「质量」的区别。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「质量与密度」的可编辑实验空间。\n知识点：K-M2-02；领域：力学；学段：初中。\n模型级别：近似 / 类比实验。\n\n探索目标\n用可编辑质量与几何尺寸计算密度，区分质量大小和材料密度。\n\n搭建方案\n放两个固定长方体，标注质量及宽高深；比较等体积不同质量、同质量不同体积，使用器具参数手算密度并写入教学说明。\n建议器具模型：box。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 质量\n• 宽高深\n\n观测与比较\n• 参数计算的体积\n• 参数计算的密度\n理论参考：ρ = m/(宽×高×深)\n\n模型边界\n质量和尺寸为独立输入，没有材料、天平或排水测量模型；密度来自公式计算而非求解器读数。\n实验名称和目标须标明“近似 / 类比”，解释每个变量的映射及无法计算的效应。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-M2-02\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“质量与密度 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "力学"
+      }
+    },
+    {
+      "id": "CH-K-M2-06",
+      "labId": "mechanics",
+      "title": "同样的重量，底面积小就压得狠（概念示意）",
+      "brief": "同样质量、不同底面积，平均压强 p = F/S 要自己算。",
+      "hint": "压力一样时，接触面积越小，压强越大。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-M2-06"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "同样的重量，把接触面积减少到原来的一半，压强会怎样？",
+        "options": [
+          "变成两倍",
+          "变成一半",
+          "不变"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "box"
+        ],
+        "variables": [
+          "（标注）质量",
+          "（标注）底面宽与深"
+        ],
+        "observations": [
+          "按 mg 算压力",
+          "按底面积算平均压强",
+          "比较两组压强倍数"
+        ],
+        "construction": "这是概念示意：平台没有接触应力分布求解，读数不代表压强。两块砖标着相同的质量和不同的底面积，p = mg ÷ (宽×深) 要自己算，然后比较哪个压得狠。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「压强」的可编辑实验空间。\n知识点：K-M2-06；领域：力学；学段：初中。\n模型级别：近似 / 类比实验。\n\n探索目标\n在相同压力下比较不同接触面积对应的平均压强。\n\n搭建方案\n用固定长方体展示不同底面积，给定相同质量与重力；把 mg 作为静止水平面上的压力，再由底面积计算平均压强。\n建议器具模型：box。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 质量\n• 底面宽与深\n\n观测与比较\n• 面积变化\n• 公式计算的平均压强\n理论参考：p = F/A\n\n模型边界\n没有接触应力或压强分布求解；结果为刚体均匀受压假设下的公式计算。\n实验名称和目标须标明“近似 / 类比”，解释每个变量的映射及无法计算的效应。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-M2-06\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“压强 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "力学"
+      }
+    },
+    {
+      "id": "CH-K-M2-13",
+      "labId": "mechanics",
+      "title": "杠杆平衡条件（概念示意）",
+      "brief": "两段力臂实测出来，另一侧要配多重，用 F₁l₁ = F₂l₂ 自己算。",
+      "hint": "平衡不是「两边一样重」，是「力矩一样大」。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-M2-13"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "intermediate",
+      "prediction": {
+        "prompt": "左边挂在离支点 2 m 处、重 10 N；右边挂在离支点 1 m 处，要平衡需挂多重？",
+        "options": [
+          "20 N",
+          "5 N",
+          "10 N"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "box",
+          "anchor",
+          "body",
+          "distance_sensor"
+        ],
+        "variables": [
+          "（示意）左右力臂",
+          "（已知）一侧的力"
+        ],
+        "observations": [
+          "读出两段力臂",
+          "算左侧力矩",
+          "反推右侧需要的力"
+        ],
+        "construction": "这是概念示意：杆固定不动，不会真的平衡。两支测距仪给出左右力臂的真实长度，把已知的一侧力乘上它的力臂，再除以另一侧力臂，就是另一边需要的力。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「杠杆平衡条件」的可编辑实验空间。\n知识点：K-M2-13；领域：力学；学段：初中。\n模型级别：概念示意。\n\n探索目标\n在静态杠杆示意图上检验力臂与施力大小的平衡关系。\n\n搭建方案\n固定长方体表示杆，固定支点和球标记两侧作用点；把力方向标为垂直杆，测量两力臂，按 F₁l₁=F₂l₂ 计算配重需求。\n建议器具模型：box、anchor、body、distance_sensor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 左右力臂\n• 已知的一侧施力\n\n观测与比较\n• 测距读数\n• 理论所需另一侧施力\n理论参考：Στ = 0\n\n模型边界\n无偏置铰链和端点施力模型，不运行假杠杆平衡；杆重未忽略时须另计重力矩。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-M2-13\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“杠杆平衡条件 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "力学"
+      }
+    },
+    {
+      "id": "CH-K-M3-09",
+      "labId": "mechanics",
+      "title": "卫星速度（概念示意）",
+      "brief": "平台没有万有引力，这一条只标出轨道半径，两种速度要用公式算。",
+      "hint": "圆轨道速度 v = √(GM/r)，逃逸速度是它的 √2 倍。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-M3-09"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "intermediate",
+      "prediction": {
+        "prompt": "轨道半径越大，绕地球做圆轨道需要的速度会怎样？",
+        "options": [
+          "越小",
+          "越大",
+          "不变"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "body",
+          "distance_sensor"
+        ],
+        "variables": [
+          "（理论）GM",
+          "（实测）轨道半径"
+        ],
+        "observations": [
+          "测距仪给出的半径",
+          "自行计算 v = √(GM/r)",
+          "比较两个半径对应的速度"
+        ],
+        "construction": "这是概念示意：所有球都是固定的，不会真的绕转。中心球代表地球，两个小球标出不同轨道半径，测距仪给出实际距离。把 GM 和这个半径代进 v = √(GM/r) 自己算——注意逃逸速度总是圆轨道速度的 √2 倍。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「卫星与宇宙速度」的可编辑实验空间。\n知识点：K-M3-09；领域：力学；学段：高中。\n模型级别：概念示意。\n\n探索目标\n用圆轨道示意区分轨道速度与逃逸速度。\n\n搭建方案\n固定球作中心天体，较小固定球标记不同轨道半径；用固定支点补充轨道位置标记，说明中给定 GM 与半径并列两种速度公式。\n建议器具模型：body、anchor、distance_sensor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 说明中的 GM\n• 轨道半径\n\n观测与比较\n• 几何半径\n• 理论圆轨道与逃逸速度比较\n理论参考：v圆 = √(GM/r)；v逃 = √(2GM/r)\n\n模型边界\n没有中心引力、轨道积分或大尺度天体单位模型；所有球均为固定示意，不宣称模拟卫星运行。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-M3-09\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“卫星与宇宙速度 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "力学"
+      }
     }
   ]
 }

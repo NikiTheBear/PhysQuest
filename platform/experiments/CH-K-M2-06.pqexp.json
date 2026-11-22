@@ -1,0 +1,98 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "同样的重量，底面积小就压得狠（概念示意）",
+    "description": "同样质量、不同底面积，平均压强 p = F/S 要自己算。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M2-06",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m2-06",
+    "title": "同样的重量，底面积小就压得狠（概念示意）",
+    "goal": "同样质量、不同底面积，平均压强 p = F/S 要自己算。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "这是概念示意：平台没有接触应力分布求解，读数不代表压强。两块砖标着相同的质量和不同的底面积，p = mg ÷ (宽×深) 要自己算，然后比较哪个压得狠。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "wide",
+        "kind": "box",
+        "name": "A：1 kg，底面 1.0×1.0 m",
+        "position": [
+          -1.6,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 1,
+          "height": 0.4,
+          "depth": 1,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "narrow",
+        "kind": "box",
+        "name": "B：1 kg，底面 0.5×0.5 m",
+        "position": [
+          1.6,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.5,
+          "height": 0.4,
+          "depth": 0.5,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "（标注）质量",
+        "（标注）底面宽与深"
+      ],
+      "steps": [
+        "按 mg 算压力",
+        "按底面积算平均压强",
+        "比较两组压强倍数"
+      ],
+      "limitations": "没有接触应力或压强分布求解；结果是均匀受压假设下的公式计算，不是仿真读数。"
+    }
+  }
+}

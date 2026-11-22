@@ -1,0 +1,160 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "挂在测力计上的，才读得出「多重」",
+    "description": "左边箱子放在地上「有东西托着」，右边小球挂在测力计上——读一读测力计，再对比。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M2-05",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m2-05",
+    "title": "挂在测力计上的，才读得出「多重」",
+    "goal": "左边箱子放在地上「有东西托着」，右边小球挂在测力计上——读一读测力计，再对比。",
+    "observation": "先看左边的箱子：放在地面上，位置一直不变（有支持力托着）。再看右边的小球：晃几下停住后读测力计，约等于 mg。把质量改成 2 kg，读数翻倍。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 9.8,
+      "damping": 0,
+      "speed": 1,
+      "collisions": true
+    },
+    "components": [
+      {
+        "id": "floor",
+        "kind": "floor_slab",
+        "name": "地面",
+        "position": [
+          0,
+          -0.08,
+          0
+        ],
+        "params": {
+          "length": 14,
+          "width": 6,
+          "friction": 0.6,
+          "restitution": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "crate",
+        "kind": "box",
+        "name": "箱子（2 kg，被地面托着）",
+        "position": [
+          -2.8,
+          0.25,
+          0
+        ],
+        "params": {
+          "mass": 2,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "depth": 0.5,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.6,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "hook",
+        "kind": "anchor",
+        "name": "固定支点",
+        "position": [
+          2,
+          5,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "ball",
+        "kind": "body",
+        "name": "小球（1 kg）",
+        "position": [
+          2,
+          3.3,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.2,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "scale",
+        "kind": "dynamometer",
+        "name": "测力计 k=20 N/m",
+        "position": [
+          2,
+          4.1,
+          0
+        ],
+        "params": {
+          "stiffness": 20,
+          "restLength": 1.5,
+          "damping": 5
+        },
+        "refs": {
+          "a": "hook",
+          "b": "ball"
+        },
+        "fixed": false
+      },
+      {
+        "id": "sensor",
+        "kind": "motion_sensor",
+        "name": "运动传感器（箱子）",
+        "position": [
+          -2.8,
+          1.2,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "target": "crate"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "小球质量",
+        "重力加速度",
+        "悬挂刚度与阻尼"
+      ],
+      "steps": [
+        "箱子是否保持静止",
+        "测力计稳定后的读数",
+        "读数是否约等于 mg"
+      ],
+      "limitations": "平台不直接输出地面给箱子的支持力，只能看它静止不动；测力计读的是弹簧轴向拉力，不是接触支持力。"
+    }
+  }
+}

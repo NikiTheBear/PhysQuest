@@ -1,0 +1,108 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "抬上去的功，和花掉的功（概念示意）",
+    "description": "斜面把重物抬高的「有用功」是固定的，但摩擦会吃掉一部分「总功」。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M2-14",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m2-14",
+    "title": "抬上去的功，和花掉的功（概念示意）",
+    "goal": "斜面把重物抬高的「有用功」是固定的，但摩擦会吃掉一部分「总功」。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "这一关是概念示意：器具只标出「抬升高度 h」和「沿坡距离 s」两个几何量。有用功 W有 = mg·h 与摩擦无关，总功 W总 = mg·h + 摩擦损失，效率 η = W有 / W总。请按标注的几何量自己算，不要期待画面里的读数。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "ramp",
+        "kind": "ramp",
+        "name": "斜面（标注 s 与 h）",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "length": 5,
+          "width": 2,
+          "angle": 25,
+          "friction": 0.3
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "load",
+        "kind": "box",
+        "name": "重物（1 kg）",
+        "position": [
+          1.6,
+          1.2,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.5,
+          "height": 0.4,
+          "depth": 0.5,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "ruler",
+        "kind": "distance_sensor",
+        "name": "测距仪（坡长 s）",
+        "position": [
+          0,
+          0.4,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "a": "ramp",
+          "b": "load"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "斜面倾角",
+        "摩擦系数",
+        "提升高度"
+      ],
+      "steps": [
+        "几何高度 h 与坡长 s 的比值",
+        "摩擦损失随 μ 的变化",
+        "自行计算 η = W有 / W总"
+      ],
+      "limitations": "平台没有独立的机械效率表，也没有「手推斜面」的完整测量链路，这一条只做几何与公式示意，不运行仿真读数。"
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "法拉第电磁感应（概念示意）",
+    "description": "磁铁、绕组、电表都是标记，平台不会真的产生感应电动势。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-11",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-11",
+    "title": "法拉第电磁感应（概念示意）",
+    "goal": "磁铁、绕组、电表都是标记，平台不会真的产生感应电动势。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "这是概念示意：平台没有磁通积分和运动感应电动势，电表方块不会动，绕组也不会自己发电。请按「磁通量有没有变」来分类：移动、转动、改变面积才会变。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "magnet",
+        "kind": "bar_magnet",
+        "name": "条形磁铁（示意）",
+        "position": [
+          -1.6,
+          1,
+          0
+        ],
+        "params": {
+          "moment": 1000,
+          "core": 0.2,
+          "axis": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "coil",
+        "kind": "cylinder",
+        "name": "绕组（示意）",
+        "position": [
+          0.4,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "radius": 0.6,
+          "height": 0.5,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.4,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "meter",
+        "kind": "box",
+        "name": "电表（示意，未接线）",
+        "position": [
+          2.6,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.7,
+          "height": 0.5,
+          "depth": 0.3,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "（示意）磁铁位置",
+        "（理论）绕组面积、匝数、转角"
+      ],
+      "steps": [
+        "哪些情况磁通量会变",
+        "按 ε = −N·dΦ/dt 判断电动势方向"
+      ],
+      "limitations": "没有磁通积分或运动感应电动势求解；不能把手设电源电压或音圈输出当成自动感应结果。"
+    }
+  }
+}

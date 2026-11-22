@@ -1,0 +1,70 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "对不上焦的「眼睛」",
+    "description": "把光屏当视网膜固定住，只改焦距：像落到屏前面还是后面？",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O2-14",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o2-14",
+    "title": "对不上焦的「眼睛」",
+    "goal": "把光屏当视网膜固定住，只改焦距：像落到屏前面还是后面？",
+    "observation": "「视网膜」固定在 15 cm。焦距 10 cm 时像正好落在屏上（对焦清楚）；把焦距调到 15 cm，像跑到 30 cm，屏上只剩模糊光斑。反过来把焦距调小，像会落到屏前面。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "bench",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座（屏=视网膜，15 cm）",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 30,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 15,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "焦距（等效眼睛调节）",
+        "光屏位置（等效视网膜）",
+        "物距"
+      ],
+      "steps": [
+        "像距 v 落在光屏前还是后",
+        "弥散圆大小",
+        "屏上是否还能看清"
+      ],
+      "limitations": "这是用光具座类比的示意，没有晶状体、房水和视网膜结构，也装不上一副眼镜；近视度数换算做不出来。"
+    }
+  }
+}

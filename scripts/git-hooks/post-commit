@@ -1,9 +1,9 @@
 #!/bin/bash
-# 每次提交后自动：同步桌面文档 + 推送 GitHub
+# 每次提交后自动：同步桌面文档 + 推送当前分支
 # 安装：cp scripts/git-hooks/post-commit .git/hooks/ && chmod +x .git/hooks/post-commit
 cd "$(git rev-parse --show-toplevel)" || exit 0
 
-# 合并 / 变基过程中不推送
+# 合并 / 变基过程中不动
 [ -d .git/rebase-merge ] && exit 0
 [ -d .git/rebase-apply ] && exit 0
 [ -f .git/MERGE_HEAD ] && exit 0
@@ -15,12 +15,19 @@ if [ -d local ]; then
   cp -R local/. "$DESK/" 2>/dev/null
 fi
 
-# ② 推送（失败不打断工作，只提示一行）
-if git push origin main > /tmp/physquest-hook-push.err 2>&1; then
-  echo "  ↳ 已自动推送到 GitHub"
+# ② 推送当前分支（main 受保护，推了也会被拒，所以 main 上不推；
+#    非 main 分支推送后按需到 scripts/publish.sh 开 PR）
+BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+if [ "$BRANCH" = "main" ]; then
+  echo "  ↳ main 受保护，跳过自动推送（用 scripts/publish.sh 走分支 + PR）"
+  exit 0
+fi
+
+if git push -u origin "$BRANCH" > /tmp/physquest-hook-push.err 2>&1; then
+  echo "  ↳ 已自动推送到分支 $BRANCH"
 else
-  if grep -qi "could not read Username\|Device not configured\|Authentication failed" /tmp/physquest-hook-push.err; then
-    echo "  ↳ 未推送：还没登录 GitHub（双击桌面「PhysQuest-登录GitHub.command」输一次令牌）"
+  if grep -qi "could not read Username\|Device not configured\|Authentication" /tmp/physquest-hook-push.err; then
+    echo "  ↳ 未推送：还没登录 GitHub（双击桌面「PhysQuest-登录GitHub.command」）"
   else
     echo "  ↳ 未推送：$(head -1 /tmp/physquest-hook-push.err)"
   fi

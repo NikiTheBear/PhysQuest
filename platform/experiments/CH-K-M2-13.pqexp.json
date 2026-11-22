@@ -1,0 +1,158 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "杠杆平衡条件（概念示意）",
+    "description": "两段力臂实测出来，另一侧要配多重，用 F₁l₁ = F₂l₂ 自己算。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M2-13",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m2-13",
+    "title": "杠杆平衡条件（概念示意）",
+    "goal": "两段力臂实测出来，另一侧要配多重，用 F₁l₁ = F₂l₂ 自己算。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "这是概念示意：杆固定不动，不会真的平衡。两支测距仪给出左右力臂的真实长度，把已知的一侧力乘上它的力臂，再除以另一侧力臂，就是另一边需要的力。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "bar",
+        "kind": "box",
+        "name": "杠杆（示意，固定）",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 5,
+          "height": 0.15,
+          "depth": 0.4,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "fulcrum",
+        "kind": "anchor",
+        "name": "支点",
+        "position": [
+          0,
+          0.7,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "load",
+        "kind": "body",
+        "name": "左：10 N（距支点 2.5 m）",
+        "position": [
+          -2.5,
+          1.2,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.16,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "effort",
+        "kind": "body",
+        "name": "右：待配重（距支点 1.25 m）",
+        "position": [
+          1.25,
+          1.2,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.16,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "arm-l",
+        "kind": "distance_sensor",
+        "name": "测距仪（左力臂）",
+        "position": [
+          0,
+          2,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "a": "fulcrum",
+          "b": "load"
+        },
+        "fixed": false
+      },
+      {
+        "id": "arm-r",
+        "kind": "distance_sensor",
+        "name": "测距仪（右力臂）",
+        "position": [
+          0,
+          1.7,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "a": "fulcrum",
+          "b": "effort"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "（示意）左右力臂",
+        "（已知）一侧的力"
+      ],
+      "steps": [
+        "读出两段力臂",
+        "算左侧力矩",
+        "反推右侧需要的力"
+      ],
+      "limitations": "没有偏置铰链和端点施力模型，不运行假杠杆平衡；杆自身重量未忽略时还要另计重力矩。"
+    }
+  }
+}

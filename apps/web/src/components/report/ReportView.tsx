@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { LearnerState } from '../../core/contracts';
 import { CHALLENGES, KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
+import { MarkdownLite } from './MarkdownLite';
 
 interface Props {
   learner: LearnerState;
@@ -175,7 +176,10 @@ export default function ReportView({
 
         {show && canGenerate && (
           <div style={{ marginTop: 14 }}>
-            <pre className="report">{report}</pre>
+            {/* 渲染成真正的标题/列表/表格，原文仍可「复制」或导出 .md */}
+            <div className="report">
+              <MarkdownLite text={report} />
+            </div>
           </div>
         )}
       </div>

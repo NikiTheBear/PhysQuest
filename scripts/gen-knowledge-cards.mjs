@@ -75,6 +75,24 @@ const DOMAIN_WHY = {
 };
 
 const cards = [];
+
+/* 误区库：把每条误区按 knowledgeIds 挂到对应知识卡上（两张来源合并） */
+const MISCONCEPTION_SOURCES = [];
+for (const path of ['optics-lens/misconceptions.json', 'misconceptions.json']) {
+  try {
+    const raw = await readFile(new URL(`../shared/knowledge-data/${path}`, import.meta.url), 'utf8');
+    MISCONCEPTION_SOURCES.push(...(JSON.parse(raw).misconceptions ?? []));
+  } catch {
+    /* 没有就没有 */
+  }
+}
+const MISCONCEPTIONS_BY_KNOWLEDGE = new Map();
+for (const mis of MISCONCEPTION_SOURCES) {
+  for (const kid of mis.knowledgeIds ?? []) {
+    if (!MISCONCEPTIONS_BY_KNOWLEDGE.has(kid)) MISCONCEPTIONS_BY_KNOWLEDGE.set(kid, []);
+    MISCONCEPTIONS_BY_KNOWLEDGE.get(kid).push(mis.id);
+  }
+}
 const promptById = new Map(PROMPTS.map((p) => [p.id, p]));
 
 for (const disc of MAP.disciplines) {
@@ -117,7 +135,7 @@ for (const disc of MAP.disciplines) {
         variables: p?.variables ?? [],
         observations: p?.observations ?? [],
         support: p?.support ?? 'conceptual',
-        misconceptions: [],
+        misconceptions: MISCONCEPTIONS_BY_KNOWLEDGE.get(item.id) ?? [],
         prerequisites: [],
         difficulty: p?.support === 'conceptual' ? 'advanced' : 'beginner',
         /** ★ 加厚内容（可能为空，界面要判断） */
@@ -136,6 +154,11 @@ try {
     await readFile(new URL('../shared/knowledge-data/optics-lens/knowledge.json', import.meta.url), 'utf8'),
   );
   const byId = new Map(cards.map((c) => [c.id, c]));
+  // 先把误区挂到卡上，再覆盖（否则会被旧值盖掉）
+  for (const hand of optics.cards)
+    hand.misconceptions = [
+      ...new Set([...(hand.misconceptions ?? []), ...(MISCONCEPTIONS_BY_KNOWLEDGE.get(hand.id) ?? [])]),
+    ];
   for (const hand of optics.cards) {
     const base = byId.get(hand.id) ?? {};
     byId.set(hand.id, {

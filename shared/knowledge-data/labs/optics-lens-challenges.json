@@ -579,6 +579,251 @@
         "stage": "university",
         "domain": "光学"
       }
+    },
+    {
+      "id": "CH-K-O1-02",
+      "labId": "optics-lens",
+      "title": "挡住光，那一片就黑了",
+      "brief": "光阑就是一块带孔的挡板：孔越小，挡住的光越多——这就是影子。",
+      "hint": "影子是光被挡住的结果，不是物体「发出黑光」。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O1-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "把光阑的孔从 0.15 m 缩小到 0.05 m，探测器上的光功率会怎样？",
+        "options": [
+          "变小，挡住的光变多",
+          "变大",
+          "不变"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "laser",
+          "aperture",
+          "detector"
+        ],
+        "variables": [
+          "光阑孔径",
+          "光源束宽",
+          "探测器位置"
+        ],
+        "observations": [
+          "探测器功率随孔径的变化",
+          "孔径小于束宽时功率是否明显下降"
+        ],
+        "construction": "把光阑孔径从 0.15 m 调到 0.05 m，看探测器功率怎么掉——挡住的那部分光就到不了探测器，这就是影子。小孔成的倒像平台做不出来，只能演示遮挡。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「影子和针孔成像」的可编辑实验空间。\n知识点：K-O1-02；领域：光学；学段：小学。\n模型级别：概念示意。\n探索目标\n理解影子是光被挡住，针孔成像是每个物点的光各走一条直线。\n搭建方案\n平台没有针孔和光屏模型。可以用激光光源 + 光阑近似演示「挡住就黑」：把光阑孔径缩小，探测器读数下降；但小孔成像的倒像做不出来，这一条只能讲不能用仿真做。\n建议器具模型：laser、aperture、detector。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 光阑孔径\n• 遮挡物位置\n观测与比较\n• 探测器功率随孔径的变化\n理论参考：像高 / 物高 = 像距 / 物距\n模型边界\n平台不模拟面光源经小孔成像。这一条是概念示意：能演示遮挡，不能演示倒像。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O1-02\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「影子和针孔成像 · 小学」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-K-O1-04",
+      "labId": "optics-lens",
+      "title": "光穿过透镜，就被掰到光轴上了",
+      "brief": "一束偏着走的光，本来打不到小探测器；放上凸透镜就收拢过去了。",
+      "hint": "透镜让光拐弯（折射），凹透镜则让它散开。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O1-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "一束平行于光轴、但偏离轴线 0.3 m 的光，经过凸透镜后会在哪里会聚？",
+        "options": [
+          "焦点上，也就是光轴上",
+          "还是平行走，一直在 0.3 m 处",
+          "越走越远"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "laser",
+          "lens",
+          "detector"
+        ],
+        "variables": [
+          "透镜焦距",
+          "透镜类型（凸 / 凹）",
+          "入射高度"
+        ],
+        "observations": [
+          "探测器功率是否从零变成有读数",
+          "焦点位置是否随焦距移动",
+          "凹透镜时是否更打不到"
+        ],
+        "construction": "没有透镜时，光沿 y = 0.3 m 直走，打不到轴上那个小探测器。放上 f = 1.5 m 的凸透镜，光被收拢到 (1.5, 0)，探测器读到功率。把透镜换成凹透镜，光反而散开。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「光会拐弯（折射）」的可编辑实验空间。\n知识点：K-O1-04；领域：光学；学段：小学。\n模型级别：近似 / 类比实验。\n探索目标\n看到光穿过透镜后方向改变，理解折射是透镜能会聚的原因。\n搭建方案\n激光光源放在 x=−4，一片薄透镜（焦距 1.5 m）放在 x=0，探测器放在 x=4。先不放透镜，光束笔直打到探测器；再放上透镜，观察光束在镜片后明显向光轴靠拢。把透镜换成凹透镜，看光反过来散开。\n建议器具模型：laser、lens、detector。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 透镜焦距\n• 激光入射高度\n• 透镜类型（凸/凹）\n观测与比较\n• 出射光束的走向\n• 探测器功率随位置的变化\n理论参考：n₁sinθ₁ = n₂sinθ₂\n模型边界\n平台用薄透镜的偏折公式代表折射，没有真实的水–空气界面，也没有折射率参数。折射定律本身只能讲，不能直接在这里验证。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O1-04\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「光会拐弯（折射） · 小学」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-K-O2-01",
+      "labId": "optics-lens",
+      "title": "焦距越小，光拐得越狠",
+      "brief": "同样偏 0.3 m 的一束光，焦距越小，出射后偏离光轴越快——这对应「折射本领越强」。",
+      "hint": "透镜焦距是折射本领的度量：f 越小，同样高度入射的光偏折越大。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O2-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "intermediate",
+      "prediction": {
+        "prompt": "同一束离轴平行光，把透镜焦距从 1.5 m 改成 0.8 m，光在 x = 3 m 处会怎样？",
+        "options": [
+          "离光轴更远，因为偏折更大",
+          "位置不变",
+          "离光轴更近"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "laser",
+          "lens",
+          "detector"
+        ],
+        "variables": [
+          "透镜焦距（等效折射本领）",
+          "入射高度",
+          "观察位置"
+        ],
+        "observations": [
+          "探测器是否接得住光",
+          "出射后偏离光轴的速度",
+          "焦距与偏折大小的关系"
+        ],
+        "construction": "探测器固定在 x = 3 m、y = −0.4 m。f = 1.5 m 时光正好打中它；把焦距调到 0.8 m，光提前会聚、之后散开得更快，在 x = 3 m 处已经跑到 y ≈ −1.1 m，打不到探测器了。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「折射规律」的可编辑实验空间。\n知识点：K-O2-01；领域：光学；学段：初中。\n模型级别：近似 / 类比实验。\n探索目标\n理解斜射进光密介质时折射角小于入射角。\n搭建方案\n平台没有平面折射界面。可以用薄透镜的偏折近似：同一高度的入射光，经过不同焦距的透镜后偏折角度不同，焦距越小偏折越大——这对应折射率越大、偏折越大。折射定律的定量关系只能靠公式讲。\n建议器具模型：laser、lens、detector。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 透镜焦距（等效折射本领）\n• 入射高度\n• 入射角度\n观测与比较\n• 出射角度相对入射角的变化\n理论参考：n₁sinθ₁ = n₂sinθ₂\n模型边界\n这是用透镜的会聚本领类比的折射，不是真实界面的折射。n₁sinθ₁ = n₂sinθ₂ 无法在这里直接验证。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O2-01\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「折射规律 · 初中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-K-O2-12",
+      "labId": "optics-lens",
+      "title": "遮住透镜一半，像还在原地",
+      "brief": "像的位置只由几何决定。挡住一半透镜，像不会挪，只会变暗。",
+      "hint": "如果像的位置会跟着挡板动，说明「三心不同高」时像才会整体偏出光屏。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O2-12"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "遮住凸透镜的上半部分，光屏上像的位置会怎样？",
+        "options": [
+          "位置不变，只是变暗",
+          "整体往上移",
+          "只剩上半部分"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "lens_bench"
+        ],
+        "variables": [
+          "是否遮挡",
+          "光屏位置",
+          "物距"
+        ],
+        "observations": [
+          "像是否还在 15 cm 处",
+          "相对照度是否下降",
+          "像高是否变化"
+        ],
+        "construction": "光屏在 15 cm，先看清楚的像；再打开「遮住上半部」，像的位置和大小完全不变，只是变暗。这说明像的位置由物距、焦距这些几何量决定——真实实验里三心不同高时，整个像会偏出光屏。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「光具座三心同高」的可编辑实验空间。\n知识点：K-O2-12；领域：光学；学段：初中。\n模型级别：概念示意。\n探索目标\n理解为什么烛焰、透镜中心、光屏中心必须调在同一高度。\n搭建方案\n平台的光具座默认三心同高，没有「偏心」这个参数，所以做不出偏移的效果。可以用遮住透镜上半部分来间接体会：像会少一半，但位置不变——这说明像的位置只由几何决定，三心不同高时像会整体移出光屏。\n建议器具模型：lens_bench。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 遮挡开关\n• 光屏位置\n观测与比较\n• 遮挡后像的完整度\n• 像的位置是否改变\n模型边界\n平台不能模拟三心不同高，这一条是概念示意。真实实验里三心不同高会让像偏出光屏，被误判为「没成像」。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O2-12\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「光具座三心同高 · 初中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "光学"
+      }
+    },
+    {
+      "id": "CH-K-O2-14",
+      "labId": "optics-lens",
+      "title": "对不上焦的「眼睛」",
+      "brief": "把光屏当视网膜固定住，只改焦距：像落到屏前面还是后面？",
+      "hint": "近视是像落在视网膜前，远视是落在后面；眼镜相当于在光路里再加一片透镜。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": true,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-O2-14"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "intermediate",
+      "prediction": {
+        "prompt": "物距和光屏（视网膜）都固定，把焦距调大，像会往哪边跑？",
+        "options": [
+          "跑到光屏后面，屏上变模糊",
+          "跑到光屏前面",
+          "不动"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [
+          "lens_bench"
+        ],
+        "variables": [
+          "焦距（等效眼睛调节）",
+          "光屏位置（等效视网膜）",
+          "物距"
+        ],
+        "observations": [
+          "像距 v 落在光屏前还是后",
+          "弥散圆大小",
+          "屏上是否还能看清"
+        ],
+        "construction": "「视网膜」固定在 15 cm。焦距 10 cm 时像正好落在屏上（对焦清楚）；把焦距调到 15 cm，像跑到 30 cm，屏上只剩模糊光斑。反过来把焦距调小，像会落到屏前面。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「眼睛与近视远视」的可编辑实验空间。\n知识点：K-O2-14；领域：光学；学段：初中。\n模型级别：概念示意。\n探索目标\n理解近视是像落在视网膜前、远视是落在后面，以及眼镜怎么矫正。\n搭建方案\n平台没有眼球模型。可以用凸透镜光具座类比：把光屏位置固定在「视网膜」的位置，改变焦距（相当于眼睛调节），看像会不会落在屏上；焦距太大像落在屏前（近视），太小落在屏后（远视）。眼镜的作用相当于在光路里再加一片透镜。\n建议器具模型：lens_bench。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n可调变量\n• 焦距（等效眼睛调节）\n• 光屏位置（等效视网膜）\n观测与比较\n• 像是否落在光屏上\n• 弥散圆大小\n理论参考：近视用凹透镜矫正；远视用凸透镜矫正\n模型边界\n这是用光具座类比的示意，没有晶状体、房水、视网膜这些结构，也不能真的装一副眼镜。近视的度数换算做不出来。\n只报告求解器实际支持和返回的量，额外公式计算须单独注明。\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-O2-14\"})。\n2. 调用 create_experiment 新建独立空间，标题建议「眼睛与近视远视 · 初中」，默认 2d；原有空间和器具保持不变。\n3. 器材外形优先复用内置模型；需要自定义时在 appearance.parts 中用最少的 box、sphere、cylinder 表现轮廓。连线与 refs 必须引用真实返回的 ID。\n4. 必须调用 create_experiment 或 update_experiment，把研究问题写入 goal、观察指引写入 observation。\n5. 根据本卡的可调变量调用 set_variable_slider 创建操作滑块，滑块用中文命名，只绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数与初始位置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "光学"
+      }
     }
   ]
 }

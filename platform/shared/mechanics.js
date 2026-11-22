@@ -5,7 +5,12 @@ import {colliderOf,colliderRotation} from './colliders.js';
 
 export class Mechanics {
   constructor(doc,bodies){
-    this.normal=normalAxis(doc);this.normalKey=['x','y','z'][this.normal];this.doc=doc;this.world=new CANNON.World({gravity:new CANNON.Vec3(0,0,0)});this.world.solver.iterations=30;this.world.solver.tolerance=1e-9;this.map=new Map();const materials=[];
+    this.normal=normalAxis(doc);this.normalKey=['x','y','z'][this.normal];this.doc=doc;this.world=new CANNON.World({gravity:new CANNON.Vec3(0,0,0)});
+    // 重力在本引擎里是每帧当外力施加的（见 physics.js），世界重力保持 0。
+    // 但 Cannon 用 world.gravity.length() 算摩擦力上限，不设 frictionGravity 摩擦就恒为 0，
+    // 所有靠摩擦的实验（斜面、轮子、机械效率）都会变成无摩擦。
+    this.world.frictionGravity=new CANNON.Vec3(0,-doc.environment.gravity,0);
+    this.world.solver.iterations=30;this.world.solver.tolerance=1e-9;this.map=new Map();const materials=[];
     const makeMaterial=(friction,restitution)=>{const m=new CANNON.Material();for(const old of materials)this.world.addContactMaterial(new CANNON.ContactMaterial(m,old.m,{friction:Math.min(friction,old.friction),restitution:Math.min(restitution,old.restitution),contactEquationStiffness:1e8,contactEquationRelaxation:50}));this.world.addContactMaterial(new CANNON.ContactMaterial(m,m,{friction,restitution,contactEquationStiffness:1e8,contactEquationRelaxation:50}));materials.push({m,friction,restitution});return m;};
     if(doc.environment.collisions&&!(doc.mode==='2d'&&doc.plane2d==='xz')&&!doc.components.some(c=>c.kind==='floor_slab')){const ground=new CANNON.Body({mass:0,shape:new CANNON.Plane(),material:makeMaterial(1,1)});ground.quaternion.setFromEuler(-Math.PI/2,0,0);this.world.addBody(ground);}
     for(const c of doc.components.filter(c=>[...RIGID_KINDS,'anchor','ramp'].includes(c.kind)||colliderOf(c).enabled)){
@@ -25,6 +30,10 @@ export class Mechanics {
     for(const c of doc.components.filter(c=>c.kind==='rod')){const a=this.map.get(c.refs.a),b=this.map.get(c.refs.b);if(a&&b&&a!==b)this.world.addConstraint(new CANNON.DistanceConstraint(a,b,c.params.restLength,1e6));}
   }
   step(dt,bodies){
+    if(this.doc.environment.gravity!==this._frictionGravity){
+      this._frictionGravity=this.doc.environment.gravity;
+      this.world.frictionGravity.set(0,-this.doc.environment.gravity,0);
+    }
     for(const [id,body]of this.map){const b=bodies.get(id);if(!body.mass)continue;body.force.set(...b.force);body.torque.set(...(b.torque||[0,0,0]));}
     this.world.step(dt);
     for(const [id,body]of this.map){const b=bodies.get(id);b.position=body.position.toArray();b.velocity=body.velocity.toArray();b.quaternion=body.quaternion.toArray();b.angularVelocity=body.angularVelocity.toArray();if(this.doc.mode==='2d'){b.position[this.normal]=0;b.velocity[this.normal]=0;body.position[this.normalKey]=0;body.velocity[this.normalKey]=0;}}

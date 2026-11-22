@@ -69,7 +69,9 @@
       ],
       "misconceptionIds": [
         "MIS-O2-05",
-        "MIS-O2-06"
+        "MIS-O2-06",
+        "MIS-O2-08",
+        "MIS-O2-09"
       ],
       "demoScriptId": "demo-magnify",
       "difficulty": "beginner",

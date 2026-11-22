@@ -1,0 +1,123 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "质量和密度不是一回事（概念示意）",
+    "description": "同样大小、不同质量；同样质量、不同大小——密度要算，不是看。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M2-02",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m2-02",
+    "title": "质量和密度不是一回事（概念示意）",
+    "goal": "同样大小、不同质量；同样质量、不同大小——密度要算，不是看。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "这是概念示意：平台没有天平、没有排水法测体积。两个长方体标着质量和尺寸，密度 = m ÷ (宽×高×深) 要自己算。同体积比质量、同质量比体积，就能说清「密度」和「质量」的区别。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "a",
+        "kind": "box",
+        "name": "A：1 kg，0.5×0.5×0.5 m",
+        "position": [
+          -1.5,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "depth": 0.5,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "b",
+        "kind": "box",
+        "name": "B：3 kg，同体积",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 3,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "depth": 0.5,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "c",
+        "kind": "box",
+        "name": "C：1 kg，0.25×0.25×0.25 m",
+        "position": [
+          1.6,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.25,
+          "height": 0.25,
+          "depth": 0.25,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "（标注）质量",
+        "（标注）宽高深"
+      ],
+      "steps": [
+        "按尺寸算出体积",
+        "按 m/V 算出密度",
+        "比较两组哪个密度更大"
+      ],
+      "limitations": "质量和尺寸是独立输入，没有材料、天平或排水测量模型；密度来自公式计算，不是求解器读数。"
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "焦距越小，光拐得越狠",
+    "description": "同样偏 0.3 m 的一束光，焦距越小，出射后偏离光轴越快——这对应「折射本领越强」。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O2-01",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o2-01",
+    "title": "焦距越小，光拐得越狠",
+    "goal": "同样偏 0.3 m 的一束光，焦距越小，出射后偏离光轴越快——这对应「折射本领越强」。",
+    "observation": "探测器固定在 x = 3 m、y = −0.4 m。f = 1.5 m 时光正好打中它；把焦距调到 0.8 m，光提前会聚、之后散开得更快，在 x = 3 m 处已经跑到 y ≈ −1.1 m，打不到探测器了。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "beam",
+        "kind": "laser",
+        "name": "离轴平行光（y = 0.3 m）",
+        "position": [
+          -4,
+          0.3,
+          0
+        ],
+        "params": {
+          "angle": 0,
+          "power": 1,
+          "wavelength": 532,
+          "width": 0.08
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lens",
+        "kind": "lens",
+        "name": "透镜 f = 1.5 m（可调到 0.8）",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "focal": 1.5,
+          "radius": 0.7,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "spot",
+        "kind": "detector",
+        "name": "探测器（x=3 m, y=−0.4 m）",
+        "position": [
+          3,
+          -0.4,
+          0
+        ],
+        "params": {
+          "radius": 0.1,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "透镜焦距（等效折射本领）",
+        "入射高度",
+        "观察位置"
+      ],
+      "steps": [
+        "探测器是否接得住光",
+        "出射后偏离光轴的速度",
+        "焦距与偏折大小的关系"
+      ],
+      "limitations": "这是用薄透镜的会聚本领类比折射，不是真实界面的折射。n₁sinθ₁ = n₂sinθ₂ 无法在这里直接验证。"
+    }
+  }
+}

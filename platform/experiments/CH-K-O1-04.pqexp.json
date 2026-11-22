@@ -1,0 +1,100 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "光穿过透镜，就被掰到光轴上了",
+    "description": "一束偏着走的光，本来打不到小探测器；放上凸透镜就收拢过去了。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O1-04",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o1-04",
+    "title": "光穿过透镜，就被掰到光轴上了",
+    "goal": "一束偏着走的光，本来打不到小探测器；放上凸透镜就收拢过去了。",
+    "observation": "没有透镜时，光沿 y = 0.3 m 直走，打不到轴上那个小探测器。放上 f = 1.5 m 的凸透镜，光被收拢到 (1.5, 0)，探测器读到功率。把透镜换成凹透镜，光反而散开。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "beam",
+        "kind": "laser",
+        "name": "激光光源（离轴 0.3 m）",
+        "position": [
+          -4,
+          0.3,
+          0
+        ],
+        "params": {
+          "angle": 0,
+          "power": 1,
+          "wavelength": 532,
+          "width": 0.08
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lens",
+        "kind": "lens",
+        "name": "凸透镜 f = 1.5 m",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "focal": 1.5,
+          "radius": 0.7,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "spot",
+        "kind": "detector",
+        "name": "小探测器（放在焦点上）",
+        "position": [
+          1.5,
+          0,
+          0
+        ],
+        "params": {
+          "radius": 0.1,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "透镜焦距",
+        "透镜类型（凸 / 凹）",
+        "入射高度"
+      ],
+      "steps": [
+        "探测器功率是否从零变成有读数",
+        "焦点位置是否随焦距移动",
+        "凹透镜时是否更打不到"
+      ],
+      "limitations": "平台用薄透镜偏折公式代表折射，没有真实的水–空气界面和折射率，不能在这里验证折射定律。"
+    }
+  }
+}

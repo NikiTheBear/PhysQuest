@@ -1,0 +1,132 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "沉和浮（概念示意）",
+    "description": "没有浮力求解器，这一条只标出三个球相对液面的位置和它们的密度关系。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M1-04",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m1-04",
+    "title": "沉和浮（概念示意）",
+    "goal": "没有浮力求解器，这一条只标出三个球相对液面的位置和它们的密度关系。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "这是概念示意：没有水、没有浸没体积、也没有浮力计算。图上三个球分别标着「下沉 / 悬浮 / 上浮」，液面由那根横条表示。请按标注的密度关系判断，不要期待读数变化。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "surface",
+        "kind": "box",
+        "name": "液面（示意）",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 5,
+          "height": 0.1,
+          "depth": 2,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "sink",
+        "kind": "body",
+        "name": "球 A：密度大 → 下沉",
+        "position": [
+          -2,
+          -0.9,
+          0
+        ],
+        "params": {
+          "mass": 2,
+          "radius": 0.35,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "float",
+        "kind": "body",
+        "name": "球 B：密度小 → 上浮",
+        "position": [
+          0,
+          0.9,
+          0
+        ],
+        "params": {
+          "mass": 0.3,
+          "radius": 0.35,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "hover",
+        "kind": "body",
+        "name": "球 C：密度相等 → 悬浮",
+        "position": [
+          2,
+          0,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.35,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "（示意）物体密度",
+        "（示意）液体密度"
+      ],
+      "steps": [
+        "三个球相对液面的位置",
+        "密度大小与沉浮的对应关系"
+      ],
+      "limitations": "平台没有液体、浸没体积或浮力求解；器具位置只是概念布局，不是沉浮计算结果。"
+    }
+  }
+}

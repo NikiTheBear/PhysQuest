@@ -1,0 +1,165 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电流在磁场里被推开",
+    "description": "线圈通电放在磁场里，会被安培力推开；换电流方向或磁场方向，位移跟着反过来。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-08",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-08",
+    "title": "电流在磁场里被推开",
+    "goal": "线圈通电放在磁场里，会被安培力推开；换电流方向或磁场方向，位移跟着反过来。",
+    "observation": "线圈位移会停在一个平衡位置。把电源电压改成负值（电流反向），位移换到另一边；把磁场强度改成负值（B 反向），位移也换到另一边。把导线长度从 2 m 加到 4 m，位移翻倍。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "cell",
+        "kind": "battery",
+        "name": "电源 6 V",
+        "position": [
+          -3,
+          0,
+          0
+        ],
+        "params": {
+          "voltage": 6,
+          "resistance": 0.5
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "limit",
+        "kind": "resistor",
+        "name": "限流电阻 5 Ω",
+        "position": [
+          -1,
+          0,
+          0
+        ],
+        "params": {
+          "resistance": 5
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "coil",
+        "kind": "coil",
+        "name": "线圈（导线长 2 m）",
+        "position": [
+          1.5,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 0.2,
+          "stiffness": 20,
+          "damping": 1,
+          "length": 2,
+          "displacement": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "b-field",
+        "kind": "field",
+        "name": "磁场 B = 2 T（+Z）",
+        "position": [
+          1.5,
+          0,
+          0
+        ],
+        "params": {
+          "strength": 2,
+          "radius": 8,
+          "axis": 2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -3,
+          0,
+          2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "a",
+        "target": "limit",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "limit",
+        "sourcePort": "b",
+        "target": "cell",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "b",
+        "target": "ground",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "drive",
+        "kind": "electrical",
+        "source": "limit",
+        "target": "coil"
+      }
+    ],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "电流大小与方向",
+        "磁感应强度 Bz",
+        "有效导线长度",
+        "悬挂刚度"
+      ],
+      "steps": [
+        "线圈平衡位移",
+        "位移对应的弹力 kx",
+        "改变方向后位移是否反向"
+      ],
+      "limitations": "有效导线固定沿 Y、运动限 X，只取 Bz 分量；没有任意方向导线、旋转线圈和反电动势回馈。"
+    }
+  }
+}

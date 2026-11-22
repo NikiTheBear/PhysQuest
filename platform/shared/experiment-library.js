@@ -162,7 +162,9 @@ export const EXPERIMENT_FILES = [
         ],
         "misconceptionIds": [
           "MIS-O2-05",
-          "MIS-O2-06"
+          "MIS-O2-06",
+          "MIS-O2-08",
+          "MIS-O2-09"
         ],
         "demoScriptId": "demo-magnify",
         "difficulty": "beginner",
@@ -254,7 +256,8 @@ export const EXPERIMENT_FILES = [
         ],
         "misconceptionIds": [
           "MIS-O2-02",
-          "MIS-O2-07"
+          "MIS-O2-07",
+          "MIS-O2-01"
         ],
         "demoScriptId": "demo-no-image",
         "difficulty": "beginner",

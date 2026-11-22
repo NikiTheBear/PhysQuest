@@ -1,0 +1,141 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "变压器（概念示意）",
+    "description": "两个绕组加一个铁芯只是结构标记：平台没有互感，二次侧不会自动出电压。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-15",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-15",
+    "title": "变压器（概念示意）",
+    "goal": "两个绕组加一个铁芯只是结构标记：平台没有互感，二次侧不会自动出电压。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "这是概念示意：圆柱只是标出两个绕组的位置，方块标出共同铁芯。平台没有互感、没有铁芯磁通，二次侧不会自动产生电压。请把匝数比代进 U₁/U₂ = n₁/n₂ 自己算。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "primary",
+        "kind": "cylinder",
+        "name": "一次绕组 n₁=1000（示意）",
+        "position": [
+          -1,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "radius": 0.5,
+          "height": 0.4,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.4,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "secondary",
+        "kind": "cylinder",
+        "name": "二次绕组 n₂=100（示意）",
+        "position": [
+          1,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "radius": 0.5,
+          "height": 0.4,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.4,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "core",
+        "kind": "box",
+        "name": "共同铁芯（示意）",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 1.6,
+          "height": 0.9,
+          "depth": 0.2,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "src",
+        "kind": "ac_source",
+        "name": "输入侧标识（不构成互感）",
+        "position": [
+          -2.6,
+          1,
+          0
+        ],
+        "params": {
+          "amplitude": 5,
+          "frequency": 50,
+          "phase": 0,
+          "offset": 0,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "（理论）匝数比",
+        "（理论）输入电压",
+        "（说明）负载"
+      ],
+      "steps": [
+        "识别一、二次绕组位置",
+        "按匝数比算二次电压",
+        "按功率守恒算电流比"
+      ],
+      "limitations": "平台没有互感、铁芯磁通或变压器模型，不能产生自动二次输出；两个独立电感并不构成变压器。"
+    }
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "两盏灯，各管各的开关",
+    "description": "两条并联支路，各带一个开关。关掉一路，另一路照常亮。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E2-09",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e2-09",
+    "title": "两盏灯，各管各的开关",
+    "goal": "两条并联支路，各带一个开关。关掉一路，另一路照常亮。",
+    "observation": "两路都闭合：读总电流。只断开 B 路开关：灯 A 的电流不变，总电流差不多掉一半。再只闭合 B 路：换成灯 B 单独亮。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "cell",
+        "kind": "battery",
+        "name": "低压电源 6 V",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "voltage": 6,
+          "resistance": 0.5
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "sw-a",
+        "kind": "switch",
+        "name": "开关 A",
+        "position": [
+          1.6,
+          0,
+          -1.2
+        ],
+        "params": {
+          "closed": 1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lamp-a",
+        "kind": "lamp",
+        "name": "灯 A（60 Ω）",
+        "position": [
+          3.6,
+          0,
+          -1.2
+        ],
+        "params": {
+          "resistance": 60,
+          "ratedPower": 2.4
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "sw-b",
+        "kind": "switch",
+        "name": "开关 B",
+        "position": [
+          1.6,
+          0,
+          1.2
+        ],
+        "params": {
+          "closed": 1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lamp-b",
+        "kind": "lamp",
+        "name": "灯 B（60 Ω）",
+        "position": [
+          3.6,
+          0,
+          1.2
+        ],
+        "params": {
+          "resistance": 60,
+          "ratedPower": 2.4
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          0,
+          0,
+          3
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "wa1",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "a",
+        "target": "sw-a",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "wa2",
+        "kind": "wire",
+        "source": "sw-a",
+        "sourcePort": "b",
+        "target": "lamp-a",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "wa3",
+        "kind": "wire",
+        "source": "lamp-a",
+        "sourcePort": "b",
+        "target": "cell",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wb1",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "a",
+        "target": "sw-b",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "wb2",
+        "kind": "wire",
+        "source": "sw-b",
+        "sourcePort": "b",
+        "target": "lamp-b",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "wb3",
+        "kind": "wire",
+        "source": "lamp-b",
+        "sourcePort": "b",
+        "target": "cell",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "b",
+        "target": "ground",
+        "targetPort": "a"
+      }
+    ],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "两个开关状态",
+        "两盏灯的电阻"
+      ],
+      "steps": [
+        "各支路电流是否独立",
+        "总电流随支路增减的变化",
+        "两灯亮度（功率）对比"
+      ],
+      "limitations": "低压直流类比，不是市电接线；没有火线零线、保护地、漏电保护和断路器，也不能用来做真实家庭布线参考。"
+    }
+  }
+}

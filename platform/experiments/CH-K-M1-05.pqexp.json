@@ -1,0 +1,157 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "杠杆：支点、动力臂、阻力臂（概念示意）",
+    "description": "标出支点和两侧施力点，用测距仪量出两段力臂。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M1-05",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m1-05",
+    "title": "杠杆：支点、动力臂、阻力臂（概念示意）",
+    "goal": "标出支点和两侧施力点，用测距仪量出两段力臂。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "这是概念示意：杆和支点都是固定的，不会真的翘起来。两支测距仪给出的是「支点到作用点」的直线距离，是真实测量值；注意它只有在力垂直于杆时正好等于力臂。「能不能平衡」要用 F₁l₁ = F₂l₂ 自己算。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "bar",
+        "kind": "box",
+        "name": "杠杆（示意，固定）",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 5,
+          "height": 0.15,
+          "depth": 0.4,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "fulcrum",
+        "kind": "anchor",
+        "name": "支点",
+        "position": [
+          0,
+          0.7,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "left",
+        "kind": "body",
+        "name": "阻力作用点",
+        "position": [
+          -2,
+          1.2,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.16,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "right",
+        "kind": "body",
+        "name": "动力作用点",
+        "position": [
+          1,
+          1.2,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "radius": 0.16,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "arm-l",
+        "kind": "distance_sensor",
+        "name": "测距仪（支点到阻力作用点）",
+        "position": [
+          0,
+          1.9,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "a": "fulcrum",
+          "b": "left"
+        },
+        "fixed": false
+      },
+      {
+        "id": "arm-r",
+        "kind": "distance_sensor",
+        "name": "测距仪（支点到动力作用点）",
+        "position": [
+          0,
+          1.6,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "a": "fulcrum",
+          "b": "right"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "（示意）支点与施力点位置",
+        "（示意）两侧力的大小"
+      ],
+      "steps": [
+        "左右力臂的实际长度",
+        "按 F₁l₁ = F₂l₂ 推算另一侧需要的力"
+      ],
+      "limitations": "平台没有偏置铰链和端点受力模型；测距仪给的是两点间距离，只有力垂直于杆时才等于力臂。"
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "挡住光，那一片就黑了",
+    "description": "光阑就是一块带孔的挡板：孔越小，挡住的光越多——这就是影子。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O1-02",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o1-02",
+    "title": "挡住光，那一片就黑了",
+    "goal": "光阑就是一块带孔的挡板：孔越小，挡住的光越多——这就是影子。",
+    "observation": "把光阑孔径从 0.15 m 调到 0.05 m，看探测器功率怎么掉——挡住的那部分光就到不了探测器，这就是影子。小孔成的倒像平台做不出来，只能演示遮挡。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "beam",
+        "kind": "laser",
+        "name": "激光光源（束宽 0.2 m）",
+        "position": [
+          -4,
+          0,
+          0
+        ],
+        "params": {
+          "angle": 0,
+          "power": 1,
+          "wavelength": 532,
+          "width": 0.2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "hole",
+        "kind": "aperture",
+        "name": "光阑（孔径 0.15 m）",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "opening": 0.15,
+          "radius": 0.8,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "screen",
+        "kind": "detector",
+        "name": "探测器",
+        "position": [
+          4,
+          0,
+          0
+        ],
+        "params": {
+          "radius": 0.5,
+          "angle": 0
+        },
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "光阑孔径",
+        "光源束宽",
+        "探测器位置"
+      ],
+      "steps": [
+        "探测器功率随孔径的变化",
+        "孔径小于束宽时功率是否明显下降"
+      ],
+      "limitations": "平台不模拟面光源经小孔成像，这一关能演示「挡住就黑」，演示不了小孔成的倒像。"
+    }
+  }
+}

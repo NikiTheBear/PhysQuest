@@ -1,0 +1,142 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "换成绝缘体，电流就没了",
+    "description": "同一个电源，只换「待测材料」的电阻：小电阻像导体，大电阻像绝缘体。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E1-02",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e1-02",
+    "title": "换成绝缘体，电流就没了",
+    "goal": "同一个电源，只换「待测材料」的电阻：小电阻像导体，大电阻像绝缘体。",
+    "observation": "待测电阻先设 2 Ω（像导体），读电流表约 2.4 A；再把电阻调到 10⁷ Ω（像绝缘体），电流掉到微安级。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "cell",
+        "kind": "battery",
+        "name": "低压电源 6 V",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "voltage": 6,
+          "resistance": 0.5
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "material",
+        "kind": "resistor",
+        "name": "待测材料 R = 2 Ω（可调到 10⁷）",
+        "position": [
+          2.4,
+          0,
+          0
+        ],
+        "params": {
+          "resistance": 2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "meter",
+        "kind": "ammeter",
+        "name": "电流表",
+        "position": [
+          4.8,
+          0,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          0,
+          0,
+          2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "a",
+        "target": "material",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "material",
+        "sourcePort": "b",
+        "target": "meter",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "meter",
+        "sourcePort": "b",
+        "target": "cell",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w4",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "b",
+        "target": "ground",
+        "targetPort": "a"
+      }
+    ],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "待测材料电阻",
+        "电源电压"
+      ],
+      "steps": [
+        "支路电流",
+        "待测元件两端电压",
+        "电流随电阻变化的倍数"
+      ],
+      "limitations": "只有集中电阻模型，没有材料微观导电机制、温度变化和绝缘击穿；不能据此判断真实材料是导体还是绝缘体。"
+    }
+  }
+}

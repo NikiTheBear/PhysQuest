@@ -1,0 +1,169 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "安全用电：断开点在哪（概念示意）",
+    "description": "真实电路，加一个标着「保护装置」的位置——它其实没有实现。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E2-10",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e2-10",
+    "title": "安全用电：断开点在哪（概念示意）",
+    "goal": "真实电路，加一个标着「保护装置」的位置——它其实没有实现。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "电源、开关、灯是真的连成回路的：断开开关，灯就没电流了，这一步是真读数。但那个标着「保护装置」的方块只是概念标记，平台没有漏电保护和断路器。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "cell",
+        "kind": "battery",
+        "name": "低压电源 6 V",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "voltage": 6,
+          "resistance": 0.5
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "breaker",
+        "kind": "switch",
+        "name": "断开点（总开关）",
+        "position": [
+          2,
+          0,
+          0
+        ],
+        "params": {
+          "closed": 1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "lamp",
+        "kind": "lamp",
+        "name": "用电器（60 Ω）",
+        "position": [
+          4,
+          0,
+          0
+        ],
+        "params": {
+          "resistance": 60,
+          "ratedPower": 2.4
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "protect",
+        "kind": "box",
+        "name": "保护装置（未实现，仅标记）",
+        "position": [
+          2,
+          1.4,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.8,
+          "height": 0.5,
+          "depth": 0.4,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "ground",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          0,
+          0,
+          2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "a",
+        "target": "breaker",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "breaker",
+        "sourcePort": "b",
+        "target": "lamp",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "lamp",
+        "sourcePort": "b",
+        "target": "cell",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w4",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "b",
+        "target": "ground",
+        "targetPort": "a"
+      }
+    ],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "开关状态",
+        "（示意）断开点位置"
+      ],
+      "steps": [
+        "断开后灯的电流是否为零",
+        "保护装置在回路中的概念位置"
+      ],
+      "limitations": "没有人体阻抗、漏电保护和触电生理模型；不提供安全电压结论，也不能作为家庭带电操作的参考。"
+    }
+  }
+}

@@ -111,7 +111,9 @@ export default function KnowledgeCard({
         </span>
       </div>
 
-      {!isBack ? (
+      {/* key 变化时 React 会重挂载这一块，翻面就有动效（只重绘这一张卡） */}
+      <div className="fc-face" key={isBack ? 'back' : 'front'}>
+        {!isBack ? (
         <>
           <h4>{card.title}</h4>
           <div className="oneline">{card.oneLine}</div>
@@ -286,7 +288,8 @@ export default function KnowledgeCard({
             )}
           </div>
         </>
-      )}
+        )}
+      </div>
     </div>
   );
 }

@@ -1,0 +1,140 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "卫星速度（概念示意）",
+    "description": "平台没有万有引力，这一条只标出轨道半径，两种速度要用公式算。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-M3-09",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-m3-09",
+    "title": "卫星速度（概念示意）",
+    "goal": "平台没有万有引力，这一条只标出轨道半径，两种速度要用公式算。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "这是概念示意：所有球都是固定的，不会真的绕转。中心球代表地球，两个小球标出不同轨道半径，测距仪给出实际距离。把 GM 和这个半径代进 v = √(GM/r) 自己算——注意逃逸速度总是圆轨道速度的 √2 倍。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "earth",
+        "kind": "body",
+        "name": "中心天体（示意）",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "mass": 10,
+          "radius": 0.9,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "low",
+        "kind": "body",
+        "name": "低轨道卫星（示意）",
+        "position": [
+          2.5,
+          0,
+          0
+        ],
+        "params": {
+          "mass": 0.2,
+          "radius": 0.2,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "high",
+        "kind": "body",
+        "name": "高轨道卫星（示意）",
+        "position": [
+          4.5,
+          0,
+          0
+        ],
+        "params": {
+          "mass": 0.2,
+          "radius": 0.2,
+          "restitution": 0.8,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "r1",
+        "kind": "distance_sensor",
+        "name": "测距仪（低轨道半径）",
+        "position": [
+          0,
+          1.4,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "a": "earth",
+          "b": "low"
+        },
+        "fixed": false
+      },
+      {
+        "id": "r2",
+        "kind": "distance_sensor",
+        "name": "测距仪（高轨道半径）",
+        "position": [
+          0,
+          -1.4,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "a": "earth",
+          "b": "high"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "（理论）GM",
+        "（实测）轨道半径"
+      ],
+      "steps": [
+        "测距仪给出的半径",
+        "自行计算 v = √(GM/r)",
+        "比较两个半径对应的速度"
+      ],
+      "limitations": "没有中心引力、轨道积分或天体尺度单位；所有球都是固定示意，不宣称模拟卫星运动。"
+    }
+  }
+}

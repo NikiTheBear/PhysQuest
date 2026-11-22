@@ -1,0 +1,173 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电压翻一倍，发热变成四倍",
+    "description": "电阻不变，只调电源电压：电流翻倍，功率变成 4 倍。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E2-08",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e2-08",
+    "title": "电压翻一倍，发热变成四倍",
+    "goal": "电阻不变，只调电源电压：电流翻倍，功率变成 4 倍。",
+    "observation": "电源先设 6 V：读电流 I 和电阻功率 P。再把电压调到 12 V：电流翻倍，功率变成四倍。Q = I²Rt 就是把这个功率乘上时间。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "cell",
+        "kind": "battery",
+        "name": "电源 6 V（可调到 12 V）",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "voltage": 6,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "load",
+        "kind": "resistor",
+        "name": "电阻 R = 100 Ω",
+        "position": [
+          2.4,
+          0,
+          0
+        ],
+        "params": {
+          "resistance": 100
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "amp",
+        "kind": "ammeter",
+        "name": "电流表",
+        "position": [
+          4.8,
+          0,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "volt",
+        "kind": "voltmeter",
+        "name": "电压表",
+        "position": [
+          2.4,
+          0,
+          1.8
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          0,
+          0,
+          2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "a",
+        "target": "load",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "load",
+        "sourcePort": "b",
+        "target": "amp",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "amp",
+        "sourcePort": "b",
+        "target": "cell",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w4",
+        "kind": "wire",
+        "source": "load",
+        "sourcePort": "a",
+        "target": "volt",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w5",
+        "kind": "wire",
+        "source": "load",
+        "sourcePort": "b",
+        "target": "volt",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w6",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "b",
+        "target": "ground",
+        "targetPort": "a"
+      }
+    ],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "电源电压",
+        "电阻阻值"
+      ],
+      "steps": [
+        "支路电流是否翻倍",
+        "电阻功率是否变成四倍",
+        "按相同时长估算 Q = Pt"
+      ],
+      "limitations": "没有热容、散热、温度或相变求解；只能由电功率估算转化出的能量，给不出升温曲线，也不能据此判断会不会烧坏。"
+    }
+  }
+}

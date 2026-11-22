@@ -1,0 +1,191 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电流的磁效应（概念示意）",
+    "description": "电路电流是真的，但导线不会生成磁场——环绕磁场只能用理论公式算。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E2-12",
+      "auto": true,
+      "handwritten": true,
+      "tier": "concept"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e2-12",
+    "title": "电流的磁效应（概念示意）",
+    "goal": "电路电流是真的，但导线不会生成磁场——环绕磁场只能用理论公式算。（概念示意：器具只做标注，读数不参与结论）",
+    "observation": "电源、电阻是真的连成回路，电流表读到的支路电流是真的。但平台里「电路导线」不产生空间磁场，所以那根圆柱只是标出导线位置，环绕方向要按右手螺旋定则自己判断。B 用 B = μ₀I / (2πr) 算，不是探针读数。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "cell",
+        "kind": "battery",
+        "name": "电源 6 V",
+        "position": [
+          -1,
+          0,
+          0
+        ],
+        "params": {
+          "voltage": 6,
+          "resistance": 0.5
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "load",
+        "kind": "resistor",
+        "name": "电阻 10 Ω",
+        "position": [
+          0.6,
+          0,
+          0
+        ],
+        "params": {
+          "resistance": 10
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "amp",
+        "kind": "ammeter",
+        "name": "电流表",
+        "position": [
+          2.2,
+          0,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "wire-view",
+        "kind": "cylinder",
+        "name": "直导线（仅标记位置）",
+        "position": [
+          0,
+          1.6,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "radius": 0.05,
+          "height": 3,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.4,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "loop",
+        "kind": "box",
+        "name": "磁感线环绕方向参考",
+        "position": [
+          0.9,
+          1.6,
+          0
+        ],
+        "params": {
+          "mass": 1,
+          "vx": 0,
+          "vy": 0,
+          "vz": 0,
+          "width": 0.5,
+          "height": 0.1,
+          "depth": 0.5,
+          "angle": 0,
+          "spin": 0,
+          "friction": 0.3,
+          "restitution": 0.2
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "ground",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -1,
+          0,
+          2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "a",
+        "target": "load",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "load",
+        "sourcePort": "b",
+        "target": "amp",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "amp",
+        "sourcePort": "b",
+        "target": "cell",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "w4",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "b",
+        "target": "ground",
+        "targetPort": "a"
+      }
+    ],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "（真实）电路电流",
+        "（理论）到导线的距离"
+      ],
+      "steps": [
+        "支路电流读数",
+        "按长直导线公式算理论 B",
+        "右手定则判断环绕方向"
+      ],
+      "limitations": "电路导线不生成空间磁场，未实现毕奥–萨伐尔积分；场强公式属于外部理论说明，不能冒充探针读数。"
+    }
+  }
+}

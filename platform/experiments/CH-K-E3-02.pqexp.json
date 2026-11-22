@@ -1,0 +1,120 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电场里，走多远差多少伏",
+    "description": "匀强电场里量出两点间距，自己算出电势差。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-02",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-02",
+    "title": "电场里，走多远差多少伏",
+    "goal": "匀强电场里量出两点间距，自己算出电势差。",
+    "observation": "探针读到的是场强 E（这是求解器算的）；A、B 两点相距 d 由测距仪给出。电势差 U = E·d 要自己算：E=1000 V/m、d=1 m 就是 1000 V。把场强改成 2000，U 跟着翻倍。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "field",
+        "kind": "electric_field",
+        "name": "匀强电场 E = 1000 V/m（+X）",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "strength": 1000,
+          "radius": 3,
+          "axis": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "point-a",
+        "kind": "anchor",
+        "name": "A 点",
+        "position": [
+          -0.5,
+          0,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "point-b",
+        "kind": "anchor",
+        "name": "B 点",
+        "position": [
+          0.5,
+          0,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "probe",
+        "kind": "probe",
+        "name": "场强探针",
+        "position": [
+          0,
+          0.6,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "ruler",
+        "kind": "distance_sensor",
+        "name": "测距仪（A–B）",
+        "position": [
+          0,
+          -0.8,
+          0
+        ],
+        "params": {},
+        "refs": {
+          "a": "point-a",
+          "b": "point-b"
+        },
+        "fixed": false
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "电场场强与方向",
+        "A、B 两点的轴向间距"
+      ],
+      "steps": [
+        "探针读到的场强",
+        "测距仪给出的距离",
+        "自行计算 U = E·d"
+      ],
+      "limitations": "求解器只给场强，不给电势或等势面；电压表不能跨接空间两点。U 是由公式算出来的，不是读数。"
+    }
+  }
+}

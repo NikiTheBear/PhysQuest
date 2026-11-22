@@ -1,0 +1,70 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "遮住透镜一半，像还在原地",
+    "description": "像的位置只由几何决定。挡住一半透镜，像不会挪，只会变暗。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-O2-12",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-o2-12",
+    "title": "遮住透镜一半，像还在原地",
+    "goal": "像的位置只由几何决定。挡住一半透镜，像不会挪，只会变暗。",
+    "observation": "光屏在 15 cm，先看清楚的像；再打开「遮住上半部」，像的位置和大小完全不变，只是变暗。这说明像的位置由物距、焦距这些几何量决定——真实实验里三心不同高时，整个像会偏出光屏。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "bench",
+        "kind": "lens_bench",
+        "name": "凸透镜光具座（三心同高）",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "u": 30,
+          "f": 10,
+          "h": 2.5,
+          "screenX": 15,
+          "lensDiameter": 6,
+          "maskTop": 0,
+          "objectShape": 0
+        },
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "是否遮挡",
+        "光屏位置",
+        "物距"
+      ],
+      "steps": [
+        "像是否还在 15 cm 处",
+        "相对照度是否下降",
+        "像高是否变化"
+      ],
+      "limitations": "光具座默认三心同高，没有「偏心」参数，做不出像整体偏出光屏的效果；这一条是间接体会。"
+    }
+  }
+}

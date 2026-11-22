@@ -58,6 +58,15 @@ if (errors.length) {
 
 /* ---------- 2. 建索引 ---------- */
 const kIds = new Set(knowledge.cards.map((c) => c.id));
+/* 全平台 176 条知识点在 knowledge-cards.json 里（kIds 只有光学的 26 张） */
+const globalCardIds = (() => {
+  try {
+    const p = join(ROOT, 'knowledge-cards.json');
+    return new Set(JSON.parse(readFileSync(p, 'utf8')).cards.map((c) => c.id));
+  } catch {
+    return new Set();
+  }
+})();
 const mIds = new Set(misconceptions.misconceptions.map((m) => m.id));
 const cIds = new Set(challenges.challenges.map((c) => c.id));
 const dIds = new Set(demos.scripts.map((d) => d.id));
@@ -105,6 +114,42 @@ misconceptions.misconceptions.forEach((m, i) => {
     errors.push(`${at}：challengedBy 指向不存在的挑战 ${m.challengedBy}`);
   }
 });
+
+/* ---------- 4b. 检查跨领域误区库（力学 / 电磁 / 声学） ---------- */
+let crossMisconceptions = [];
+try {
+  const p = join(ROOT, 'misconceptions.json');
+  if (existsSync(p)) crossMisconceptions = JSON.parse(readFileSync(p, 'utf8')).misconceptions ?? [];
+} catch (e) {
+  errors.push(`misconceptions.json：JSON 格式错误 —— ${e.message}`);
+}
+{
+  // 挑战可能来自任何一个 lab 文件
+  const allChallengeIds = new Set(challenges.challenges.map((c) => c.id));
+  for (const lab of ['mechanics', 'circuits', 'acoustics']) {
+    const p = join(ROOT, 'labs', `${lab}-challenges.json`);
+    if (!existsSync(p)) continue;
+    for (const c of JSON.parse(readFileSync(p, 'utf8')).challenges ?? []) allChallengeIds.add(c.id);
+  }
+  const seen = new Set(misconceptions.misconceptions.map((m) => m.id));
+  crossMisconceptions.forEach((m, i) => {
+    const at = `misconceptions.json 第 ${i + 1} 条（${m.id ?? '无 id'}）`;
+    ['id', 'belief', 'truth', 'challengedBy'].forEach((f) => {
+      if (!m[f] || String(m[f]).trim() === '') errors.push(`${at}：缺字段 ${f}`);
+    });
+    if (seen.has(m.id)) errors.push(`${at}：id 与其他误区重复`);
+    seen.add(m.id);
+    if (m.challengedBy && !allChallengeIds.has(m.challengedBy)) {
+      errors.push(`${at}：challengedBy 指向不存在的挑战 ${m.challengedBy}`);
+    }
+    (m.knowledgeIds ?? []).forEach((k) => {
+      if (!kIds.has(k) && !/* 全平台知识点在 knowledge-cards.json 里 */ globalCardIds.has(k)) {
+        errors.push(`${at}：knowledgeIds 引用不存在的知识点 ${k}`);
+      }
+    });
+    if (!m.knowledgeIds?.length) warns.push(`${at}：没有 knowledgeIds，挂不到知识卡上`);
+  });
+}
 
 /* ---------- 5. 检查挑战 ---------- */
 challenges.challenges.forEach((c, i) => {

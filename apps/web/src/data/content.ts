@@ -1,5 +1,6 @@
 import knowledge from '@knowledge/optics-lens/knowledge.json';
-import misconceptions from '@knowledge/optics-lens/misconceptions.json';
+import opticsMisconceptions from '@knowledge/optics-lens/misconceptions.json';
+import allMisconceptions from '@knowledge/misconceptions.json';
 import challenges from '@knowledge/optics-lens/challenges.json';
 import quiz from '@knowledge/optics-lens/quiz.json';
 import demos from '@knowledge/optics-lens/demo-scripts.json';
@@ -14,8 +15,11 @@ import type {
 } from '../core/contracts';
 
 export const KNOWLEDGE: KnowledgeCard[] = knowledge.cards as unknown as KnowledgeCard[];
-export const MISCONCEPTIONS: Misconception[] =
-  misconceptions.misconceptions as unknown as Misconception[];
+/** 误区库 = 光学 10 条（光具座关卡引用）+ 全平台 32 条（力学 / 电磁 / 声学） */
+export const MISCONCEPTIONS: Misconception[] = [
+  ...(opticsMisconceptions.misconceptions as unknown as Misconception[]),
+  ...(allMisconceptions.misconceptions as unknown as Misconception[]),
+];
 export const CHALLENGES: Challenge[] = challenges.challenges as unknown as Challenge[];
 export const QUIZ: QuizItem[] = quiz.items as unknown as QuizItem[];
 export const DEMOS = demos.scripts;

@@ -1,0 +1,5 @@
+# 本机用 bun 跑测试（CI 用 npm/node）。
+# 只扫 tests/ 目录，和 `npm test`（node --test tests/*.test.mjs）保持一致；
+# 否则会把 physquest/apps/web 里拷过来的前端测试也扫进来（那些依赖只有 web 装了）。
+[test]
+root = "tests"

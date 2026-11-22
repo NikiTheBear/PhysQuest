@@ -19,7 +19,6 @@ import {
 } from './core/persistence';
 import { applyTheme, loadTheme, saveTheme, useTheme, type Theme } from './core/theme';
 import { solve } from './labs/optics-lens/engine';
-import LabStage from './labs/optics-lens/LabStage';
 import Hub from './components/hub/Hub';
 import KnowledgeMap from './components/knowledge-map/KnowledgeMap';
 import ControlPanel from './components/lab-workspace/ControlPanel';
@@ -192,7 +191,6 @@ export default function App() {
   const weak = useMemo(() => weakMisconceptions(learner), [learner]);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', 'light');
     applyTheme(theme);
   }, [theme]);
 

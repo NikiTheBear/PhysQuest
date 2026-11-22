@@ -18,17 +18,26 @@ if [ -z "$TOKEN" ]; then
   exit 0
 fi
 
-# 已有未关闭的 PR 就直接复用
-EXISTING=$(curl -s -H "Authorization: Bearer $TOKEN" \
-  "https://api.github.com/repos/$REPO/pulls?state=open&head=$REPO:$BRANCH" \
-  | grep -o '"html_url": *"[^"]*"' | head -1 | sed 's/.*"\(https[^"]*\)"/\1/')
+# 已有未关闭的 PR 就复用（用 json 解析，不靠 grep 猜）
+EXISTING=$(BRANCH="$BRANCH" REPO="$REPO" curl -s -H "Authorization: Bearer $TOKEN" \
+  "https://api.github.com/repos/$REPO/pulls?state=open&per_page=100" \
+  | BRANCH="$BRANCH" python3 -c "
+import json, os, sys
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+if isinstance(data, list):
+    for p in data:
+        if p.get('head', {}).get('ref') == os.environ['BRANCH']:
+            print(p['html_url']); break
+")
 if [ -n "$EXISTING" ]; then
   echo "$EXISTING"
   unset TOKEN
   exit 0
 fi
 
-# PR 标题用分支名后面那段，正文自动列出这一支的提交
 TITLE=$(git log --format=%s -1 "$BRANCH")
 BODY=$(git log --format='- %s' "$BASE..$BRANCH")
 PAYLOAD=$(BRANCH="$BRANCH" BASE="$BASE" TITLE="$TITLE" BODY="$BODY" python3 - <<'PY'
@@ -45,6 +54,11 @@ PY
 URL=$(curl -s -X POST -H "Authorization: Bearer $TOKEN" \
   -H "Accept: application/vnd.github+json" \
   "https://api.github.com/repos/$REPO/pulls" -d "$PAYLOAD" \
-  | grep -o '"html_url": *"[^"]*"' | head -1 | sed 's/.*"\(https[^"]*\)"/\1/')
+  | python3 -c "
+import json, sys
+try: d = json.load(sys.stdin)
+except Exception: sys.exit(0)
+print(d.get('html_url') or '')
+")
 unset TOKEN
 echo "$URL"

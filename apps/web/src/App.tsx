@@ -229,6 +229,33 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /**
+   * 清空实验台（含服务端）。
+   *
+   * 实验台的数据有两份：
+   *   ① 工作台自己的 localStorage（key 是 `fieldlab-workspace`，不带 physquest. 前缀）
+   *   ② 本地启动器的服务端（`platform/.local/workspaces%2Flocal-user.json`）
+   * 顶栏「重置」只清 physquest.* 前缀的 key，所以这两份都清不到——
+   * 这就是「重置后实验台还是老样子」的原因。
+   *
+   * 做法：
+   *   ① 直接删 localStorage 里那个 key（工作台下次打开会重新拉服务端）
+   *   ② 调启动器的 `/api/reset`（如果没有这个接口就退化成清空当前空间的器具）
+   */
+  const clearWorkbench = useCallback(async () => {
+    try {
+      localStorage.removeItem('fieldlab-workspace');
+    } catch {
+      /* 存不下就算了 */
+    }
+    try {
+      // 启动器在 8787，会把这个请求转到 4317
+      await fetch('/api/reset-workspace', { method: 'POST' });
+    } catch {
+      /* 启动器没起就算了，至少本地那份清了 */
+    }
+  }, []);
+
   /** 选定模块 → 进挑战导览 */
   const openModule = useCallback((id: string) => {
     const meta = labById(id);
@@ -777,7 +804,10 @@ export default function App() {
             setPromptEntry(null);
             setPhase('explore');
             setView('map');
-            setToast('学习进度已清除');
+            // ★ 实验台的数据存在本地启动器（4317 服务端的 .local），
+            //   只清 localStorage 是清不掉的。这里发一条消息让工作台自己清空。
+            clearWorkbench();
+            setToast('学习进度已清除（实验台也一并清空了）');
           }}
           onResetEverything={() => {
             setLearner(resetEverything());
@@ -798,7 +828,8 @@ export default function App() {
             setCircParams(DEFAULT_CIRCUIT);
             setSoundParams(DEFAULT_SOUND);
             setParams(DEFAULT_LENS_PARAMS);
-            setToast('已全部清空');
+            clearWorkbench();
+            setToast('已全部清空（含实验台）');
           }}
           onClose={() => setShowReset(false)}
         />

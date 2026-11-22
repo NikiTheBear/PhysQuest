@@ -19,7 +19,7 @@
  */
 
 import { createServer } from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, stat, unlink } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname, extname, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -208,6 +208,26 @@ if (!existsSync(DIST)) {
  * 服务
  * ========================================================== */
 
+/** 重置实验台：删掉工作台在服务端的存储，工作台下次打开就是空白 */
+async function resetFieldlabWorkspace(res) {
+  const dir = process.env.FIELDLAB_DATA_DIR || join(REPO, 'platform', '.local');
+  const paths = [
+    join(dir, 'workspaces%2Flocal-user.json'),
+    join(dir, 'workspaces/local-user.json'),
+  ];
+  let removed = 0;
+  for (const p of paths) {
+    try {
+      await unlink(p);
+      removed += 1;
+    } catch {
+      /* 不存在就算了 */
+    }
+  }
+  res.writeHead(200, { 'content-type': 'application/json' });
+  res.end(JSON.stringify({ ok: true, removed }));
+}
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? '/', `http://${HOST}:${PORT}`);
   const origin = req.headers.origin ?? '';
@@ -217,6 +237,11 @@ const server = createServer(async (req, res) => {
     if (isFieldlabPath(url.pathname)) {
       await proxyToFieldlab(req, res, url);
       return;
+    }
+
+    /* ---------- 重置实验台（删服务端存储） ---------- */
+    if (url.pathname === '/api/reset-workspace' && req.method === 'POST') {
+      return resetFieldlabWorkspace(res);
     }
 
     /* ---------- 健康检查 ---------- */

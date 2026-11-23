@@ -74,6 +74,23 @@ function readDeepLink() {
 
 const DEEP = readDeepLink();
 
+/** 参数键 → 中文名。用于「探索记录」里把 u / f / screenX 这种键翻成人话 */
+const PARAM_LABEL: Record<string, string> = {
+  // 光学
+  u: '物距', f: '焦距', h: '物高', screenX: '光屏位置',
+  lensDiameter: '透镜口径', maskTop: '遮住上半部', objectShape: '物体形状',
+  // 力学
+  mass: '质量', radius: '半径', stiffness: '劲度系数', restLength: '原长',
+  damping: '阻尼', gravity: '重力加速度', friction: '摩擦系数', angle: '角度',
+  // 电路
+  voltage: '电动势', resistance: '电阻', current: '电流', power: '功率',
+  // 声学
+  frequency: '频率', amplitude: '声压幅值', phase: '相位', speed: '传播速度',
+  // 热学
+  temperature: '温度', responseTime: '响应时间', conductivity: '导热系数',
+  length: '长度', area: '截面积', heatCapacity: '热容',
+};
+
 export default function App() {
   const [theme, setTheme] = useState<Theme>(() => loadTheme());
   useTheme(theme);
@@ -685,30 +702,46 @@ export default function App() {
                 {learner.runs.length === 0 ? (
                   <div className="empty">还没有锁定任何参数</div>
                 ) : (
-                  <table className="log">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>u</th>
-                        <th>f</th>
-                        <th>|v|</th>
-                        <th>m</th>
-                        <th>结果</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {learner.runs.slice(-12).map((r, i) => (
-                        <tr key={r.lockedAt}>
-                          <td>{i + 1}</td>
-                          <td>{r.params.u.toFixed(1)}</td>
-                          <td>{r.params.f.toFixed(0)}</td>
-                          <td>{Math.abs(r.metrics.v).toFixed(1)}</td>
-                          <td>{r.metrics.m.toFixed(2)}</td>
-                          <td>{r.metrics.description}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className="run-list">
+                    {learner.runs
+                      .slice(-12)
+                      .reverse()
+                      .map((r, i) => {
+                        // 手写关在 CHALLENGES，其余在 AUTO_CHALLENGES —— 两处都要查，
+                        // 否则热学/电路那些关只显示一个 CH-K-T1-02 这样的编号
+                        const ch =
+                          CHALLENGES.find((c) => c.id === r.challengeId) ??
+                          AUTO_CHALLENGES.find((c) => c.id === r.challengeId);
+                        // 参数摘要：只挑数值型的键，翻成中文
+                        const nums = Object.entries(r.params ?? {}).filter(
+                          ([, v]) => typeof v === 'number' && Number.isFinite(v),
+                        ) as Array<[string, number]>;
+                        return (
+                          <div className="run-item" key={`${r.challengeId}-${r.lockedAt}`}>
+                            <div className="run-head">
+                              <span className="run-no">#{learner.runs.length - i}</span>
+                              <span className="run-title">{ch?.title ?? r.challengeId}</span>
+                              <span className="run-time">
+                                {new Date(r.lockedAt).toLocaleTimeString('zh-CN', {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </span>
+                            </div>
+                            {nums.length > 0 && (
+                              <div className="run-params">
+                                {nums.map(([k, v]) => (
+                                  <span className="run-chip" key={k}>
+                                    {PARAM_LABEL[k] ?? k} {Number(v.toFixed(2))}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            <div className="run-result">{r.metrics.description}</div>
+                          </div>
+                        );
+                      })}
+                  </div>
                 )}
               </div>
             </div>

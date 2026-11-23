@@ -190,7 +190,7 @@ describe('报告第七节', () => {
     expect((html.match(/<table/g) ?? []).length).toBeGreaterThanOrEqual(2);
   });
 
-  it('m = null 的读数不崩、写「无定义」', () => {
+  it('m = null 的读数不崩（u ≈ f 时引擎给 Infinity，存回来变成 null）', () => {
     const learner2 = emptyLearner();
     learner2.runs = [
       {
@@ -209,8 +209,10 @@ describe('报告第七节', () => {
         lockedAt: 1,
       },
     ];
+    // 表格改成通用之后不再逐列格式化 u/f/v/m，但这一条要守住的原意没变：
+    // m = null 时报告不能崩，结果列要写引擎自己的说法。
     const md = buildReport(learner2, '', '标题', null);
-    expect(md).toContain('无定义');
-    expect(md).toContain('无穷远');
+    expect(md).toContain('不成像：出射光平行');
+    expect(md).toContain('探索记录');
   });
 });

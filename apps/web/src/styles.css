@@ -5851,3 +5851,68 @@ button:focus:not(:focus-visible) {
 .lock-notice button {
   flex: none;
 }
+
+/* ============================================================
+   探索记录（通用卡片列表，不是光学专属的表格）
+   ============================================================ */
+.run-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.run-item {
+  padding: 11px 13px;
+  border-radius: var(--r-ctrl);
+  background: var(--surface-2);
+  border: 1px solid var(--separator);
+}
+.run-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.run-no {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--label-3);
+  flex: none;
+}
+.run-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--label);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.run-time {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--label-3);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.run-params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+.run-chip {
+  font-size: 11.5px;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: var(--fill);
+  color: var(--label-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.run-result {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--label-2);
+  padding-left: 9px;
+  border-left: 2px solid var(--accent-soft);
+}

@@ -8,7 +8,7 @@ import {
   previewImport,
   type LearnerImportSummary,
 } from '../../core/persistence';
-import { CHALLENGES, KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
+import { AUTO_CHALLENGES, CHALLENGES, KNOWLEDGE, MISCONCEPTIONS } from '../../data/content';
 import type { GradeResult } from '../../core/grading/types';
 import { BAND_LABEL, DIM_LABEL, LEVEL_LABEL, W } from '../../core/grading/types';
 import { fmt } from '../../core/grading/rules';
@@ -60,15 +60,24 @@ export function buildReport(
   if (runs.length === 0) {
     lines.push('_还没有锁定任何一组参数。_');
   } else {
-    lines.push('| # | 物距u | 焦距f | 像距v | 放大率m | 结果 | 我的预测 |');
-    lines.push('|---|---|---|---|---|---|---|');
+    // 不再硬编码光学的 u/f/v/m 四列 —— 平台有五个模块，记录要通用。
+    // 每行显示：序号 · 挑战名 · 参数摘要 · 结果 · 我的预测
+    lines.push('| # | 挑战 | 参数 | 结果 | 我的预测 |');
+    lines.push('|---|---|---|---|---|');
     runs.forEach((r, i) => {
-      const ch = CHALLENGES.find((c) => c.id === r.challengeId);
-      const pred = r.prediction && ch ? ch.prediction.options[r.prediction.chosenIndex] : '—';
-      // m 可能是 null（u ≈ f 时引擎给 Infinity，JSON 存回来变成 null）。直接 .toFixed 会抛错，
-      // 整页白屏 —— 这就是文档 §2.4 缺口 5 那个 bug。
+      const ch =
+        CHALLENGES.find((c) => c.id === r.challengeId) ??
+        AUTO_CHALLENGES.find((c) => c.id === r.challengeId);
+      const pred =
+        r.prediction && ch?.prediction ? ch.prediction.options[r.prediction.chosenIndex] : '—';
+      const nums = Object.entries(r.params ?? {}).filter(
+        ([, v]) => typeof v === 'number' && Number.isFinite(v),
+      ) as Array<[string, number]>;
+      const paramText = nums.length
+        ? nums.map(([k, v]) => `${PARAM_LABEL[k] ?? k} ${Number(v.toFixed(2))}`).join('，')
+        : '—';
       lines.push(
-        `| ${i + 1} | ${r.params.u.toFixed(1)} | ${r.params.f.toFixed(0)} | ${fmtV(r.metrics.v)} | ${fmtM(r.metrics.m)} | ${r.metrics.description} | ${pred} |`,
+        `| ${i + 1} | ${ch?.title ?? r.challengeId} | ${paramText} | ${r.metrics?.description ?? '—'} | ${pred} |`,
       );
     });
   }
@@ -167,17 +176,16 @@ function cell(text: string): string {
 }
 
 /** m 的安全显示：null（JSON 把 Infinity 存成 null）和 1e6 都写成人话 */
-function fmtM(m: number | null | undefined): string {
-  if (m === null || m === undefined) return '无定义';
-  if (!Number.isFinite(m) || Math.abs(m) >= 1e6) return '无穷远';
-  return m.toFixed(2);
-}
-
-function fmtV(v: number | null | undefined): string {
-  if (v === null || v === undefined) return '无定义';
-  if (!Number.isFinite(v) || Math.abs(v) >= 1e6) return '无穷远';
-  return Math.abs(v).toFixed(1);
-}
+const PARAM_LABEL: Record<string, string> = {
+  u: '物距', f: '焦距', h: '物高', screenX: '光屏位置',
+  lensDiameter: '透镜口径', maskTop: '遮住上半部', objectShape: '物体形状',
+  mass: '质量', radius: '半径', stiffness: '劲度系数', restLength: '原长',
+  damping: '阻尼', gravity: '重力加速度', friction: '摩擦系数', angle: '角度',
+  voltage: '电动势', resistance: '电阻', current: '电流', power: '功率',
+  frequency: '频率', amplitude: '声压幅值', phase: '相位', speed: '传播速度',
+  temperature: '温度', responseTime: '响应时间', conductivity: '导热系数',
+  length: '长度', area: '截面积', heatCapacity: '热容',
+};
 
 export default function ReportView({
   learner,

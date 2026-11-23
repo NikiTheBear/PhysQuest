@@ -1,0 +1,105 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "两极最强，侧面最弱：用探针量出来",
+    "description": "条形磁铁的磁场不是到处一样强。把探针放在轴线上和侧面，读磁感应强度。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E1-05",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e1-05",
+    "title": "两极最强，侧面最弱：用探针量出来",
+    "goal": "条形磁铁的磁场不是到处一样强。把探针放在轴线上和侧面，读磁感应强度。",
+    "observation": "三个探针同时读数：轴线上 0.4 m 处 1.565 mT；侧面 1.5 m 处只有 0.029 mT；轴线上 3.0 m 处衰减到 0.007 mT。把探针沿轴线往外挪，能看到磁场掉得非常快（大约距离翻倍掉到八分之一）。把磁矩方向改成反向，探针读到的大小不变——大小只看距离和磁矩，方向看正负。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "magnet",
+        "kind": "bar_magnet",
+        "name": "条形磁铁（磁矩 1000 A·m²）",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "moment": 1000,
+          "core": 0.2,
+          "axis": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "pAxis",
+        "kind": "probe",
+        "name": "探针 A（轴线 0.4 m）",
+        "position": [
+          0.4,
+          0,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "pSide",
+        "kind": "probe",
+        "name": "探针 B（侧面 1.5 m）",
+        "position": [
+          0,
+          1.5,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "pFar",
+        "kind": "probe",
+        "name": "探针 C（轴线 3 m）",
+        "position": [
+          3,
+          0,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": true
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "磁矩大小",
+        "探针到磁铁的距离",
+        "探针相对磁铁的方向"
+      ],
+      "steps": [
+        "轴线与侧面的磁感应强度对比",
+        "距离变大时衰减速度",
+        "磁矩方向对读数的影响"
+      ],
+      "limitations": "平台用的是软化磁偶极场的解析式，没有磁滞、饱和和材料磁化过程，也没有「能吸哪些材料」的信息。"
+    }
+  }
+}

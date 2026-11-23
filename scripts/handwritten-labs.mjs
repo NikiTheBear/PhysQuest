@@ -806,4 +806,111 @@ export const HANDWRITTEN_LABS = [
     ],
     connections: [],
   },
+  {
+    id: 'CH-K-E1-05',
+    knowledgeId: 'K-E1-05',
+    labId: 'circuits',
+    tier: 'real',
+    difficulty: 'beginner',
+    title: '两极最强，侧面最弱：用探针量出来',
+    brief: '条形磁铁的磁场不是到处一样强。把探针放在轴线上和侧面，读磁感应强度。',
+    hint: '轴线（对着磁极）衰减比侧面慢：远场都是 1/r³，但轴线上系数是侧面的两倍。',
+    prediction: {
+      prompt: '同一块条形磁铁，距离相同的情况下，哪里磁场更强？',
+      options: ['正对磁极的轴线上', '磁铁正侧面（赤道方向）', '两个方向一样强'],
+      answerIndex: 0,
+    },
+    observation:
+      '三个探针同时读数：轴线上 0.4 m 处 1.565 mT；侧面 1.5 m 处只有 0.029 mT；轴线上 3.0 m 处衰减到 0.007 mT。把探针沿轴线往外挪，能看到磁场掉得非常快（大约距离翻倍掉到八分之一）。把磁矩方向改成反向，探针读到的大小不变——大小只看距离和磁矩，方向看正负。',
+    learning: {
+      variables: ['磁矩大小', '探针到磁铁的距离', '探针相对磁铁的方向'],
+      steps: ['轴线与侧面的磁感应强度对比', '距离变大时衰减速度', '磁矩方向对读数的影响'],
+      limitations:
+        '平台用的是软化磁偶极场的解析式，没有磁滞、饱和和材料磁化过程，也没有「能吸哪些材料」的信息。',
+    },
+    env: { gravity: 0, damping: 0, speed: 1, collisions: false },
+    components: [
+      { id: 'magnet', kind: 'bar_magnet', name: '条形磁铁（磁矩 1000 A·m²）', pos: [0, 0, 0], params: { moment: 1000, core: 0.2, axis: 0 }, fixed: true },
+      { id: 'pAxis', kind: 'probe', name: '探针 A（轴线 0.4 m）', pos: [0.4, 0, 0], params: {}, fixed: true },
+      { id: 'pSide', kind: 'probe', name: '探针 B（侧面 1.5 m）', pos: [0, 1.5, 0], params: {}, fixed: true },
+      { id: 'pFar', kind: 'probe', name: '探针 C（轴线 3 m）', pos: [3, 0, 0], params: {}, fixed: true },
+    ],
+    connections: [],
+  },
+  {
+    id: 'CH-K-E3-13',
+    knowledgeId: 'K-E3-13',
+    labId: 'circuits',
+    tier: 'real',
+    difficulty: 'advanced',
+    title: '电感让电流慢慢爬上来',
+    brief: 'RL 电路通电瞬间，电流不是一下子到最大。改电感量，看它爬得多慢。',
+    hint: '自感电动势 u = L·di/dt 阻碍电流自己变化，时间常数 τ = L/R。L 越大，爬得越慢。',
+    prediction: {
+      prompt: '把一个电感量为 L 的电感换成 10 倍大的，通电后电流爬到同样比例需要的时间会怎样？',
+      options: ['变成 10 倍长', '变成 1/10', '不变，电流只由电阻决定'],
+      answerIndex: 0,
+    },
+    observation:
+      '电源 6 V（内阻 0.1 Ω）、电阻 10 Ω、电感 100 mH，时间常数 τ = L/R ≈ 9.9 ms。通电 20 ms 后读电流 0.506 A（理论 0.515 A）。把电感改成 1000 mH：τ 变成 99 ms，同样 20 ms 后电流只有 0.112 A（理论 0.109 A）——明显还没爬上来。',
+    learning: {
+      variables: ['电感量', '电阻', '通电时间'],
+      steps: ['某时刻的电流', '电流上升曲线的弯曲', '时间常数 τ = L/R 的变化'],
+      limitations:
+        '只有自感（RL 暂态），没有互感与变压器耦合；求解用后向 Euler，步长较大时会有小偏差。',
+    },
+    env: { gravity: 0, damping: 0, speed: 1, collisions: false },
+    components: [
+      { id: 'cell', kind: 'battery', name: '电源 6 V（内阻 0.1 Ω）', pos: [0, 0, 0], params: { voltage: 6, resistance: 0.1 } },
+      { id: 'load', kind: 'resistor', name: '电阻 R = 10 Ω', pos: [2.4, 0, 0], params: { resistance: 10 } },
+      { id: 'coilL', kind: 'inductor', name: '电感 L = 100 mH', pos: [4.8, 0, 0], params: { inductance: 100, initialCurrent: 0 } },
+      { id: 'amp', kind: 'ammeter', name: '电流表', pos: [7.2, 0, 0], params: {} },
+      { id: 'ground', kind: 'ground', name: '参考地', pos: [0, 0, 2], params: {} },
+    ],
+    connections: [
+      { id: 'w1', kind: 'wire', source: 'cell', sourcePort: 'a', target: 'load', targetPort: 'a' },
+      { id: 'w2', kind: 'wire', source: 'load', sourcePort: 'b', target: 'coilL', targetPort: 'a' },
+      { id: 'w3', kind: 'wire', source: 'coilL', sourcePort: 'b', target: 'amp', targetPort: 'a' },
+      { id: 'w4', kind: 'wire', source: 'amp', sourcePort: 'b', target: 'cell', targetPort: 'b' },
+      { id: 'wg', kind: 'wire', source: 'cell', sourcePort: 'b', target: 'ground', targetPort: 'a' },
+    ],
+  },
+  {
+    id: 'CH-K-E2-14',
+    knowledgeId: 'K-E2-14',
+    labId: 'circuits',
+    tier: 'real',
+    difficulty: 'intermediate',
+    title: '通电的音圈在磁场里被推开',
+    brief: '电流、磁场、力三者互相垂直。给音圈通电，它被安培力推到一个平衡位置——位移可以读。',
+    hint: 'F = B·L·I。电流反向，力就反向；磁场反向，力也反向；两根都反向，力反而回到原方向。',
+    prediction: {
+      prompt: '通电线圈在磁场里被推开后，把电源正负极对调，线圈会怎样？',
+      options: ['往反方向偏，位移大小差不多', '不动了', '偏得更远'],
+      answerIndex: 0,
+    },
+    observation:
+      '电源 6 V（内阻 0.5 Ω）、限流电阻 5 Ω、音圈有效导线 2 m、磁场 2 T 沿 Z 方向。稳定后音圈位移读 0.218 m（弹力 kx 恰好等于 B·L·I）。把电源电压改成 −6 V（电流反向）：位移变成 −0.218 m。把导线长度从 2 m 加到 4 m：位移翻倍。',
+    learning: {
+      variables: ['电流（通过电压调节）', '磁感应强度', '有效导线长度', '悬挂刚度'],
+      steps: ['音圈的平衡位移', '位移对应的弹力', '方向反转后位移是否反向'],
+      limitations:
+        '这里只做「电动机」这一侧（通电受力）；平台没有感应电动势，「发电机」那一侧做不出来。有效导线固定沿一个方向，只取磁场垂直分量。',
+    },
+    env: { gravity: 0, damping: 0, speed: 1, collisions: false },
+    components: [
+      { id: 'cell', kind: 'battery', name: '电源 6 V（内阻 0.5 Ω）', pos: [-3, 0, 0], params: { voltage: 6, resistance: 0.5 } },
+      { id: 'limit', kind: 'resistor', name: '限流电阻 5 Ω', pos: [-1, 0, 0], params: { resistance: 5 } },
+      { id: 'coil', kind: 'coil', name: '音圈（导线 2 m，k=20 N/m）', pos: [1.5, 1, 0], params: { mass: 0.2, stiffness: 20, damping: 1, length: 2, displacement: 0 }, fixed: true },
+      { id: 'bField', kind: 'field', name: '磁场 B = 2 T（+Z）', pos: [1.5, 0, 0], params: { strength: 2, radius: 8, axis: 2 } },
+      { id: 'ground', kind: 'ground', name: '参考地', pos: [-3, 0, 2], params: {} },
+    ],
+    connections: [
+      { id: 'w1', kind: 'wire', source: 'cell', sourcePort: 'a', target: 'limit', targetPort: 'a' },
+      { id: 'w2', kind: 'wire', source: 'limit', sourcePort: 'b', target: 'cell', targetPort: 'b' },
+      { id: 'wg', kind: 'wire', source: 'cell', sourcePort: 'b', target: 'ground', targetPort: 'a' },
+      { id: 'drive', kind: 'electrical', source: 'limit', target: 'coil', gain: 1 },
+    ],
+  },
+
 ];

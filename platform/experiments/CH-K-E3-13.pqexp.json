@@ -1,0 +1,168 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "电感让电流慢慢爬上来",
+    "description": "RL 电路通电瞬间，电流不是一下子到最大。改电感量，看它爬得多慢。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E3-13",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e3-13",
+    "title": "电感让电流慢慢爬上来",
+    "goal": "RL 电路通电瞬间，电流不是一下子到最大。改电感量，看它爬得多慢。",
+    "observation": "电源 6 V（内阻 0.1 Ω）、电阻 10 Ω、电感 100 mH，时间常数 τ = L/R ≈ 9.9 ms。通电 20 ms 后读电流 0.506 A（理论 0.515 A）。把电感改成 1000 mH：τ 变成 99 ms，同样 20 ms 后电流只有 0.112 A（理论 0.109 A）——明显还没爬上来。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "cell",
+        "kind": "battery",
+        "name": "电源 6 V（内阻 0.1 Ω）",
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "params": {
+          "voltage": 6,
+          "resistance": 0.1
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "load",
+        "kind": "resistor",
+        "name": "电阻 R = 10 Ω",
+        "position": [
+          2.4,
+          0,
+          0
+        ],
+        "params": {
+          "resistance": 10
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "coilL",
+        "kind": "inductor",
+        "name": "电感 L = 100 mH",
+        "position": [
+          4.8,
+          0,
+          0
+        ],
+        "params": {
+          "inductance": 100,
+          "initialCurrent": 0
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "amp",
+        "kind": "ammeter",
+        "name": "电流表",
+        "position": [
+          7.2,
+          0,
+          0
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          0,
+          0,
+          2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "a",
+        "target": "load",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "load",
+        "sourcePort": "b",
+        "target": "coilL",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w3",
+        "kind": "wire",
+        "source": "coilL",
+        "sourcePort": "b",
+        "target": "amp",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w4",
+        "kind": "wire",
+        "source": "amp",
+        "sourcePort": "b",
+        "target": "cell",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "b",
+        "target": "ground",
+        "targetPort": "a"
+      }
+    ],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "电感量",
+        "电阻",
+        "通电时间"
+      ],
+      "steps": [
+        "某时刻的电流",
+        "电流上升曲线的弯曲",
+        "时间常数 τ = L/R 的变化"
+      ],
+      "limitations": "只有自感（RL 暂态），没有互感与变压器耦合；求解用后向 Euler，步长较大时会有小偏差。"
+    }
+  }
+}

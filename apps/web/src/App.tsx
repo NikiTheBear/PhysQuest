@@ -395,7 +395,7 @@ export default function App() {
     const snapChannels = lastSnap?.readings?.channels ?? {};
     const readings = Object.entries(snapChannels)
       .filter(([, v]) => v && typeof v.value === 'number' && v.valid !== false)
-      .slice(0, 6)
+      .slice(0, 12)
       .map(([, v]) => ({ label: v.label, value: v.value, unit: v.unit }));
 
     const run: LockedRun = {

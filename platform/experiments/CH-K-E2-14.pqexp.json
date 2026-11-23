@@ -1,0 +1,165 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "通电的音圈在磁场里被推开",
+    "description": "电流、磁场、力三者互相垂直。给音圈通电，它被安培力推到一个平衡位置——位移可以读。",
+    "source": {
+      "project": "PhysQuest",
+      "license": "MIT",
+      "challengeId": "CH-K-E2-14",
+      "auto": true,
+      "handwritten": true,
+      "tier": "real"
+    }
+  },
+  "experiment": {
+    "id": "exp-ch-k-e2-14",
+    "title": "通电的音圈在磁场里被推开",
+    "goal": "电流、磁场、力三者互相垂直。给音圈通电，它被安培力推到一个平衡位置——位移可以读。",
+    "observation": "电源 6 V（内阻 0.5 Ω）、限流电阻 5 Ω、音圈有效导线 2 m、磁场 2 T 沿 Z 方向。稳定后音圈位移读 0.218 m（弹力 kx 恰好等于 B·L·I）。把电源电压改成 −6 V（电流反向）：位移变成 −0.218 m。把导线长度从 2 m 加到 4 m：位移翻倍。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false
+    },
+    "components": [
+      {
+        "id": "cell",
+        "kind": "battery",
+        "name": "电源 6 V（内阻 0.5 Ω）",
+        "position": [
+          -3,
+          0,
+          0
+        ],
+        "params": {
+          "voltage": 6,
+          "resistance": 0.5
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "limit",
+        "kind": "resistor",
+        "name": "限流电阻 5 Ω",
+        "position": [
+          -1,
+          0,
+          0
+        ],
+        "params": {
+          "resistance": 5
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "coil",
+        "kind": "coil",
+        "name": "音圈（导线 2 m，k=20 N/m）",
+        "position": [
+          1.5,
+          1,
+          0
+        ],
+        "params": {
+          "mass": 0.2,
+          "stiffness": 20,
+          "damping": 1,
+          "length": 2,
+          "displacement": 0
+        },
+        "refs": {},
+        "fixed": true
+      },
+      {
+        "id": "bField",
+        "kind": "field",
+        "name": "磁场 B = 2 T（+Z）",
+        "position": [
+          1.5,
+          0,
+          0
+        ],
+        "params": {
+          "strength": 2,
+          "radius": 8,
+          "axis": 2
+        },
+        "refs": {},
+        "fixed": false
+      },
+      {
+        "id": "ground",
+        "kind": "ground",
+        "name": "参考地",
+        "position": [
+          -3,
+          0,
+          2
+        ],
+        "params": {},
+        "refs": {},
+        "fixed": false
+      }
+    ],
+    "connections": [
+      {
+        "gain": 1,
+        "id": "w1",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "a",
+        "target": "limit",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "w2",
+        "kind": "wire",
+        "source": "limit",
+        "sourcePort": "b",
+        "target": "cell",
+        "targetPort": "b"
+      },
+      {
+        "gain": 1,
+        "id": "wg",
+        "kind": "wire",
+        "source": "cell",
+        "sourcePort": "b",
+        "target": "ground",
+        "targetPort": "a"
+      },
+      {
+        "gain": 1,
+        "id": "drive",
+        "kind": "electrical",
+        "source": "limit",
+        "target": "coil"
+      }
+    ],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "variables": [
+        "电流（通过电压调节）",
+        "磁感应强度",
+        "有效导线长度",
+        "悬挂刚度"
+      ],
+      "steps": [
+        "音圈的平衡位移",
+        "位移对应的弹力",
+        "方向反转后位移是否反向"
+      ],
+      "limitations": "这里只做「电动机」这一侧（通电受力）；平台没有感应电动势，「发电机」那一侧做不出来。有效导线固定沿一个方向，只取磁场垂直分量。"
+    }
+  }
+}

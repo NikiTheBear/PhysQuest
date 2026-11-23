@@ -76,8 +76,10 @@ export function buildReport(
       const paramText = nums.length
         ? nums.map(([k, v]) => `${PARAM_LABEL[k] ?? k} ${Number(v.toFixed(2))}`).join('，')
         : '—';
+      // 结论：优先用这一关自己的 summary；老记录只有光学 metrics 时退回它的 description
+      const conclusion = r.summary ?? r.metrics?.description ?? '—';
       lines.push(
-        `| ${i + 1} | ${ch?.title ?? r.challengeId} | ${paramText} | ${r.metrics?.description ?? '—'} | ${pred} |`,
+        `| ${i + 1} | ${ch?.title ?? r.challengeId} | ${paramText} | ${conclusion} | ${pred} |`,
       );
     });
   }

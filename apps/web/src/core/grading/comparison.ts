@@ -218,31 +218,37 @@ export function circuitErrorOf(snap: CaptureSnapshot): string | null {
  */
 export function factFromLocked(run: LockedRun, index: number, id?: string): RunFact {
   const cid = 'lens-bench';
+  // 非光学关没有 metrics（LockedRun.metrics 现在是可选的），这种记录不该走这条路径。
+  // 兜底一份全 0 的度量，避免 .toFixed / 取值时崩。
+  const m = run.metrics ?? {
+    v: 0, m: 0, real: false, imageHeight: 0,
+    screenHasImage: false, blurDiameter: 0, description: '（这条记录没有光学度量）',
+  };
   const p = run.params as LensParams;
   const params: Record<string, Record<string, number | boolean | string>> = {
     [cid]: toScalarParams(p as unknown as Record<string, unknown>),
   };
   const channels: Record<string, ChannelReading> = {
-    [`${cid}:v`]: { label: '凸透镜光具座 · 像距', value: run.metrics.v, unit: 'cm' },
+    [`${cid}:v`]: { label: '凸透镜光具座 · 像距', value: m.v, unit: 'cm' },
     [`${cid}:m`]: {
       label: '凸透镜光具座 · 放大率',
-      value: run.metrics.m,
+      value: m.m,
       unit: '倍',
-      valid: Number.isFinite(run.metrics.m),
+      valid: Number.isFinite(m.m),
     },
     [`${cid}:imageHeight`]: {
       label: '凸透镜光具座 · 像高',
-      value: run.metrics.imageHeight,
+      value: m.imageHeight,
       unit: 'cm',
-      valid: Number.isFinite(run.metrics.imageHeight),
+      valid: Number.isFinite(m.imageHeight),
     },
-    [`${cid}:blurDiameter`]: { label: '凸透镜光具座 · 弥散圆', value: run.metrics.blurDiameter, unit: 'cm' },
+    [`${cid}:blurDiameter`]: { label: '凸透镜光具座 · 弥散圆', value: m.blurDiameter, unit: 'cm' },
     [`${cid}:screenHasImage`]: {
       label: '凸透镜光具座 · 光屏可见像',
-      value: run.metrics.screenHasImage ? 1 : 0,
+      value: m.screenHasImage ? 1 : 0,
       unit: '0/1',
     },
-    [`${cid}:real`]: { label: '凸透镜光具座 · 实像', value: run.metrics.real ? 1 : 0, unit: '0/1' },
+    [`${cid}:real`]: { label: '凸透镜光具座 · 实像', value: m.real ? 1 : 0, unit: '0/1' },
   };
 
   return {
@@ -263,14 +269,14 @@ export function factFromLocked(run: LockedRun, index: number, id?: string): RunF
       lensDiameter: p.lensDiameter,
     },
     metrics: {
-      v: run.metrics.v,
+      v: m.v,
       // Infinity 存进 localStorage 会变成 null（缺口 5）
-      m: Number.isFinite(run.metrics.m) ? run.metrics.m : null,
-      real: run.metrics.real,
-      imageHeight: Number.isFinite(run.metrics.imageHeight) ? run.metrics.imageHeight : null,
-      blurDiameter: run.metrics.blurDiameter,
-      screenHasImage: run.metrics.screenHasImage,
-      description: run.metrics.description,
+      m: Number.isFinite(m.m) ? m.m : null,
+      real: m.real,
+      imageHeight: Number.isFinite(m.imageHeight) ? m.imageHeight : null,
+      blurDiameter: m.blurDiameter,
+      screenHasImage: m.screenHasImage,
+      description: m.description,
     },
   };
 }

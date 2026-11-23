@@ -379,12 +379,35 @@ export default function App() {
     setPhase('explore');
   };
 
+  /**
+   * 锁定一次探索。
+   *
+   * ★ 关键修复：原来无论哪一关（电学、热学、声学…）都塞 `solve(params)` 的透镜度量，
+   *   于是「电学实验」最后的结论写的是「倒立、缩小的实像」。
+   *   现在按 challenge.labId 分开：
+   *     - 光学关：记透镜度量（metrics）
+   *     - 其它关：记最近一次「记录此刻」拿到的引擎读数（readings + summary）
+   */
   const confirmLock = () => {
     if (!challenge) return;
+    const isOptics = challenge.labId === 'optics-lens';
+    const lastSnap = freeRuns[0];
+    const snapChannels = lastSnap?.readings?.channels ?? {};
+    const readings = Object.entries(snapChannels)
+      .filter(([, v]) => v && typeof v.value === 'number' && v.valid !== false)
+      .slice(0, 6)
+      .map(([, v]) => ({ label: v.label, value: v.value, unit: v.unit }));
+
     const run: LockedRun = {
       challengeId: challenge.id,
-      params,
-      metrics: {
+      labId: challenge.labId,
+      params: isOptics ? params : { ...(snapChannels ? {} : {}) },
+      prediction: learner.predictions[challenge.id] ?? null,
+      lockedAt: Date.now(),
+    };
+
+    if (isOptics) {
+      run.metrics = {
         v: metrics.v,
         m: metrics.m,
         real: metrics.real,
@@ -392,10 +415,25 @@ export default function App() {
         screenHasImage: metrics.screenHasImage,
         blurDiameter: metrics.blurDiameter,
         description: metrics.description,
-      },
-      prediction: learner.predictions[challenge.id] ?? null,
-      lockedAt: Date.now(),
-    };
+      };
+      run.summary = metrics.description;
+    } else {
+      // 非光学：参数和结论都来自实验台的真实读数，不掺透镜公式
+      if (lastSnap) {
+        const comps = lastSnap.experiment?.components ?? [];
+        const p: Record<string, unknown> = {};
+        for (const c of comps) {
+          for (const [k, v] of Object.entries(c.params ?? {})) {
+            if (typeof v === 'number' && Number.isFinite(v)) p[k] = v;
+          }
+        }
+        run.params = p;
+      }
+      run.readings = readings;
+      run.summary = readings.length
+        ? readings.map((r) => `${r.label} ${Number(r.value.toFixed(3))} ${r.unit}`).join('，')
+        : '这次锁定没有采到读数——回实验台点「记录此刻」再锁定。';
+    }
     setLocked(run);
     setLearner((s) => {
       let next = pushRun(s, run);
@@ -737,7 +775,9 @@ export default function App() {
                                 ))}
                               </div>
                             )}
-                            <div className="run-result">{r.metrics.description}</div>
+                            <div className="run-result">
+                              {r.summary ?? r.metrics?.description ?? '（这条记录没有结论）'}
+                            </div>
                           </div>
                         );
                       })}

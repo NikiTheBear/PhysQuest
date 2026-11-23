@@ -260,10 +260,34 @@ export interface PredictionRecord {
   lockedAt: number;
 }
 
+/**
+ * 一次「锁定的探索记录」。
+ *
+ * 原来是纯光学的（params 是 LensParams，metrics 是透镜度量）。但平台现在有五个模块，
+ * 学生在电学/热学里做完实验一锁定，记录里塞的却是凸透镜的 `solve(params)`
+ * ——于是就出现了「电学实验，结论写的是倒立缩小的实像」。
+ *
+ * 现在改成：
+ *   labId    —— 这一关属于哪个模块（老记录没有，按 optics-lens 处理）
+ *   params   —— 这一关锁定时能拿到的参数（键名由各模块定）
+ *   readings —— 引擎报了什么就读什么（label + 值 + 单位）
+ *   summary  —— 一句人话结论
+ *   metrics  —— 光学专用的度量，**只有光学关才有**
+ */
 export interface LockedRun {
   challengeId: string;
-  params: LensParams;
-  metrics: Pick<
+  /** 这一关属于哪个模块 */
+  labId?: string;
+  /** 通用参数：光学的 u/f/screenX，电学的 voltage/resistance，热学的 temperature… */
+  // union 而不是 & Record：LensParams 本身没有 index signature，
+  // 用交叉类型会让老代码（new LockedRun 里的 params 直接传 LensParams）报错
+  params: LensParams | Record<string, unknown>;
+  /** 引擎读数（哪个模块有就填哪个） */
+  readings?: Array<{ label: string; value: number; unit: string }>;
+  /** 一句人话结论（光学是「倒立缩小的实像」，电学可能是「电流 0.12 A」） */
+  summary?: string;
+  /** 光学专用度量。非光学关不填 */
+  metrics?: Pick<
     LensMetrics,
     'v' | 'm' | 'real' | 'imageHeight' | 'screenHasImage' | 'blurDiameter' | 'description'
   >;

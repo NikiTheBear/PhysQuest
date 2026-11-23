@@ -128,14 +128,3 @@ export const autoChallengesFor = (labId: string) =>
 /** 某个知识点有没有对应的自动挑战 */
 export const autoChallengeForKnowledge = (knowledgeId: string) =>
   AUTO_CHALLENGES.find((c) => c.knowledgeIds.includes(knowledgeId));
-export const quizForChallenge = (challenge: Challenge): QuizItem[] => {
-  // 优先取这个挑战考的知识点对应的题
-  const hit = QUIZ.filter((q) => challenge.knowledgeIds.includes(q.knowledgeId));
-  const rest = QUIZ.filter((q) => !challenge.knowledgeIds.includes(q.knowledgeId));
-  const picked = [...hit];
-  for (const r of rest) {
-    if (picked.length >= 4) break;
-    if (!picked.some((p) => p.misconceptionId === r.misconceptionId)) picked.push(r);
-  }
-  return picked.slice(0, 4);
-};

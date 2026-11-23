@@ -7,8 +7,8 @@ interface Props {
   metrics: LensMetrics;
   onCancel: () => void;
   onConfirm: () => void;
-  /** 锁定后直接去做题库 */
-  onGoQuiz: () => void;
+  /** 锁定（不再强制跳题库，只记录一组参数） */
+  onGoQuiz?: () => void;
 }
 
 /** 满意度闸门：学生必须自己调到满意才能提交，提交后才解锁 AI 演示。 */
@@ -34,7 +34,8 @@ export default function SatisfactionGate({
       <div className="modal">
         <h3>这组参数，你自己满意吗？</h3>
         <p className="sub">
-          锁定之后才算完成这次探索。锁定后系统会对比你的预测和实际结果，并解锁 AI 讲解。
+          锁定之后才算完成这次探索。锁定后系统会记下这组参数和读数——
+          <b>不会强制你去做题</b>，想去的时候从顶栏进题库就行。
         </p>
 
         <div className="compare">
@@ -100,14 +101,8 @@ export default function SatisfactionGate({
           <button className="btn-ghost" onClick={onCancel}>
             回去再调调
           </button>
-          <button
-            className="btn-primary"
-            onClick={() => {
-              onConfirm();
-              onGoQuiz();
-            }}
-          >
-            锁定，去做题库 →
+          <button className="btn-primary" onClick={onConfirm}>
+            锁定这组参数 →
           </button>
         </div>
       </div>

@@ -5,7 +5,6 @@ import type {
   LensMetrics,
   LensParams,
   LockedRun,
-  QuizItem,
 } from './core/contracts';
 import { DEFAULT_LENS_PARAMS } from './core/contracts';
 import {
@@ -27,7 +26,6 @@ import CurveChart from './components/lab-workspace/CurveChart';
 import ObservationPanel from './components/lab-workspace/ObservationPanel';
 import SatisfactionGate from './components/lab-workspace/SatisfactionGate';
 import PredictionPanel from './components/prediction/PredictionPanel';
-import { QuizModal, QuizResult } from './components/knowledge-cards/Quiz';
 import ReportView, { LearnerBackupPanel } from './components/report/ReportView';
 import AITutor from './components/ai-tutor/AITutor';
 import AISettings from './components/ai-tutor/AISettings';
@@ -48,7 +46,7 @@ import type { KnowledgePrompt } from './data/knowledge-prompts';
 import PromptDialog from './components/knowledge-prompts/PromptDialog';
 import { loadAIConfig, type AIConfig } from './ai/client';
 import type { AIAction } from './ai/prompts';
-import { AUTO_CHALLENGES, CHALLENGES, KNOWLEDGE, quizForChallenge } from './data/content';
+import { AUTO_CHALLENGES, CHALLENGES, KNOWLEDGE } from './data/content';
 import { LABS, labById, type LabId } from './labs/registry';
 import { EmptyPickLab, EmptyReport } from './components/common/EmptyStates';
 import ResetPanel from './components/common/ResetPanel';
@@ -130,10 +128,8 @@ export default function App() {
   const [showVirtual, setShowVirtual] = useState(true);
   const [prediction, setPrediction] = useState<number | null>(null);
   const [locked, setLocked] = useState<LockedRun | null>(null);
-  const [quizItems, setQuizItems] = useState<QuizItem[]>([]);
-  const [quizAnswers, setQuizAnswers] = useState<
-    Record<string, { correct: boolean; chosen: number | string }>
-  >({});
+  /** 锁定后给一条非阻断提示：建议去题库，但不强制 */
+  const [lockedNotice, setLockedNotice] = useState(false);
   const [reflection, setReflectionDraft] = useState('');
   const [aiOpen, setAiOpen] = useState(false);
   const [aiWidth, setAiWidth] = useState(() => {
@@ -391,32 +387,12 @@ export default function App() {
       });
       return next;
     });
-    // 锁定后直接进题库（不再弹「预测 vs 实际」对比）
-    setQuizItems(quizForChallenge(challenge));
-    setPhase('quiz');
-  };
-
-  const submitQuiz = (answers: Record<string, { correct: boolean; chosen: number | string }>) => {
-    setQuizAnswers(answers);
-    setPhase('quizResult');
-    setLearner((s) => {
-      let next = s;
-      Object.entries(answers).forEach(([id, a]) => {
-        if (!a.correct) {
-          const item = quizItems.find((q) => q.id === id);
-          if (item?.misconceptionId) next = hitMisconception(next, item.misconceptionId);
-        }
-      });
-      return next;
-    });
-  };
-
-  const goFix = (knowledgeId: string) => {
-    const k = KNOWLEDGE.find((x) => x.id === knowledgeId);
-    if (k?.labPreset) {
-      patchParams(k.labPreset);
-      setView('lab');
-    }
+    // ★ 锁定后不再强制做题。
+    //   原来这里直接 setPhase('quiz') 弹题，学生刚做完实验就被推进题库，
+    //   而且做的还是「这一关」的题，不是他自己挑的。
+    //   现在只记一条锁定的记录，然后回实验台；要去做题由学生自己从顶栏进。
+    setPhase('explore');
+    setLockedNotice(true);
   };
 
   return (
@@ -749,31 +725,9 @@ export default function App() {
             metrics={metrics}
             onCancel={() => setPhase('explore')}
             onConfirm={confirmLock}
-            onGoQuiz={() => {
-              setQuizItems(quizForChallenge(challenge));
-              setPhase('quiz');
-            }}
           />
         )}
 
-        {phase === 'quiz' && (
-          <QuizModal items={quizItems} onSubmit={submitQuiz} onCancel={() => setPhase('explore')} />
-        )}
-
-        {phase === 'quizResult' && (
-          <QuizResult
-            items={quizItems}
-            answers={quizAnswers}
-            onGoFix={(kid) => {
-              goFix(kid);
-              setPhase('explore');
-            }}
-            onFinish={() => {
-              setPhase('explore');
-              setView('report');
-            }}
-          />
-        )}
       </div>
 
       {promptEntry && (
@@ -787,6 +741,34 @@ export default function App() {
       {toast && (
         <div className="pq-toast" role="status">
           {toast}
+        </div>
+      )}
+
+      {/* 锁定后的建议条：不阻断、不强制，学生想去才去 */}
+      {lockedNotice && (
+        <div className="lock-notice" role="status">
+          <span className="ln-icon">✓</span>
+          <span className="ln-text">
+            参数已记录。建议去题库做几道这一关的题检验一下——不强制，你也可以继续调。
+          </span>
+          <button
+            className="btn-primary btn-small"
+            onClick={() => {
+              setLockedNotice(false);
+              // 只把这一关涉及的知识点带进选题页，不直接开做
+              setQuizPicked(challenge?.knowledgeIds ?? []);
+              setQuizStage('doing');
+              setView('quiz-bank');
+            }}
+          >
+            去做这几道题
+          </button>
+          <button
+            className="btn-ghost btn-small"
+            onClick={() => setLockedNotice(false)}
+          >
+            继续调
+          </button>
         </div>
       )}
 
@@ -816,8 +798,6 @@ export default function App() {
             setChallenge(null);
             setPrediction(null);
             setLocked(null);
-            setQuizItems([]);
-            setQuizAnswers({});
             setReflectionDraft('');
             setFreeRuns([]);
             setBuildRequest(null);
@@ -835,8 +815,6 @@ export default function App() {
             setChallenge(null);
             setPrediction(null);
             setLocked(null);
-            setQuizItems([]);
-            setQuizAnswers({});
             setReflectionDraft('');
             setFreeRuns([]);
             setBuildRequest(null);

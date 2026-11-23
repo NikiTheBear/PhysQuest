@@ -2,8 +2,8 @@
   "format": "physquest.experiment",
   "version": 1,
   "metadata": {
-    "title": "挡住光，那一片就黑了",
-    "description": "光阑就是一块带孔的挡板：孔越小，挡住的光越多——这就是影子。",
+    "title": "孔越小，像越清楚；孔越大，像越亮",
+    "description": "一个物点穿过小孔投到屏上是一个斑。改孔径和孔屏距，看像高、模糊斑和亮度怎么换着来。",
     "source": {
       "project": "PhysQuest",
       "license": "MIT",
@@ -15,9 +15,9 @@
   },
   "experiment": {
     "id": "exp-ch-k-o1-02",
-    "title": "挡住光，那一片就黑了",
-    "goal": "光阑就是一块带孔的挡板：孔越小，挡住的光越多——这就是影子。",
-    "observation": "把光阑孔径从 0.15 m 调到 0.05 m，看探测器功率怎么掉——挡住的那部分光就到不了探测器，这就是影子。小孔成的倒像平台做不出来，只能演示遮挡。",
+    "title": "孔越小，像越清楚；孔越大，像越亮",
+    "goal": "一个物点穿过小孔投到屏上是一个斑。改孔径和孔屏距，看像高、模糊斑和亮度怎么换着来。",
+    "observation": "装置里物高 0.2 m、物距 0.6 m、孔屏距 0.4 m。先把孔径设成 2 mm：读像高 0.133 m、模糊斑 3.3 mm、清晰度 0.975。把孔径改成 20 mm：像高一点没变，但模糊斑涨到 33 mm、清晰度掉到 0.75、亮度涨 100 倍。再把物距从 0.6 m 调到 1.2 m：像高缩到 0.067 m（正好一半）。",
     "mode": "2d",
     "environment": {
       "gravity": 0,
@@ -27,52 +27,19 @@
     },
     "components": [
       {
-        "id": "beam",
-        "kind": "laser",
-        "name": "激光光源（束宽 0.2 m）",
+        "id": "pin",
+        "kind": "pinhole_screen",
+        "name": "针孔成像装置（孔 2 mm）",
         "position": [
-          -4,
           0,
+          1,
           0
         ],
         "params": {
-          "angle": 0,
-          "power": 1,
-          "wavelength": 532,
-          "width": 0.2
-        },
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "hole",
-        "kind": "aperture",
-        "name": "光阑（孔径 0.15 m）",
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "params": {
-          "opening": 0.15,
-          "radius": 0.8,
-          "angle": 0
-        },
-        "refs": {},
-        "fixed": false
-      },
-      {
-        "id": "screen",
-        "kind": "detector",
-        "name": "探测器",
-        "position": [
-          4,
-          0,
-          0
-        ],
-        "params": {
-          "radius": 0.5,
-          "angle": 0
+          "objectHeight": 0.2,
+          "objectDistance": 0.6,
+          "holeDistance": 0.4,
+          "holeDiameter": 0.002
         },
         "refs": {},
         "fixed": false
@@ -85,15 +52,16 @@
     },
     "learning": {
       "variables": [
-        "光阑孔径",
-        "光源束宽",
-        "探测器位置"
+        "孔径",
+        "物距",
+        "孔到屏的距离"
       ],
       "steps": [
-        "探测器功率随孔径的变化",
-        "孔径小于束宽时功率是否明显下降"
+        "像高（倒像，按相似三角形）",
+        "模糊斑直径与清晰度",
+        "相对亮度"
       ],
-      "limitations": "平台不模拟面光源经小孔成像，这一关能演示「挡住就黑」，演示不了小孔成的倒像。"
+      "limitations": "每个物点只投一个斑，所以不会真的看到「倒立的图像」——平台算的是尺寸与清晰度的定量关系，不是成像画面。"
     }
   }
 }

@@ -97,6 +97,63 @@ export class LabScene {
     if(c.kind==='laser'){const m=add(new THREE.CylinderGeometry(.14,.14,.65,24),'#a8aca5');m.rotation.z=Math.PI/2;const tip=add(new THREE.CylinderGeometry(.1,.1,.03,24),'#d4e296',[.34,0,0],{emissive:'#b9d977',emissiveIntensity:1});tip.rotation.z=Math.PI/2;group.rotation.z=p.angle*Math.PI/180;}
     if(c.kind==='lens'){add(lensGeometry(p.radius,originalKind==='diverging_lens'),'#87c9df',[0,0,0],{transparent:true,opacity:.52,depthWrite:false,metalness:.08,roughness:.12});const rim=add(new THREE.TorusGeometry(p.radius,p.radius*.022,12,64),'#778c98');rim.rotation.y=Math.PI/2;stand();group.rotation.z=p.angle*Math.PI/180;}
     if(c.kind==='mirror'){const m=add(new THREE.CylinderGeometry(p.radius,p.radius,.04,40),'#a7c8d7',undefined,{metalness:.95,roughness:.12});m.rotation.z=Math.PI/2;stand();group.rotation.z=p.angle*Math.PI/180;}
+    if(c.kind==='refract_plane'){
+      const plate=add(new THREE.CylinderGeometry(p.radius,p.radius,.03,48),'#9ecddd',undefined,{transparent:true,opacity:.34,metalness:.1,roughness:.12,depthWrite:false});plate.rotation.z=Math.PI/2;
+      const rim=add(new THREE.TorusGeometry(p.radius,.015,10,64),'#7b909c');rim.rotation.y=Math.PI/2;
+      // 法线：沿局部 X 的一串短线段，看得出是虚线
+      const normal=[];for(let x=-p.radius*1.15;x<p.radius*1.15;x+=.28)normal.push([x,0,0],[Math.min(x+.17,p.radius*1.15),0,0]);
+      group.add(this.lines(normal,'#d9e6ec',.8));
+      stand();group.rotation.z=p.angle*Math.PI/180;
+    }
+    if(c.kind==='pinhole_screen'){
+      // 组合器具：物体、带孔挡板、光屏沿光轴排开，已在参数里的物距、孔屏距直接当几何用。
+      // 物高/像高只做示意，封顶到光屏尺寸，避免极端参数把画面拉满。
+      const left=-p.objectDistance,object=Math.min(p.objectHeight,1.6),board=Math.max(.4,Math.min(1,object*.9)),image=Math.max(-board*.9,Math.min(board*.9,p.objectHeight*p.holeDistance/p.objectDistance));
+      add(new THREE.BoxGeometry(p.objectDistance+p.holeDistance,.045,.1),'#93a3ad',[(p.holeDistance-p.objectDistance)/2,0,0]);
+      add(new THREE.CylinderGeometry(.025,.025,object,12),'#b7854b',[left,object/2,0]);
+      add(new THREE.ConeGeometry(object*.12,object*.18,12),'#b7854b',[left,object+object*.09,0]);
+      const plate=add(new THREE.RingGeometry(Math.max(p.holeDiameter/2,.012),board/2,48),'#667984',[0,0,0],{side:THREE.DoubleSide});plate.rotation.y=Math.PI/2;
+      add(new THREE.BoxGeometry(.04,board,board),'#b7cec1',[p.holeDistance,0,0],{transparent:true,opacity:.42});
+      group.add(this.lines([[-p.objectDistance*.98,0,0],[p.holeDistance*.98,0,0]],'#c3d2da',.35));
+      // 倒像画在光屏上（向下），与物上下相反
+      group.add(this.lines([[p.holeDistance,.02,0],[p.holeDistance,-image,0],[p.holeDistance-image*.1*.5,-image*.92,0],[p.holeDistance+image*.1*.5,-image*.92,0],[p.holeDistance,-image,0]],'#7ba58f',.7));
+      stand();
+    }
+    if(c.kind==='eye_model'){
+      // 眼球只有 2 cm 量级，场景里放大 25 倍；尺寸只做示意，不参与计算。
+      const radius=p.axialLength*25/2;
+      add(new THREE.SphereGeometry(radius,32,24),'#e8eff2',undefined,{transparent:true,opacity:.26,roughness:.2,depthWrite:false});
+      add(lensGeometry(radius*.46),'#87c9df',[-radius*.56,0,0],{transparent:true,opacity:.6,metalness:.08,roughness:.12});
+      const retina=add(new THREE.CylinderGeometry(radius*.66,radius*.66,.02,32),'#d89a86',[radius*.72,0,0],{emissive:'#a3675c',emissiveIntensity:.15});retina.rotation.z=Math.PI/2;
+      group.add(this.lines([[-radius*.72,0,0],[radius*.98,0,0]],'#c3d2da',.4));
+      add(new THREE.CylinderGeometry(.035,.035,.34,12),'#7c8d9a',[0,-radius-.17,0]);
+      add(new THREE.CylinderGeometry(.22,.28,.1,24),'#434f5d',[0,-radius-.39,0]);
+    }
+    if(c.kind==='thermometer'){
+      // 玻璃管 + 底部液泡 + 红色液柱；液柱高度在 draw3/draw2 里随温度更新（0 ℃ 底、100 ℃ 顶）。
+      const tube=add(new THREE.CylinderGeometry(.028,.028,.98,18),'#dfeaf0',[0,.02,0],{transparent:true,opacity:.42,roughness:.15,depthWrite:false});
+      add(new THREE.SphereGeometry(.075,20,16),'#dfeaf0',[0,-.5,0],{transparent:true,opacity:.42,roughness:.15,depthWrite:false});
+      const liquid=add(new THREE.CylinderGeometry(.018,.018,1,12),'#d9584f',[0,-.42,0],{emissive:'#8a2f28',emissiveIntensity:.25});
+      liquid.name='thermometer-liquid';liquid.scale.y=.001;liquid.position.y=-.42;
+      add(new THREE.SphereGeometry(.055,16,12),'#d9584f',[0,-.5,0],{emissive:'#8a2f28',emissiveIntensity:.25});
+      // 刻度：0 ℃ 与 100 ℃ 两条短横线
+      group.add(this.lines([[-.055,-.42,0],[-.085,-.42,0],[-.055,.42,0],[-.085,.42,0]],'#7c8d9a',.9));
+      stand();
+    }
+    if(c.kind==='heat_source'){
+      add(new THREE.BoxGeometry(.6,.5,.6),'#8a6a58');
+      add(new THREE.BoxGeometry(.5,.06,.5),'#b58a70',[0,-.28,0]);
+      // 顶部发热盘：亮度在 draw3 里随功率变化。
+      const glow=add(new THREE.CylinderGeometry(.22,.22,.05,28),'#e2743f',[0,.28,0],{emissive:'#ff7a3c',emissiveIntensity:1});
+      glow.name='heat-source-glow';
+      add(new THREE.TorusGeometry(.26,.018,10,32),'#c9803f',[0,.3,0]).rotation.x=Math.PI/2;
+    }
+    if(c.kind==='conductor'){
+      // 沿两端连线方向的圆柱；单位长度几何体沿局部 X，draw3 里按两端位置与杆长摆放。
+      const tube=new THREE.CylinderGeometry(.05,.05,1,22);tube.rotateZ(Math.PI/2);
+      const shell=add(tube,'#c1854f',[0,0,0],{metalness:.55,roughness:.35});shell.name='conductor-tube';
+      for(const [i,x] of [[0,-.5],[1,.5]]){const ring=new THREE.TorusGeometry(.062,.011,8,24);ring.rotateY(Math.PI/2);add(ring,'#8a6a4a',[x,0,0]).name='conductor-ring-'+i;}
+    }
     if(c.kind==='detector'){add(new THREE.BoxGeometry(.12,p.radius*2,p.radius*2),'#506b60');add(new THREE.BoxGeometry(.015,p.radius*1.7,p.radius*1.7),'#a6cdb8',[-.07,0,0],{emissive:'#6e9c86',emissiveIntensity:.3});stand();group.rotation.z=(p.angle||0)*Math.PI/180;}
     if(c.kind==='microphone'){add(new THREE.SphereGeometry(.18,20,16),'#a4c4bb');add(new THREE.CylinderGeometry(.055,.07,.55,16),'#6b8d83',[0,-.3,0]);stand();}
     if(c.kind==='probe'){add(new THREE.CylinderGeometry(.035,.035,.7,12),'#91a8a0',[0,.25,0]);add(new THREE.BoxGeometry(.28,.4,.18),'#547468',[0,-.2,0]);add(new THREE.BoxGeometry(.18,.12,.01),'#a0d1b9',[0,-.15,.1]);}
@@ -239,6 +296,28 @@ export class LabScene {
         ctx.restore();
       }
       else if(c.kind==='lens_bench'){drawBench2(ctx,c.params,this.scale2);}
+      else if(c.kind==='refract_plane'){
+        const extent=Math.max(14,Math.min(60,radius));
+        ctx.rotate(-(c.params.angle||0)*Math.PI/180);
+        // 界面垂直于法线：实线是分界面，虚线是法线。
+        ctx.fillStyle='#9ecddd33';ctx.strokeStyle='#6c97a8';ctx.beginPath();ctx.rect(-3,-extent,6,extent*2);ctx.fill();ctx.stroke();
+        ctx.setLineDash([5,4]);ctx.strokeStyle='#8ea9b6';ctx.beginPath();ctx.moveTo(-extent*.6,0);ctx.lineTo(extent*.6,0);ctx.stroke();ctx.setLineDash([]);
+      }
+      else if(c.kind==='pinhole_screen'){
+        const pinhole=c.params,left=-pinhole.objectDistance*this.scale2,screen=pinhole.holeDistance*this.scale2,object=Math.min(pinhole.objectHeight*this.scale2,64),board=Math.max(14,Math.min(46,object)),image=Math.max(-board,Math.min(board,object*pinhole.holeDistance/pinhole.objectDistance));
+        ctx.strokeStyle='#93a3ad';ctx.beginPath();ctx.moveTo(left,0);ctx.lineTo(screen,0);ctx.stroke();
+        ctx.strokeStyle='#b7854b';ctx.beginPath();ctx.moveTo(left,0);ctx.lineTo(left,-object);ctx.stroke();
+        ctx.strokeStyle='#667984';ctx.beginPath();ctx.moveTo(0,-board);ctx.lineTo(0,-Math.max(2,pinhole.holeDiameter/2*this.scale2));ctx.moveTo(0,Math.max(2,pinhole.holeDiameter/2*this.scale2));ctx.lineTo(0,board);ctx.stroke();
+        ctx.fillStyle='#b7cec166';ctx.fillRect(screen-2,-board,4,board*2);ctx.strokeStyle='#7e9b89';ctx.strokeRect(screen-2,-board,4,board*2);
+        // 倒像：在光屏上向下画
+        ctx.strokeStyle='#7ba58f';ctx.beginPath();ctx.moveTo(screen,0);ctx.lineTo(screen,-image);ctx.stroke();
+      }
+      else if(c.kind==='eye_model'){
+        const eye=c.params,eyeRadius=Math.max(8,Math.min(28,eye.axialLength*this.scale2*8));
+        ctx.strokeStyle=color;ctx.fillStyle=color+'18';ctx.beginPath();ctx.arc(0,0,eyeRadius,0,Math.PI*2);ctx.fill();ctx.stroke();
+        ctx.fillStyle='#87c9df88';ctx.strokeStyle='#5c8fa3';ctx.beginPath();ctx.ellipse(-eyeRadius*.55,0,3,eyeRadius*.7,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#d89a86';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(eyeRadius*.7,-eyeRadius*.5);ctx.lineTo(eyeRadius*.7,eyeRadius*.5);ctx.stroke();
+      }
       else if(c.kind==='cylinder'){ctx.beginPath();ctx.arc(0,0,radius,0,Math.PI*2);ctx.fill();ctx.stroke();const q=b.quaternion||[0,0,0,1],angle=2*Math.atan2(q[2],q[3]);ctx.beginPath();ctx.moveTo(-radius*Math.cos(angle),radius*Math.sin(angle));ctx.lineTo(radius*Math.cos(angle),-radius*Math.sin(angle));ctx.stroke();}
       else if(c.kind==='box'||c.kind==='ramp'||c.kind==='floor_slab'){const width=(c.kind==='box'?c.params.width:c.params.length)*this.scale2,height=(this.vertical===2?(c.kind==='box'?c.params.depth:c.params.width):(c.kind==='box'?c.params.height:.16))*this.scale2;const q=b.quaternion;const angle=q?Math.atan2(2*(q[3]*q[2]+q[0]*q[1]),1-2*(q[1]**2+q[2]**2)):(c.params.angle||0)*Math.PI/180;ctx.rotate(-angle);ctx.fillRect(-width/2,-height/2,width,height);ctx.strokeRect(-width/2,-height/2,width,height);ctx.rotate(angle);}
       else if(['body','charge','microphone','probe','motion_sensor','distance_sensor'].includes(c.kind)){ctx.beginPath();ctx.arc(0,0,Math.min(radius,40),0,Math.PI*2);ctx.fill();ctx.stroke();if(c.kind==='charge'){ctx.fillStyle=color;ctx.textAlign='center';ctx.font='16px sans-serif';ctx.fillText(c.params.charge>=0?'+':'−',0,5);}}

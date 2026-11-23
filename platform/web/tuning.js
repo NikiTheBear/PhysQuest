@@ -5,7 +5,11 @@ import {sliderTarget} from '../shared/sliders.js';
 const primary={
   lens_bench:['u','f','screenX'],speaker:['frequency','amplitude'],directional_speaker:['frequency','angle'],
   rheostat:['ratio'],battery:['voltage'],body:['mass','vx'],box:['mass','vx'],ramp:['angle'],
-  ac_source:['amplitude','frequency'],harmonic_force:['frequency','amplitude']
+  ac_source:['amplitude','frequency'],harmonic_force:['frequency','amplitude'],
+  refract_plane:['angle','n1','n2'],
+  pinhole_screen:['holeDiameter','holeDistance'],
+  eye_model:['focal','axialLength','correction'],
+  thermometer:['responseTime'],heat_source:['temperature','power'],conductor:['conductivity','length']
 };
 const environmentKeys=['gravity','damping','speed'];
 

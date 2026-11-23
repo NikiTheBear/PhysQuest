@@ -5,7 +5,8 @@ export const DOMAINS = {
   electricity: { name: '电学', color: '#6bbcff', symbol: 'ϟ' },
   magnetism: { name: '磁学', color: '#ec91b8', symbol: '⊂' },
   circuit: { name: '电路', color: '#408bd3', symbol: '⊕' },
-  sensors: { name: '测量', color: '#79d7b7', symbol: '⌖' }
+  sensors: { name: '测量', color: '#79d7b7', symbol: '⌖' },
+  thermodynamics: { name: '热学', color: '#e2a06b', symbol: '🌡' }
 };
 const p = (label, value, min, max, step, unit = '') => ({ label, value, min, max, step, unit });
 const motion = { mass:p('质量',1,.01,100,.01,'kg'),vx:p('初速度 X',0,-20,20,.1,'m/s'),vy:p('初速度 Y',0,-20,20,.1,'m/s'),vz:p('初速度 Z',0,-20,20,.1,'m/s') };
@@ -63,7 +64,20 @@ Object.assign(CATALOG, {
   distance_sensor:{name:'测距仪',domain:'sensors',icon:'probe',description:'跟踪两个器具中心的实际距离',refs:['a','b'],params:{}},
   motion_sensor:{name:'运动传感器',domain:'sensors',icon:'probe',description:'跟踪目标位移、速度与外力加速度',refs:['target'],params:{}}
 });
+
+Object.assign(CATALOG, {
+  refract_plane:{name:'折射界面',domain:'optics',icon:'mirror',description:'平面介质分界面，按斯涅尔定律折射（n₁sinθ₁ = n₂sinθ₂）',params:{angle:p('法线角度',0,-180,180,1,'°'),radius:p('界面半径',1.5,.1,5,.05,'m'),n1:p('入射侧折射率',1,1,3,.01),n2:p('折射侧折射率',1.5,1,3,.01)}},
+  pinhole_screen:{name:'针孔成像装置',domain:'optics',icon:'target',description:'物体发出的光穿过小孔，在光屏上形成倒像；孔越大越亮越模糊',params:{objectHeight:p('物高',1,.05,5,.05,'m'),objectDistance:p('物距',2,.1,10,.1,'m'),holeDistance:p('孔到屏距离',1,.05,5,.05,'m'),holeDiameter:p('孔径',.005,.0001,.2,.0001,'m')}},
+  eye_model:{name:'眼球模型',domain:'optics',icon:'sphere',description:'可变焦透镜 + 视网膜；模拟正常眼、近视、远视',params:{focal:p('晶状体焦距（等效）',.017,.005,.1,.001,'m'),axialLength:p('眼轴长度',.024,.015,.05,.001,'m'),objectDistance:p('物距',5,.1,100,.1,'m'),correction:p('眼镜度数',0,-20,20,.25,'D')}}
+});
+
+Object.assign(CATALOG, {
+  thermometer:{name:'温度计',domain:'thermodynamics',icon:'probe',description:'测量所在位置的温度；读数按 responseTime 滞后趋近环境温度（附近的热源或导热棒优先，否则为环境温度）',params:{responseTime:p('响应时间',2,.1,120,.1,'s')}},
+  heat_source:{name:'恒温热源',domain:'thermodynamics',icon:'sparkles',description:'自身温度恒定，对作用半径内的温度计与导热棒按 P = 功率·(T源−T目标)/max(d,0.1) 提供热流',params:{temperature:p('温度',100,-273,1000,1,'℃'),power:p('加热功率',50,0,10000,1,'W'),radius:p('作用半径',.5,.05,5,.01,'m')}},
+  conductor:{name:'导热棒',domain:'thermodynamics',icon:'rod',description:'两端各连一个热学器具，按傅里叶定律 dQ/dt = λA(T_A−T_B)/L 传热；读数带符号，正值为 A→B',refs:['a','b'],params:{conductivity:p('导热系数',200,.01,1000,.01,'W/(m·K)'),length:p('长度',1,.05,10,.01,'m'),area:p('截面积',.01,1e-6,10,1e-4,'m²'),heatCapacity:p('热容',100,.1,100000,.1,'J/K')}}
+});
 export const SOUND_KINDS=['speaker','directional_speaker'];
+export const THERMAL_KINDS=['thermometer','heat_source','conductor'];
 export const LENS_KINDS=['lens','diverging_lens'];
 export const RIGID_KINDS=['body','charge','box','cylinder'];
 export const ENDPOINT_KINDS=[...RIGID_KINDS,'anchor'];
@@ -82,7 +96,7 @@ export function component(kind, overrides = {}) {
   return { id: uid(), kind, name: def.name, position: [0, kind==='floor_slab'?-.08:1, 0], fixed: kind==='floor_slab', params: Object.fromEntries(Object.entries(def.params).map(([k, v]) => [k, v.value])), refs: {}, ...overrides };
 }
 export function blankExperiment(title = '未命名实验') {
-  return { id: uid(), title, goal: '', mode: '3d', components: [], connections: [], control: { running: false, reset: 0 }, environment: { gravity: 0, damping: 0, speed: 1, collisions: true }, createdAt: new Date().toISOString() };
+  return { id: uid(), title, goal: '', mode: '3d', components: [], connections: [], control: { running: false, reset: 0 }, environment: { gravity: 0, damping: 0, speed: 1, collisions: true, temperature: 20 }, createdAt: new Date().toISOString() };
 }
 export function blankWorkspace() {
   const doc = blankExperiment();

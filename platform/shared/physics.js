@@ -1,12 +1,14 @@
 import {normalAxis,verticalAxis} from './planes.js';
 import {lensTrain} from './lens-train.js';
-import { CATALOG, RIGID_KINDS, CIRCUIT_KINDS, SOUND_KINDS, LENS_KINDS, LINK_KINDS } from './catalog.js';
+import { CATALOG, RIGID_KINDS, CIRCUIT_KINDS, SOUND_KINDS, LENS_KINDS, LINK_KINDS, THERMAL_KINDS } from './catalog.js';
 import { solve as solveLens } from './physquest-lens.js';
 import { Circuit } from './circuit.js';
 import {compileForce} from './force-expression.js';
 import { Mechanics } from './mechanics.js';
 export const DT = 1 / 480;
 const K = 8.9875517923e9;
+// 眼球模型固定取明视瞳孔直径 3 mm（参数表里不暴露瞳孔）
+const PUPIL_DIAMETER = .003;
 const TAU = Math.PI * 2;
 const dot = (a, b) => a.reduce((n, v, i) => n + v * b[i], 0);
 const norm = a => Math.hypot(...a);
@@ -15,6 +17,13 @@ const mul = (a, n) => a.map(v => v * n);
 const add = (a, b) => a.map((v, i) => v + b[i]);
 const cross = (a, b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
 const unit = a => mul(a, 1 / (norm(a) || 1));
+// 热学集中参数模型：温度状态夹在绝对零度与模型上限之间，所有交换用精确指数解，不会发散。
+const THERMAL_MIN = -273, THERMAL_MAX = 1000;
+// 温度计只是探针，热容不开放给参数：它仅在作为导热棒端点时参与一次交换，数值只影响该处的瞬态。
+const THERMOMETER_CAPACITY = 10;
+const ambientOf = doc => { const t = doc?.environment?.temperature; return Number.isFinite(t) ? clampTemperature(t) : 20; };
+const clampTemperature = t => Math.max(THERMAL_MIN, Math.min(THERMAL_MAX, Number.isFinite(t) ? t : 20));
+export { ambientOf, clampTemperature };
 export function fieldAt(doc, point, bodies = null, exclude = '') {
   let electric = [0,0,0], magnetic = [0,0,0];
   for (const c of doc.components) {
@@ -45,6 +54,10 @@ export class Simulation {
       axes:c.kind==='expression_force'?['fx','fy','fz'].map(axis=>compileForce(c.params[axis])):null
     }));
     this.mechanics=new Mechanics(this.doc,this.bodies);this.circuit=new Circuit(this.doc);
+    this.thermal=new Map();
+    for(const c of this.doc.components.filter(c=>THERMAL_KINDS.includes(c.kind)))this.thermal.set(c.id,{temperature:clampTemperature(c.params.temperature??ambientOf(this.doc))});
+    // 导热棒两端都接上时，杆身初温取两端平均，静止状态下的热流就是傅里叶定律的读数。
+    for(const c of this.doc.components.filter(c=>c.kind==='conductor'&&c.refs.a&&c.refs.b)){const a=this.thermal.get(c.refs.a),b=this.thermal.get(c.refs.b);if(a&&b&&a!==b)this.thermal.get(c.id).temperature=clampTemperature((a.temperature+b.temperature)/2);}
     this.samples = []; this.measure();
   }
   sourceCurrent(id, t) {
@@ -82,7 +95,7 @@ export class Simulation {
   }
   step(dt = DT) {
     const doc=this.doc, env=doc.environment, movable=doc.components.filter(c => RIGID_KINDS.includes(c.kind) && !c.fixed);
-    this.circuit.step(dt);
+    this.circuit.step(dt);this.thermalStep(dt);
     for(const b of this.bodies.values()){b.force=[0,0,0];b.torque=[0,0,0];}
     for(const c of movable) {
       const b=this.bodies.get(c.id), m=c.params.mass;
@@ -136,6 +149,81 @@ export class Simulation {
       this.measure();this.samples.push({t:this.time,...this.readings});if(this.samples.length>900)this.samples.shift();
     }
   }
+  /** 一段热交换在一步 dt 内让本节点走掉的温差比例：ΔT_本 = (T_另一端 − T_本)·f。
+   *  精确解是 1−e^{−G(1/C_本+1/C_对)dt}，再按热容比分配；对端是无限热库时就直接取满。 */
+  thermalFraction(capacitySelf, capacityOther, conductance, dt) {
+    if(!(conductance>0)||!Number.isFinite(dt)||dt<=0)return 0;
+    const freeSelf=Number.isFinite(capacitySelf),freeOther=Number.isFinite(capacityOther);
+    const inverse=(freeSelf?1/capacitySelf:0)+(freeOther?1/capacityOther:0);if(!(inverse>0))return 0;
+    return (1-Math.exp(-conductance*inverse*dt))*(freeOther?capacityOther/(capacityOther+capacitySelf):1);
+  }
+  /** 器具的热容；恒温热源是无限大热库（温度由 parameters 锁定），温度计是纯探针、只有固定的等效热容。 */
+  heatCapacityOf(c){
+    if(c.kind==='heat_source')return Infinity;
+    if(c.kind==='thermometer')return THERMOMETER_CAPACITY;
+    return Math.max(c.params.heatCapacity,1e-6);
+  }
+  /** 该位置的温度：相连导热棒的杆身 > 作用半径内的热源 > 环境温度。 */
+  localTemperature(c){
+    const rods=this.doc.components.filter(x=>x.kind==='conductor'&&(x.refs.a===c.id||x.refs.b===c.id));
+    if(rods.length)return rods.reduce((sum,rod)=>sum+this.temperatureOf(rod.id),0)/rods.length;
+    const point=this.bodies.get(c.id)?.position||c.position;let best=null,nearest=Infinity;
+    for(const source of this.doc.components.filter(x=>x.kind==='heat_source')){
+      const distance=norm(sub(point,this.bodies.get(source.id)?.position||source.position));
+      if(distance>source.params.radius||distance>=nearest)continue;
+      nearest=distance;best=source;
+    }
+    return best?clampTemperature(best.params.temperature):ambientOf(this.doc);
+  }
+  temperatureOf(id){const node=this.thermal?.get(id);return node?clampTemperature(node.temperature):ambientOf(this.doc);}
+  /** 傅里叶热流 W，正值表示由 A 端流向 B 端。 */
+  heatFlowOf(c){const p=c.params;if(!this.thermal?.get(c.refs.a)||!this.thermal?.get(c.refs.b))return 0;return p.conductivity*p.area*(this.temperatureOf(c.refs.a)-this.temperatureOf(c.refs.b))/Math.max(p.length,1e-6);}
+  thermalStep(dt) {
+    if(!this.thermal?.size)return;
+    const doc=this.doc,nodes=doc.components.filter(c=>THERMAL_KINDS.includes(c.kind)&&this.thermal.has(c.id));
+    if(!nodes.length)return;
+    const capacity=new Map(nodes.map(c=>[c.id,this.heatCapacityOf(c)]));
+    const sources=nodes.filter(c=>c.kind==='heat_source');
+    for(const source of sources)this.thermal.get(source.id).temperature=clampTemperature(source.params.temperature);
+    // 热源 → 作用半径内的导热棒：等效热导 h = 功率 / max(距离, 0.1)，精确指数积分保证不发散。
+    for(const source of sources){
+      const sp=source.params,origin=this.bodies.get(source.id)?.position||source.position;
+      if(!(sp.power>0))continue;
+      for(const target of nodes){
+        if(target.kind!=='conductor')continue;
+        // 半径比较必须用真实距离：夹到 0.1 m 只用在热导上，否则 radius < 0.1 时连正中心的导热棒都落不进作用区。
+        const distance=norm(sub(this.bodies.get(target.id)?.position||target.position,origin));
+        if(distance>sp.radius)continue;
+        const node=this.thermal.get(target.id),gain=1-Math.exp(-dt*(sp.power/Math.max(distance,.1))/capacity.get(target.id));
+        node.temperature=clampTemperature(node.temperature+(clampTemperature(sp.temperature)-node.temperature)*gain);
+      }
+    }
+    // 导热棒：两端温差产生热流，每半段热导 2λA/L，稳态通量即 λA(T_A−T_B)/L。
+    // 两半段必须基于「本步开始时」的同一份温度快照一起写回。先 A 后 B 的顺序更新是算子分裂：杆身在一步里
+    // 被连续拉向 A 又拉向 B，稳态落到后一个端点一侧，G·dt/C 越大偏得越多（极端参数下能从 50 ℃ 偏到 0 ℃），
+    // 而且对调 refs.a / refs.b 就换一个答案。
+    for(const rod of nodes.filter(c=>c.kind==='conductor')){
+      const a=this.thermal.get(rod.refs.a),b=this.thermal.get(rod.refs.b),body=this.thermal.get(rod.id);
+      if(!a||!b||a===b)continue;
+      const capA=capacity.get(rod.refs.a),capB=capacity.get(rod.refs.b),own=capacity.get(rod.id);
+      const half=2*rod.params.conductivity*rod.params.area/Math.max(rod.params.length,1e-6);
+      const ta=a.temperature,tb=b.temperature,tm=body.temperature;
+      const fA=this.thermalFraction(own,capA,half,dt),fB=this.thermalFraction(own,capB,half,dt);
+      // 两半段并联时杆身的合成比例是 1−e^{−(f_A+f_B)}（两端为无限热库时与解析解完全一致）；
+      // 用它统一缩放两段增量，极端参数 G·dt/C ≫ 1 也不会在中点两侧来回振荡。
+      const sum=fA+fB,mix=sum>0?(1-Math.exp(-sum))/sum:1;
+      const fromA=(ta-tm)*fA*mix,fromB=(tb-tm)*fB*mix;
+      body.temperature=clampTemperature(tm+fromA+fromB);
+      // 有限热容的端点按能量守恒扣掉对应的热量：C_端·ΔT_端 = −C_杆·ΔT_杆(来自该段)。
+      if(Number.isFinite(capA))a.temperature=clampTemperature(ta-own/capA*fromA);
+      if(Number.isFinite(capB))b.temperature=clampTemperature(tb-own/capB*fromB);
+    }
+    // 温度计：探针本身不带走热量，读数按一阶滞后趋近局部环境温度。
+    for(const meter of nodes.filter(c=>c.kind==='thermometer')){
+      const node=this.thermal.get(meter.id),tau=Math.max(meter.params.responseTime,.01);
+      node.temperature=clampTemperature(node.temperature+(this.localTemperature(meter)-node.temperature)*(1-Math.exp(-dt/tau)));
+    }
+  }
   rays() {
     const segments=[];
     for(const source of this.doc.components.filter(c=>c.kind==='laser'))for(let i=-2;i<=2;i++) {
@@ -145,7 +233,7 @@ export class Simulation {
       let lastId=source.id;
       for(let bounce=0;bounce<Math.min(72,8+this.doc.components.length);bounce++) {
         let best=null;
-        for(const c of this.doc.components.filter(c=>[...LENS_KINDS,'mirror','detector','aperture','optical_filter'].includes(c.kind)&&c.id!==lastId)) {
+        for(const c of this.doc.components.filter(c=>[...LENS_KINDS,'mirror','refract_plane','detector','aperture','optical_filter'].includes(c.kind)&&c.id!==lastId)) {
           const pos=this.bodies.get(c.id).position, angle=(c.params.angle||0)*Math.PI/180,n=[Math.cos(angle),Math.sin(angle),0],den=dot(dir,n);
           if(Math.abs(den)<1e-6)continue;
           const distance=dot(sub(pos,origin),n)/den;
@@ -160,6 +248,14 @@ export class Simulation {
         if(best.c.kind==='aperture'){if(norm(sub(best.hit,best.pos))>best.c.params.opening)break;}
         else if(best.c.kind==='optical_filter')power*=best.c.params.transmission;
         else if(best.c.kind==='mirror')dir=sub(dir,mul(best.n,2*dot(dir,best.n)));
+        else if(best.c.kind==='refract_plane'){
+          const p=best.c.params,eta=p.n1/p.n2;
+          // n1/n2 按参数含义固定为“入射侧 / 折射侧”；法线取指向入射侧的方向，cosI = -dot(dir, n) ≥ 0。
+          const facing=dot(dir,best.n),n=mul(best.n,-(Math.sign(facing)||1)),cosI=-dot(dir,n),k=1-eta*eta*(1-cosI*cosI);
+          // 斯涅尔定律 n₁sinθ₁ = n₂sinθ₂；k<0 无实解，发生全反射。
+          if(k<0)dir=sub(dir,mul(n,2*dot(dir,n)));
+          else dir=unit(add(mul(dir,eta),mul(n,eta*cosI-Math.sqrt(k))));
+        }
         else {
           const axis=mul(best.n,Math.sign(dot(dir,best.n))),normalPart=dot(dir,axis),height=sub(best.hit,best.pos);
           // Paraxial thin-lens slope change: theta_out = theta_in - h/f.
@@ -182,6 +278,33 @@ export class Simulation {
         channels[c.id]={label:c.name+' · 放大率',value:Number.isFinite(metrics.m)?metrics.m:0,unit:'倍',valid:Number.isFinite(metrics.m)};
         continue;
       }
+      if(c.kind==='pinhole_screen'){
+        // 每个物点穿过小孔投出一个斑：倒像高度按相似三角形，斑径 = 孔径 × (1 + 孔屏距/物孔距)。
+        const imageHeight=p.objectHeight*p.holeDistance/p.objectDistance;
+        const blur=p.holeDiameter*(1+p.holeDistance/p.objectDistance);
+        const sharpness=Math.max(0,1-blur/imageHeight);
+        // 相对亮度取小孔在屏处张开的立体角 Ω = π(d/2)²/L²，单位 sr；孔径变大则亮、L 变大则暗。
+        const brightness=Math.PI*(p.holeDiameter/2)**2/(p.holeDistance**2);
+        for(const [key,label,unitLabel] of [['imageHeight','像高','m'],['blur','模糊斑直径','m'],['sharpness','清晰度','比例'],['brightness','相对亮度','sr']]){
+          const v={imageHeight,blur,sharpness,brightness}[key];channels[c.id+':'+key]={label:c.name+' · '+label,value:Number.isFinite(v)?v:0,unit:unitLabel,valid:Number.isFinite(v)};
+        }
+        value=imageHeight;unitLabel='m';label=c.name+' · 像高';
+        channels[c.id]={value,unit:unitLabel,label,kind:c.kind};
+        continue;
+      }
+      if(c.kind==='eye_model'){
+        // 晶状体 + 眼镜先叠加成等效光焦度，再把薄透镜像距与固定视网膜位置比较。
+        const power=1/p.focal+p.correction,parallel=Math.abs(power)<1e-6,fEff=parallel?Infinity:1/power;
+        // 等效光焦度为零或物距正好等于焦距时不成像，取远端近似（同 lens_bench 的 FAR）。
+        const v=parallel||Math.abs(p.objectDistance-fEff)<1e-9?1e6:p.objectDistance*fEff/(p.objectDistance-fEff);
+        const focusError=v-p.axialLength;
+        const inFocus=Math.abs(focusError)<.0005;
+        const retinaBlur=Math.abs(focusError)*(PUPIL_DIAMETER/2)/Math.max(.001,Math.abs(v));
+        for(const [key,label,unitLabel] of [['focusError','焦点偏差','m'],['inFocus','是否看得清','0/1'],['retinaBlur','视网膜模糊斑','m'],['v','像距','m']]){
+          const v2={focusError,inFocus:Number(inFocus),retinaBlur,v}[key];channels[c.id+':'+key]={label:c.name+' · '+label,value:Number.isFinite(v2)?v2:0,unit:unitLabel,valid:Number.isFinite(v2)};
+        }
+        value=Number.isFinite(focusError)?focusError:0;unitLabel='m';label=c.name+' · 焦点偏差';
+      }
       if(RIGID_KINDS.includes(c.kind)){value=norm(b.velocity);unitLabel='m/s';energy+=.5*p.mass*value**2+p.mass*this.doc.environment.gravity*b.position[1]+this.mechanics.rotationalEnergy(c.id);channels[c.id+':angular']={value:norm(b.angularVelocity||[0,0,0]),unit:'rad/s',label:c.name+' · 角速度',kind:c.kind};maxSpeed=Math.max(maxSpeed,value);}
       if(c.kind==='coil'){value=b.x;unitLabel='m';energy+=.5*p.mass*b.v**2+.5*p.stiffness*b.x**2;maxSpeed=Math.max(maxSpeed,Math.abs(b.v));}
       if(LINK_KINDS.includes(c.kind)) { const a=this.bodies.get(c.refs.a),bb=this.bodies.get(c.refs.b);value=a&&bb?norm(sub(a.position,bb.position))-(p.restLength||0):0;unitLabel='m';energy+=.5*(p.stiffness||0)*(c.kind==='rope'?Math.max(0,value):value)**2; }
@@ -199,6 +322,15 @@ export class Simulation {
       if(['expression_force','drag'].includes(c.kind)){value=norm(b.appliedForce||[0,0,0]);unitLabel='N';}
       if(c.kind==='harmonic_force'){value=p.amplitude*Math.sin(TAU*p.frequency*this.time+p.phase*Math.PI/180);unitLabel='N';}
       if(c.kind==='force'){value=norm([p.fx,p.fy,p.fz]);unitLabel='N';}
+      if(c.kind==='thermometer'){value=this.temperatureOf(c.id);unitLabel='℃';channels[c.id+':target']={value:this.localTemperature(c),unit:'℃',label:c.name+' · 环境温度',kind:c.kind};}
+      if(c.kind==='heat_source'){value=clampTemperature(p.temperature);unitLabel='℃';}
+      if(c.kind==='conductor'){
+        const ta=this.thermal?.get(c.refs.a)?this.temperatureOf(c.refs.a):null,tb=this.thermal?.get(c.refs.b)?this.temperatureOf(c.refs.b):null;
+        value=ta===null||tb===null?0:this.heatFlowOf(c);unitLabel='W';
+        channels[c.id+':Ta']={value:ta===null?0:ta,unit:'℃',label:c.name+' · A 端',valid:ta!==null,kind:c.kind};
+        channels[c.id+':Tb']={value:tb===null?0:tb,unit:'℃',label:c.name+' · B 端',valid:tb!==null,kind:c.kind};
+        channels[c.id+':heatFlow']={value,unit:'W',label:c.name+' · 热流（A→B）',valid:ta!==null&&tb!==null,kind:c.kind};
+      }
       if(CIRCUIT_KINDS.includes(c.kind)){const r=this.circuit.readings[c.id];if(r){value=['battery','ac_source','capacitor','voltmeter'].includes(c.kind)?r.voltage:r.current;unitLabel=['battery','ac_source','capacitor','voltmeter'].includes(c.kind)?'V':'A';channels[c.id+':V']={value:r.voltage,unit:'V',label:c.name+' · 电压',kind:c.kind};channels[c.id+':I']={value:r.current,unit:'A',label:c.name+' · 电流',kind:c.kind};channels[c.id+':P']={value:r.power,unit:'W',label:c.name+' · 功率',kind:c.kind};}}
       channels[c.id]={value,unit:unitLabel,label,kind:c.kind};
     }

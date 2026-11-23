@@ -1,6 +1,6 @@
 import {instrumentPlane} from './planes.js';
 import {validateAppearance} from './appearance.js';
-import { CATALOG, COUPLINGS, blankExperiment, component, uid, activeExperiment, ENDPOINT_KINDS, RIGID_KINDS, LINK_KINDS } from './catalog.js';
+import { CATALOG, COUPLINGS, blankExperiment, component, uid, activeExperiment, ENDPOINT_KINDS, RIGID_KINDS, LINK_KINDS, THERMAL_KINDS } from './catalog.js';
 import {sliderTarget,validateSliders} from './sliders.js';
 import {sampleChart,validateChart} from './experiment-chart.js';
 import {compileForce} from './force-expression.js';
@@ -22,6 +22,9 @@ export function validateComponent(c) {
   if(!c.refs||typeof c.refs!=='object'||Array.isArray(c.refs))throw new Error('refs 必须为对象');
   for(const [key,v] of Object.entries(c.refs)){if(!def.refs?.includes(key))throw new Error('未知连接端口');text(v,100,'端点');}
   if(c.kind==='aperture'&&c.params.opening>c.params.radius)throw new Error('通光孔径不能大于遮挡盘半径');
+  if(c.kind==='conductor'&&c.refs.a&&c.refs.b&&c.refs.a===c.refs.b)throw new Error('导热棒需要两个不同的热学端点');
+  if(c.kind==='pinhole_screen'&&!(c.params.holeDistance>0))throw new Error('孔到屏距离必须大于 0');
+  if(c.kind==='eye_model'&&!(c.params.axialLength>0))throw new Error('眼轴长度必须大于 0');
   return c;
 }
 export function validateExperiment(doc) {
@@ -38,10 +41,15 @@ export function validateExperiment(doc) {
     if(c.refs.a&&c.refs.a===c.refs.b)throw new Error('机械连接需要两个不同端点');
   }
   for(const c of doc.components.filter(c=>['force','drag','expression_force','harmonic_force','motion_sensor'].includes(c.kind)))if(c.refs.target&&!RIGID_KINDS.includes(doc.components.find(x=>x.id===c.refs.target)?.kind))throw new Error('目标必须是刚体');
+  // 导热棒两端各接一个热学器具；允许先选一端（另一端待定），但两端不能是同一个。
+  for(const c of doc.components.filter(c=>c.kind==='conductor')){
+    for(const ref of [c.refs.a,c.refs.b])if(ref&&!THERMAL_KINDS.includes(doc.components.find(x=>x.id===ref)?.kind))throw new Error('导热棒的两端必须连接热学器具');
+    if(c.refs.a&&c.refs.b&&c.refs.a===c.refs.b)throw new Error('导热棒需要两个不同的热学端点');
+  }
   if(!Array.isArray(doc.connections)||doc.connections.length>128)throw new Error('最多支持 128 个连接');
   const linkIds=new Set();
   for(const l of doc.connections){const k=COUPLINGS[l.kind],a=doc.components.find(c=>c.id===l.source),b=doc.components.find(c=>c.id===l.target);if(!k||!a||!b||!k.from.includes(a.kind)||!k.to.includes(b.kind))throw new Error('连接的源或目标类型不兼容');text(l.id,100,'连接 ID');if(linkIds.has(l.id))throw new Error('连接 ID 重复');linkIds.add(l.id);number(l.gain,-20,20,'连接增益');if(l.kind==='wire'){if(!CATALOG[a.kind].terminals.includes(l.sourcePort)||!CATALOG[b.kind].terminals.includes(l.targetPort))throw new Error('必须指定有效接线端子 a / b');if(a.id===b.id&&l.sourcePort===l.targetPort)throw new Error('不能将同一端子连接到自身');}}
-  const env=doc.environment;if(!env)throw new Error('缺少环境参数');number(env.gravity,0,25,'重力加速度');number(env.damping,0,5,'环境阻尼');number(env.speed,.05,4,'时间倍率');if(typeof env.collisions!=='boolean')throw new Error('collisions 必须为布尔值');
+  const env=doc.environment;if(!env)throw new Error('缺少环境参数');number(env.gravity,0,25,'重力加速度');number(env.damping,0,5,'环境阻尼');number(env.speed,.05,4,'时间倍率');if(typeof env.collisions!=='boolean')throw new Error('collisions 必须为布尔值');if(env.temperature!==undefined)number(env.temperature,-273,1000,'环境温度');
   if(!doc.control||typeof doc.control.running!=='boolean')throw new Error('缺少运行状态');number(doc.control.reset,0,1e9,'重置序号');
   for(const key of ['learning','source'])if(doc[key]!==undefined){if(!doc[key]||typeof doc[key]!=='object'||Array.isArray(doc[key])||JSON.stringify(doc[key]).length>12000)throw new Error(key+' 必须是 12 KB 以内的对象');}
   if(doc.learning?.prediction?.options!==undefined&&(!Array.isArray(doc.learning.prediction.options)||doc.learning.prediction.options.some(o=>typeof o!=='string')))throw new Error('预测选项必须为文本数组');

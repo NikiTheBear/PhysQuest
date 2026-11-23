@@ -273,7 +273,7 @@ It's not a change of wording — it's a change of interaction depth:
 | | GitHub | What they built |
 |---|---|---|
 | **A** | [@NikiTheBear](https://github.com/NikiTheBear) | Web app (5 pages / 23 components / 16,353 lines), physics engine, **all 176 knowledge cards**, **1,416 quiz questions**, **176 AI prompts**, AI integration, local launcher, CI & deployment, bilingual docs |
-| **B** | [@FCZ19](https://github.com/FCZ19) | Fieldlab platform (8,254 lines): physics solvers, **47 instruments**, **25 MCP tools**, full-screen workbench, 109 tests |
+| **B** | [@FCZ19](https://github.com/FCZ19) | Fieldlab platform (8,254 lines): physics solvers, **53 instruments**, **25 MCP tools**, full-screen workbench, 162 tests |
 | **C** | [@yoyosiqidai-cpu](https://github.com/yoyosiqidai-cpu) | Formula lab (97 entries), misconception bank, experiment files, handwritten questions, teacher handbook, delivery tests |
 
 Read the [contribution guide](./CONTRIBUTING.md) before you start.

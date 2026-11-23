@@ -10,7 +10,7 @@
   | 方式 | 怎么起 | 特点 |
   |---|---|---|
   | A. 本地完整版 | 终端 1 `node scripts/run-platform.mjs`；终端 2 `cd apps/launcher && node src/server.mjs` | 实验台 + 各家 AI 都能用 |
-  | B. 在线版 | https://nikithebear.github.io/PhysQuest/ | 只有直连 AI（OpenAI），实验台走静态版 |
+  | B. 在线版 | https://wave-to-say-hi.github.io/PhysQuest/ | 只有直连 AI（OpenAI），实验台走静态版 |
 
 ---
 

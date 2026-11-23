@@ -6,7 +6,7 @@
 
 **English** · [README.en.md](./README.en.md)
 
-> **在线试玩** → https://nikithebear.github.io/PhysQuest/
+> **在线试玩** → https://wave-to-say-hi.github.io/PhysQuest/
 > （在线版只有直连模式，实验台需要本地启动器，见下面的「跑起来」）
 
 ---

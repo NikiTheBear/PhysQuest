@@ -6,7 +6,7 @@
 
 [中文](./README.md) · **English**
 
-> **Live demo** → https://nikithebear.github.io/PhysQuest/
+> **Live demo** → https://wave-to-say-hi.github.io/PhysQuest/
 > (The online version is browser-only; the full interactive lab needs a local launcher — see "Run it" below.)
 
 ---

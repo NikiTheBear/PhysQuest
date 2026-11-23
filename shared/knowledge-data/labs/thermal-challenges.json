@@ -1,0 +1,1115 @@
+{
+  "labId": "thermal",
+  "auto": false,
+  "challenges": [
+    {
+      "id": "CH-K-T1-01",
+      "labId": "thermal",
+      "title": "冷和热",
+      "brief": "两个温度不同的东西放在一起，温度计读数会怎么变化？",
+      "hint": "温度计不直接量「冷热感」，它读的是自己到达热平衡后的温度，而且要等一会儿。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T1-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "把一个 20 ℃ 的温度计放进 100 ℃ 的热源里，刚放进去的那一瞬间，读数是多少？",
+        "options": [
+          "100 ℃，因为它测的是热源的温度",
+          "20 ℃，然后慢慢爬上去",
+          "50 ℃，取两者的平均值"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "heat_source",
+          "thermometer"
+        ],
+        "variables": [
+          "热源温度",
+          "温度计响应时间",
+          "到热源的距离"
+        ],
+        "observations": [
+          "温度计读数",
+          "读数达到稳定的时间"
+        ],
+        "construction": "放一个 100 ℃ 的恒温热源和一个温度计，让两者位置重合；把热源温度分别调成 0、50、100 ℃，看温度计读数怎么变。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「冷和热」的可编辑实验空间。\n知识点：K-T1-01；领域：热学；学段：小学。\n模型级别：概念示意。\n\n探索目标\n区分冷暖感受与温度数值，说明冷热由比较对象决定。\n\n搭建方案\n并排放置三个固定长方体，分别命名为低温、中间温度、高温物体，在 learning 中给出温度示例及比较问题。\n建议器具模型：box。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 标注的温度\n• 比较顺序\n\n观测与比较\n• 相对冷热判断\n• 温度排序\n\n模型边界\n器具没有温度状态或感受模型，颜色和名称仅作教学标注，不会真实传热。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T1-01\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“冷和热 · 小学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "thermodynamics",
+        "limitations": "器具没有温度状态或感受模型，颜色和名称仅作教学标注，不会真实传热。"
+      }
+    },
+    {
+      "id": "CH-K-T1-02",
+      "labId": "thermal",
+      "title": "温度计怎么用",
+      "brief": "为什么温度计要等一会儿才能读数？",
+      "hint": "读数上升是指数趋近，不是直线爬升。前一半时间爬得最快。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T1-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "温度计的响应时间从 2 s 改成 20 s，插进 100 ℃ 的水里，读数会怎么变？",
+        "options": [
+          "最终读数变低",
+          "最终读数不变，只是爬得更慢",
+          "最终读数变高"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "heat_source",
+          "thermometer"
+        ],
+        "variables": [
+          "响应时间",
+          "热源温度"
+        ],
+        "observations": [
+          "读数随时间的变化曲线",
+          "达到稳定所需的时间"
+        ],
+        "construction": "固定热源 100 ℃，把温度计的响应时间设成 1 s、5 s、20 s，各跑 30 s，记录读数曲线。观察「响应时间」这个参数怎么影响到达稳定的快慢。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「温度计怎么用」的可编辑实验空间。\n知识点：K-T1-02；领域：热学；学段：小学。\n模型级别：概念示意。\n\n探索目标\n学习温标、量程和分度值，并区分摄氏温度与开尔文温度。\n\n搭建方案\n以固定细长长方体示意温度计，支点标记两端刻度；说明中设置读数案例和换算表，允许用户修改标注值。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 标注读数\n• 量程\n• 分度值\n\n观测与比较\n• 估读误差范围\n• 温标换算\n理论参考：T/K=t/°C+273.15\n\n模型边界\n没有热膨胀测温器具，场强探针不能替代温度计；读数属于题设。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T1-02\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“温度计怎么用 · 小学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "primary",
+        "domain": "thermodynamics",
+        "limitations": "没有热膨胀测温器具，场强探针不能替代温度计；读数属于题设。"
+      }
+    },
+    {
+      "id": "CH-K-T1-03",
+      "labId": "thermal",
+      "title": "热会传过去",
+      "brief": "一根导热棒两端温度不同，热流有多大？",
+      "hint": "傅里叶定律：热流 = λA ΔT / L。导热系数、截面积越大，热流越大；越长，热流越小。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T1-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "intermediate",
+      "prediction": {
+        "prompt": "一根导热棒的导热系数调大一倍，两端温度不变，通过它的热流会变成几倍？",
+        "options": [
+          "不变",
+          "变成两倍",
+          "变成四倍"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "heat_source",
+          "heat_source",
+          "conductor"
+        ],
+        "variables": [
+          "导热系数",
+          "截面积",
+          "长度",
+          "两端温差"
+        ],
+        "observations": [
+          "热流读数（W）",
+          "两端温度"
+        ],
+        "construction": "两端各放一个恒温热源（100 ℃ 和 0 ℃），中间连一根导热棒。先把导热系数从 50 调到 400，再看截面积从 0.001 调到 0.05，观察热流读数怎么变。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「热会传过去」的可编辑实验空间。\n知识点：K-T1-03；领域：热学；学段：小学。\n模型级别：近似 / 类比实验。\n\n探索目标\n用一阶弛豫说明温差减小和趋近平衡的趋势。\n\n搭建方案\n建立电容向电阻放电的闭合回路；将电容电压映射为物体相对环境的温差，将 RC 映射为热时间常数，并把装置命名为热交换电路类比。\n建议器具模型：capacitor、resistor、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 初始电压对应初始温差\n• 电阻\n• 电容\n\n观测与比较\n• 温差类比量的指数衰减\n• 时间常数\n理论参考：ΔT类比(t)=ΔT₀e^(−t/RC)\n\n模型边界\n这是真实 RC 电路求解，仅类比单一集中热容与恒温环境，不包含空间温度场。\n实验名称和目标须标明“近似 / 类比”，解释每个变量的映射及无法计算的效应。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T1-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“热会传过去 · 小学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "thermodynamics",
+        "limitations": "这是真实 RC 电路求解，仅类比单一集中热容与恒温环境，不包含空间温度场。"
+      }
+    },
+    {
+      "id": "CH-K-T1-04",
+      "labId": "thermal",
+      "title": "保温",
+      "brief": "想让它凉得慢，应该加大热阻还是加大热容？",
+      "hint": "时间常数 τ = 热容 / 热导。两个都能让曲线变平，但原因完全不同：一个存得多，一个漏得慢。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T1-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "intermediate",
+      "prediction": {
+        "prompt": "同一个杯子，装满热水和只装半杯热水，哪个凉得慢？",
+        "options": [
+          "一样快",
+          "装满的慢，因为水多、热容大",
+          "半杯的慢，因为表面积比例小"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "heat_source",
+          "conductor",
+          "thermometer"
+        ],
+        "variables": [
+          "导热棒的热容",
+          "导热棒的导热系数",
+          "热源温度"
+        ],
+        "observations": [
+          "温度计读数随时间的衰减",
+          "降到一半所需的时间"
+        ],
+        "construction": "用一个 100 ℃ 的热源给导热棒加热，然后撤掉热源（或观察它和 20 ℃ 环境的平衡），对比「热容调大 10 倍」和「导热系数调小 10 倍」两种情况的降温曲线。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「保温」的可编辑实验空间。\n知识点：K-T1-04；领域：热学；学段：小学。\n模型级别：近似 / 类比实验。\n\n探索目标\n用时间常数比较保温强弱对应的降温快慢。\n\n搭建方案\n建立两个相同初始电压与电容、不同电阻的放电回路；电阻类比热阻，电容类比热容，比较相同时刻的电压。\n建议器具模型：capacitor、resistor、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 类比热阻的电阻\n• 初始温差\n• 电容\n\n观测与比较\n• 相同时间剩余温差类比量\n• 达到指定比例的时间\n理论参考：τ类比=RC\n\n模型边界\n未包含真实保温材料、辐射或对流；只适用于线性集总类比。\n实验名称和目标须标明“近似 / 类比”，解释每个变量的映射及无法计算的效应。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T1-04\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“保温 · 小学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "thermodynamics",
+        "limitations": "未包含真实保温材料、辐射或对流；只适用于线性集总类比。"
+      }
+    },
+    {
+      "id": "CH-K-T2-01",
+      "labId": "thermal",
+      "title": "温度与内能",
+      "brief": "同样的温度，热容大的物体吸热更多还是更少？",
+      "hint": "温度是「有多烫」，内能是「存了多少」。热容就是两者的换算率。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T2-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "intermediate",
+      "prediction": {
+        "prompt": "同一个热源加热两个物体，一个热容是另一个的 10 倍。10 分钟后哪个温度高？",
+        "options": [
+          "热容大的更高",
+          "热容小的更高",
+          "两个一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "heat_source",
+          "conductor",
+          "thermometer"
+        ],
+        "variables": [
+          "导热棒热容",
+          "热源温度"
+        ],
+        "observations": [
+          "导热棒温度上升到某值所需的时间",
+          "温度计读数"
+        ],
+        "construction": "固定热源 100 ℃ 和相同的加热功率，把导热棒的热容从 10 调到 1000，看温度爬升的速度差多少倍。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「温度与内能」的可编辑实验空间。\n知识点：K-T2-01；领域：热学；学段：初中。\n模型级别：概念示意。\n\n探索目标\n理解温度与内能不是同一物理量，物质量也影响内能。\n\n搭建方案\n用两组不同数量的固定球表示不同物质量的同温样品，以固定长方体作为容器示意；说明中列出同温不同内能的理想气体例子。\n建议器具模型：body、box。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 标注温度\n• 粒子数量所代表的物质量\n\n观测与比较\n• 同温样品的理论内能比\n• 温度相同不代表总能量相同\n理论参考：单原子理想气体 U=3nRT/2\n\n模型边界\n球的静止或机械速度不代表分子温度；没有热运动与内能求解。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T2-01\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“温度与内能 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "thermodynamics",
+        "limitations": "球的静止或机械速度不代表分子温度；没有热运动与内能求解。"
+      }
+    },
+    {
+      "id": "CH-K-T2-02",
+      "labId": "thermal",
+      "title": "热传递的三种方式",
+      "brief": "导热棒只能演示「传导」；对流和辐射平台做不出来。",
+      "hint": "传导：靠分子碰撞一个个传。对流：靠流体整体流动搬。辐射：靠电磁波，不需要介质。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T2-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "intermediate",
+      "prediction": {
+        "prompt": "把一根铜棒和一根木棒的一端同时放进火里，另一端哪个先烫手？",
+        "options": [
+          "木棒",
+          "铜棒",
+          "一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "heat_source",
+          "conductor",
+          "thermometer"
+        ],
+        "variables": [
+          "导热系数",
+          "两端温差"
+        ],
+        "observations": [
+          "热流读数",
+          "两端温度"
+        ],
+        "construction": "这是三种方式里唯一能真算的一种：用导热棒演示传导。把导热系数从 1 调到 1000（相当于从木头换到铜），看热流差多少。对流和辐射只能靠讲解。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「热传递的三种方式」的可编辑实验空间。\n知识点：K-T2-02；领域：热学；学段：初中。\n模型级别：概念示意。\n\n探索目标\n区分传导、对流和辐射所需条件。\n\n搭建方案\n用三个分开的固定结构表示接触导热、流体环流和非接触辐射路径；各用名称标注传递方式，在说明中比较真空条件下的差别。\n建议器具模型：box、anchor、body。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 是否接触\n• 是否有流体\n• 是否为真空的题设\n\n观测与比较\n• 三种机制的必要条件\n• 能量传递路径\n\n模型边界\n无温度场、流体流动或热辐射引擎；装置只能结构示意，不给出热流读数。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T2-02\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“热传递的三种方式 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "thermodynamics",
+        "limitations": "无温度场、流体流动或热辐射引擎；装置只能结构示意，不给出热流读数。"
+      }
+    },
+    {
+      "id": "CH-K-T2-03",
+      "labId": "thermal",
+      "title": "比热容",
+      "brief": "单位质量升高 1 ℃ 需要多少热量——可以用热容和温差算出来。",
+      "hint": "c = Q / (m ΔT)。平台没有质量概念，所以只能用「热容」这个整体量来类比。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T2-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "intermediate",
+      "prediction": {
+        "prompt": "同样加热 1 分钟，1 kg 水和 1 kg 铁，哪个温度升得多？",
+        "options": [
+          "水",
+          "铁",
+          "一样"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "heat_source",
+          "conductor",
+          "thermometer"
+        ],
+        "variables": [
+          "热容",
+          "加热功率",
+          "温差"
+        ],
+        "observations": [
+          "温度上升曲线",
+          "相同时间内升了多少度"
+        ],
+        "construction": "热源功率固定 50 W，导热棒热容设 100 和 400，各加热 20 s，比温度上升了多少。热容 4 倍的那根应该只升 1/4。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「比热容」的可编辑实验空间。\n知识点：K-T2-03；领域：热学；学段：初中。\n模型级别：近似 / 类比实验。\n\n探索目标\n在输入能量相同的条件下比较不同热容对应的温升。\n\n搭建方案\n用恒流源对两个不同电容量的电容充电，串联电流表并联电压表；电荷输入类比热量，电容类比总热容，电压变化类比温升。\n建议器具模型：current_source、capacitor、ammeter、voltmeter。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 电容量对应总热容\n• 恒流输入\n• 充电时长\n\n观测与比较\n• 电压变化\n• 由 IΔt 计算的电荷量\n理论参考：Q热=mcΔT；Q电=CΔV\n\n模型边界\n这是 Q电=CΔV 与 Q热=C热ΔT 的数学类比；电能与电荷不能混同，也不代表真实物质比热。\n实验名称和目标须标明“近似 / 类比”，解释每个变量的映射及无法计算的效应。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T2-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“比热容 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "thermodynamics",
+        "limitations": "这是 Q电=CΔV 与 Q热=C热ΔT 的数学类比；电能与电荷不能混同，也不代表真实物质比热。"
+      }
+    },
+    {
+      "id": "CH-K-T2-04",
+      "labId": "thermal",
+      "title": "熔化与凝固",
+      "brief": "这一条平台做不出实验：熔化与凝固需要相变模型（潜热、熔点），平台没有物质状态这个概念。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T2-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「熔化与凝固」这一条需要什么，平台才有？",
+        "options": [
+          "熔化与凝固需要相变模型（潜热、熔点），平台没有物质状态这个概念",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "熔化与凝固需要相变模型（潜热、熔点），平台没有物质状态这个概念。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「熔化与凝固」的可编辑实验空间。\n知识点：K-T2-04；领域：热学；学段：初中。\n模型级别：概念示意。\n\n探索目标\n区分晶体相变吸收潜热与单一物态的升温。\n\n搭建方案\n用固定长方体分区表示固态、固液共存和液态，用支点标记温度平台；在说明中给定质量、比热和潜热，逐段列能量账本。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 质量\n• 比热与熔化潜热的题设\n• 输入热量\n\n观测与比较\n• 理论温度平台\n• 各阶段能量分配\n理论参考：Q相变=mL；非相变段 Q=mcΔT\n\n模型边界\n不模拟熔化界面、物态或温度；平台为相变理论示意，不能用弹簧位移冒充温度。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T2-04\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“熔化与凝固 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "thermodynamics",
+        "limitations": "不模拟熔化界面、物态或温度；平台为相变理论示意，不能用弹簧位移冒充温度。"
+      }
+    },
+    {
+      "id": "CH-K-T2-05",
+      "labId": "thermal",
+      "title": "汽化与液化",
+      "brief": "这一条平台做不出实验：汽化与液化需要气相和液相两种状态，平台只有「温度」一个标量。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T2-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「汽化与液化」这一条需要什么，平台才有？",
+        "options": [
+          "汽化与液化需要气相和液相两种状态，平台只有「温度」一个标量",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "汽化与液化需要气相和液相两种状态，平台只有「温度」一个标量。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「汽化与液化」的可编辑实验空间。\n知识点：K-T2-05；领域：热学；学段：初中。\n模型级别：概念示意。\n\n探索目标\n比较蒸发与沸腾，并理解汽化潜热。\n\n搭建方案\n以固定容器、液面标记和少量固定小球示意气相，分别标注表面蒸发和整体沸腾；说明中设置相同质量的汽化能量计算。\n建议器具模型：box、body、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 题设环境压强\n• 温度\n• 汽化质量\n\n观测与比较\n• 蒸发与沸腾条件\n• 潜热需求\n理论参考：Q汽化=mL汽化\n\n模型边界\n无蒸汽压、成核、液滴或热流求解；固定粒子仅示意物态。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T2-05\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“汽化与液化 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "thermodynamics",
+        "limitations": "无蒸汽压、成核、液滴或热流求解；固定粒子仅示意物态。"
+      }
+    },
+    {
+      "id": "CH-K-T2-06",
+      "labId": "thermal",
+      "title": "升华与凝华",
+      "brief": "这一条平台做不出实验：升华与凝华同样需要相变，而且是最少见的一种，平台完全没有。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T2-06"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「升华与凝华」这一条需要什么，平台才有？",
+        "options": [
+          "升华与凝华同样需要相变，而且是最少见的一种，平台完全没有",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "升华与凝华同样需要相变，而且是最少见的一种，平台完全没有。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「升华与凝华」的可编辑实验空间。\n知识点：K-T2-06；领域：热学；学段：初中。\n模型级别：概念示意。\n\n探索目标\n在温度和压强条件下区分升华、凝华与经液相的变化。\n\n搭建方案\n搭建固态、液态、气态三个固定区域，支点标明三相点概念；用说明表格比较干冰式升华与凝华路径。\n建议器具模型：box、body、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 题设温度\n• 题设压强\n• 变化路径\n\n观测与比较\n• 经过的物态\n• 理论相图路径\n\n模型边界\n没有物态方程或相图求解；空间位置不对应自动计算的温压。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T2-06\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“升华与凝华 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "thermodynamics",
+        "limitations": "没有物态方程或相图求解；空间位置不对应自动计算的温压。"
+      }
+    },
+    {
+      "id": "CH-K-T2-07",
+      "labId": "thermal",
+      "title": "热值",
+      "brief": "这一条平台做不出实验：热值要烧燃料、称质量、量放热，平台没有燃烧模型也没有天平。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T2-07"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「热值」这一条需要什么，平台才有？",
+        "options": [
+          "热值要烧燃料、称质量、量放热，平台没有燃烧模型也没有天平",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "热值要烧燃料、称质量、量放热，平台没有燃烧模型也没有天平。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「热值」的可编辑实验空间。\n知识点：K-T2-07；领域：热学；学段：初中。\n模型级别：概念示意。\n\n探索目标\n比较相同质量不同燃料和不同质量同种燃料的化学释热量。\n\n搭建方案\n用固定长方体表示燃料样品与受热物体，分别标注质量、热值和传递效率；在说明中列出能量计算与单位。\n建议器具模型：box。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 题设燃料质量\n• 热值\n• 传热效率\n\n观测与比较\n• 理论释热量\n• 进入受热物体的能量\n理论参考：Q释放=mq\n\n模型边界\n不模拟燃烧反应、火焰或污染物，热值来自题设而非器具测量。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T2-07\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“热值 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "thermodynamics",
+        "limitations": "不模拟燃烧反应、火焰或污染物，热值来自题设而非器具测量。"
+      }
+    },
+    {
+      "id": "CH-K-T2-08",
+      "labId": "thermal",
+      "title": "热机效率",
+      "brief": "这一条平台做不出实验：热机效率要有「做功」这个输出通道，平台只算热流不算功。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T2-08"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「热机效率」这一条需要什么，平台才有？",
+        "options": [
+          "热机效率要有「做功」这个输出通道，平台只算热流不算功",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "热机效率要有「做功」这个输出通道，平台只算热流不算功。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「热机效率」的可编辑实验空间。\n知识点：K-T2-08；领域：热学；学段：初中。\n模型级别：概念示意。\n\n探索目标\n用能量流向区分热机输入热量、有用功与废热。\n\n搭建方案\n固定长方体分别标为高温热源、热机、低温冷源；以位置和名称显示能量流向，说明中给出 Qh、Qc 与 W 的守恒表。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 题设输入热量\n• 排出热量\n• 热源温度\n\n观测与比较\n• 理论效率\n• 能量守恒关系\n理论参考：W=Qh−Qc；η=W/Qh\n\n模型边界\n无热机循环或热机械耦合模型；不要用电路效率当真实热机效率。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T2-08\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“热机效率 · 初中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "junior",
+        "domain": "thermodynamics",
+        "limitations": "无热机循环或热机械耦合模型；不要用电路效率当真实热机效率。"
+      }
+    },
+    {
+      "id": "CH-K-T3-01",
+      "labId": "thermal",
+      "title": "气体状态参量",
+      "brief": "这一条平台做不出实验：气体状态参量需要 p、V、T 三个量，平台只有 T。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T3-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「气体状态参量」这一条需要什么，平台才有？",
+        "options": [
+          "气体状态参量需要 p、V、T 三个量，平台只有 T",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "气体状态参量需要 p、V、T 三个量，平台只有 T。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「气体状态参量」的可编辑实验空间。\n知识点：K-T3-01；领域：热学；学段：高中。\n模型级别：概念示意。\n\n探索目标\n区分气体压强、体积、温度与物质量，并辨认状态变化时保持不变的量。\n\n搭建方案\n用固定长方体围成气缸示意，固定板表示活塞；在 learning 中保存两组 p、V、T、n 题设和单位，移动示意活塞对应比较体积。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 标注压强\n• 体积\n• 绝对温度\n• 物质量\n\n观测与比较\n• 状态量变化\n• 各量单位及约束\n理论参考：理想气体 pV=nRT\n\n模型边界\n没有气体状态方程求解或活塞受压；几何体积只是比例示意。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T3-01\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“气体状态参量 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "thermodynamics",
+        "limitations": "没有气体状态方程求解或活塞受压；几何体积只是比例示意。"
+      }
+    },
+    {
+      "id": "CH-K-T3-02",
+      "labId": "thermal",
+      "title": "玻意耳定律",
+      "brief": "这一条平台做不出实验：玻意耳定律需要可压缩的气体和活塞，平台没有气体模型。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T3-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「玻意耳定律」这一条需要什么，平台才有？",
+        "options": [
+          "玻意耳定律需要可压缩的气体和活塞，平台没有气体模型",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "玻意耳定律需要可压缩的气体和活塞，平台没有气体模型。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「玻意耳定律」的可编辑实验空间。\n知识点：K-T3-02；领域：热学；学段：高中。\n模型级别：概念示意。\n\n探索目标\n在物质量和温度不变时比较压强与体积的反比关系。\n\n搭建方案\n建立气缸与活塞的固定示意结构，标记 V、2V、V/2 三个位置；说明中列出对应理论压强 p、p/2、2p。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 题设体积\n• 恒定温度\n• 物质量\n\n观测与比较\n• p-V 关系\n• pV 的恒定值\n理论参考：p₁V₁=p₂V₂（等温理想气体）\n\n模型边界\n无气体碰撞统计或真实压力，活塞不会由压强自动驱动。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T3-02\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“玻意耳定律 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "thermodynamics",
+        "limitations": "无气体碰撞统计或真实压力，活塞不会由压强自动驱动。"
+      }
+    },
+    {
+      "id": "CH-K-T3-03",
+      "labId": "thermal",
+      "title": "查理定律",
+      "brief": "这一条平台做不出实验：查理定律同样需要气体。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T3-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「查理定律」这一条需要什么，平台才有？",
+        "options": [
+          "查理定律同样需要气体",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "查理定律同样需要气体。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「查理定律」的可编辑实验空间。\n知识点：K-T3-03；领域：热学；学段：高中。\n模型级别：概念示意。\n\n探索目标\n按中文教材常用的等容查理定律，比较绝对温度变化引起的压强变化。\n\n搭建方案\n用固定容器示意恒定体积，把三个固定支点命名为不同开尔文温度状态；说明中给出等容 p/T 对照，并注明英文 Charles law 常指等压 V/T 关系。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 绝对温度\n• 恒定体积\n• 物质量\n\n观测与比较\n• 理论 p-T 直线\n• 使用摄氏温度直接取比值的错误\n理论参考：p₁/T₁=p₂/T₂（n、V 不变）\n\n模型边界\n无温度或压力求解，必须明确采用等容定义并使用开尔文温标。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T3-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“查理定律 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "thermodynamics",
+        "limitations": "无温度或压力求解，必须明确采用等容定义并使用开尔文温标。"
+      }
+    },
+    {
+      "id": "CH-K-T3-04",
+      "labId": "thermal",
+      "title": "理想气体状态方程",
+      "brief": "这一条平台做不出实验：理想气体状态方程需要 pV = nRT 全套，只有 T 算不出来。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T3-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「理想气体状态方程」这一条需要什么，平台才有？",
+        "options": [
+          "理想气体状态方程需要 pV = nRT 全套，只有 T 算不出来",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "理想气体状态方程需要 pV = nRT 全套，只有 T 算不出来。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「理想气体状态方程」的可编辑实验空间。\n知识点：K-T3-04；领域：热学；学段：高中。\n模型级别：概念示意。\n\n探索目标\n检查理想气体状态方程中四个状态量的联合约束。\n\n搭建方案\n以固定容器与活塞表示两种体积，创建可编辑状态标记；在说明中选择三个已知量计算第四个，并列出改变 n 与 T 的两个对照。\n建议器具模型：box、body、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 题设 p、V、T、n 中三个量\n• 待求状态量\n\n观测与比较\n• 理论状态一致性\n• 量纲检查\n理论参考：pV=nRT\n\n模型边界\n未实现气体模型，不能用刚体压力或球数直接替代真实摩尔数；低温高压的非理想效应未包含。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T3-04\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“理想气体状态方程 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "thermodynamics",
+        "limitations": "未实现气体模型，不能用刚体压力或球数直接替代真实摩尔数；低温高压的非理想效应未包含。"
+      }
+    },
+    {
+      "id": "CH-K-T3-05",
+      "labId": "thermal",
+      "title": "热力学第一定律",
+      "brief": "热源给的热量，有多少进了物体、多少散到环境——这笔账能算清。",
+      "hint": "ΔU = Q − W。平台里没有「做功」这个通道，所以 W = 0，只剩吸热和散热。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T3-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "advanced",
+      "prediction": {
+        "prompt": "用 50 W 加热一个热容 100 J/K 的物体 10 秒（不计散热），温度升高多少？",
+        "options": [
+          "0.5 ℃",
+          "5 ℃",
+          "50 ℃"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "heat_source",
+          "conductor",
+          "thermometer"
+        ],
+        "variables": [
+          "加热功率",
+          "加热时间",
+          "热容"
+        ],
+        "observations": [
+          "温度上升量",
+          "热流读数"
+        ],
+        "construction": "50 W 加热热容 100 J/K 的导热棒 10 s，理论上应升 5 ℃。把热容改成 200，同样条件只升 2.5 ℃。差值来自环境散热。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「热力学第一定律」的可编辑实验空间。\n知识点：K-T3-05；领域：热学；学段：高中。\n模型级别：概念示意。\n\n探索目标\n统一热量、气体对外做功和内能变化的符号约定。\n\n搭建方案\n搭建热源、气缸、活塞三个固定示意部件，在说明中设置吸热膨胀、绝热压缩和等容加热三组能量账本。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 输入热量 Q\n• 气体对外做功 W\n• 过程条件\n\n观测与比较\n• 理论内能变化\n• 符号一致性\n理论参考：ΔU=Q−W（W 为系统对外做功）\n\n模型边界\n不存在热力学能量状态；符号和数值由题设推导，不从机械能通道读取内能。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T3-05\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“热力学第一定律 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "thermodynamics",
+        "limitations": "不存在热力学能量状态；符号和数值由题设推导，不从机械能通道读取内能。"
+      }
+    },
+    {
+      "id": "CH-K-T3-06",
+      "labId": "thermal",
+      "title": "等值过程",
+      "brief": "这一条平台做不出实验：等值过程（等温/等压/等容/绝热）都需要气体。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T3-06"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「等值过程」这一条需要什么，平台才有？",
+        "options": [
+          "等值过程（等温/等压/等容/绝热）都需要气体",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "等值过程（等温/等压/等容/绝热）都需要气体。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「等值过程」的可编辑实验空间。\n知识点：K-T3-06；领域：热学；学段：高中。\n模型级别：概念示意。\n\n探索目标\n比较等温、等压、等容过程在 p-V 图上的特点及做功差异。\n\n搭建方案\n用固定标记表示同一起点和各过程终点，气缸活塞展示体积变化；learning 分别写约束式、终态与曲线下面积含义。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 过程类型\n• 初末体积或压强\n• 绝对温度\n\n观测与比较\n• 理论做功\n• 内能变化\n• 过程路径\n理论参考：W=∫p dV；等容 W=0\n\n模型边界\n场景不是 p-V 曲线求解器，位置仅为示意；理论积分需单独标明。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T3-06\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“等值过程 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "thermodynamics",
+        "limitations": "场景不是 p-V 曲线求解器，位置仅为示意；理论积分需单独标明。"
+      }
+    },
+    {
+      "id": "CH-K-T3-07",
+      "labId": "thermal",
+      "title": "热机循环",
+      "brief": "热机效率 = 做功 / 吸热。平台能算「吸了多少热」，算不出「做了多少功」。",
+      "hint": "卡诺效率 η = 1 − T_cold/T_hot 只能靠公式实验室算，这里是能量账的简化版。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T3-07"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "advanced",
+      "prediction": {
+        "prompt": "热机的高温热源温度越高，效率会怎样？",
+        "options": [
+          "降低",
+          "升高",
+          "不变"
+        ],
+        "answerIndex": 1
+      },
+      "build": {
+        "models": [
+          "heat_source",
+          "heat_source",
+          "conductor"
+        ],
+        "variables": [
+          "高温热源温度",
+          "低温热源温度",
+          "导热系数"
+        ],
+        "observations": [
+          "热流读数",
+          "两个热源的温差"
+        ],
+        "construction": "两个热源（高温 300 ℃、低温 20 ℃）中间连导热棒，热流读数就是「每秒钟从高温搬到低温的能量」。效率要靠公式算，平台上没有「做功」这个读数。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「热机循环」的可编辑实验空间。\n知识点：K-T3-07；领域：热学；学段：高中。\n模型级别：概念示意。\n\n探索目标\n比较闭合热力学循环中净做功与循环方向。\n\n搭建方案\n用四个固定支点表示循环四个状态，以气缸与两个热源组成示意；在说明中列出每段吸放热、做功及最终内能回到初值。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 各状态 p、V、T\n• 循环方向\n• 高低温源温度\n\n观测与比较\n• 理论净功\n• 净吸热\n• 循环面积\n理论参考：循环 ΔU=0，W净=Q净\n\n模型边界\n没有热循环自动积分或可动气体活塞；不可把四个标记之间的机械轨迹当 p-V 循环。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T3-07\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“热机循环 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "thermodynamics",
+        "limitations": "没有热循环自动积分或可动气体活塞；不可把四个标记之间的机械轨迹当 p-V 循环。"
+      }
+    },
+    {
+      "id": "CH-K-T3-08",
+      "labId": "thermal",
+      "title": "熵与第二定律",
+      "brief": "这一条平台做不出实验：熵与第二定律需要统计力学，平台是宏观集总参数模型。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T3-08"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「熵与第二定律」这一条需要什么，平台才有？",
+        "options": [
+          "熵与第二定律需要统计力学，平台是宏观集总参数模型",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "熵与第二定律需要统计力学，平台是宏观集总参数模型。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「熵与第二定律」的可编辑实验空间。\n知识点：K-T3-08；领域：热学；学段：高中。\n模型级别：概念示意。\n\n探索目标\n说明能量守恒并不足以判断过程方向，并比较可逆与不可逆熵变。\n\n搭建方案\n用两个固定热库和中间接触区示意热从高温流向低温；在说明中给出小量热交换的两热库熵变并比较总和。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 高低温库的绝对温度\n• 转移热量\n• 是否可逆的题设\n\n观测与比较\n• 两热库熵变\n• 总熵产生\n理论参考：ΔS总=−Q/Th+Q/Tc≥0（Th>Tc）\n\n模型边界\n无热传导或熵状态求解；不可从机械阻尼曲线直接读取熵。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T3-08\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“熵与第二定律 · 高中”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "senior",
+        "domain": "thermodynamics",
+        "limitations": "无热传导或熵状态求解；不可从机械阻尼曲线直接读取熵。"
+      }
+    },
+    {
+      "id": "CH-K-T4-01",
+      "labId": "thermal",
+      "title": "麦克斯韦速率分布",
+      "brief": "这一条平台做不出实验：麦克斯韦速率分布需要大量分子的速度统计，平台不追踪单个分子。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T4-01"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「麦克斯韦速率分布」这一条需要什么，平台才有？",
+        "options": [
+          "麦克斯韦速率分布需要大量分子的速度统计，平台不追踪单个分子",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "麦克斯韦速率分布需要大量分子的速度统计，平台不追踪单个分子。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「麦克斯韦速率分布」的可编辑实验空间。\n知识点：K-T4-01；领域：热学；学段：大学。\n模型级别：概念示意。\n\n探索目标\n区分最概然速率、平均速率和方均根速率，比较温度对分布的影响。\n\n搭建方案\n用固定容器和少量固定球仅示意气体，把不同温度下的理论速率参数写入说明；不让少量经典球的初值冒充平衡分布。\n建议器具模型：box、body。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 分子质量\n• 绝对温度\n\n观测与比较\n• 理论最概然速率\n• 理论方均根速率\n• 分布展宽趋势\n理论参考：v最概然=√(2kBT/m)，v方均根=√(3kBT/m)\n\n模型边界\n没有大粒子数热平衡采样或统计直方图求解，示意球速度不代表麦克斯韦分布。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T4-01\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“麦克斯韦速率分布 · 大学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "university",
+        "domain": "thermodynamics",
+        "limitations": "没有大粒子数热平衡采样或统计直方图求解，示意球速度不代表麦克斯韦分布。"
+      }
+    },
+    {
+      "id": "CH-K-T4-02",
+      "labId": "thermal",
+      "title": "能量均分定理",
+      "brief": "这一条平台做不出实验：能量均分定理要数自由度，平台没有微观自由度概念。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T4-02"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「能量均分定理」这一条需要什么，平台才有？",
+        "options": [
+          "能量均分定理要数自由度，平台没有微观自由度概念",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "能量均分定理要数自由度，平台没有微观自由度概念。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「能量均分定理」的可编辑实验空间。\n知识点：K-T4-02；领域：热学；学段：大学。\n模型级别：概念示意。\n\n探索目标\n比较单原子和双原子理想气体的有效自由度与平均能量。\n\n搭建方案\n以固定单球和固定双球组合表示分子种类；在说明中列出平动、转动与振动自由度，并比较经典适用温度范围。\n建议器具模型：body、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 分子类型\n• 题设温度\n• 有效自由度\n\n观测与比较\n• 理论平均能量\n• 摩尔定容热容\n理论参考：每个经典二次型自由度平均能量 kBT/2\n\n模型边界\n未模拟分子量子转动振动；低温自由度冻结不能由刚体动画证明。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T4-02\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“能量均分定理 · 大学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "university",
+        "domain": "thermodynamics",
+        "limitations": "未模拟分子量子转动振动；低温自由度冻结不能由刚体动画证明。"
+      }
+    },
+    {
+      "id": "CH-K-T4-03",
+      "labId": "thermal",
+      "title": "熵的统计意义",
+      "brief": "这一条平台做不出实验：熵的统计意义需要微观状态数 Ω，平台没有。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T4-03"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「熵的统计意义」这一条需要什么，平台才有？",
+        "options": [
+          "熵的统计意义需要微观状态数 Ω，平台没有",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "熵的统计意义需要微观状态数 Ω，平台没有。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「熵的统计意义」的可编辑实验空间。\n知识点：K-T4-03；领域：热学；学段：大学。\n模型级别：概念示意。\n\n探索目标\n通过少量粒子在两区的分配计数理解宏观态与微观态。\n\n搭建方案\n用两个固定区域及四个固定球构成计数示意；在 learning 中列出左侧有 0 至 4 个粒子的组合数，比较最常见宏观态。\n建议器具模型：box、body。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 示意粒子数\n• 左右占据数\n• 区域划分\n\n观测与比较\n• 理论组合数\n• 宏观态概率\n• 熵差\n理论参考：S=kB lnΩ；Ω=C(N,n左)\n\n模型边界\n固定球位置用于组合计数，没有随机采样、真实混合或熵的动力学演化。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T4-03\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“熵的统计意义 · 大学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "university",
+        "domain": "thermodynamics",
+        "limitations": "固定球位置用于组合计数，没有随机采样、真实混合或熵的动力学演化。"
+      }
+    },
+    {
+      "id": "CH-K-T4-04",
+      "labId": "thermal",
+      "title": "黑体辐射",
+      "brief": "这一条平台做不出实验：黑体辐射需要光谱分布，平台没有辐射模型。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T4-04"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「黑体辐射」这一条需要什么，平台才有？",
+        "options": [
+          "黑体辐射需要光谱分布，平台没有辐射模型",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "黑体辐射需要光谱分布，平台没有辐射模型。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「黑体辐射」的可编辑实验空间。\n知识点：K-T4-04；领域：热学；学段：大学。\n模型级别：概念示意。\n\n探索目标\n比较温度改变时黑体辐射谱的峰位和总辐射变化。\n\n搭建方案\n以固定腔体和小孔标记黑体结构，探测器仅作位置示意；说明中给出普朗克谱的变量与不同温度的理论趋势。\n建议器具模型：box、aperture、detector。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 绝对温度\n• 理论波长\n• 表面积\n\n观测与比较\n• 谱峰移动方向\n• 理论总辐射增长\n理论参考：Bλ(T)=2hc²/[λ⁵(exp(hc/(λkBT))−1)]\n\n模型边界\n几何激光源和探测器不产生或测量热辐射谱；不把可见光颜色当完整黑体温度计。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T4-04\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“黑体辐射 · 大学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "university",
+        "domain": "thermodynamics",
+        "limitations": "几何激光源和探测器不产生或测量热辐射谱；不把可见光颜色当完整黑体温度计。"
+      }
+    },
+    {
+      "id": "CH-K-T4-05",
+      "labId": "thermal",
+      "title": "斯特凡-玻尔兹曼定律",
+      "brief": "这一条平台做不出实验：斯特凡-玻尔兹曼定律需要辐射功率 P = σAT⁴，平台没有辐射。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T4-05"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「斯特凡-玻尔兹曼定律」这一条需要什么，平台才有？",
+        "options": [
+          "斯特凡-玻尔兹曼定律需要辐射功率 P = σAT⁴，平台没有辐射",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "斯特凡-玻尔兹曼定律需要辐射功率 P = σAT⁴，平台没有辐射。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「斯特凡-玻尔兹曼定律」的可编辑实验空间。\n知识点：K-T4-05；领域：热学；学段：大学。\n模型级别：概念示意。\n\n探索目标\n比较温度、面积和发射率对辐射功率的影响。\n\n搭建方案\n用两块固定板表示辐射体与环境，名称注明绝对温度与面积；说明中计算两组温度下的总辐射和净辐射。\n建议器具模型：box。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 绝对温度\n• 面积\n• 发射率\n• 环境温度\n\n观测与比较\n• 理论 T⁴ 比例\n• 理论净辐射功率\n理论参考：P净=εσA(T⁴−T环境⁴)\n\n模型边界\n没有辐射传热模型；公式中的发射率是题设，不能加到不支持的器具参数中。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T4-05\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“斯特凡-玻尔兹曼定律 · 大学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "university",
+        "domain": "thermodynamics",
+        "limitations": "没有辐射传热模型；公式中的发射率是题设，不能加到不支持的器具参数中。"
+      }
+    },
+    {
+      "id": "CH-K-T4-06",
+      "labId": "thermal",
+      "title": "维恩位移定律",
+      "brief": "这一条平台做不出实验：维恩位移定律需要黑体谱峰值，平台没有光谱。",
+      "hint": "去看知识卡背面的「模型边界」，那里写了完整的原因。",
+      "winCondition": {
+        "metric": "m",
+        "op": "<",
+        "value": 0
+      },
+      "auto": false,
+      "multiAnswer": true,
+      "knowledgeIds": [
+        "K-T4-06"
+      ],
+      "misconceptionIds": [],
+      "demoScriptId": "",
+      "difficulty": "beginner",
+      "prediction": {
+        "prompt": "「维恩位移定律」这一条需要什么，平台才有？",
+        "options": [
+          "维恩位移定律需要黑体谱峰值，平台没有光谱",
+          "只需要更多器具，物理模型已经有了",
+          "只需要换一个更快的电脑"
+        ],
+        "answerIndex": 0
+      },
+      "build": {
+        "models": [],
+        "variables": [],
+        "observations": [],
+        "construction": "维恩位移定律需要黑体谱峰值，平台没有光谱。",
+        "prompt": "请使用 PhysQuest / Fieldlab 的 MCP 工具，为我实际搭建「维恩位移定律」的可编辑实验空间。\n知识点：K-T4-06；领域：热学；学段：大学。\n模型级别：概念示意。\n\n探索目标\n比较温度升高时按波长定义的黑体谱峰如何移动。\n\n搭建方案\n用固定热源示意体和标记点表示不同温度状态，在说明中计算峰值波长并与可见光范围对照。\n建议器具模型：box、anchor。参数名、单位、范围以 list_instruments 的实际返回值为准；不要发明未支持的类型、连接或物理效果。\n\n可调变量\n• 绝对温度\n• 按波长或频率表示谱的选择\n\n观测与比较\n• 理论峰值波长\n• 温度倍增时的峰位比例\n理论参考：λ峰T≈2.898×10⁻³ m·K\n\n模型边界\n未求解光谱；按频率的谱峰不能直接用 c/ν峰 代替按波长的谱峰。\n只能搭建明确标为“概念示意”的结构，相关理论量只列公式和推导，不把示意器具读数当成该理论的求解结果。\n\n执行要求\n1. 先调用 get_workspace、list_instruments；需要原始说明可用 get_knowledge_prompt({\"knowledgeId\":\"K-T4-06\"})。\n2. 调用 create_experiment 新建独立空间，标题建议“维恩位移定律 · 大学”，默认 2d；原有空间和器具保持不变。设置合理环境和初值。搭建需要承托、落地、反弹或地面摩擦的实验时，主动检查并放置力学地面 floor_slab，开启 collisions，按任务设置重力及接触材质。默认地面顶面 y=0；校准物体初始高度。已有合适地面时复用；自由空间、光路或无接触实验按目标决定。需要观察快速运动时可用 environment.speed 设置慢放，例如 0.25。\n3. 器材外形优先复用内置模型。需要自定义时，在 appearance.parts 中用最少的 box、sphere、cylinder 表现可辨认轮廓，通常 1–3 个，最多 6 个。尺寸用米，尽量沿用器材物理尺寸；省略装饰、纹理和隐藏结构。外形只影响显示，接触范围需要时另设 collider。优先用 design_assembly / design_component 制作可复用器具，并调用 instantiate_design 放入场景；也可用 add_component 和 connect_components 直接组装。连线与 refs 必须引用真实返回的 ID。\n4. 搭建或重新设计实验时，必须调用 create_experiment 或 update_experiment，将研究问题写入 goal，将面向用户的观察指引写入 observation（实验台独立的“实验目标”区）。结合实际配置说明怎么操作或改变什么变量、看哪个物体或仪表、比较什么现象；用“观察是否……”区分预期和实际读数。最终回复也要用一句话告诉用户先观察什么。实际放置至少一个器具；用 update_experiment 写入目标和 learning 中的变量、步骤及模型限制。单次建议 2–8 个部件，不使用任意代码。\n5. 根据本卡的可调变量，调用 set_variable_slider 为主要自变量创建操作滑块。器具参数绑定已放置的 componentId 与真实数值参数键；环境参数省略 componentId。滑块用中文命名，仅绑定当前模型支持的量。\n6. 调用 simulate_experiment 做短时验证（duration 0.1–2 s、sampleRate 5–10），检查读数、初始位置和错误；概念示意仅检查配置，不宣称验证原理论。需要比较时改变一个变量后再计算，保留可操作的最终配置。\n7. 最后列出实际创建的空间、器具、可调参数、观测方法和限制。必须依据成功工具调用说明结果；只写方案不算搭建完成。",
+        "stage": "university",
+        "domain": "thermodynamics",
+        "limitations": "未求解光谱；按频率的谱峰不能直接用 c/ν峰 代替按波长的谱峰。"
+      }
+    }
+  ]
+}

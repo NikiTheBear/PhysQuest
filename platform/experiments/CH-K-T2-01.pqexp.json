@@ -1,0 +1,98 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "温度与内能",
+    "description": "同样的温度，热容大的物体吸热更多还是更少？"
+  },
+  "experiment": {
+    "id": "exp-ch-k-t2-01",
+    "title": "温度与内能",
+    "goal": "理解温度与内能不是同一物理量，物质量也影响内能。",
+    "observation": "先按搭建方案把器具摆好，然后只改「导热棒热容」，观察：导热棒温度上升到某值所需的时间；温度计读数。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false,
+      "temperature": 20
+    },
+    "components": [
+      {
+        "kind": "heat_source",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 100,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-1",
+        "name": "恒温热源"
+      },
+      {
+        "kind": "conductor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "conductivity": 200,
+          "length": 1,
+          "area": 0.01,
+          "heatCapacity": 100
+        },
+        "refs": {
+          "a": "src-1",
+          "b": "meter-1"
+        },
+        "fixed": true,
+        "id": "rod-1",
+        "name": "导热棒（铜）"
+      },
+      {
+        "kind": "thermometer",
+        "position": [
+          1.6,
+          1,
+          0
+        ],
+        "params": {
+          "responseTime": 2
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "meter-1",
+        "name": "温度计"
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "labId": "thermal",
+      "challengeId": "CH-K-T2-01",
+      "knowledgeIds": [
+        "K-T2-01"
+      ],
+      "variables": [
+        "导热棒热容",
+        "热源温度"
+      ],
+      "steps": [
+        "导热棒温度上升到某值所需的时间",
+        "温度计读数"
+      ],
+      "limitations": "球的静止或机械速度不代表分子温度；没有热运动与内能求解。"
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "热会传过去",
+    "description": "一根导热棒两端温度不同，热流有多大？"
+  },
+  "experiment": {
+    "id": "exp-ch-k-t1-03",
+    "title": "热会传过去",
+    "goal": "用一阶弛豫说明温差减小和趋近平衡的趋势。",
+    "observation": "先按搭建方案把器具摆好，然后只改「导热系数」，观察：热流读数（W）；两端温度。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false,
+      "temperature": 20
+    },
+    "components": [
+      {
+        "kind": "heat_source",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 100,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-1",
+        "name": "高温热源（100 ℃）"
+      },
+      {
+        "kind": "heat_source",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 0,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-2",
+        "name": "低温热源（0 ℃）"
+      },
+      {
+        "kind": "conductor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "conductivity": 200,
+          "length": 1,
+          "area": 0.01,
+          "heatCapacity": 100
+        },
+        "refs": {
+          "a": "src-1",
+          "b": "src-2"
+        },
+        "fixed": true,
+        "id": "rod-1",
+        "name": "导热棒（铜）"
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "labId": "thermal",
+      "challengeId": "CH-K-T1-03",
+      "knowledgeIds": [
+        "K-T1-03"
+      ],
+      "variables": [
+        "导热系数",
+        "截面积",
+        "长度",
+        "两端温差"
+      ],
+      "steps": [
+        "热流读数（W）",
+        "两端温度"
+      ],
+      "limitations": "这是真实 RC 电路求解，仅类比单一集中热容与恒温环境，不包含空间温度场。"
+    }
+  }
+}

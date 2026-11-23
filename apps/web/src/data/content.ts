@@ -88,6 +88,7 @@ import mechAuto from '@knowledge/labs/mechanics-challenges.json';
 import circAuto from '@knowledge/labs/circuits-challenges.json';
 import opticsAuto from '@knowledge/labs/optics-lens-challenges.json';
 import acousticsAuto from '@knowledge/labs/acoustics-challenges.json';
+import thermalAuto from '@knowledge/labs/thermal-challenges.json';
 
 export interface AutoChallenge {
   id: string;
@@ -117,6 +118,7 @@ export const AUTO_CHALLENGES: AutoChallenge[] = [
   ...((circAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
   ...((opticsAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
   ...((acousticsAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
+  ...((thermalAuto as unknown as { challenges: AutoChallenge[] }).challenges ?? []),
 ];
 
 /** 某个模块下自动生成的挑战 */

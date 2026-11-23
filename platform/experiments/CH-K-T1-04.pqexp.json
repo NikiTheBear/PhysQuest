@@ -1,0 +1,99 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "保温",
+    "description": "想让它凉得慢，应该加大热阻还是加大热容？"
+  },
+  "experiment": {
+    "id": "exp-ch-k-t1-04",
+    "title": "保温",
+    "goal": "用时间常数比较保温强弱对应的降温快慢。",
+    "observation": "先按搭建方案把器具摆好，然后只改「导热棒的热容」，观察：温度计读数随时间的衰减；降到一半所需的时间。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false,
+      "temperature": 20
+    },
+    "components": [
+      {
+        "kind": "heat_source",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 100,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-1",
+        "name": "恒温热源"
+      },
+      {
+        "kind": "conductor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "conductivity": 200,
+          "length": 1,
+          "area": 0.01,
+          "heatCapacity": 100
+        },
+        "refs": {
+          "a": "src-1",
+          "b": "meter-1"
+        },
+        "fixed": true,
+        "id": "rod-1",
+        "name": "导热棒（铜）"
+      },
+      {
+        "kind": "thermometer",
+        "position": [
+          1.6,
+          1,
+          0
+        ],
+        "params": {
+          "responseTime": 2
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "meter-1",
+        "name": "温度计"
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "labId": "thermal",
+      "challengeId": "CH-K-T1-04",
+      "knowledgeIds": [
+        "K-T1-04"
+      ],
+      "variables": [
+        "导热棒的热容",
+        "导热棒的导热系数",
+        "热源温度"
+      ],
+      "steps": [
+        "温度计读数随时间的衰减",
+        "降到一半所需的时间"
+      ],
+      "limitations": "未包含真实保温材料、辐射或对流；只适用于线性集总类比。"
+    }
+  }
+}

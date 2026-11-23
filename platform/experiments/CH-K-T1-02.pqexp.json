@@ -1,0 +1,77 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "温度计怎么用",
+    "description": "为什么温度计要等一会儿才能读数？"
+  },
+  "experiment": {
+    "id": "exp-ch-k-t1-02",
+    "title": "温度计怎么用",
+    "goal": "学习温标、量程和分度值，并区分摄氏温度与开尔文温度。",
+    "observation": "先按搭建方案把器具摆好，然后只改「响应时间」，观察：读数随时间的变化曲线；达到稳定所需的时间。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false,
+      "temperature": 20
+    },
+    "components": [
+      {
+        "kind": "heat_source",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 100,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-1",
+        "name": "恒温热源"
+      },
+      {
+        "kind": "thermometer",
+        "position": [
+          0.2,
+          1,
+          0
+        ],
+        "params": {
+          "responseTime": 2
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "meter-1",
+        "name": "温度计"
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "labId": "thermal",
+      "challengeId": "CH-K-T1-02",
+      "knowledgeIds": [
+        "K-T1-02"
+      ],
+      "variables": [
+        "响应时间",
+        "热源温度"
+      ],
+      "steps": [
+        "读数随时间的变化曲线",
+        "达到稳定所需的时间"
+      ],
+      "limitations": "没有热膨胀测温器具，场强探针不能替代温度计；读数属于题设。"
+    }
+  }
+}

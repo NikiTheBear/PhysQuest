@@ -1,0 +1,98 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "热传递的三种方式",
+    "description": "导热棒只能演示「传导」；对流和辐射平台做不出来。"
+  },
+  "experiment": {
+    "id": "exp-ch-k-t2-02",
+    "title": "热传递的三种方式",
+    "goal": "区分传导、对流和辐射所需条件。",
+    "observation": "先按搭建方案把器具摆好，然后只改「导热系数」，观察：热流读数；两端温度。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false,
+      "temperature": 20
+    },
+    "components": [
+      {
+        "kind": "heat_source",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 100,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-1",
+        "name": "恒温热源"
+      },
+      {
+        "kind": "conductor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "conductivity": 200,
+          "length": 1,
+          "area": 0.01,
+          "heatCapacity": 100
+        },
+        "refs": {
+          "a": "src-1",
+          "b": "meter-1"
+        },
+        "fixed": true,
+        "id": "rod-1",
+        "name": "导热棒（铜）"
+      },
+      {
+        "kind": "thermometer",
+        "position": [
+          1.6,
+          1,
+          0
+        ],
+        "params": {
+          "responseTime": 2
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "meter-1",
+        "name": "温度计"
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "labId": "thermal",
+      "challengeId": "CH-K-T2-02",
+      "knowledgeIds": [
+        "K-T2-02"
+      ],
+      "variables": [
+        "导热系数",
+        "两端温差"
+      ],
+      "steps": [
+        "热流读数",
+        "两端温度"
+      ],
+      "limitations": "无温度场、流体流动或热辐射引擎；装置只能结构示意，不给出热流读数。"
+    }
+  }
+}

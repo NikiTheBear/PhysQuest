@@ -1,0 +1,101 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "热机循环",
+    "description": "热机效率 = 做功 / 吸热。平台能算「吸了多少热」，算不出「做了多少功」。"
+  },
+  "experiment": {
+    "id": "exp-ch-k-t3-07",
+    "title": "热机循环",
+    "goal": "比较闭合热力学循环中净做功与循环方向。",
+    "observation": "先按搭建方案把器具摆好，然后只改「高温热源温度」，观察：热流读数；两个热源的温差。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false,
+      "temperature": 20
+    },
+    "components": [
+      {
+        "kind": "heat_source",
+        "position": [
+          -2,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 100,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-1",
+        "name": "高温热源（100 ℃）"
+      },
+      {
+        "kind": "heat_source",
+        "position": [
+          2,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 0,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-2",
+        "name": "低温热源（0 ℃）"
+      },
+      {
+        "kind": "conductor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "conductivity": 200,
+          "length": 1,
+          "area": 0.01,
+          "heatCapacity": 100
+        },
+        "refs": {
+          "a": "src-1",
+          "b": "src-2"
+        },
+        "fixed": true,
+        "id": "rod-1",
+        "name": "导热棒（铜）"
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "labId": "thermal",
+      "challengeId": "CH-K-T3-07",
+      "knowledgeIds": [
+        "K-T3-07"
+      ],
+      "variables": [
+        "高温热源温度",
+        "低温热源温度",
+        "导热系数"
+      ],
+      "steps": [
+        "热流读数",
+        "两个热源的温差"
+      ],
+      "limitations": "没有热循环自动积分或可动气体活塞；不可把四个标记之间的机械轨迹当 p-V 循环。"
+    }
+  }
+}

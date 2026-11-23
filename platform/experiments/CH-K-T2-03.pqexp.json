@@ -1,0 +1,99 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "比热容",
+    "description": "单位质量升高 1 ℃ 需要多少热量——可以用热容和温差算出来。"
+  },
+  "experiment": {
+    "id": "exp-ch-k-t2-03",
+    "title": "比热容",
+    "goal": "在输入能量相同的条件下比较不同热容对应的温升。",
+    "observation": "先按搭建方案把器具摆好，然后只改「热容」，观察：温度上升曲线；相同时间内升了多少度。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false,
+      "temperature": 20
+    },
+    "components": [
+      {
+        "kind": "heat_source",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 100,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-1",
+        "name": "恒温热源"
+      },
+      {
+        "kind": "conductor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "conductivity": 200,
+          "length": 1,
+          "area": 0.01,
+          "heatCapacity": 100
+        },
+        "refs": {
+          "a": "src-1",
+          "b": "meter-1"
+        },
+        "fixed": true,
+        "id": "rod-1",
+        "name": "导热棒（铜）"
+      },
+      {
+        "kind": "thermometer",
+        "position": [
+          1.6,
+          1,
+          0
+        ],
+        "params": {
+          "responseTime": 2
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "meter-1",
+        "name": "温度计"
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "labId": "thermal",
+      "challengeId": "CH-K-T2-03",
+      "knowledgeIds": [
+        "K-T2-03"
+      ],
+      "variables": [
+        "热容",
+        "加热功率",
+        "温差"
+      ],
+      "steps": [
+        "温度上升曲线",
+        "相同时间内升了多少度"
+      ],
+      "limitations": "这是 Q电=CΔV 与 Q热=C热ΔT 的数学类比；电能与电荷不能混同，也不代表真实物质比热。"
+    }
+  }
+}

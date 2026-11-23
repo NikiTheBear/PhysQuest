@@ -1,0 +1,99 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "热力学第一定律",
+    "description": "热源给的热量，有多少进了物体、多少散到环境——这笔账能算清。"
+  },
+  "experiment": {
+    "id": "exp-ch-k-t3-05",
+    "title": "热力学第一定律",
+    "goal": "统一热量、气体对外做功和内能变化的符号约定。",
+    "observation": "先按搭建方案把器具摆好，然后只改「加热功率」，观察：温度上升量；热流读数。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false,
+      "temperature": 20
+    },
+    "components": [
+      {
+        "kind": "heat_source",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 100,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-1",
+        "name": "恒温热源"
+      },
+      {
+        "kind": "conductor",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "conductivity": 200,
+          "length": 1,
+          "area": 0.01,
+          "heatCapacity": 100
+        },
+        "refs": {
+          "a": "src-1",
+          "b": "meter-1"
+        },
+        "fixed": true,
+        "id": "rod-1",
+        "name": "导热棒（铜）"
+      },
+      {
+        "kind": "thermometer",
+        "position": [
+          1.6,
+          1,
+          0
+        ],
+        "params": {
+          "responseTime": 2
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "meter-1",
+        "name": "温度计"
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "labId": "thermal",
+      "challengeId": "CH-K-T3-05",
+      "knowledgeIds": [
+        "K-T3-05"
+      ],
+      "variables": [
+        "加热功率",
+        "加热时间",
+        "热容"
+      ],
+      "steps": [
+        "温度上升量",
+        "热流读数"
+      ],
+      "limitations": "不存在热力学能量状态；符号和数值由题设推导，不从机械能通道读取内能。"
+    }
+  }
+}

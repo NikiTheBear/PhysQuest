@@ -1,0 +1,78 @@
+{
+  "format": "physquest.experiment",
+  "version": 1,
+  "metadata": {
+    "title": "冷和热",
+    "description": "两个温度不同的东西放在一起，温度计读数会怎么变化？"
+  },
+  "experiment": {
+    "id": "exp-ch-k-t1-01",
+    "title": "冷和热",
+    "goal": "区分冷暖感受与温度数值，说明冷热由比较对象决定。",
+    "observation": "先按搭建方案把器具摆好，然后只改「热源温度」，观察：温度计读数；读数达到稳定的时间。",
+    "mode": "2d",
+    "environment": {
+      "gravity": 0,
+      "damping": 0,
+      "speed": 1,
+      "collisions": false,
+      "temperature": 20
+    },
+    "components": [
+      {
+        "kind": "heat_source",
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "params": {
+          "temperature": 100,
+          "power": 50,
+          "radius": 0.5
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "src-1",
+        "name": "恒温热源"
+      },
+      {
+        "kind": "thermometer",
+        "position": [
+          0.2,
+          1,
+          0
+        ],
+        "params": {
+          "responseTime": 2
+        },
+        "refs": {},
+        "fixed": true,
+        "id": "meter-1",
+        "name": "温度计"
+      }
+    ],
+    "connections": [],
+    "control": {
+      "running": false,
+      "reset": 0
+    },
+    "learning": {
+      "labId": "thermal",
+      "challengeId": "CH-K-T1-01",
+      "knowledgeIds": [
+        "K-T1-01"
+      ],
+      "variables": [
+        "热源温度",
+        "温度计响应时间",
+        "到热源的距离"
+      ],
+      "steps": [
+        "温度计读数",
+        "读数达到稳定的时间"
+      ],
+      "limitations": "器具没有温度状态或感受模型，颜色和名称仅作教学标注，不会真实传热。"
+    }
+  }
+}

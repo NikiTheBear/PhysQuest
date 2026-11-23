@@ -22,6 +22,7 @@ const KNOWLEDGE_IDS_OPTICS = idsOf(['K-O']);
 const KNOWLEDGE_IDS_MECH = idsOf(['K-M']).filter((id) => !MOVED_TO_ACOUSTICS.includes(id));
 const KNOWLEDGE_IDS_EM = idsOf(['K-E']);
 const KNOWLEDGE_IDS_ACOUSTICS = [...idsOf(['K-A']), ...MOVED_TO_ACOUSTICS];
+const KNOWLEDGE_IDS_THERMAL = idsOf(['K-T']);
 import { DEFAULT_LENS_PARAMS } from '../core/contracts';
 
 /**
@@ -31,7 +32,7 @@ import { DEFAULT_LENS_PARAMS } from '../core/contracts';
  * 加第三个模块时只需在这里加一条 + 提供对应的实验台组件。
  */
 
-export type LabId = 'optics-lens' | 'mechanics' | 'circuits' | 'acoustics';
+export type LabId = 'optics-lens' | 'mechanics' | 'circuits' | 'acoustics' | 'thermal';
 
 export interface LabMeta {
   id: LabId;
@@ -63,6 +64,7 @@ import AUTO_JSON from '@knowledge/labs/mechanics-challenges.json';
 import CIRCUIT_JSON from '@knowledge/labs/circuits-challenges.json';
 import OPTICS_JSON from '@knowledge/labs/optics-lens-challenges.json';
 import ACOUSTIC_JSON from '@knowledge/labs/acoustics-challenges.json';
+import THERMAL_JSON from '@knowledge/labs/thermal-challenges.json';
 
 const ALL_CARD_IDS = new Set(
   (CARDS_JSON as { cards: Array<{ id: string }> }).cards.map((c) => c.id),
@@ -74,6 +76,7 @@ const AUTO_ALL: Array<{ labId?: string }> = [
   ...((CIRCUIT_JSON as ChallengeFile).challenges ?? []),
   ...((OPTICS_JSON as ChallengeFile).challenges ?? []),
   ...((ACOUSTIC_JSON as ChallengeFile).challenges ?? []),
+  ...((THERMAL_JSON as ChallengeFile).challenges ?? []),
 ];
 
 /** 手写挑战（凸透镜那 5 关）+ 自动挑战，按模块数一数 */
@@ -136,6 +139,19 @@ export const LABS: LabMeta[] = [
     defaultParams: DEFAULT_LENS_PARAMS,
     stats: statsOf('acoustics', KNOWLEDGE_IDS_ACOUSTICS, 0),
     knowledgeIds: KNOWLEDGE_IDS_ACOUSTICS,
+  },
+  {
+    id: 'thermal',
+    title: '热学',
+    subtitle: '从冷热感到热力学第二定律',
+    discipline: 'thermodynamics',
+    stages: ['primary', 'junior', 'senior', 'university'],
+    intro: '温度计、恒温热源、导热棒。改温度、量热流、看曲线——26 条里 9 条能真做，其余会告诉你为什么做不出来。',
+    badge: '有引导',
+    mode: 'guided',
+    defaultParams: DEFAULT_LENS_PARAMS,
+    stats: statsOf('thermal', KNOWLEDGE_IDS_THERMAL, 0),
+    knowledgeIds: KNOWLEDGE_IDS_THERMAL,
   },
 ];
 

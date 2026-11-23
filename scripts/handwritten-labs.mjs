@@ -806,4 +806,35 @@ export const HANDWRITTEN_LABS = [
     ],
     connections: [],
   },
+  {
+    id: 'CH-K-M4-08',
+    knowledgeId: 'K-M4-08',
+    labId: 'mechanics',
+    tier: 'real',
+    difficulty: 'advanced',
+    title: '水里滑行：速度按指数衰减',
+    brief: '给小球一个初速度，让它在与速度成正比的阻力里滑。读速度，对照 v = v₀·e^(−ct/m)。',
+    hint: '线性阻力下速度不是匀减速：开头掉得快，越慢掉得越慢，永远不真正到零。',
+    prediction: {
+      prompt: '物体在「阻力与速度成正比」的环境里滑行，它的速度随时间怎么变？',
+      options: ['按指数衰减，越慢掉得越慢', '匀减速，直到停下', '先慢后快，越来越快'],
+      answerIndex: 0,
+    },
+    observation:
+      '小球 1 kg、初速度 10 m/s，线性阻力系数 2 kg/s。跑 1 秒读速度：1.36 m/s（理论 10·e^(−2) = 1.35）；跑到 2 秒：0.19 m/s。把阻力系数改成 0.5，同样的 1 秒后还剩 6.07 m/s——阻力系数越大，掉得越快。',
+    learning: {
+      variables: ['初速度', '线性阻力系数', '小球质量'],
+      steps: ['某时刻的速度', '速度衰减是否越来越慢', '阻力系数变大后衰减更快'],
+      limitations:
+        '只做「阻力与速度成正比」这一种（平台 drag 器具的线性项）；真实的粘滞流体有非线性项和湍流，平台用 quadratic 参数近似但不含完整流场。',
+    },
+    env: { gravity: 0, damping: 0, speed: 1, collisions: false },
+    components: [
+      { id: 'ball', kind: 'body', name: '小球（1 kg，初速度 10 m/s）', pos: [0, 2, 0], params: { mass: 1, radius: 0.2, restitution: 0.2, vx: 10, vy: 0, vz: 0 } },
+      { id: 'fluid', kind: 'drag', name: '流体阻力 c = 2 kg/s', pos: [0, 2, 0], params: { linear: 2, quadratic: 0 }, refs: { target: 'ball' } },
+      { id: 'sensor', kind: 'motion_sensor', name: '运动传感器', pos: [0, 3, 0], refs: { target: 'ball' } },
+    ],
+    connections: [],
+  },
+
 ];

@@ -72,7 +72,7 @@ three in the converging-lens module:
 | Electromagnetism | 42 | 21 | |
 | Optics | 32 | 21 | From shadows and magnifying glasses up to ABCD matrices |
 | Acoustics | 15 | 15 | Full coverage |
-| Thermodynamics | 26 | 0 | No thermodynamics solver yet — cards and quiz only |
+| Thermodynamics | 26 | **9** | Thermometer / heat source / conductor cover 9; the other 17 explain why they cannot be built |
 | Modern physics | 20 | 0 | No quantum solver yet — cards and quiz only |
 
 **Every knowledge point declares its model fidelity honestly**: 79 computable /
@@ -83,7 +83,7 @@ three in the converging-lens module:
 **Knowledge map → pick a module → challenge → guess (locked) → adjust → satisfaction
 gate → question bank → report**
 
-- ✅ **79 challenges** (optics 17 + mechanics 27 + circuits 21 + acoustics 14)
+- ✅ **129 challenges** (optics 22 + mechanics 37 + circuits 30 + acoustics 14 + thermodynamics 26)
 - ✅ **176 two-sided knowledge cards**. Each one carries:
   - *Front* — one-line conclusion / formula / everyday analogy / why it works /
     **deeper explanation** (2–3 paragraphs) / **don't confuse these** (common mix-ups) /

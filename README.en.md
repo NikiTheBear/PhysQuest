@@ -68,11 +68,11 @@ three in the converging-lens module:
 
 | Domain | Points | With a hands-on challenge | Notes |
 |---|---|---|---|
-| Mechanics | 41 | 24 | |
-| Electromagnetism | 42 | 21 | |
-| Optics | 32 | 21 | From shadows and magnifying glasses up to ABCD matrices |
+| Mechanics | 41 | **35** | From carts to viscous fluids |
+| Electromagnetism | 42 | **33** | From circuit switches to self-inductance |
+| Optics | 32 | **26** | From pinhole imaging up to ABCD matrices |
 | Acoustics | 15 | 15 | Full coverage |
-| Thermodynamics | 26 | **9** | Thermometer / heat source / conductor cover 9; the other 17 explain why they cannot be built |
+| Thermodynamics | 26 | **26** | 9 real experiments + 17 boundary explanations |
 | Modern physics | 20 | 0 | No quantum solver yet — cards and quiz only |
 
 **Every knowledge point declares its model fidelity honestly**: 79 computable /
@@ -83,14 +83,14 @@ three in the converging-lens module:
 **Knowledge map → pick a module → challenge → guess (locked) → adjust → satisfaction
 gate → question bank → report**
 
-- ✅ **129 challenges** (optics 22 + mechanics 37 + circuits 30 + acoustics 14 + thermodynamics 26)
+- ✅ **133 challenges** (optics 17 + mechanics 38 + circuits 33 + acoustics 14 + thermodynamics 26 + 5 handwritten)
 - ✅ **176 two-sided knowledge cards**. Each one carries:
   - *Front* — one-line conclusion / formula / everyday analogy / why it works /
     **deeper explanation** (2–3 paragraphs) / **don't confuse these** (common mix-ups) /
     **where you see it in life** / **test yourself** (three self-check questions)
   - *Back* — which instruments to use / how to arrange them / what to vary / what to
     observe / model boundaries / the full AI prompt
-- ✅ **1,416 quiz questions** covering all 176 points, and **every question explains
+- ✅ **1,609 quiz questions** covering all 176 points, and **every question explains
   each option individually** — not just which one is right, but why each wrong one is wrong
 - ✅ Students **choose which knowledge points to drill** instead of grinding from the top
 - ✅ Exploration log: every locked-in parameter set is recorded
@@ -272,8 +272,8 @@ It's not a change of wording — it's a change of interaction depth:
 
 | | GitHub | What they built |
 |---|---|---|
-| **A** | [@NikiTheBear](https://github.com/NikiTheBear) | Web app (5 pages / 23 components / 16,353 lines), physics engine, **all 176 knowledge cards**, **1,416 quiz questions**, **176 AI prompts**, AI integration, local launcher, CI & deployment, bilingual docs |
-| **B** | [@FCZ19](https://github.com/FCZ19) | Fieldlab platform (8,254 lines): physics solvers, **53 instruments**, **25 MCP tools**, full-screen workbench, 162 tests |
+| **A** | [@NikiTheBear](https://github.com/NikiTheBear) | Web app (5 pages / 23 components / 16,353 lines), physics engine, **all 176 knowledge cards**, **1,609 quiz questions**, **176 AI prompts**, AI integration, local launcher, CI & deployment, bilingual docs |
+| **B** | [@FCZ19](https://github.com/FCZ19) | Fieldlab platform (8,254 lines): physics solvers, **53 instruments**, **25 MCP tools**, full-screen workbench, 168 tests |
 | **C** | [@yoyosiqidai-cpu](https://github.com/yoyosiqidai-cpu) | Formula lab (97 entries), misconception bank, experiment files, handwritten questions, teacher handbook, delivery tests |
 
 Read the [contribution guide](./CONTRIBUTING.md) before you start.

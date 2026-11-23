@@ -1,7 +1,7 @@
 # PhysQuest · 探理实验室
 
-[![Preflight](https://github.com/NikiTheBear/PhysQuest/actions/workflows/preflight.yml/badge.svg)](https://github.com/NikiTheBear/PhysQuest/actions/workflows/preflight.yml)
-[![Deploy](https://github.com/NikiTheBear/PhysQuest/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/NikiTheBear/PhysQuest/actions/workflows/deploy-pages.yml)
+[![Preflight](https://github.com/Wave-to-Say-HI/PhysQuest/actions/workflows/preflight.yml/badge.svg)](https://github.com/Wave-to-Say-HI/PhysQuest/actions/workflows/preflight.yml)
+[![Deploy](https://github.com/Wave-to-Say-HI/PhysQuest/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/Wave-to-Say-HI/PhysQuest/actions/workflows/deploy-pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 [中文](./README.md) · **English**

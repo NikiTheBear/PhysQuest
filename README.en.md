@@ -45,20 +45,31 @@ it still works.
 
 ---
 
-## Three counter-intuitive results
+## Five modules
 
-Every physics simulator should have moments that make you say "wait, what?". We built
-three in the converging-lens module:
+| Module | Points | Challenges | Instruments |
+|---|---|---|---|
+| Optics | 32 | 22 | Bench, laser, lenses, mirror, aperture, filter, refracting plane, pinhole, eye model |
+| Mechanics | 41 | 38 | Rigid bodies, springs, ramps, ropes, rods, dampers, force sources, dynamometer, rollers, drag |
+| Circuits | 42 | 33 | Source, resistor, capacitor, inductor, switch, lamp, meters, rheostat, AC source, current source |
+| Acoustics | 15 | 14 | Point source, directional source, measurement microphone |
+| Thermodynamics | 26 | 26 | Thermometer, constant-temperature source, conducting rod |
 
-| Scenario | What students get wrong 100% of the time |
-|---|---|
-| **Cover the top half of the lens** | Expect half the image to disappear → actually **the image is complete, just dimmer** |
-| **u = f** | Expect one enormous image → actually **no image at all**; rays exit parallel |
-| **u < f** | Expect the screen to catch it → actually **it never can**, but your eye sees it fine |
+53 instruments total. All physics runs locally — Cannon for rigid bodies, nodal analysis for
+circuits, paraxial thin lenses for optics, spherical-wave superposition for acoustics,
+Fourier conduction for heat.
 
-![Covering half the lens](docs/screenshots/04-mask.png)
+**135 of the 176 knowledge points have a hands-on experiment.** The other 41 (20 modern-physics
+points plus 21 that lack instruments) open an empty bench with a note saying exactly what the
+platform cannot build. We don't call a schematic "computable".
 
----
+![Mechanics module](docs/screenshots/02-hub.png)
+
+![Optics bench](docs/screenshots/03-lab-optics.png)
+
+![Circuits bench](docs/screenshots/04-lab-circuit.png)
+
+![Thermodynamics bench](docs/screenshots/05-lab-thermal.png)
 
 ## What's in it today
 
@@ -68,9 +79,9 @@ three in the converging-lens module:
 
 | Domain | Points | With a hands-on challenge | Notes |
 |---|---|---|---|
-| Mechanics | 41 | **35** | From carts to viscous fluids |
-| Electromagnetism | 42 | **33** | From circuit switches to self-inductance |
-| Optics | 32 | **26** | From pinhole imaging up to ABCD matrices |
+| Mechanics | 41 | **38** | From carts to viscous fluids |
+| Circuits | 42 | **33** | From circuit switches to self-inductance |
+| Optics | 32 | **22** | From pinhole imaging up to ABCD matrices |
 | Acoustics | 15 | 15 | Full coverage |
 | Thermodynamics | 26 | **26** | 9 real experiments + 17 boundary explanations |
 | Modern physics | 20 | 0 | No quantum solver yet — cards and quiz only |

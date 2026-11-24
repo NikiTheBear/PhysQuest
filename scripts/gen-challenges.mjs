@@ -13,6 +13,7 @@
  * 用法：node scripts/gen-challenges.mjs
  */
 import { readFile, writeFile, mkdir, rm, readdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { CATALOG, RIGID_KINDS, LINK_KINDS } from '../platform/shared/catalog.js';
 import { HANDWRITTEN_LABS } from './handwritten-labs.mjs';
 
@@ -480,3 +481,9 @@ for (const name of stale) await rm(new URL(name, experimentsDir), { force: true 
 if (stale.length) console.log(`清理 ${stale.length} 个旧编号实验文件`);
 
 console.log(`共生成 ${challenges.length} 个挑战、${experiments.length} 个实验文件`);
+
+// 顺手更新「哪些挑战有实验文件」的索引（网页层用，避免把没有文件的关塞进 iframe）
+if (existsSync('scripts/gen-experiment-index.mjs')) {
+  const { execFileSync } = await import('node:child_process');
+  execFileSync(process.execPath, ['scripts/gen-experiment-index.mjs'], { stdio: 'inherit' });
+}

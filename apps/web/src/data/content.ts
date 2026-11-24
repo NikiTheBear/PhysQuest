@@ -6,6 +6,7 @@ import quiz from '@knowledge/optics-lens/quiz.json';
 import demos from '@knowledge/optics-lens/demo-scripts.json';
 import allCards from '@knowledge/knowledge-cards.json';
 import allPrompts from '@knowledge/knowledge-prompts.json';
+import expIndex from '@knowledge/experiment-index.json';
 
 import type {
   Challenge,
@@ -70,6 +71,17 @@ export const ALL_PROMPTS = allPrompts as Array<{
 }>;
 
 export const promptById = (id: string) => ALL_PROMPTS.find((p) => p.id === id);
+
+/**
+ * 这一关有没有实验文件。
+ *
+ * 热学那 17 条「做不出来」的挑战（相变 / 气体 / 统计 / 辐射）故意没有 .pqexp.json。
+ * 网页层读不到文件系统，所以用 scripts/gen-experiment-index.mjs 生成一份清单。
+ */
+export const HAS_EXPERIMENT: Record<string, boolean> = (
+  expIndex as { has: Record<string, boolean> }
+).has;
+export const hasExperiment = (challengeId: string) => HAS_EXPERIMENT[challengeId] === true;
 export const allCardById = (id: string) => ALL_CARDS.find((c) => c.id === id);
 
 export const knowledgeById = (id: string) => KNOWLEDGE.find((k) => k.id === id);

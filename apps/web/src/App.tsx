@@ -46,7 +46,7 @@ import type { KnowledgePrompt } from './data/knowledge-prompts';
 import PromptDialog from './components/knowledge-prompts/PromptDialog';
 import { loadAIConfig, type AIConfig } from './ai/client';
 import type { AIAction } from './ai/prompts';
-import { AUTO_CHALLENGES, CHALLENGES, KNOWLEDGE } from './data/content';
+import { AUTO_CHALLENGES, CHALLENGES, KNOWLEDGE, hasExperiment } from './data/content';
 import { LABS, labById, type LabId } from './labs/registry';
 import { EmptyPickLab, EmptyReport } from './components/common/EmptyStates';
 import ResetPanel from './components/common/ResetPanel';
@@ -147,6 +147,7 @@ export default function App() {
   const [locked, setLocked] = useState<LockedRun | null>(null);
   /** 锁定后给一条非阻断提示：建议去题库，但不强制 */
   const [lockedNotice, setLockedNotice] = useState(false);
+
   const [reflection, setReflectionDraft] = useState('');
   const [aiOpen, setAiOpen] = useState(false);
   const [aiWidth, setAiWidth] = useState(() => {
@@ -164,6 +165,18 @@ export default function App() {
   // ?help=1 可以直接打开教程页（方便分享链接）
   const [showHelp, setShowHelp] = useState(() => DEEP.help === '1');
   /** 题库：选题 or 做题 */
+  /**
+   * 这一关有没有实验文件。
+   *
+   * 热学那 17 条「做不出来」的挑战（相变 / 气体 / 统计 / 辐射）故意没有 .pqexp.json。
+   * 直接把它们塞进 iframe 会报「打开挑战失败：找不到实验文件」。
+   * 用 useMemo 从 challenge 派生（不是 state），这样深链接、点卡片、任何路径都对。
+   */
+  const noExperiment = useMemo(
+    () => Boolean(challenge && !hasExperiment(challenge.id)),
+    [challenge],
+  );
+
   const [quizStage, setQuizStage] = useState<'pick' | 'doing'>('pick');
   const [quizPicked, setQuizPicked] = useState<string[]>([]);
   /** 题库完成情况，报告闸门要用 */
@@ -623,7 +636,7 @@ export default function App() {
                 prediction: c.prediction,
               });
               setPhase(c.prediction ? 'predict' : 'explore');
-              setView('lab');
+                      setView('lab');
             }}
             onBackToMap={() => setView('map')}
           />
@@ -637,9 +650,15 @@ export default function App() {
           <ImmersiveLab
             key={challenge?.id ?? 'blank'}
             staticMode={import.meta.env.VITE_STATIC_WORKBENCH === '1'}
-            loadExperiment={challenge?.id}
             challengeTitle={challenge?.title ?? '自由实验台'}
-            challengeBrief={challenge?.brief ?? '不挂挑战，从空白开始自己搭；也可以让 AI 帮你搭'}
+            challengeBrief={
+              noExperiment && challenge
+                ? challenge.brief
+                : (challenge?.brief ?? '不挂挑战，从空白开始自己搭；也可以让 AI 帮你搭')
+            }
+            /* 没有实验文件的关（热学那 17 条做不出来的）：不传 loadExperiment，
+               让工作台开一个空场景，而不是去请求一个不存在的文件报错 */
+            loadExperiment={noExperiment ? undefined : challenge?.id}
             phaseLabel={
               challenge ? (prediction === null ? '还没预测' : '探索中') : undefined
             }

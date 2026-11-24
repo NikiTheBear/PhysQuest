@@ -268,15 +268,64 @@ It's not a change of wording — it's a change of interaction depth:
 
 ---
 
-## People
+## Who built this
 
-| | GitHub | What they built |
+| | GitHub | What they did | Share |
+|---|---|---|---|
+| **A** | [@NikiTheBear](https://github.com/NikiTheBear) | Web app (5 pages / 23 components / 29,554 lines), physics engine, **all 176 knowledge cards**, **1,609 quiz questions**, **176 AI prompts**, local launcher, CI & deployment, bilingual docs | 40% |
+| **B** | [@FCZ19](https://github.com/FCZ19) | Fieldlab platform (17,502 lines): physics solvers, **47 instruments**, **25 MCP tools**, full-screen workbench, 133 tests | 34% |
+| **C** | [@yoyosiqidai-cpu](https://github.com/yoyosiqidai-cpu) | **97 formula-lab definitions**, **46 misconceptions**, **190 handwritten questions**, 30+ handwritten experiments, UI polish, 4 teacher handbook chapters | 26% |
+
+> A later added 6 more instruments (3 thermodynamics + 3 optics), so the total is 53.
+
+### One file, one owner
+
+| Scope | Owner |
+|---|---|
+| `apps/web/src/**`, `scripts/**`, `apps/launcher/**`, `.github/**` | A |
+| `platform/**` (solvers, workbench, instrument catalog, MCP tools, tests) | B |
+| `shared/knowledge-data/card-text/**`, `card-detail/**`, `question-bank.ts` | A |
+| `platform/experiments/*.pqexp.json`, `docs/handbook/**` | C |
+
+---
+
+## Roadmap
+
+| | Content | Status |
 |---|---|---|
-| **A** | [@NikiTheBear](https://github.com/NikiTheBear) | Web app (5 pages / 23 components / 16,353 lines), physics engine, **all 176 knowledge cards**, **1,609 quiz questions**, **176 AI prompts**, AI integration, local launcher, CI & deployment, bilingual docs |
-| **B** | [@FCZ19](https://github.com/FCZ19) | Fieldlab platform (8,254 lines): physics solvers, **53 instruments**, **25 MCP tools**, full-screen workbench, 168 tests |
-| **C** | [@yoyosiqidai-cpu](https://github.com/yoyosiqidai-cpu) | Formula lab (97 entries), misconception bank, experiment files, handwritten questions, teacher handbook, delivery tests |
+| M1 | Physics engine + dual-pane bench | ✅ |
+| M2 | Complete learning loop | ✅ |
+| M2.5 | Fieldlab merged in + 166 knowledge cards | ✅ |
+| M2.6 | Selectable quiz topics + per-option explanations | ✅ |
+| M2.7 | Optics expanded into a full domain | ✅ |
+| M3.1 | Formula lab (97 entries) | ✅ |
+| M3.2 | AI experiment grading (local 3 dimensions + AI comment) | ✅ |
+| M3.3 | Learner record export / import | ✅ |
+| M3.4 | Thermodynamics as the fifth module | ✅ |
+| M3.5 | Demo script player | ✅ |
+| M4 | Quantum schematic instruments for the 20 modern-physics points | ⬜ |
+| M5 | Offline single-file build | ⬜ |
 
-Read the [contribution guide](./CONTRIBUTING.md) before you start.
+---
+
+## One hard rule
+
+**We will never write a single line of server-side code that can receive a student's API key.**
+
+Keys live only in the student's own browser. The local launcher listens on `127.0.0.1` only —
+no logging, no persistence. Any "official proxy endpoint" in the code counts as a bug.
+
+---
+
+## Docs
+
+| File | Contents |
+|---|---|
+| [`docs/STUDENT-FLOW.md`](./docs/STUDENT-FLOW.md) | The nine steps from opening the page to exporting a report |
+| [`docs/LAUNCHER.md`](./docs/LAUNCHER.md) | The local launcher: why it exists, how to use it |
+| [`docs/DELIVERY-TEST.md`](./docs/DELIVERY-TEST.md) | Delivery test checklist: 10 scenarios |
+| [`docs/handbook/`](./docs/handbook/) | Teacher handbook (4 chapters) |
+| [`platform/experiments/FORMAT.md`](./platform/experiments/FORMAT.md) | Experiment file format (`.pqexp.json`) |
 
 ---
 

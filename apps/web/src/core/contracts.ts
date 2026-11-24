@@ -226,31 +226,6 @@ export interface QuizResult {
 }
 
 /* ============================================================
- * 7. AI 演示剧本
- *    逐帧都要过引擎校验，过不了就退回预置剧本。
- * ========================================================== */
-
-export interface AIDemoStep {
-  stepIndex: number;
-  /** 本步演示对应的核心知识点 */
-  knowledgePoint: string;
-  /** 气泡讲解文案 */
-  narration: string;
-  /** 自动驱动实验台调整到的目标参数（只允许参数，不允许画面操作） */
-  targetParams: Partial<LensParams>;
-  /** 实验台上需要高亮的器材 */
-  highlightRigIds: RigElementId[];
-  /** 本步停留观察时长 (ms) */
-  durationMs: number;
-}
-
-export interface AIDemoSequence {
-  id: string;
-  title: string;
-  steps: AIDemoStep[];
-}
-
-/* ============================================================
  * 8. 学习记录
  * ========================================================== */
 

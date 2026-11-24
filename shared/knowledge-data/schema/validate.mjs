@@ -48,7 +48,6 @@ const knowledge = load('knowledge.json');
 const misconceptions = load('misconceptions.json');
 const challenges = load('challenges.json');
 const quiz = load('quiz.json');
-const demos = load('demo-scripts.json');
 
 if (errors.length) {
   console.log(C.red('\n✗ 读取失败：\n'));
@@ -69,7 +68,6 @@ const globalCardIds = (() => {
 })();
 const mIds = new Set(misconceptions.misconceptions.map((m) => m.id));
 const cIds = new Set(challenges.challenges.map((c) => c.id));
-const dIds = new Set(demos.scripts.map((d) => d.id));
 const qIds = new Set(quiz.items.map((q) => q.id));
 
 const STAGE_ORDER = { primary: 1, junior: 2, senior: 3, university: 4 };
@@ -169,7 +167,7 @@ challenges.challenges.forEach((c, i) => {
   (c.misconceptionIds ?? []).forEach((m) => {
     if (!mIds.has(m)) errors.push(`${at}：引用不存在的误区 ${m}`);
   });
-  if (c.demoScriptId && !dIds.has(c.demoScriptId)) {
+  if (false) {
     errors.push(`${at}：demoScriptId 指向不存在的剧本 ${c.demoScriptId}`);
   }
   const p = c.prediction;
@@ -200,22 +198,6 @@ quiz.items.forEach((q, i) => {
   if (q.type === 'short_answer' && !q.answerKey) errors.push(`${at}：简答题必须有 answerKey`);
 });
 
-/* ---------- 7. 检查演示剧本 ---------- */
-demos.scripts.forEach((s, i) => {
-  const at = `demo-scripts.json 第 ${i + 1} 套（${s.id ?? '无 id'}）`;
-  if (!Array.isArray(s.steps) || s.steps.length === 0) errors.push(`${at}：没有 steps`);
-  (s.steps ?? []).forEach((st, j) => {
-    const sat = `${at} 第 ${j + 1} 步`;
-    if (typeof st.stepIndex !== 'number') errors.push(`${sat}：缺 stepIndex`);
-    if (!st.narration) errors.push(`${sat}：缺 narration`);
-    if (!st.targetParams || Object.keys(st.targetParams).length === 0)
-      errors.push(`${sat}：targetParams 不能为空`);
-    if (!Array.isArray(st.highlightRigIds)) errors.push(`${sat}：highlightRigIds 必须是数组`);
-    if (!st.durationMs || st.durationMs < 500) errors.push(`${sat}：durationMs 太小或缺失`);
-    if (!kIds.has(st.knowledgePoint)) errors.push(`${sat}：knowledgePoint ${st.knowledgePoint} 不存在`);
-  });
-});
-
 /* ---------- 8. 覆盖率报告 ---------- */
 const usedByChallenges = new Set(challenges.challenges.flatMap((c) => c.knowledgeIds ?? []));
 const usedByQuiz = new Set(quiz.items.map((q) => q.knowledgeId));
@@ -231,7 +213,7 @@ const misUnused = misconceptions.misconceptions.filter(
 /* ---------- 9. 输出 ---------- */
 console.log('');
 console.log(C.bold('═══ 内容校验 ═══'));
-console.log(C.dim(`知识点 ${knowledge.cards.length} · 误区 ${misconceptions.misconceptions.length} · 挑战 ${challenges.challenges.length} · 题目 ${quiz.items.length} · 剧本 ${demos.scripts.length}`));
+console.log(C.dim(`知识点 ${knowledge.cards.length} · 误区 ${misconceptions.misconceptions.length} · 挑战 ${challenges.challenges.length} · 题目 ${quiz.items.length}`));
 console.log('');
 
 if (warns.length) {

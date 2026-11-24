@@ -3,7 +3,6 @@ import opticsMisconceptions from '@knowledge/optics-lens/misconceptions.json';
 import allMisconceptions from '@knowledge/misconceptions.json';
 import challenges from '@knowledge/optics-lens/challenges.json';
 import quiz from '@knowledge/optics-lens/quiz.json';
-import demos from '@knowledge/optics-lens/demo-scripts.json';
 import allCards from '@knowledge/knowledge-cards.json';
 import allPrompts from '@knowledge/knowledge-prompts.json';
 import expIndex from '@knowledge/experiment-index.json';
@@ -23,7 +22,6 @@ export const MISCONCEPTIONS: Misconception[] = [
 ];
 export const CHALLENGES: Challenge[] = challenges.challenges as unknown as Challenge[];
 export const QUIZ: QuizItem[] = quiz.items as unknown as QuizItem[];
-export const DEMOS = demos.scripts;
 
 /** 全平台 176 张知识卡（光学 32 手写 + 其余生成，全部带加厚内容） */
 export const ALL_CARDS = (allCards as { cards: unknown[] }).cards as Array<{

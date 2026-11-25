@@ -203,7 +203,7 @@ export interface AIError {
 }
 
 function translateError(status: number, text: string, conn: AIConnection): AIError {
-  if (status === 401 || status === 403) {
+  if (status === 401) {
     return {
       kind: 'unauthorized',
       message: 'Key 无效或已过期',
@@ -218,10 +218,17 @@ function translateError(status: number, text: string, conn: AIConnection): AIErr
     };
   }
   if (status === 403) {
+    if (conn === 'launcher' && text.includes('forbidden_origin')) {
+      return {
+        kind: 'forbidden',
+        message: '启动器拒绝了这次请求',
+        detail: '通常是从 file:// 或非本机地址打开的页面才会被拒。请用启动器给出的那个地址打开网页。',
+      };
+    }
     return {
-      kind: 'forbidden',
-      message: '启动器拒绝了这次请求',
-      detail: '通常是从 file:// 打开的页面才会被拒。请用启动器给出的那个地址打开网页。',
+      kind: 'unauthorized',
+      message: '无权访问该模型或接口（403）',
+      detail: '检查 Key 权限、所在地区限制，或确认该模型已在厂商控制台开通。',
     };
   }
   if (status === 404) {

@@ -106,7 +106,7 @@ export const LABS: LabMeta[] = [
     subtitle: '力学 · 从推小车到能量守恒',
     discipline: 'mechanics',
     stages: ['junior', 'senior'],
-    intro: '刚体、弹簧、斜面、滑轮——从推小车到能量守恒。每个都先猜一句再动手。',
+    intro: '刚体、弹簧、斜面、流体阻力——从推小车到能量守恒。每个都先猜一句再动手。',
     badge: '有引导',
     mode: 'guided',
     defaultParams: DEFAULT_LENS_PARAMS,

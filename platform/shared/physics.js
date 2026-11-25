@@ -84,7 +84,7 @@ export class Simulation {
     for (const c of this.doc.components.filter(c => SOUND_KINDS.includes(c.kind))) {
       const d = Math.max(.2, norm(sub(point, this.bodies.get(c.id).position)));
       const relative=sub(point,this.bodies.get(c.id).position),angle=(c.params.angle||0)*Math.PI/180,directivity=c.kind==='directional_speaker'?Math.max(0,(relative[0]*Math.cos(angle)+relative[verticalAxis(this.doc)]*Math.sin(angle))/d)**c.params.directivity:1;
-      sum += directivity*c.params.amplitude * this.modulation(c.id, 'acoustic') / Math.max(1, d) * Math.sin(TAU*c.params.frequency*(t-d/c.params.speed) + c.params.phase*Math.PI/180);
+      sum += directivity*c.params.amplitude * this.modulation(c.id, 'acoustic') / d * Math.sin(TAU*c.params.frequency*(t-d/c.params.speed) + c.params.phase*Math.PI/180);
     }
     return sum;
   }
@@ -249,17 +249,19 @@ export class Simulation {
         else if(best.c.kind==='optical_filter')power*=best.c.params.transmission;
         else if(best.c.kind==='mirror')dir=sub(dir,mul(best.n,2*dot(dir,best.n)));
         else if(best.c.kind==='refract_plane'){
-          const p=best.c.params,eta=p.n1/p.n2;
-          // n1/n2 按参数含义固定为“入射侧 / 折射侧”；法线取指向入射侧的方向，cosI = -dot(dir, n) ≥ 0。
-          const facing=dot(dir,best.n),n=mul(best.n,-(Math.sign(facing)||1)),cosI=-dot(dir,n),k=1-eta*eta*(1-cosI*cosI);
+          const p=best.c.params,facing=dot(dir,best.n);
+          // 正向入射（沿法线方向）由 n1 进入 n2，反向入射则由 n2 返回 n1，支持玻璃砖等双面折射。
+          const eta=facing>=0?p.n1/p.n2:p.n2/p.n1;
+          const n=mul(best.n,-(Math.sign(facing)||1)),cosI=-dot(dir,n),k=1-eta*eta*(1-cosI*cosI);
           // 斯涅尔定律 n₁sinθ₁ = n₂sinθ₂；k<0 无实解，发生全反射。
           if(k<0)dir=sub(dir,mul(n,2*dot(dir,n)));
           else dir=unit(add(mul(dir,eta),mul(n,eta*cosI-Math.sqrt(k))));
         }
         else {
           const axis=mul(best.n,Math.sign(dot(dir,best.n))),normalPart=dot(dir,axis),height=sub(best.hit,best.pos);
+          const focal=Math.abs(best.c.params.focal)<1e-6?(best.c.params.focal<0?-1e-6:1e-6):best.c.params.focal;
           // Paraxial thin-lens slope change: theta_out = theta_in - h/f.
-          dir=unit(add(axis,sub(mul(sub(dir,mul(axis,normalPart)),1/Math.max(.001,normalPart)),mul(height,1/best.c.params.focal))));
+          dir=unit(add(axis,sub(mul(sub(dir,mul(axis,normalPart)),1/Math.max(.001,normalPart)),mul(height,1/focal))));
         }
         origin=end;lastId=best.c.id;
       }
@@ -280,9 +282,10 @@ export class Simulation {
       }
       if(c.kind==='pinhole_screen'){
         // 每个物点穿过小孔投出一个斑：倒像高度按相似三角形，斑径 = 孔径 × (1 + 孔屏距/物孔距)。
-        const imageHeight=p.objectHeight*p.holeDistance/p.objectDistance;
-        const blur=p.holeDiameter*(1+p.holeDistance/p.objectDistance);
-        const sharpness=Math.max(0,1-blur/imageHeight);
+        const objDist=Math.max(1e-6,p.objectDistance),holeDist=Math.max(1e-6,p.holeDistance);
+        const imageHeight=p.objectHeight*holeDist/objDist;
+        const blur=p.holeDiameter*(1+holeDist/objDist);
+        const sharpness=imageHeight>1e-9?Math.max(0,1-blur/imageHeight):0;
         // 相对亮度取小孔在屏处张开的立体角 Ω = π(d/2)²/L²，单位 sr；孔径变大则亮、L 变大则暗。
         const brightness=Math.PI*(p.holeDiameter/2)**2/(p.holeDistance**2);
         for(const [key,label,unitLabel] of [['imageHeight','像高','m'],['blur','模糊斑直径','m'],['sharpness','清晰度','比例'],['brightness','相对亮度','sr']]){

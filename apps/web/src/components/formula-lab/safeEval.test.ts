@@ -357,8 +357,8 @@ describe('safeEval · 97 条真实数据', () => {
         }
       }
     }
-    // 当前实际用量：PI×7 sqrt×5 exp×5 log×2 pow×2 log10×1
-    expect([...used].sort()).toEqual(['PI', 'exp', 'log', 'log10', 'pow', 'sqrt']);
+    // 当前实际用量：PI×7 sqrt×5 exp×5 log×2 pow×2 log10×1 max×1
+    expect([...used].sort()).toEqual(['PI', 'exp', 'log', 'log10', 'max', 'pow', 'sqrt']);
     for (const name of used) {
       expect(MATH_MEMBER_NAMES.has(name), `白名单漏了 Math.${name}`).toBe(true);
     }

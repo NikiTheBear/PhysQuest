@@ -157,18 +157,35 @@ const MIME = {
   '.map': 'application/json',
 };
 
+function isPrivateHost(hostname) {
+  const h = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  if (h === 'localhost' || h === '::1' || h === '0.0.0.0' || h.endsWith('.local')) return true;
+  if (/^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h) || /^169\.254\./.test(h)) return true;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(h)) return true;
+  if (/^(fc|fd|fe80:)/i.test(h)) return true;
+  return false;
+}
+
+function isAllowedOrigin(origin) {
+  // 禁止 origin === 'null'，防止外部网页用 sandboxed iframe 伪造本机请求
+  return origin === '' || /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(origin);
+}
+
 function isSafeTarget(url) {
   try {
     const u = new URL(url);
-    return u.protocol === 'http:' || u.protocol === 'https:';
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return false;
+    if (isPrivateHost(u.hostname)) return false;
+    return true;
   } catch {
     return false;
   }
 }
 
 function corsHeaders(origin) {
+  const allowOrigin = origin && isAllowedOrigin(origin) ? origin : `http://${HOST}:${PORT}`;
   return {
-    'Access-Control-Allow-Origin': origin || '*',
+    'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
@@ -241,6 +258,10 @@ const server = createServer(async (req, res) => {
 
     /* ---------- 重置实验台（删服务端存储） ---------- */
     if (url.pathname === '/api/reset-workspace' && req.method === 'POST') {
+      if (!isAllowedOrigin(origin)) {
+        sendJSON(res, { error: 'forbidden_origin', detail: '只允许本机页面调用' }, 403, origin);
+        return;
+      }
       return resetFieldlabWorkspace(res);
     }
 
@@ -282,12 +303,8 @@ const server = createServer(async (req, res) => {
  * ========================================================== */
 
 async function handleLLM(req, res, url, origin) {
-  // 只允许本机页面调用，防止别的网页偷偷用这个转发端点
-  const allowed =
-    origin === '' ||
-    origin === 'null' ||
-    /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(origin);
-  if (!allowed) {
+  // 只允许本机页面调用，防止别的网页（含 sandboxed iframe 的 null origin）偷偷用这个转发端点
+  if (!isAllowedOrigin(origin)) {
     sendJSON(res, { error: 'forbidden_origin', detail: '只允许本机页面调用' }, 403, origin);
     return;
   }
@@ -309,16 +326,28 @@ async function handleLLM(req, res, url, origin) {
     return;
   }
   if (!isSafeTarget(rawTarget)) {
-    sendJSON(res, { error: 'bad_target', detail: '只能转发到 http/https 地址' }, 400, origin);
+    sendJSON(res, { error: 'bad_target', detail: '只能转发到公网 http/https 接口，禁止内网地址' }, 400, origin);
     return;
   }
 
   const bodyText = await readBody(req);
 
-  // Key：前端传的优先，其次配置文件里的
-  // 注意：只经过内存，不写日志、不落盘
-  const auth =
-    req.headers.authorization || (CONFIG.apiKey ? `Bearer ${CONFIG.apiKey}` : null);
+  // Key：前端传的优先；若回退到 config.local.json 里的 Key，只允许发往已配置的同主机端点，防止 Key 被带到任意域名
+  let fallbackAuth = null;
+  if (CONFIG.apiKey) {
+    if (!CONFIG.endpoint) {
+      fallbackAuth = `Bearer ${CONFIG.apiKey}`;
+    } else {
+      try {
+        if (new URL(rawTarget).hostname === new URL(CONFIG.endpoint).hostname) {
+          fallbackAuth = `Bearer ${CONFIG.apiKey}`;
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+  const auth = req.headers.authorization || fallbackAuth;
   if (!auth) {
     sendJSON(
       res,

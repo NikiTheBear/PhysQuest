@@ -78,6 +78,12 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
+function normalizeQuote(s: string): string {
+  return s
+    .replace(/[\s,，。.;；:：!！?？「」『』“”"'()（）]+/g, '')
+    .toLowerCase();
+}
+
 function validClaim(raw: unknown, input: GradingInput): Claim | null {
   if (!isPlainObject(raw)) return null;
   const quote = raw.quote;
@@ -87,11 +93,14 @@ function validClaim(raw: unknown, input: GradingInput): Claim | null {
   if (typeof checkId !== 'string') return null;
   if (!input.checks.some((c) => c.id === checkId)) return null;
   if (typeof verdict !== 'string' || !VERDICT_SET.has(verdict)) return null;
+  const trimmed = quote.trim();
+  const exact = input.reflection.text.includes(trimmed);
+  const normQuote = normalizeQuote(trimmed);
+  const fuzzy =
+    !exact && normQuote.length >= 4 && normalizeQuote(input.reflection.text).includes(normQuote);
   return {
-    // quote 必须是反思里的原文：不在原文里的直接判成空，靠下面的过滤丢掉
-    quote: input.reflection.text.includes(quote.trim())
-      ? quote.trim().replace(/\s*\n+\s*/g, ' ').slice(0, 120)
-      : '',
+    // quote 必须能在反思原文中找到（允许标点与空白差异，但不允许 AI 凭空捏造）
+    quote: exact || fuzzy ? trimmed.replace(/\s*\n+\s*/g, ' ').slice(0, 120) : '',
     checkId,
     verdict: verdict as Claim['verdict'],
     note: typeof raw.note === 'string' ? raw.note.trim().replace(/\s*\n+\s*/g, ' ').slice(0, 120) : '',
@@ -209,7 +218,11 @@ export function foreignNumbers(text: string, allowed: Set<string>): string[] {
   const stripped = text
     .replace(/\b[RVTD]\d+\b/g, ' ')
     .replace(/[RVT]\d+/g, ' ')
-    .replace(/D\d/g, ' ');
+    .replace(/D\d/g, ' ')
+    // 放行序数词（如「第 1 组」「第2次」）和常见物理公式结构里的常数（如 1/f、2f）
+    .replace(/第\s*\d+\s*[组次条步个项]/g, ' ')
+    .replace(/\b1\/[fuv]\b/gi, ' ')
+    .replace(/\b2f\b/gi, ' ');
   const matches = stripped.match(/-?\d+(?:\.\d+)?/g) ?? [];
   return matches.filter((m) => {
     if (allowed.has(m)) return false;

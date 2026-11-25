@@ -13,7 +13,7 @@ export class Circuit {
     const root=k=>{let p=parent.get(k);if(p===k)return k;p=root(p);parent.set(k,p);return p;};
     const join=(a,b)=>parent.set(root(a),root(b));
     for(const c of this.components)for(const port of CATALOG[c.kind].terminals)parent.set(key(c.id,port),key(c.id,port));
-    for(const l of doc.connections.filter(l=>l.kind==='wire'))join(key(l.source,l.sourcePort),key(l.target,l.targetPort));
+    for(const l of doc.connections.filter(l=>l.kind==='wire')){const a=key(l.source,l.sourcePort),b=key(l.target,l.targetPort);if(parent.has(a)&&parent.has(b))join(a,b);}
     const grounds=this.components.filter(c=>c.kind==='ground');for(let i=1;i<grounds.length;i++)join(key(grounds[0].id,'a'),key(grounds[i].id,'a'));
     this.ports=new Map([...parent.keys()].map(k=>[k,root(k)]));
     const nodes=[...new Set(this.ports.values())],adj=new Map(nodes.map(n=>[n,new Set()]));
@@ -44,11 +44,11 @@ export class Circuit {
     const time=this.time+(commit?dt:0);const n=this.indices.size,A=Array.from({length:n},()=>Array(n).fill(0)),z=Array(n).fill(0),branches=[];
     const stamp=(a,b,g,j)=>{const i=this.indices.get(a),k=this.indices.get(b);if(i!==undefined){A[i][i]+=g;z[i]-=j;}if(k!==undefined){A[k][k]+=g;z[k]+=j;}if(i!==undefined&&k!==undefined){A[i][k]-=g;A[k][i]-=g;}};
     for(const c of this.components){if(c.kind==='ground')continue;const p=c.params,h=this.history.get(c.id),a=this.ports.get(c.id+':a'),b=this.ports.get(c.id+':b');let g=0,j=0;
-      if(['resistor','lamp'].includes(c.kind))g=1/p.resistance;
-      if(c.kind==='battery'){g=1/p.resistance;j=-p.voltage*g;}
-      if(c.kind==='rheostat')g=1/(p.resistance*p.ratio);
-      if(c.kind==='current_source'){g=1/p.resistance;j=-p.current;}
-      if(c.kind==='ac_source'){g=1/p.resistance;j=-(p.offset+p.amplitude*Math.sin(2*Math.PI*p.frequency*time+p.phase*Math.PI/180))*g;}
+      if(['resistor','lamp'].includes(c.kind))g=1/Math.max(1e-6,p.resistance);
+      if(c.kind==='battery'){g=1/Math.max(1e-6,p.resistance);j=-p.voltage*g;}
+      if(c.kind==='rheostat')g=1/Math.max(1e-6,p.resistance*p.ratio);
+      if(c.kind==='current_source'){g=1/Math.max(1e-6,p.resistance);j=-p.current;}
+      if(c.kind==='ac_source'){g=1/Math.max(1e-6,p.resistance);j=-(p.offset+p.amplitude*Math.sin(2*Math.PI*p.frequency*time+p.phase*Math.PI/180))*g;}
       if(c.kind==='capacitor'){g=p.capacitance*1e-6/dt;j=-g*h.voltage;}
       if(c.kind==='inductor'){g=dt/(p.inductance*1e-3);j=h.current;}
       if(c.kind==='switch')g=p.closed?1/.001:1e-12;

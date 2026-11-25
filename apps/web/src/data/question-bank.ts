@@ -1175,20 +1175,30 @@ function otherModels(entry: PromptEntry, all: PromptEntry[]) {
     .map((p) => p.models);
 }
 
+const HANDWRITTEN_SLOTS = new Set(HANDWRITTEN.map((q) => `${q.knowledgeId}:${q.level}`));
+
 function derive(entry: PromptEntry, all: PromptEntry[]): BankQuestion[] {
   const out: BankQuestion[] = [];
   const base = entry.id;
   const supLabel =
     entry.support === 'direct' ? '可计算' : entry.support === 'approximation' ? '近似' : '仅示意';
+  const hasHandwritten = (lv: QuizLevel) => HANDWRITTEN_SLOTS.has(`${entry.id}:${lv}`);
 
-  /* ---------- easy ①：这条该看什么 ---------- */
-  if (entry.observations.length >= 2) {
-    const wrongs = all
+  /* ---------- easy ①：这条该看什么（仅在无手写 easy 题时补充，且按 id 稳定随机抽干扰项） ---------- */
+  if (!hasHandwritten('easy') && entry.observations.length >= 2) {
+    const candidates = all
       .filter((p) => p.id !== entry.id && p.domainLabel === entry.domainLabel)
       .flatMap((p) => p.observations.map((o) => ({ o, from: p })))
-      .filter((x) => !entry.observations.includes(x.o))
-      .slice(0, 2);
-    if (wrongs.length === 2) {
+      .filter((x) => !entry.observations.includes(x.o));
+    const unique: typeof candidates = [];
+    const seen = new Set<string>([entry.observations[0]]);
+    for (const c of seededShuffle(candidates, `${base}-obs`)) {
+      if (seen.has(c.o)) continue;
+      seen.add(c.o);
+      unique.push(c);
+      if (unique.length === 2) break;
+    }
+    if (unique.length === 2) {
       out.push(
         pack(
           {
@@ -1202,7 +1212,7 @@ function derive(entry: PromptEntry, all: PromptEntry[]): BankQuestion[] {
             text: entry.observations[0],
             note: `对。这是这一条的主观测项，其余两项属于别的研究。`,
           },
-          wrongs.map((w, i) => ({
+          unique.map((w) => ({
             text: w.o,
             note: `这是「${w.from.title}」要看的量，不是这一条。题目换一条知识点，观测项就跟着换。`,
           })),
@@ -1211,12 +1221,19 @@ function derive(entry: PromptEntry, all: PromptEntry[]): BankQuestion[] {
     }
   }
 
-  /* ---------- easy ②：这个实验到底要干什么 ---------- */
-  if (entry.objective) {
-    const pool = all.filter(
-      (p) => p.id !== entry.id && p.domainLabel === entry.domainLabel && p.objective,
-    );
-    if (pool.length >= 2) {
+  /* ---------- easy ②：这个实验到底要干什么（仅在无手写 easy 题时补充，按 id 随机抽干扰项） ---------- */
+  if (!hasHandwritten('easy') && entry.objective) {
+    const pool = seededShuffle(
+      all.filter(
+        (p) =>
+          p.id !== entry.id &&
+          p.domainLabel === entry.domainLabel &&
+          p.objective &&
+          p.objective !== entry.objective,
+      ),
+      `${base}-obj`,
+    ).slice(0, 2);
+    if (pool.length === 2) {
       out.push(
         pack(
           {
@@ -1230,7 +1247,7 @@ function derive(entry: PromptEntry, all: PromptEntry[]): BankQuestion[] {
             text: entry.objective,
             note: '对。这是这一条的探索目标，实验台上「实验目标」那一栏写的就是它。',
           },
-          pool.slice(0, 2).map((p) => ({
+          pool.map((p) => ({
             text: p.objective,
             note: `这是「${p.title}」的目标，不是这一条。两件事看着像，但要测的东西不同。`,
           })),
@@ -1239,74 +1256,37 @@ function derive(entry: PromptEntry, all: PromptEntry[]): BankQuestion[] {
     }
   }
 
-  /* ---------- easy ③：要用哪些器具 ---------- */
-  if (entry.models.length > 0 && entry.models.length <= 4) {
-    const mine = entry.models.map(modelName).join('、');
-    const others = otherModels(entry, all);
-    const pickWrong = (idx: number) => {
-      const cand = others[idx];
-      if (!cand || cand.length === 0) return '';
-      return cand.slice(0, Math.min(3, cand.length)).map(modelName).join('、');
-    };
-    const w1 = pickWrong(3);
-    const w2 = pickWrong(11);
-    if (w1 && w2 && w1 !== mine && w2 !== mine) {
-      out.push(
-        pack(
-          {
-            id: `BQ-${base}-easy-3`,
-            knowledgeId: entry.id,
-            level: 'easy',
-            question: `要在实验台上搭出「${entry.title}」，最少需要下面哪一组器具？`,
-            explanation: `这一条的搭建方案用的是：${mine}。器具选错了，实验根本做不起来——所以这是动手前的第一道关。`,
-          },
-          { text: mine, note: `对。${mine} 就是这一条的搭建方案。` },
-          [
-            { text: w1, note: `这几样是别的知识点用的，凑不出「${entry.title}」。` },
-            { text: w2, note: `这几样也是别处的器具。器具和规律是对应的，不能随便换。` },
-          ],
-        ),
-      );
-    }
-  }
-
-  /* ---------- medium ①：模型边界 ---------- */
-  if (entry.limitations) {
-    const boundaryHint =
-      entry.support === 'conceptual'
-        ? '它只有示意图，能说明趋势，但给不出准确数字'
-        : entry.support === 'approximation'
-          ? '它是近似模型，越过边界就不准了'
-          : '它有真实求解器，但同样有前提条件';
+  /* ---------- medium ①：模型边界（仅在无手写 medium 题时补充） ---------- */
+  if (!hasHandwritten('medium') && entry.limitations) {
     out.push(
       pack(
         {
           id: `BQ-${base}-medium`,
           knowledgeId: entry.id,
           level: 'medium',
-          question: `关于「${entry.title}」，下面哪句话是准确的？`,
+          question: `关于「${entry.title}」的模型适用范围，下面哪句话是准确的？`,
           explanation: `平台的标注是「${supLabel}」。${SUPPORT_WHY[entry.support]} 这条的边界是：${entry.limitations}`,
         },
         {
           text: `${supLabel}——${entry.limitations}`,
-          note: `对。既说清了级别，也说清了边界。这是这个平台对每一条知识点都要求写出来的东西。`,
+          note: `对。既说清了模型级别，也说清了适用边界。`,
         },
         [
           {
-            text: '它是精确模型，任何真实装置都能算准',
-            note: '错。没有哪个物理模型是「任何情况都准」。真实装置里总有模型没算进去的因素，比如摩擦、形变、空气。',
+            text: '只要参数在滑杆范围内，模型读数就与任何真实实验装置完全一致',
+            note: '错。真实装置中存在摩擦、形变、空气阻力或非线性效应，任何物理模型都有适用边界。',
           },
           {
-            text: '它没有任何适用条件，随便怎么用都行',
-            note: '错。物理规律都有前提。「没有条件」这句话本身就是错的。',
+            text: '只需套用公式即可，不需要考虑实验前提与近似条件',
+            note: '错。物理规律都有前提条件，脱离前提套公式会得到与实测偏离的结果。',
           },
         ],
       ),
     );
   }
 
-  /* ---------- medium ②：怎么操作才叫研究规律 ---------- */
-  if (entry.variables.length >= 2) {
+  /* ---------- medium ②：控制变量法（仅在无手写 medium 题时补充） ---------- */
+  if (!hasHandwritten('medium') && entry.variables.length >= 2) {
     const v0 = entry.variables[0];
     const v1 = entry.variables[1];
     out.push(
@@ -1337,40 +1317,8 @@ function derive(entry: PromptEntry, all: PromptEntry[]): BankQuestion[] {
     );
   }
 
-  /* ---------- medium ③：搭建方案里第一步做什么 ---------- */
-  if (entry.construction) {
-    const short = entry.construction.length > 46
-      ? `${entry.construction.slice(0, 46)}……`
-      : entry.construction;
-    out.push(
-      pack(
-        {
-          id: `BQ-${base}-medium-3`,
-          knowledgeId: entry.id,
-          level: 'medium',
-          question: `「${entry.title}」的搭建方案是这样写的：「${short}」这段话主要是在说？`,
-          explanation: `完整的搭建方案是：${entry.construction} 它告诉你器具怎么摆、参数设成多少、先看哪一段——照着做就能复现这个实验。`,
-        },
-        {
-          text: '器具怎么摆、参数设多少、先观察什么',
-          note: '对。搭建方案就是「操作说明书」，不是结论。',
-        },
-        [
-          {
-            text: '这个知识点的结论是什么',
-            note: '错。结论在「一句话」和「公式」里，搭建方案讲的是怎么做，不是结果是什么。',
-          },
-          {
-            text: '这个实验为什么不准',
-            note: '错。讲局限的是「模型边界」那一栏，不是搭建方案。',
-          },
-        ],
-      ),
-    );
-  }
-
-  /* ---------- hard ①：变量与因果 ---------- */
-  if (entry.variables.length > 0 && entry.formula) {
+  /* ---------- hard ①：变量与因果（仅在无手写 hard 题时补充） ---------- */
+  if (!hasHandwritten('hard') && entry.variables.length > 0 && entry.formula) {
     out.push(
       pack(
         {
@@ -1398,8 +1346,8 @@ function derive(entry: PromptEntry, all: PromptEntry[]): BankQuestion[] {
     );
   }
 
-  /* ---------- hard ②：这条规律管不管得住那个现象 ---------- */
-  if (entry.limitations && entry.formula) {
+  /* ---------- hard ②：超出适用边界的归因（仅在无手写 hard 题时补充） ---------- */
+  if (!hasHandwritten('hard') && entry.limitations && entry.formula) {
     out.push(
       pack(
         {

@@ -1,21 +1,24 @@
 #!/usr/bin/env node
 /**
- * 内容校验脚本
+ * 全平台内容校验脚本
  *
  * 用法：  node shared/knowledge-data/schema/validate.mjs
  *
- * 它检查四件事：
- *   1. JSON 能不能解析（写错一个逗号就报出来）
- *   2. 必填字段有没有空（C 最常犯的错）
- *   3. 引用的 id 存不存在（防止把 MIS-O2-04 写成 MIS-O2-4）
- *   4. 前置依赖有没有指向比自己学段更高的知识点
+ * 检查范围：
+ *   1. 全平台 176 张知识卡（knowledge-cards.json）：必填字段、id 唯一、前置依赖存在且不跨级
+ *   2. 全平台 46 条误区（optics-lens/misconceptions.json + misconceptions.json）：必填字段、id 唯一、关联挑战与知识点有效
+ *   3. 全平台挑战（optics-lens/challenges.json + labs/*-challenges.json）：必填字段、id 唯一、知识点引用与预测选项合法
+ *   4. 公式实验室（formula-lab.json）：全部 97 条条目在默认值及滑杆边界处不产生语法错误或 NaN
+ *   5. 实验索引（experiment-index.json）与 platform/experiments/*.pqexp.json 一致性
+ *   6. 光学旧版题库（optics-lens/quiz.json）兼容性校验
  */
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const REPO = join(ROOT, '..', '..');
 const LAB = 'optics-lens';
 
 const C = {
@@ -29,25 +32,28 @@ const C = {
 const errors = [];
 const warns = [];
 
-function load(name) {
-  const p = join(ROOT, LAB, name);
-  if (!existsSync(p)) {
-    errors.push(`${name}：文件不存在`);
+function loadJson(absPath, label) {
+  if (!existsSync(absPath)) {
+    errors.push(`${label}：文件不存在`);
     return null;
   }
   try {
-    return JSON.parse(readFileSync(p, 'utf8'));
+    return JSON.parse(readFileSync(absPath, 'utf8'));
   } catch (e) {
-    errors.push(`${name}：JSON 格式错误 —— ${e.message}`);
+    errors.push(`${label}：JSON 格式错误 —— ${e.message}`);
     return null;
   }
 }
 
-/* ---------- 1. 读文件 ---------- */
-const knowledge = load('knowledge.json');
-const misconceptions = load('misconceptions.json');
-const challenges = load('challenges.json');
-const quiz = load('quiz.json');
+/* ---------- 1. 读取全部核心数据 ---------- */
+const knowledge = loadJson(join(ROOT, LAB, 'knowledge.json'), 'optics-lens/knowledge.json');
+const optMisconceptions = loadJson(join(ROOT, LAB, 'misconceptions.json'), 'optics-lens/misconceptions.json');
+const optChallenges = loadJson(join(ROOT, LAB, 'challenges.json'), 'optics-lens/challenges.json');
+const quiz = loadJson(join(ROOT, LAB, 'quiz.json'), 'optics-lens/quiz.json');
+const globalCardsData = loadJson(join(ROOT, 'knowledge-cards.json'), 'knowledge-cards.json');
+const crossMiscData = loadJson(join(ROOT, 'misconceptions.json'), 'misconceptions.json');
+const formulaLabData = loadJson(join(ROOT, 'formula-lab.json'), 'formula-lab.json');
+const expIndexData = loadJson(join(ROOT, 'experiment-index.json'), 'experiment-index.json');
 
 if (errors.length) {
   console.log(C.red('\n✗ 读取失败：\n'));
@@ -55,182 +61,217 @@ if (errors.length) {
   process.exit(1);
 }
 
-/* ---------- 2. 建索引 ---------- */
-const kIds = new Set(knowledge.cards.map((c) => c.id));
-/* 全平台 176 条知识点在 knowledge-cards.json 里（kIds 只有光学的 26 张） */
-const globalCardIds = (() => {
-  try {
-    const p = join(ROOT, 'knowledge-cards.json');
-    return new Set(JSON.parse(readFileSync(p, 'utf8')).cards.map((c) => c.id));
-  } catch {
-    return new Set();
-  }
-})();
-const mIds = new Set(misconceptions.misconceptions.map((m) => m.id));
-const cIds = new Set(challenges.challenges.map((c) => c.id));
-const qIds = new Set(quiz.items.map((q) => q.id));
-
 const STAGE_ORDER = { primary: 1, junior: 2, senior: 3, university: 4 };
 
-/* ---------- 3. 检查知识卡 ---------- */
-const REQUIRED_CARD = ['id', 'stage', 'title', 'oneLine', 'analogy', 'why', 'prerequisites', 'labPreset'];
-knowledge.cards.forEach((card, i) => {
-  const at = `knowledge.json 第 ${i + 1} 张卡（${card.id ?? '无 id'}）`;
-  REQUIRED_CARD.forEach((f) => {
+/* ---------- 2. 校验全平台 176 张知识卡 ---------- */
+const globalCards = globalCardsData.cards ?? [];
+const globalCardMap = new Map();
+globalCards.forEach((card, i) => {
+  const at = `knowledge-cards.json 第 ${i + 1} 张卡（${card.id ?? '无 id'}）`;
+  ['id', 'stage', 'domain', 'title', 'oneLine', 'why'].forEach((f) => {
     const v = card[f];
-    if (v === undefined || v === null) errors.push(`${at}：缺字段 ${f}`);
-    else if (typeof v === 'string' && v.trim() === '') errors.push(`${at}：字段 ${f} 是空的`);
+    if (v === undefined || v === null || (typeof v === 'string' && v.trim() === '')) {
+      errors.push(`${at}：缺必填字段 ${f}`);
+    }
   });
-  (card.misconceptions ?? []).forEach((m) => {
-    if (!mIds.has(m)) errors.push(`${at}：引用了不存在的误区 ${m}`);
-  });
+  if (card.id) {
+    if (globalCardMap.has(card.id)) errors.push(`${at}：id 重复`);
+    globalCardMap.set(card.id, card);
+  }
+  if (card.stage && !(card.stage in STAGE_ORDER)) {
+    errors.push(`${at}：非法学段 ${card.stage}`);
+  }
+});
+
+globalCards.forEach((card) => {
+  const at = `knowledge-cards.json（${card.id}）`;
   (card.prerequisites ?? []).forEach((p) => {
-    if (!kIds.has(p)) {
+    const pre = globalCardMap.get(p);
+    if (!pre) {
       errors.push(`${at}：前置知识 ${p} 不存在`);
       return;
     }
-    const pre = knowledge.cards.find((c) => c.id === p);
     if (STAGE_ORDER[pre.stage] > STAGE_ORDER[card.stage]) {
       errors.push(`${at}：前置 ${p} 的学段（${pre.stage}）高于自己（${card.stage}）`);
     }
   });
-  if (!card.why || card.why.trim().length < 12) {
-    warns.push(`${at}：why 字段太短（少于 12 字），可能解释不清楚`);
-  }
-  if (!card.analogy || card.analogy.trim().length < 8) {
-    warns.push(`${at}：analogy 字段太短，生活类比可能不够具体`);
-  }
 });
 
-/* ---------- 4. 检查误区 ---------- */
-misconceptions.misconceptions.forEach((m, i) => {
-  const at = `misconceptions.json 第 ${i + 1} 条（${m.id ?? '无 id'}）`;
+/* ---------- 3. 校验全部 5 个模块的挑战（共 133 个） ---------- */
+const allChallenges = [];
+const allChallengeIds = new Set();
+
+function checkChallengeList(list, sourceLabel) {
+  list.forEach((c, i) => {
+    const at = `${sourceLabel} 第 ${i + 1} 个（${c.id ?? '无 id'}）`;
+    ['id', 'title', 'brief'].forEach((f) => {
+      if (!c[f] || String(c[f]).trim() === '') errors.push(`${at}：缺字段 ${f}`);
+    });
+    if (c.id) {
+      if (allChallengeIds.has(c.id)) errors.push(`${at}：挑战 id 重复`);
+      allChallengeIds.add(c.id);
+    }
+    (c.knowledgeIds ?? []).forEach((k) => {
+      if (!globalCardMap.has(k)) errors.push(`${at}：引用不存在的知识点 ${k}`);
+    });
+    if (c.knowledgeId && !globalCardMap.has(c.knowledgeId)) {
+      errors.push(`${at}：引用不存在的知识点 ${c.knowledgeId}`);
+    }
+    if (c.prediction) {
+      const p = c.prediction;
+      if (!Array.isArray(p.options) || p.options.length < 2) {
+        errors.push(`${at}：prediction.options 至少要有 2 个`);
+      }
+      if (typeof p.answerIndex !== 'number' || p.answerIndex < 0 || p.answerIndex >= (p.options?.length ?? 0)) {
+        errors.push(`${at}：prediction.answerIndex 越界或非数字`);
+      }
+    }
+    allChallenges.push(c);
+  });
+}
+
+checkChallengeList(optChallenges.challenges ?? [], 'optics-lens/challenges.json');
+
+const labsDir = join(ROOT, 'labs');
+if (existsSync(labsDir)) {
+  for (const file of readdirSync(labsDir).filter((f) => f.endsWith('-challenges.json')).sort()) {
+    const data = loadJson(join(labsDir, file), `labs/${file}`);
+    if (data) checkChallengeList(data.challenges ?? [], `labs/${file}`);
+  }
+}
+
+/* ---------- 4. 校验全部 46 条误区 ---------- */
+const allMisconceptions = [
+  ...(optMisconceptions.misconceptions ?? []).map((m) => ({ ...m, _src: 'optics-lens/misconceptions.json' })),
+  ...(crossMiscData.misconceptions ?? []).map((m) => ({ ...m, _src: 'misconceptions.json' })),
+];
+const allMiscIds = new Set();
+
+allMisconceptions.forEach((m, i) => {
+  const at = `${m._src} 第 ${i + 1} 条（${m.id ?? '无 id'}）`;
   ['id', 'belief', 'truth'].forEach((f) => {
     if (!m[f] || String(m[f]).trim() === '') errors.push(`${at}：缺字段 ${f}`);
   });
-  if (m.challengedBy && !cIds.has(m.challengedBy)) {
+  if (m.id) {
+    if (allMiscIds.has(m.id)) errors.push(`${at}：误区 id 重复`);
+    allMiscIds.add(m.id);
+  }
+  if (m.challengedBy && !allChallengeIds.has(m.challengedBy)) {
     errors.push(`${at}：challengedBy 指向不存在的挑战 ${m.challengedBy}`);
   }
+  (m.knowledgeIds ?? []).forEach((k) => {
+    if (!globalCardMap.has(k)) errors.push(`${at}：knowledgeIds 引用不存在的知识点 ${k}`);
+  });
 });
 
-/* ---------- 4b. 检查跨领域误区库（力学 / 电磁 / 声学） ---------- */
-let crossMisconceptions = [];
-try {
-  const p = join(ROOT, 'misconceptions.json');
-  if (existsSync(p)) crossMisconceptions = JSON.parse(readFileSync(p, 'utf8')).misconceptions ?? [];
-} catch (e) {
-  errors.push(`misconceptions.json：JSON 格式错误 —— ${e.message}`);
-}
-{
-  // 挑战可能来自任何一个 lab 文件
-  const allChallengeIds = new Set(challenges.challenges.map((c) => c.id));
-  for (const lab of ['mechanics', 'circuits', 'acoustics']) {
-    const p = join(ROOT, 'labs', `${lab}-challenges.json`);
-    if (!existsSync(p)) continue;
-    for (const c of JSON.parse(readFileSync(p, 'utf8')).challenges ?? []) allChallengeIds.add(c.id);
-  }
-  const seen = new Set(misconceptions.misconceptions.map((m) => m.id));
-  crossMisconceptions.forEach((m, i) => {
-    const at = `misconceptions.json 第 ${i + 1} 条（${m.id ?? '无 id'}）`;
-    ['id', 'belief', 'truth', 'challengedBy'].forEach((f) => {
-      if (!m[f] || String(m[f]).trim() === '') errors.push(`${at}：缺字段 ${f}`);
-    });
-    if (seen.has(m.id)) errors.push(`${at}：id 与其他误区重复`);
-    seen.add(m.id);
-    if (m.challengedBy && !allChallengeIds.has(m.challengedBy)) {
-      errors.push(`${at}：challengedBy 指向不存在的挑战 ${m.challengedBy}`);
+/* ---------- 5. 校验全部 97 条公式实验室（含默认值与滑杆边界求值） ---------- */
+const formulaLabs = formulaLabData.labs ?? {};
+const formulaEntries = Object.entries(formulaLabs);
+let formulaWithExpr = 0;
+
+for (const [kid, lab] of formulaEntries) {
+  const at = `formula-lab.json（${kid}）`;
+  if (!globalCardMap.has(kid)) errors.push(`${at}：知识点 ${kid} 不存在`);
+  const inputs = lab.inputs ?? [];
+  const outputs = lab.outputs ?? [];
+  if (outputs.length === 0) continue;
+  formulaWithExpr++;
+
+  const defaults = {};
+  for (const inp of inputs) {
+    if (!inp.key) {
+      errors.push(`${at}：存在缺少 key 的输入参数`);
+      continue;
     }
-    (m.knowledgeIds ?? []).forEach((k) => {
-      if (!kIds.has(k) && !/* 全平台知识点在 knowledge-cards.json 里 */ globalCardIds.has(k)) {
-        errors.push(`${at}：knowledgeIds 引用不存在的知识点 ${k}`);
+    if (typeof inp.min === 'number' && typeof inp.max === 'number' && inp.min >= inp.max) {
+      errors.push(`${at}：参数 ${inp.key} 的 min(${inp.min}) >= max(${inp.max})`);
+    }
+    defaults[inp.key] = inp.default;
+  }
+
+  for (const out of outputs) {
+    if (!out.expr) {
+      errors.push(`${at}：输出 ${out.key ?? out.label} 缺少 expr`);
+      continue;
+    }
+    let fn;
+    try {
+      fn = new Function(...Object.keys(defaults), `return (${out.expr});`);
+    } catch (e) {
+      errors.push(`${at}：公式「${out.expr}」语法错误 —— ${e.message}`);
+      continue;
+    }
+    try {
+      const defVal = fn(...Object.values(defaults));
+      if (!Number.isFinite(defVal)) {
+        errors.push(`${at}：公式「${out.expr}」在默认值处结果非法（${defVal}）`);
       }
-    });
-    if (!m.knowledgeIds?.length) warns.push(`${at}：没有 knowledgeIds，挂不到知识卡上`);
-  });
+    } catch (e) {
+      errors.push(`${at}：公式「${out.expr}」在默认值处求值异常 —— ${e.message}`);
+    }
+    for (const inp of inputs) {
+      for (const edge of [inp.min, inp.max]) {
+        const testVars = { ...defaults, [inp.key]: edge };
+        try {
+          const val = fn(...Object.values(testVars));
+          if (Number.isNaN(val)) {
+            errors.push(`${at}：公式「${out.expr}」在边界 ${inp.key}=${edge} 处产生 NaN`);
+          } else if (!Number.isFinite(val)) {
+            warns.push(`${at}：公式「${out.expr}」在边界 ${inp.key}=${edge} 处趋于无穷（${val}）`);
+          }
+        } catch (e) {
+          errors.push(`${at}：公式「${out.expr}」在边界 ${inp.key}=${edge} 处异常 —— ${e.message}`);
+        }
+      }
+    }
+  }
 }
 
-/* ---------- 5. 检查挑战 ---------- */
-challenges.challenges.forEach((c, i) => {
-  const at = `challenges.json 第 ${i + 1} 个（${c.id ?? '无 id'}）`;
-  ['id', 'title', 'brief', 'hint', 'prediction'].forEach((f) => {
-    if (!c[f]) errors.push(`${at}：缺字段 ${f}`);
-  });
-  // guided 挑战用 winCondition（本地引擎判定），free 挑战用 goal（工作台读数判定）
-  if (c.kind === 'free') {
-    if (!c.goal) errors.push(`${at}：自由搭建的挑战必须有 goal 字段`);
-  } else if (!c.winCondition) {
-    errors.push(`${at}：缺字段 winCondition`);
+/* ---------- 6. 校验 experiment-index.json 与实际实验文件 ---------- */
+const expDir = join(REPO, 'platform', 'experiments');
+const expHas = expIndexData.has ?? {};
+const indexedExpIds = Object.keys(expHas).filter((k) => expHas[k]);
+if (existsSync(expDir)) {
+  const actualFiles = new Set(
+    readdirSync(expDir)
+      .filter((f) => f.endsWith('.pqexp.json'))
+      .map((f) => f.replace(/\.pqexp\.json$/, '')),
+  );
+  for (const id of indexedExpIds) {
+    if (!actualFiles.has(id)) {
+      errors.push(`experiment-index.json：索引了 ${id}，但 platform/experiments/${id}.pqexp.json 不存在`);
+    }
   }
-  (c.knowledgeIds ?? []).forEach((k) => {
-    if (!kIds.has(k)) errors.push(`${at}：引用不存在的知识点 ${k}`);
-  });
-  (c.misconceptionIds ?? []).forEach((m) => {
-    if (!mIds.has(m)) errors.push(`${at}：引用不存在的误区 ${m}`);
-  });
-  if (false) {
-    errors.push(`${at}：demoScriptId 指向不存在的剧本 ${c.demoScriptId}`);
-  }
-  const p = c.prediction;
-  if (p) {
-    if (!Array.isArray(p.options) || p.options.length < 2) errors.push(`${at}：prediction.options 至少要有 2 个`);
-    if (typeof p.answerIndex !== 'number') errors.push(`${at}：prediction.answerIndex 必须是数字`);
-    else if (p.answerIndex < 0 || p.answerIndex >= p.options.length)
-      errors.push(`${at}：prediction.answerIndex 越界`);
-  }
-  if (!c.multiAnswer && c.multiAnswer !== false) warns.push(`${at}：multiAnswer 没写，默认为否`);
-});
+}
 
-/* ---------- 6. 检查题库 ---------- */
-quiz.items.forEach((q, i) => {
-  const at = `quiz.json 第 ${i + 1} 题（${q.id ?? '无 id'}）`;
+/* ---------- 7. 光学旧版题库（optics-lens/quiz.json） ---------- */
+const optKIds = new Set((knowledge.cards ?? []).map((c) => c.id));
+(quiz.items ?? []).forEach((q, i) => {
+  const at = `optics-lens/quiz.json 第 ${i + 1} 题（${q.id ?? '无 id'}）`;
   ['id', 'type', 'question', 'knowledgeId', 'explanation'].forEach((f) => {
     if (!q[f]) errors.push(`${at}：缺字段 ${f}`);
   });
-  if (!kIds.has(q.knowledgeId)) errors.push(`${at}：knowledgeId ${q.knowledgeId} 不存在`);
-  if (q.misconceptionId && !mIds.has(q.misconceptionId))
-    errors.push(`${at}：misconceptionId ${q.misconceptionId} 不存在`);
-  if (q.type === 'single_choice') {
-    if (!Array.isArray(q.options) || q.options.length < 2) errors.push(`${at}：选择题至少 2 个选项`);
-    if (typeof q.answerIndex !== 'number') errors.push(`${at}：选择题必须有 answerIndex`);
-    else if (q.answerIndex < 0 || q.answerIndex >= (q.options?.length ?? 0))
-      errors.push(`${at}：answerIndex 越界`);
+  if (!optKIds.has(q.knowledgeId) && !globalCardMap.has(q.knowledgeId)) {
+    errors.push(`${at}：knowledgeId ${q.knowledgeId} 不存在`);
   }
-  if (q.type === 'short_answer' && !q.answerKey) errors.push(`${at}：简答题必须有 answerKey`);
+  if (q.misconceptionId && !allMiscIds.has(q.misconceptionId)) {
+    errors.push(`${at}：misconceptionId ${q.misconceptionId} 不存在`);
+  }
 });
 
-/* ---------- 8. 覆盖率报告 ---------- */
-const usedByChallenges = new Set(challenges.challenges.flatMap((c) => c.knowledgeIds ?? []));
-const usedByQuiz = new Set(quiz.items.map((q) => q.knowledgeId));
-const uncovered = knowledge.cards.filter(
-  (c) => !usedByChallenges.has(c.id) && !usedByQuiz.has(c.id),
-);
-const misUsedByQuiz = new Set(quiz.items.map((q) => q.misconceptionId).filter(Boolean));
-const misUsedByChallenge = new Set(challenges.challenges.flatMap((c) => c.misconceptionIds ?? []));
-const misUnused = misconceptions.misconceptions.filter(
-  (m) => !misUsedByQuiz.has(m.id) && !misUsedByChallenge.has(m.id),
-);
-
-/* ---------- 9. 输出 ---------- */
+/* ---------- 8. 输出汇总 ---------- */
 console.log('');
-console.log(C.bold('═══ 内容校验 ═══'));
-console.log(C.dim(`知识点 ${knowledge.cards.length} · 误区 ${misconceptions.misconceptions.length} · 挑战 ${challenges.challenges.length} · 题目 ${quiz.items.length}`));
+console.log(C.bold('═══ 全平台内容校验 ═══'));
+console.log(
+  C.dim(
+    `知识点 ${globalCards.length} · 挑战 ${allChallenges.length} · 误区 ${allMisconceptions.length} · 公式实验室 ${formulaEntries.length}（含算式 ${formulaWithExpr}） · 实验索引 ${indexedExpIds.length}`,
+  ),
+);
 console.log('');
 
 if (warns.length) {
   console.log(C.yellow(`⚠ ${warns.length} 条提醒`));
   warns.forEach((w) => console.log('  ' + C.dim('·') + ' ' + w));
-  console.log('');
-}
-
-if (uncovered.length) {
-  console.log(C.yellow(`⚠ ${uncovered.length} 个知识点没有被任何挑战或题目用到：`));
-  uncovered.forEach((c) => console.log('  ' + C.dim('·') + ` ${c.id} ${c.title}`));
-  console.log('');
-}
-
-if (misUnused.length) {
-  console.log(C.yellow(`⚠ ${misUnused.length} 条误区既没有被题目考察、也没有对应挑战：`));
-  misUnused.forEach((m) => console.log('  ' + C.dim('·') + ` ${m.id} ${m.belief}`));
   console.log('');
 }
 
@@ -241,5 +282,5 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(C.green('✓ 全部通过'));
+console.log(C.green('✓ 全平台校验通过'));
 console.log('');

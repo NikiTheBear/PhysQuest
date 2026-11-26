@@ -14,6 +14,7 @@ import { BAND_LABEL, DIM_LABEL, LEVEL_LABEL, W } from '../../core/grading/types'
 import { fmt } from '../../core/grading/rules';
 import { MarkdownLite } from './MarkdownLite';
 import GradingPanel, { pickGradeChallenge } from './GradingPanel';
+import { TeacherSummaryPanel } from './TeacherSummaryPanel';
 import { loadCaptures } from '../../core/grading/capture-store';
 
 interface Props {
@@ -310,6 +311,8 @@ export default function ReportView({
       />
 
       <LearnerBackupPanel learner={learner} onImported={onImported} onToast={onToast} />
+
+      <TeacherSummaryPanel onToast={onToast} />
     </>
   );
 }

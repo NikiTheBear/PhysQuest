@@ -12,10 +12,11 @@
  */
 
 import RAW from './rubric-optics-lens.json';
+import ALL_RAW from '@knowledge/grading/rubrics-all.json';
 import type { Rubric } from './types';
 
 interface RubricFile {
-  labId: string;
+  labId?: string;
   version: number;
   challenges: Record<
     string,
@@ -29,16 +30,17 @@ interface RubricFile {
 }
 
 const FILE = RAW as unknown as RubricFile;
+const ALL_FILE = ALL_RAW as unknown as RubricFile;
 
 /** 缓存：同一关反复评（改反思重评）不用重复构造 */
 const CACHE = new Map<string, Rubric>();
 
-/** 取某一关的评分规则。没有标准时返回 null（§4 的 NO_RUBRIC） */
+/** 取某一关的评分规则：优先手写光学标准，其次全模块合并标准。没有则返回 null（§4 的 NO_RUBRIC） */
 export function loadRubric(challengeId: string): Rubric | null {
   const hit = CACHE.get(challengeId);
   if (hit) return hit;
 
-  const raw = FILE.challenges[challengeId];
+  const raw = FILE.challenges[challengeId] ?? ALL_FILE.challenges?.[challengeId];
   if (!raw) return null;
 
   const rubric: Rubric = {
@@ -54,12 +56,12 @@ export function loadRubric(challengeId: string): Rubric | null {
 
 /** rubric 覆盖了哪些挑战（测试和 UI 文案用） */
 export function coveredChallengeIds(): string[] {
-  return Object.keys(FILE.challenges);
+  return [...new Set([...Object.keys(FILE.challenges), ...Object.keys(ALL_FILE.challenges ?? {})])];
 }
 
 /** 这一关有没有评分标准 */
 export function hasRubric(challengeId: string): boolean {
-  return Boolean(FILE.challenges[challengeId]);
+  return Boolean(FILE.challenges[challengeId] ?? ALL_FILE.challenges?.[challengeId]);
 }
 
 /** 通道后缀 → 人看得懂的名字。取不到就退回后缀本身 */

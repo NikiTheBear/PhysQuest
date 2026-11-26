@@ -1175,14 +1175,35 @@ function otherModels(entry: PromptEntry, all: PromptEntry[]) {
     .map((p) => p.models);
 }
 
-const HANDWRITTEN_SLOTS = new Set(HANDWRITTEN.map((q) => `${q.knowledgeId}:${q.level}`));
+import AI_QUESTIONS_JSON from '@knowledge/ai-questions.json';
+
+const AI_QUESTIONS: BankQuestion[] = (
+  (AI_QUESTIONS_JSON as { questions?: BankQuestion[] }).questions ?? []
+).map((q) => {
+  const items = q.options.map((text, idx) => ({
+    text,
+    note: q.optionNotes?.[idx] ?? '',
+    right: idx === q.answerIndex,
+  }));
+  const shuffled = seededShuffle(items, q.id);
+  return {
+    ...q,
+    options: shuffled.map((i) => i.text),
+    answerIndex: shuffled.findIndex((i) => i.right),
+    optionNotes: shuffled.map((i) => i.note),
+  };
+});
+
+const CURATED_SLOTS = new Set(
+  [...HANDWRITTEN, ...AI_QUESTIONS].map((q) => `${q.knowledgeId}:${q.level}`),
+);
 
 function derive(entry: PromptEntry, all: PromptEntry[]): BankQuestion[] {
   const out: BankQuestion[] = [];
   const base = entry.id;
   const supLabel =
     entry.support === 'direct' ? '可计算' : entry.support === 'approximation' ? '近似' : '仅示意';
-  const hasHandwritten = (lv: QuizLevel) => HANDWRITTEN_SLOTS.has(`${entry.id}:${lv}`);
+  const hasHandwritten = (lv: QuizLevel) => CURATED_SLOTS.has(`${entry.id}:${lv}`);
 
   /* ---------- easy ①：这条该看什么（仅在无手写 easy 题时补充，且按 id 稳定随机抽干扰项） ---------- */
   if (!hasHandwritten('easy') && entry.observations.length >= 2) {
@@ -1382,8 +1403,8 @@ function derive(entry: PromptEntry, all: PromptEntry[]): BankQuestion[] {
 const ALL_PROMPTS = PROMPTS as PromptEntry[];
 const derived: BankQuestion[] = ALL_PROMPTS.flatMap((e) => derive(e, ALL_PROMPTS));
 
-/** 全部题目 */
-export const BANK: BankQuestion[] = [...HANDWRITTEN, ...derived];
+/** 全部题目（手写题 + DeepSeek 审核合入题 + 少量缺档兜底题） */
+export const BANK: BankQuestion[] = [...HANDWRITTEN, ...AI_QUESTIONS, ...derived];
 
 export const bankForKnowledge = (knowledgeId: string) =>
   BANK.filter((q) => q.knowledgeId === knowledgeId);

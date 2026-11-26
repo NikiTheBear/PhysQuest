@@ -42,6 +42,7 @@ jobs:
       - name: 拷贝离线工作台与实验文件
         run: |
           mkdir -p apps/web/dist/prompts
+          cp platform/standalone/fieldlab.html apps/web/dist/workbench.html
           cp shared/knowledge-data/knowledge-prompts.json apps/web/dist/prompts/ 2>/dev/null || true
           touch apps/web/dist/.nojekyll
 

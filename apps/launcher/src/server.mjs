@@ -107,6 +107,18 @@ async function proxyToFieldlab(req, res, url) {
     res.end(buf);
   } catch (e) {
     const aborted = e.name === 'AbortError';
+    // 如果 4317 服务未启动，但本地已有单文件离线版工作台，则直接降级返回它（浏览器端自带完整物理引擎）
+    const standaloneHtml = join(REPO, 'platform', 'standalone', 'fieldlab.html');
+    if (!aborted && (req.method ?? 'GET') === 'GET' && url.pathname === '/workbench' && existsSync(standaloneHtml)) {
+      const buf = await readFile(standaloneHtml);
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Content-Length': String(buf.length),
+        'Cache-Control': 'no-cache',
+      });
+      res.end(buf);
+      return;
+    }
     const msg = aborted ? '工作台响应超时' : '连不上工作台';
     res.writeHead(aborted ? 504 : 502, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end(

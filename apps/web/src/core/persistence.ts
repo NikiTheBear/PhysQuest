@@ -202,32 +202,52 @@ function readBool(o: Record<string, unknown>, key: string, at: string): boolean 
 
 const SHAPES = ['arrow', 'F', 'candle'] as const;
 
+function sanitizeRecord(obj: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (UNSAFE_KEY.has(k)) continue;
+    if (isPlainObject(v)) out[k] = sanitizeRecord(v);
+    else out[k] = v;
+  }
+  return out;
+}
+
+function readReadings(
+  raw: unknown,
+  at: string,
+): Array<{ label: string; value: number; unit: string }> {
+  if (!Array.isArray(raw)) bad(`${at}的 readings 应该是一个数组，实际是${describe(raw)}。`);
+  return (raw as unknown[]).map((item, idx) => {
+    const pos = `${at}的 readings[${idx}]`;
+    if (!isPlainObject(item)) bad(`${pos}应该是一个对象，实际是${describe(item)}。`);
+    return {
+      label: readString(item, 'label', pos),
+      value: readNum(item, 'value', pos),
+      unit: readString(item, 'unit', pos),
+    };
+  });
+}
+
 function readRun(raw: unknown, index: number): LockedRun {
   const at = `第 ${index + 1} 条参数记录`;
   if (!isPlainObject(raw)) bad(`${at}应该是一个对象，实际是${describe(raw)}。`);
   const r = raw as Record<string, unknown>;
 
-  const params = r.params;
-  if (!isPlainObject(params)) bad(`${at}缺 params（那次的实验参数），实际是${describe(params)}。`);
-  const p = params as Record<string, unknown>;
-  const shape = p.objectShape;
-  if (!SHAPES.includes(shape as (typeof SHAPES)[number])) {
-    bad(`${at}的参数 objectShape 只能是 arrow / F / candle，实际是${describe(shape)}。`);
-  }
+  const rawParams = r.params;
+  if (!isPlainObject(rawParams)) bad(`${at}缺 params（那次的实验参数），实际是${describe(rawParams)}。`);
+  const p = rawParams as Record<string, unknown>;
 
-  const metrics = r.metrics;
-  if (!isPlainObject(metrics)) bad(`${at}缺 metrics（那次的实验结果），实际是${describe(metrics)}。`);
-  const m = metrics as Record<string, unknown>;
+  const labId = r.labId !== undefined ? readString(r, 'labId', at) : undefined;
+  const isOpticsRun =
+    (labId === undefined || labId === 'optics-lens') && 'objectShape' in p && 'u' in p && 'f' in p;
 
-  const prediction = r.prediction;
-  if (prediction !== null && !isPlainObject(prediction)) {
-    bad(`${at}的 prediction 要么是 null，要么是一个对象，实际是${describe(prediction)}。`);
-  }
-  const pred = prediction ? (prediction as Record<string, unknown>) : null;
-
-  return {
-    challengeId: readString(r, 'challengeId', at),
-    params: {
+  let params: LockedRun['params'];
+  if (isOpticsRun) {
+    const shape = p.objectShape;
+    if (!SHAPES.includes(shape as (typeof SHAPES)[number])) {
+      bad(`${at}的参数 objectShape 只能是 arrow / F / candle，实际是${describe(shape)}。`);
+    }
+    params = {
       u: readNum(p, 'u', `${at}的 params`),
       f: readNum(p, 'f', `${at}的 params`),
       h: readNum(p, 'h', `${at}的 params`),
@@ -235,8 +255,18 @@ function readRun(raw: unknown, index: number): LockedRun {
       maskTop: readBool(p, 'maskTop', `${at}的 params`),
       lensDiameter: readNum(p, 'lensDiameter', `${at}的 params`),
       objectShape: shape as (typeof SHAPES)[number],
-    },
-    metrics: {
+    };
+  } else {
+    params = sanitizeRecord(p);
+  }
+
+  let metrics: LockedRun['metrics'] | undefined;
+  if (r.metrics !== undefined && r.metrics !== null) {
+    if (!isPlainObject(r.metrics)) {
+      bad(`${at}的 metrics 应该是一个对象，实际是${describe(r.metrics)}。`);
+    }
+    const m = r.metrics as Record<string, unknown>;
+    metrics = {
       v: readNum(m, 'v', `${at}的 metrics`),
       m: readNum(m, 'm', `${at}的 metrics`),
       real: readBool(m, 'real', `${at}的 metrics`),
@@ -244,7 +274,27 @@ function readRun(raw: unknown, index: number): LockedRun {
       screenHasImage: readBool(m, 'screenHasImage', `${at}的 metrics`),
       blurDiameter: readNum(m, 'blurDiameter', `${at}的 metrics`),
       description: readString(m, 'description', `${at}的 metrics`),
-    },
+    };
+  } else if (isOpticsRun) {
+    bad(`${at}缺 metrics（那次的实验结果），实际是${describe(r.metrics)}。`);
+  }
+
+  const readings = r.readings !== undefined ? readReadings(r.readings, at) : undefined;
+  const summary = r.summary !== undefined ? readString(r, 'summary', at) : undefined;
+
+  const prediction = r.prediction;
+  if (prediction !== null && prediction !== undefined && !isPlainObject(prediction)) {
+    bad(`${at}的 prediction 要么是 null，要么是一个对象，实际是${describe(prediction)}。`);
+  }
+  const pred = prediction ? (prediction as Record<string, unknown>) : null;
+
+  return {
+    challengeId: readString(r, 'challengeId', at),
+    ...(labId !== undefined ? { labId } : {}),
+    params,
+    ...(readings !== undefined ? { readings } : {}),
+    ...(summary !== undefined ? { summary } : {}),
+    ...(metrics !== undefined ? { metrics } : {}),
     prediction: pred
       ? {
           challengeId: readString(pred, 'challengeId', `${at}的 prediction`),

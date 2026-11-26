@@ -22,15 +22,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: apps/web/package-lock.json
 
-      - name: 安装依赖
+      - name: 安装主应用依赖
         working-directory: apps/web
         run: npm ci
 
-      - name: 构建（静态模式）
+      - name: 构建主应用（静态模式）
         working-directory: apps/web
         env:
           # Pages 部署在 /PhysQuest/ 子路径下
@@ -38,6 +38,14 @@ jobs:
           # 让自由搭建工作台走静态单文件版，不需要本地服务
           VITE_STATIC_WORKBENCH: '1'
         run: npm run build
+
+      - name: 构建离线单文件工作台
+        working-directory: platform
+        run: |
+          npm ci
+          node scripts/sync-physquest.mjs ..
+          npm --prefix physquest/apps/web ci
+          npm run build
 
       - name: 拷贝离线工作台与实验文件
         run: |

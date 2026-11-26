@@ -229,6 +229,21 @@ export default function ImmersiveLab({
           >
             {confirmClear ? '再点一次确认清空' : '清空实验台'}
           </button>
+          {loadExperiment && (
+            <button
+              className="ib-btn"
+              onClick={() => {
+                const share = `${location.origin}${location.pathname}?challenge=${encodeURIComponent(loadExperiment)}&view=lab`;
+                navigator.clipboard?.writeText(share).then(
+                  () => onMessage?.('已复制本关直达链接，发给学生点开即进此关'),
+                  () => onMessage?.(`本关链接：${share}`),
+                );
+              }}
+              title="复制这一关的直达分享链接"
+            >
+              分享链接
+            </button>
+          )}
           <button className="ib-btn" disabled={!ready || capturing} onClick={capture}>
             {capturing ? '记录中…' : '记录此刻'}
           </button>

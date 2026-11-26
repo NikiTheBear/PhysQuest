@@ -319,10 +319,10 @@ describe('对称对数刻度（跨零 / 从 0 起、且线性太粗）', () => {
    ============================================================ */
 
 describe('全量 193 个 input（formula-lab.json）', () => {
-  it('数量对得上：78 条 formula / 193 个 input', () => {
+  it('数量对得上：86 条 formula / 212 个 input', () => {
     const labs = Object.values(LABS).filter((l) => l.kind === 'formula');
-    expect(labs).toHaveLength(78);
-    expect(labs.reduce((n, l) => n + l.inputs.length, 0)).toBe(193);
+    expect(labs).toHaveLength(86);
+    expect(labs.reduce((n, l) => n + l.inputs.length, 0)).toBe(212);
   });
 
   it('每个 input 的 fromPos 全程有限、在 [min,max] 内、单调不减', () => {
@@ -449,18 +449,18 @@ describe('全量 193 个 input（formula-lab.json）', () => {
     expect(bad).toEqual([]);
   });
 
-  it('刻度分布：91 线性 / 99 对数 / 3 对称对数（数据一变这条会提醒）', () => {
+  it('刻度分布：106 线性 / 103 对数 / 3 对称对数（数据一变这条会提醒）', () => {
     const counts = { linear: 0, log: 0, symlog: 0 };
     for (const { inp: i } of allInputs()) counts[scaleKind(i)] += 1;
-    expect(counts).toEqual({ linear: 91, log: 99, symlog: 3 });
+    expect(counts).toEqual({ linear: 106, log: 103, symlog: 3 });
   });
 
-  it('其中 min = 0 的 13 个、跨零的 10 个，全部不走对数', () => {
+  it('其中 min = 0 的 13 个、跨零的 11 个，全部不走对数', () => {
     const rows = allInputs();
     const zeroMin = rows.filter((r) => r.inp.min === 0);
     const crossing = rows.filter((r) => r.inp.min < 0 && r.inp.max > 0);
     expect(zeroMin).toHaveLength(13);
-    expect(crossing).toHaveLength(10);
+    expect(crossing).toHaveLength(11);
     for (const r of [...zeroMin, ...crossing]) {
       expect(scaleKind(r.inp), `${r.labId}/${r.inp.key} 不该走对数`).not.toBe('log');
     }

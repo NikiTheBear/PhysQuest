@@ -334,6 +334,25 @@ export class Simulation {
         channels[c.id+':Tb']={value:tb===null?0:tb,unit:'℃',label:c.name+' · B 端',valid:tb!==null,kind:c.kind};
         channels[c.id+':heatFlow']={value,unit:'W',label:c.name+' · 热流（A→B）',valid:ta!==null&&tb!==null,kind:c.kind};
       }
+      if(c.kind==='gas_piston'){
+        const R=8.314462618,n=Math.max(1e-6,p.moles),V=Math.max(1e-6,p.volume),T=Math.max(1,p.temperature),gamma=Math.max(1.05,p.gamma||1.4);
+        const pressureKPa=(n*R*T/V)/1000;
+        const internalEnergy=(n*R*T)/(gamma-1);
+        channels[c.id+':pressure']={value:pressureKPa,unit:'kPa',label:c.name+' · 气体压强',valid:Number.isFinite(pressureKPa),kind:c.kind};
+        channels[c.id+':internalEnergy']={value:internalEnergy,unit:'J',label:c.name+' · 气体内能',valid:Number.isFinite(internalEnergy),kind:c.kind};
+        channels[c.id+':temperature']={value:T,unit:'K',label:c.name+' · 温度',valid:true,kind:c.kind};
+        channels[c.id+':volume']={value:V,unit:'m³',label:c.name+' · 体积',valid:true,kind:c.kind};
+        value=pressureKPa;unitLabel='kPa';label=c.name+' · 压强';
+      }
+      if(c.kind==='pulley'){
+        const g=Math.max(.1,p.gravity||9.8),weight=Math.max(0,p.loadMass)*g,strands=Math.max(1,Math.round(p.strands||1)),eta=Math.max(.05,Math.min(1,p.efficiency||1));
+        const idealEffort=weight/strands,effort=idealEffort/eta,ma=strands*eta;
+        channels[c.id+':effort']={value:effort,unit:'N',label:c.name+' · 实际拉力',valid:Number.isFinite(effort),kind:c.kind};
+        channels[c.id+':weight']={value:weight,unit:'N',label:c.name+' · 物重',valid:Number.isFinite(weight),kind:c.kind};
+        channels[c.id+':idealEffort']={value:idealEffort,unit:'N',label:c.name+' · 理想拉力',valid:Number.isFinite(idealEffort),kind:c.kind};
+        channels[c.id+':mechanicalAdvantage']={value:ma,unit:'倍',label:c.name+' · 实际省力倍数',valid:Number.isFinite(ma),kind:c.kind};
+        value=effort;unitLabel='N';label=c.name+' · 拉力';
+      }
       if(CIRCUIT_KINDS.includes(c.kind)){const r=this.circuit.readings[c.id];if(r){value=['battery','ac_source','capacitor','voltmeter'].includes(c.kind)?r.voltage:r.current;unitLabel=['battery','ac_source','capacitor','voltmeter'].includes(c.kind)?'V':'A';channels[c.id+':V']={value:r.voltage,unit:'V',label:c.name+' · 电压',kind:c.kind};channels[c.id+':I']={value:r.current,unit:'A',label:c.name+' · 电流',kind:c.kind};channels[c.id+':P']={value:r.power,unit:'W',label:c.name+' · 功率',kind:c.kind};}}
       channels[c.id]={value,unit:unitLabel,label,kind:c.kind};
     }

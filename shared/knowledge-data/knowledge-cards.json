@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "count": 176,
+  "count": 200,
   "cards": [
     {
       "id": "K-A1-01",
@@ -514,6 +514,85 @@
           "a": "四分之一。8 米是 2 米的四倍，声压按 1/d 掉到四分之一；若算声强，才会掉到十六分之一。"
         }
       ]
+    },
+    {
+      "id": "K-A3-06",
+      "stage": "senior",
+      "domain": "acoustics",
+      "domainLabel": "声学",
+      "title": "驻波与乐器泛音",
+      "oneLine": "理解两列反向传播的同频波叠加形成波节与波腹不动的驻波，以及弦乐/管乐的泛音列。",
+      "analogy": "换一个「弦长 L」，结果就不一样——就像同时改变弦长 L和波速 v去试同一件事，感觉完全不同。",
+      "formula": "f_n = n·v / (2L)",
+      "why": "怎么研究：在实验台放入 speaker、microphone，调节 弦长 L、波速 v、谐波次数 n 并记录 基频与泛音频率。\n这一条目前只能做示意图，平台里还没有对应的数值求解器——所以它讲的是趋势和关系，不是精确数字。\n边界：平台声场无边界反射，驻波定量规律通过公式实验室验证。",
+      "variables": [
+        "弦长 L",
+        "波速 v",
+        "谐波次数 n"
+      ],
+      "observations": [
+        "基频与泛音频率"
+      ],
+      "support": "conceptual",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "advanced",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-A3-07",
+      "stage": "senior",
+      "domain": "acoustics",
+      "domainLabel": "声学",
+      "title": "拍频（两相近频率叠加）",
+      "oneLine": "放两个频率只差几赫兹的点声源，用麦克风测声压波形，观察包络周期性强弱起伏（拍现象）。",
+      "analogy": "换一个「声源1频率 f₁」，结果就不一样——就像同时改变声源1频率 f₁和声源2频率 f₂去试同一件事，感觉完全不同。",
+      "formula": "f_拍 = |f₁ − f₂|",
+      "why": "怎么研究：在实验台放入 speaker、microphone，调节 声源1频率 f₁、声源2频率 f₂ 并记录 叠加声压波形。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：频率差过小时需延长采样时间才能看到完整拍周期。",
+      "variables": [
+        "声源1频率 f₁",
+        "声源2频率 f₂"
+      ],
+      "observations": [
+        "叠加声压波形"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-A3-08",
+      "stage": "senior",
+      "domain": "acoustics",
+      "domainLabel": "声学",
+      "title": "波速、频率与波长的关系",
+      "oneLine": "明确波速由介质决定、频率由波源决定，波长则是两者共同决定的空间周期。",
+      "analogy": "换一个「频率 f」，结果就不一样——就像同时改变频率 f和声速 v去试同一件事，感觉完全不同。",
+      "formula": "v = λ·f",
+      "why": "怎么研究：在实验台放入 speaker、microphone，调节 频率 f、声速 v 并记录 波长 λ。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：均匀无色散介质近似。",
+      "variables": [
+        "频率 f",
+        "声速 v"
+      ],
+      "observations": [
+        "波长 λ"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
     },
     {
       "id": "K-A4-03",
@@ -2798,6 +2877,114 @@
       ]
     },
     {
+      "id": "K-E3-17",
+      "stage": "senior",
+      "domain": "electromagnetism",
+      "domainLabel": "电磁",
+      "title": "高斯定律与对称电场",
+      "oneLine": "理解闭合曲面电通量只取决于内部净电荷，利用球/柱/面对称性快速求电场分布。",
+      "analogy": "换一个「内部电荷量」，结果就不一样——就像同时改变内部电荷量和高斯面半径去试同一件事，感觉完全不同。",
+      "formula": "Φ_E = ∮ E·dA = Q_内 / ε₀",
+      "why": "怎么研究：在实验台放入 charge、probe，调节 内部电荷量、高斯面半径 并记录 电场强度。\n这一条目前只能做示意图，平台里还没有对应的数值求解器——所以它讲的是趋势和关系，不是精确数字。\n边界：解析求解依赖高度几何对称性；非对称电荷分布仍满足高斯定律但难直接反解 E。",
+      "variables": [
+        "内部电荷量",
+        "高斯面半径"
+      ],
+      "observations": [
+        "电场强度"
+      ],
+      "support": "conceptual",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "advanced",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-E3-18",
+      "stage": "senior",
+      "domain": "electromagnetism",
+      "domainLabel": "电磁",
+      "title": "基尔霍夫电路定律",
+      "oneLine": "用节点电流定律（电荷守恒）和回路电压定律（能量守恒）分析任意复杂多回路网络。",
+      "analogy": "换一个「支路电阻」，结果就不一样——就像同时改变支路电阻和电源电动势去试同一件事，感觉完全不同。",
+      "formula": "∑I_入 = ∑I_出，∑ΔV_回路 = 0",
+      "why": "怎么研究：在实验台放入 battery、resistor、ammeter、voltmeter，调节 支路电阻、电源电动势 并记录 各支路电流、各元件电压。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：适用于集总参数电路（电路尺寸远小于电磁波波长）。",
+      "variables": [
+        "支路电阻",
+        "电源电动势"
+      ],
+      "observations": [
+        "各支路电流",
+        "各元件电压"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-E3-19",
+      "stage": "senior",
+      "domain": "electromagnetism",
+      "domainLabel": "电磁",
+      "title": "RC 与 RL 电路时间常数",
+      "oneLine": "观察电容充放电与电感通断暂态曲线，验证经过 1 个时间常数 τ 变化完成约 63.2%。",
+      "analogy": "换一个「电阻 R」，结果就不一样——就像同时改变电阻 R和电容 C去试同一件事，感觉完全不同。",
+      "formula": "τ_RC = R·C，τ_RL = L / R",
+      "why": "怎么研究：在实验台放入 battery、resistor、capacitor、switch，调节 电阻 R、电容 C 并记录 电容电压、支路电流。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：采用理想定值电阻与线性电容/电感，忽略导线分布参数。",
+      "variables": [
+        "电阻 R",
+        "电容 C"
+      ],
+      "observations": [
+        "电容电压",
+        "支路电流"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-E3-20",
+      "stage": "senior",
+      "domain": "electromagnetism",
+      "domainLabel": "电磁",
+      "title": "RLC 串联谐振与阻抗",
+      "oneLine": "调节交流电源频率，找到容抗与感抗恰好抵消、回路阻抗最小且电流最大的谐振频率。",
+      "analogy": "换一个「交流频率 f」，结果就不一样——就像同时改变交流频率 f和电感 L去试同一件事，感觉完全不同。",
+      "formula": "Z = √(R² + (X_L − X_C)²)，f₀ = 1 / (2π√(LC))",
+      "why": "怎么研究：在实验台放入 ac_source、resistor、capacitor、inductor，调节 交流频率 f、电感 L、电容 C 并记录 回路电流、元件电压。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：实际电感线圈存在绕组电阻与铁芯损耗，品质因数 Q 有限。",
+      "variables": [
+        "交流频率 f",
+        "电感 L",
+        "电容 C"
+      ],
+      "observations": [
+        "回路电流",
+        "元件电压"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
       "id": "K-E4-01",
       "stage": "university",
       "domain": "electromagnetism",
@@ -4555,6 +4742,60 @@
       ]
     },
     {
+      "id": "K-M2-15",
+      "stage": "junior",
+      "domain": "mechanics",
+      "domainLabel": "力学",
+      "title": "定滑轮与动滑轮",
+      "oneLine": "对比定滑轮（改变方向不省力）与动滑轮（省一半力但费一倍距离）的拉力差异。",
+      "analogy": "换一个「承重绳股数 n」，结果就不一样——就像同时改变承重绳股数 n和重物质量去试同一件事，感觉完全不同。",
+      "formula": "定滑轮 F = G；理想动滑轮 F = G/2",
+      "why": "怎么研究：在实验台放入 pulley，调节 承重绳股数 n、重物质量 并记录 实际拉力、物重。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：忽略绳重与绳弹性伸长，机械效率以综合系数 η 近似。",
+      "variables": [
+        "承重绳股数 n",
+        "重物质量"
+      ],
+      "observations": [
+        "实际拉力",
+        "物重"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-M2-16",
+      "stage": "junior",
+      "domain": "mechanics",
+      "domainLabel": "力学",
+      "title": "滑轮组与省力费距离",
+      "oneLine": "验证滑轮组承重股数越多越省力，但手拉绳的距离也成倍增加（功的原理）。",
+      "analogy": "换一个「承重绳股数 n」，结果就不一样——就像同时改变承重绳股数 n和机械效率 η去试同一件事，感觉完全不同。",
+      "formula": "F = G / (n·η)，s = n·h",
+      "why": "怎么研究：在实验台放入 pulley，调节 承重绳股数 n、机械效率 η 并记录 实际拉力、实际省力倍数。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：绳段视为平行竖直，不计斜拉夹角带来的额外张力。",
+      "variables": [
+        "承重绳股数 n",
+        "机械效率 η"
+      ],
+      "observations": [
+        "实际拉力",
+        "实际省力倍数"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
       "id": "K-M3-01",
       "stage": "senior",
       "domain": "mechanics",
@@ -5583,6 +5824,113 @@
       ]
     },
     {
+      "id": "K-M3-17",
+      "stage": "senior",
+      "domain": "mechanics",
+      "domainLabel": "力学",
+      "title": "静摩擦与滑动摩擦的突变",
+      "oneLine": "观察推力逐渐增大时，静摩擦力随之增大直到最大静摩擦，物体启动瞬间摩擦力回落到滑动摩擦。",
+      "analogy": "换一个「水平推力」，结果就不一样——就像同时改变水平推力和摩擦系数去试同一件事，感觉完全不同。",
+      "formula": "f_静 ≤ μ_s·N，f_滑 = μ_k·N",
+      "why": "怎么研究：在实验台放入 box、floor_slab、force，调节 水平推力、摩擦系数 并记录 速度、外力加速度。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：Cannon 刚体引擎以单一摩擦系数近似静/动摩擦，精细突变需结合理论曲线理解。",
+      "variables": [
+        "水平推力",
+        "摩擦系数"
+      ],
+      "observations": [
+        "速度",
+        "外力加速度"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-M3-18",
+      "stage": "senior",
+      "domain": "mechanics",
+      "domainLabel": "力学",
+      "title": "超重与失重（非惯性系初探）",
+      "oneLine": "理解超重和失重只取决于加速度方向而非运动方向：加速上升或减速下降均超重，反之失重。",
+      "analogy": "换一个「竖直加速度 a」，结果就不一样——就像同时改变竖直加速度 a和质量 m去试同一件事，感觉完全不同。",
+      "formula": "N = m(g + a)",
+      "why": "怎么研究：在实验台放入 box、force，调节 竖直加速度 a、质量 m 并记录 视重 N。\n这一条是近似/类比模型，结论在边界内成立，越过边界就不准了。\n边界：假设竖直加速度恒定且不计空气浮力。",
+      "variables": [
+        "竖直加速度 a",
+        "质量 m"
+      ],
+      "observations": [
+        "视重 N"
+      ],
+      "support": "approximation",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-M3-19",
+      "stage": "senior",
+      "domain": "mechanics",
+      "domainLabel": "力学",
+      "title": "质心与质心运动定理",
+      "oneLine": "理解多体系统的内力无论多复杂，都不会改变质心加速度；质心运动只由合外力决定。",
+      "analogy": "换一个「两球质量比」，结果就不一样——就像同时改变两球质量比和弹簧劲度系数去试同一件事，感觉完全不同。",
+      "formula": "F_合外 = M·a_cm",
+      "why": "怎么研究：在实验台放入 body、spring，调节 两球质量比、弹簧劲度系数 并记录 质心位置、两球速度。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：质心位置按离散质点加权平均计算，不含连续体形变。",
+      "variables": [
+        "两球质量比",
+        "弹簧劲度系数"
+      ],
+      "observations": [
+        "质心位置",
+        "两球速度"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-M3-20",
+      "stage": "senior",
+      "domain": "mechanics",
+      "domainLabel": "力学",
+      "title": "弹簧振子与单摆周期",
+      "oneLine": "验证弹簧振子周期只与质量、劲度系数有关而与振幅无关；单摆周期与摆球质量无关。",
+      "analogy": "换一个「质量 m」，结果就不一样——就像同时改变质量 m和劲度系数 k去试同一件事，感觉完全不同。",
+      "formula": "T_弹簧 = 2π√(m/k)，T_单摆 = 2π√(L/g)",
+      "why": "怎么研究：在实验台放入 anchor、body、spring，调节 质量 m、劲度系数 k 并记录 位移、周期。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：单摆周期公式仅在小摆角（θ < 5°）近似下成立。",
+      "variables": [
+        "质量 m",
+        "劲度系数 k"
+      ],
+      "observations": [
+        "位移",
+        "周期"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
       "id": "K-M4-01",
       "stage": "university",
       "domain": "mechanics",
@@ -6089,6 +6437,59 @@
           "a": "不能。雷诺数很大时惯性主导，阻力近似正比于速度的平方，还可能出现湍流和涡脱落，须换另一套模型。"
         }
       ]
+    },
+    {
+      "id": "K-M4-09",
+      "stage": "university",
+      "domain": "mechanics",
+      "domainLabel": "力学",
+      "title": "平行轴定理与刚体纯滚动",
+      "oneLine": "比较实心圆柱与滑块沿斜面下滑的加速度差异，理解转动惯量分走了部分重力势能。",
+      "analogy": "换一个「斜面倾角」，结果就不一样——就像同时改变斜面倾角和圆柱半径去试同一件事，感觉完全不同。",
+      "formula": "I = I_cm + m·d²，v_cm = ω·R",
+      "why": "怎么研究：在实验台放入 cylinder、ramp，调节 斜面倾角、圆柱半径 并记录 速度、角速度。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：纯滚动要求静摩擦足够大（不打滑），且忽略滚动阻力矩。",
+      "variables": [
+        "斜面倾角",
+        "圆柱半径"
+      ],
+      "observations": [
+        "速度",
+        "角速度"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-M4-10",
+      "stage": "university",
+      "domain": "mechanics",
+      "domainLabel": "力学",
+      "title": "开普勒三定律与轨道能量",
+      "oneLine": "理解椭圆轨道扫掠面积速率守恒（角动量守恒），以及轨道半长轴与周期的 3/2 次方关系。",
+      "analogy": "换一个「半长轴 a」，结果就不一样——就像同时改变半长轴 a和中心天体质量去试同一件事，感觉完全不同。",
+      "formula": "T² / a³ = 4π² / (GM)",
+      "why": "怎么研究：在实验台放入 body、expression_force，调节 半长轴 a、中心天体质量 并记录 轨道周期。\n这一条是近似/类比模型，结论在边界内成立，越过边界就不准了。\n边界：忽略多体摄动与广义相对论进动，仅适用于二体引力问题。",
+      "variables": [
+        "半长轴 a",
+        "中心天体质量"
+      ],
+      "observations": [
+        "轨道周期"
+      ],
+      "support": "approximation",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
     },
     {
       "id": "K-N1-01",
@@ -9150,6 +9551,112 @@
       }
     },
     {
+      "id": "K-O3-07",
+      "stage": "senior",
+      "domain": "optics",
+      "domainLabel": "光学",
+      "title": "全反射与光纤原理",
+      "oneLine": "让激光从光密介质射向光疏介质，增大入射角超过临界角，观察折射光消失并发生全反射。",
+      "analogy": "换一个「入射角」，结果就不一样——就像同时改变入射角和介质折射率 n₁/n₂去试同一件事，感觉完全不同。",
+      "formula": "sin θ_c = n₂ / n₁（n₁ > n₂）",
+      "why": "怎么研究：在实验台放入 laser、refract_plane，调节 入射角、介质折射率 n₁/n₂ 并记录 反射光路。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：全反射只在光密射向光疏时发生；模型不计算界面处的倏逝波渗透。",
+      "variables": [
+        "入射角",
+        "介质折射率 n₁/n₂"
+      ],
+      "observations": [
+        "反射光路"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-O3-08",
+      "stage": "senior",
+      "domain": "optics",
+      "domainLabel": "光学",
+      "title": "杨氏双缝干涉",
+      "oneLine": "理解两列相干光波因光程差形成明暗相间条纹，以及条纹间距与波长、缝距的关系。",
+      "analogy": "换一个「波长 λ」，结果就不一样——就像同时改变波长 λ和双缝间距 d去试同一件事，感觉完全不同。",
+      "formula": "Δx = L·λ / d",
+      "why": "怎么研究：在实验台放入 laser、detector，调节 波长 λ、双缝间距 d、缝屏距 L 并记录 条纹间距 Δx。\n这一条目前只能做示意图，平台里还没有对应的数值求解器——所以它讲的是趋势和关系，不是精确数字。\n边界：几何光线追踪器不模拟波动干涉，本条通过公式实验室验证定量规律。",
+      "variables": [
+        "波长 λ",
+        "双缝间距 d",
+        "缝屏距 L"
+      ],
+      "observations": [
+        "条纹间距 Δx"
+      ],
+      "support": "conceptual",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "advanced",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-O3-09",
+      "stage": "senior",
+      "domain": "optics",
+      "domainLabel": "光学",
+      "title": "薄膜干涉与增透膜",
+      "oneLine": "理解肥皂泡彩色条纹与相机镜头镀膜增透的原理：上下表面反射光的光程差与半波损失。",
+      "analogy": "换一个「膜厚 d」，结果就不一样——就像同时改变膜厚 d和膜折射率 n去试同一件事，感觉完全不同。",
+      "formula": "2n·d = (m + 1/2)·λ（半波损失）",
+      "why": "怎么研究：在实验台放入 optical_filter，调节 膜厚 d、膜折射率 n、波长 λ 并记录 干涉相消条件。\n这一条目前只能做示意图，平台里还没有对应的数值求解器——所以它讲的是趋势和关系，不是精确数字。\n边界：正入射单层膜近似，不计多次反射叠加与色散。",
+      "variables": [
+        "膜厚 d",
+        "膜折射率 n",
+        "波长 λ"
+      ],
+      "observations": [
+        "干涉相消条件"
+      ],
+      "support": "conceptual",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "advanced",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-O3-10",
+      "stage": "senior",
+      "domain": "optics",
+      "domainLabel": "光学",
+      "title": "光的偏振与马吕斯定律",
+      "oneLine": "理解光是横波才能发生偏振；线偏振光通过检偏器后的光强按夹角余弦平方衰减。",
+      "analogy": "换一个「偏振片夹角 θ」，结果就不一样——就像同时改变偏振片夹角 θ和入射光强 I₀去试同一件事，感觉完全不同。",
+      "formula": "I = I₀·cos²θ",
+      "why": "怎么研究：在实验台放入 laser、optical_filter，调节 偏振片夹角 θ、入射光强 I₀ 并记录 透射光强 I。\n这一条目前只能做示意图，平台里还没有对应的数值求解器——所以它讲的是趋势和关系，不是精确数字。\n边界：理想偏振片模型，忽略吸收损耗与椭圆偏振。",
+      "variables": [
+        "偏振片夹角 θ",
+        "入射光强 I₀"
+      ],
+      "observations": [
+        "透射光强 I"
+      ],
+      "support": "conceptual",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "advanced",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
       "id": "K-O4-01",
       "stage": "university",
       "domain": "optics",
@@ -10271,6 +10778,33 @@
       ]
     },
     {
+      "id": "K-T2-09",
+      "stage": "junior",
+      "domain": "thermodynamics",
+      "domainLabel": "热学",
+      "title": "热膨胀与双金属片",
+      "oneLine": "理解大多数物体热胀冷缩，以及不同膨胀系数金属贴合后受热弯曲做温控开关的原理。",
+      "analogy": "换一个「线膨胀系数 α」，结果就不一样——就像同时改变线膨胀系数 α和温差 ΔT去试同一件事，感觉完全不同。",
+      "formula": "ΔL = α·L₀·ΔT",
+      "why": "怎么研究：在实验台放入 heat_source、thermometer，调节 线膨胀系数 α、温差 ΔT、原长 L₀ 并记录 长度伸长量 ΔL。\n这一条目前只能做示意图，平台里还没有对应的数值求解器——所以它讲的是趋势和关系，不是精确数字。\n边界：线性膨胀近似仅在较小温差区间成立。",
+      "variables": [
+        "线膨胀系数 α",
+        "温差 ΔT",
+        "原长 L₀"
+      ],
+      "observations": [
+        "长度伸长量 ΔL"
+      ],
+      "support": "conceptual",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "advanced",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
       "id": "K-T3-01",
       "stage": "senior",
       "domain": "thermodynamics",
@@ -10776,6 +11310,87 @@
       ]
     },
     {
+      "id": "K-T3-09",
+      "stage": "senior",
+      "domain": "thermodynamics",
+      "domainLabel": "热学",
+      "title": "盖-吕萨克定律（等压变化）",
+      "oneLine": "用理想气体活塞缸保持压强不变，调节热力学温度 T，验证气体体积与绝对温度成正比。",
+      "analogy": "换一个「热力学温度 T」，结果就不一样——就像同时改变热力学温度 T和气体体积 V去试同一件事，感觉完全不同。",
+      "formula": "V / T = 常量（P、n 恒定）",
+      "why": "怎么研究：在实验台放入 gas_piston，调节 热力学温度 T、气体体积 V 并记录 气体压强、气体体积。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：理想气体假设，高压低温接近液化点时偏离。",
+      "variables": [
+        "热力学温度 T",
+        "气体体积 V"
+      ],
+      "observations": [
+        "气体压强",
+        "气体体积"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-T3-10",
+      "stage": "senior",
+      "domain": "thermodynamics",
+      "domainLabel": "热学",
+      "title": "绝热过程与绝热指数 γ",
+      "oneLine": "对比单原子（γ≈1.67）与双原子（γ≈1.4）气体的绝热压缩，理解绝热线比等温线更陡。",
+      "analogy": "换一个「绝热指数 γ」，结果就不一样——就像同时改变绝热指数 γ和气体体积 V去试同一件事，感觉完全不同。",
+      "formula": "P·V^γ = 常量，U = nRT / (γ − 1)",
+      "why": "怎么研究：在实验台放入 gas_piston，调节 绝热指数 γ、气体体积 V、温度 T 并记录 气体压强、气体内能。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：准静态可逆绝热近似，不计快速压缩产生的激波耗散。",
+      "variables": [
+        "绝热指数 γ",
+        "气体体积 V",
+        "温度 T"
+      ],
+      "observations": [
+        "气体压强",
+        "气体内能"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
+      "id": "K-T3-11",
+      "stage": "senior",
+      "domain": "thermodynamics",
+      "domainLabel": "热学",
+      "title": "卡诺循环与最高效率上限",
+      "oneLine": "理解工作在两个恒温热源之间的任何热机，效率都无法超过可逆卡诺热机上限。",
+      "analogy": "换一个「高温热源 T_高」，结果就不一样——就像同时改变高温热源 T_高和低温热源 T_低去试同一件事，感觉完全不同。",
+      "formula": "η_卡诺 = 1 − T_低 / T_高",
+      "why": "怎么研究：在实验台放入 gas_piston，调节 高温热源 T_高、低温热源 T_低 并记录 最高理论效率。\n这一条是近似/类比模型，结论在边界内成立，越过边界就不准了。\n边界：卡诺循环要求无限慢的准静态可逆过程，实际热机效率必定更低。",
+      "variables": [
+        "高温热源 T_高",
+        "低温热源 T_低"
+      ],
+      "observations": [
+        "最高理论效率"
+      ],
+      "support": "approximation",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
+    },
+    {
       "id": "K-T4-01",
       "stage": "university",
       "domain": "thermodynamics",
@@ -11153,6 +11768,34 @@
           "a": "不是。由于谱密度按波长还是按频率定义不同，两个峰位置差约 1.76 倍，不能直接互推。"
         }
       ]
+    },
+    {
+      "id": "K-T4-07",
+      "stage": "university",
+      "domain": "thermodynamics",
+      "domainLabel": "热学",
+      "title": "热传导串联复合墙与热阻",
+      "oneLine": "把两根不同导热系数的导热棒串联，类比串联电阻理解热阻叠加与界面温度分布。",
+      "analogy": "换一个「导热系数 λ」，结果就不一样——就像同时改变导热系数 λ和长度 L去试同一件事，感觉完全不同。",
+      "formula": "R_热 = L / (λ·A)，P = ΔT / (R₁ + R₂)",
+      "why": "怎么研究：在实验台放入 heat_source、conductor、thermometer，调节 导热系数 λ、长度 L、截面积 A 并记录 热流（A→B）、界面温度。\n这一条有真实的数值求解器支撑，可以拖动参数直接看结果。\n边界：一维稳态导热近似，忽略侧面散热与接触热阻。",
+      "variables": [
+        "导热系数 λ",
+        "长度 L",
+        "截面积 A"
+      ],
+      "observations": [
+        "热流（A→B）",
+        "界面温度"
+      ],
+      "support": "direct",
+      "misconceptions": [],
+      "prerequisites": [],
+      "difficulty": "beginner",
+      "detail": [],
+      "compare": [],
+      "everyday": [],
+      "selfCheck": []
     }
   ]
 }

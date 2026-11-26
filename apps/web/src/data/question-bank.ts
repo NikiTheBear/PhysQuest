@@ -1164,6 +1164,14 @@ const MODEL_NAME: Record<string, string> = {
   motion_sensor: '运动传感器',
   wire: '导线',
   box_slab: '地面',
+  thermometer: '温度计',
+  heat_source: '恒温热源',
+  conductor: '导热棒',
+  refract_plane: '折射界面',
+  pinhole_screen: '针孔成像装置',
+  eye_model: '眼球模型',
+  gas_piston: '理想气体活塞缸',
+  pulley: '滑轮组',
 };
 
 const modelName = (k: string) => MODEL_NAME[k] ?? k;

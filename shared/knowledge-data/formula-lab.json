@@ -2,7 +2,7 @@
   "format": "physquest.formula-lab",
   "version": 1,
   "generated": "2026-11-22",
-  "count": 97,
+  "count": 105,
   "labs": {
     "K-A1-01": {
       "kind": "formula",
@@ -3216,6 +3216,294 @@
       ],
       "watch": "两头都在浪费：带隙定得低，红外的长波光子用不上；带隙定得高，蓝光光子多出的能量变成热。所以效率有个天花板。",
       "note": "没有单一公式（要数值积分），这里画效率曲线示意；平台没有太阳光谱模型。"
+    },
+    "K-M2-15": {
+      "kind": "formula",
+      "title": "定滑轮与动滑轮",
+      "formula": "F = m·g / (n·η)",
+      "inputs": [
+        {
+          "key": "m",
+          "label": "重物质量",
+          "unit": "kg",
+          "min": 0.5,
+          "max": 100,
+          "default": 10
+        },
+        {
+          "key": "n",
+          "label": "承重绳股数",
+          "unit": "股",
+          "min": 1,
+          "max": 6,
+          "default": 2
+        },
+        {
+          "key": "eta",
+          "label": "机械效率",
+          "unit": "",
+          "min": 0.3,
+          "max": 1,
+          "default": 0.9
+        }
+      ],
+      "outputs": [
+        {
+          "key": "F",
+          "label": "实际拉力",
+          "unit": "N",
+          "expr": "m * 9.8 / (n * eta)"
+        }
+      ],
+      "note": "n=1 为定滑轮，n=2 为单动滑轮；省力必然费距离。",
+      "example": "吊起 10 kg 重物（98 N），用 2 股绳、效率 0.9 的滑轮组只需约 54.4 N 拉力。"
+    },
+    "K-M3-18": {
+      "kind": "formula",
+      "title": "超重与失重",
+      "formula": "N = m·(g + a)",
+      "inputs": [
+        {
+          "key": "m",
+          "label": "质量",
+          "unit": "kg",
+          "min": 1,
+          "max": 120,
+          "default": 60
+        },
+        {
+          "key": "a",
+          "label": "竖直加速度（向上为正）",
+          "unit": "m/s²",
+          "min": -9.8,
+          "max": 10,
+          "default": 2
+        }
+      ],
+      "outputs": [
+        {
+          "key": "N",
+          "label": "支持力（视重）",
+          "unit": "N",
+          "expr": "m * (9.8 + a)"
+        }
+      ],
+      "note": "a = -9.8 m/s² 时视重为 0，即完全失重，但重力 mg 本身从未消失。",
+      "example": "60 kg 的人乘电梯以 2 m/s² 加速上升，体重计读数约 708 N（相当于 72.2 kg）。"
+    },
+    "K-M3-20": {
+      "kind": "formula",
+      "title": "弹簧振子与单摆周期",
+      "formula": "T = 2π√(m/k)",
+      "inputs": [
+        {
+          "key": "m",
+          "label": "振子质量",
+          "unit": "kg",
+          "min": 0.1,
+          "max": 20,
+          "default": 1
+        },
+        {
+          "key": "k",
+          "label": "劲度系数",
+          "unit": "N/m",
+          "min": 1,
+          "max": 200,
+          "default": 25
+        }
+      ],
+      "outputs": [
+        {
+          "key": "T",
+          "label": "振动周期",
+          "unit": "s",
+          "expr": "2 * Math.PI * Math.sqrt(m / k)"
+        }
+      ],
+      "note": "在弹性限度内，周期与振幅完全无关（等时性）。",
+      "example": "1 kg 物体挂在 25 N/m 弹簧上，周期约为 1.26 s。"
+    },
+    "K-E3-19": {
+      "kind": "formula",
+      "title": "RC 与 RL 时间常数",
+      "formula": "τ = R·C",
+      "inputs": [
+        {
+          "key": "r",
+          "label": "电阻 R",
+          "unit": "Ω",
+          "min": 10,
+          "max": 100000,
+          "default": 1000
+        },
+        {
+          "key": "c",
+          "label": "电容 C",
+          "unit": "μF",
+          "min": 1,
+          "max": 10000,
+          "default": 1000
+        }
+      ],
+      "outputs": [
+        {
+          "key": "tau",
+          "label": "时间常数 τ",
+          "unit": "s",
+          "expr": "r * c * 1e-6"
+        }
+      ],
+      "note": "充电 1τ 达到 63.2%，约 5τ 达到 99.3% 视为充满。",
+      "example": "1 kΩ 电阻配 1000 μF 电容，时间常数正好是 1 s。"
+    },
+    "K-E3-20": {
+      "kind": "formula",
+      "title": "RLC 串联谐振频率",
+      "formula": "f₀ = 1 / (2π√(L·C))",
+      "inputs": [
+        {
+          "key": "l",
+          "label": "电感 L",
+          "unit": "mH",
+          "min": 0.1,
+          "max": 1000,
+          "default": 100
+        },
+        {
+          "key": "c",
+          "label": "电容 C",
+          "unit": "μF",
+          "min": 0.1,
+          "max": 1000,
+          "default": 10
+        }
+      ],
+      "outputs": [
+        {
+          "key": "f0",
+          "label": "谐振频率 f₀",
+          "unit": "Hz",
+          "expr": "1 / (2 * Math.PI * Math.sqrt(l * 1e-3 * c * 1e-6))"
+        }
+      ],
+      "note": "谐振时电容和电感两端电压相位相反、幅值相等，可能高于电源电压。",
+      "example": "100 mH 电感与 10 μF 电容串联，谐振频率约 159.2 Hz。"
+    },
+    "K-O3-08": {
+      "kind": "formula",
+      "title": "杨氏双缝干涉条纹间距",
+      "formula": "Δx = L·λ / d",
+      "inputs": [
+        {
+          "key": "lam",
+          "label": "波长 λ",
+          "unit": "nm",
+          "min": 380,
+          "max": 750,
+          "default": 532
+        },
+        {
+          "key": "L",
+          "label": "缝到屏距离 L",
+          "unit": "m",
+          "min": 0.2,
+          "max": 5,
+          "default": 1.5
+        },
+        {
+          "key": "d",
+          "label": "双缝间距 d",
+          "unit": "mm",
+          "min": 0.05,
+          "max": 2,
+          "default": 0.5
+        }
+      ],
+      "outputs": [
+        {
+          "key": "dx",
+          "label": "相邻亮纹间距 Δx",
+          "unit": "mm",
+          "expr": "L * lam * 1e-9 / (d * 1e-3) * 1000"
+        }
+      ],
+      "note": "需满足 L ≫ d ≫ λ 的远场小角近似。",
+      "example": "532 nm 绿光、缝距 0.5 mm、屏距 1.5 m 时，相邻亮纹间距约 1.60 mm。"
+    },
+    "K-A3-06": {
+      "kind": "formula",
+      "title": "两端固定弦的驻波频率",
+      "formula": "f_n = n·v / (2L)",
+      "inputs": [
+        {
+          "key": "n",
+          "label": "谐波次数 n",
+          "unit": "",
+          "min": 1,
+          "max": 8,
+          "default": 1
+        },
+        {
+          "key": "v",
+          "label": "弦上波速 v",
+          "unit": "m/s",
+          "min": 50,
+          "max": 600,
+          "default": 300
+        },
+        {
+          "key": "L",
+          "label": "弦长 L",
+          "unit": "m",
+          "min": 0.2,
+          "max": 2,
+          "default": 0.65
+        }
+      ],
+      "outputs": [
+        {
+          "key": "fn",
+          "label": "第 n 阶频率",
+          "unit": "Hz",
+          "expr": "n * v / (2 * L)"
+        }
+      ],
+      "note": "n=1 为基音，n≥2 为泛音；泛音比例决定了乐器的音色。",
+      "example": "吉他空弦长 0.65 m、波速 300 m/s 时，基频约 230.8 Hz。"
+    },
+    "K-T3-11": {
+      "kind": "formula",
+      "title": "卡诺热机最高效率",
+      "formula": "η = 1 − T_c / T_h",
+      "inputs": [
+        {
+          "key": "th",
+          "label": "高温热源 T_高",
+          "unit": "K",
+          "min": 350,
+          "max": 2000,
+          "default": 600
+        },
+        {
+          "key": "tc",
+          "label": "低温热源 T_低",
+          "unit": "K",
+          "min": 50,
+          "max": 340,
+          "default": 300
+        }
+      ],
+      "outputs": [
+        {
+          "key": "eta",
+          "label": "最高效率（%）",
+          "unit": "%",
+          "expr": "(1 - tc / th) * 100"
+        }
+      ],
+      "note": "温度必须用开尔文（K）；只有 T_低 = 0 K 时效率才趋近 100%，这在物理上不可达。",
+      "example": "600 K 高温热源配 300 K 室温冷源，理论极限效率只有 50%。"
     }
   }
 }

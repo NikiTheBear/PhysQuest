@@ -74,7 +74,9 @@ Object.assign(CATALOG, {
 Object.assign(CATALOG, {
   thermometer:{name:'温度计',domain:'thermodynamics',icon:'probe',description:'测量所在位置的温度；读数按 responseTime 滞后趋近环境温度（附近的热源或导热棒优先，否则为环境温度）',params:{responseTime:p('响应时间',2,.1,120,.1,'s')}},
   heat_source:{name:'恒温热源',domain:'thermodynamics',icon:'sparkles',description:'自身温度恒定，对作用半径内的温度计与导热棒按 P = 功率·(T源−T目标)/max(d,0.1) 提供热流',params:{temperature:p('温度',100,-273,1000,1,'℃'),power:p('加热功率',50,0,10000,1,'W'),radius:p('作用半径',.5,.05,5,.01,'m')}},
-  conductor:{name:'导热棒',domain:'thermodynamics',icon:'rod',description:'两端各连一个热学器具，按傅里叶定律 dQ/dt = λA(T_A−T_B)/L 传热；读数带符号，正值为 A→B',refs:['a','b'],params:{conductivity:p('导热系数',200,.01,1000,.01,'W/(m·K)'),length:p('长度',1,.05,10,.01,'m'),area:p('截面积',.01,1e-6,10,1e-4,'m²'),heatCapacity:p('热容',100,.1,100000,.1,'J/K')}}
+  conductor:{name:'导热棒',domain:'thermodynamics',icon:'rod',description:'两端各连一个热学器具，按傅里叶定律 dQ/dt = λA(T_A−T_B)/L 传热；读数带符号，正值为 A→B',refs:['a','b'],params:{conductivity:p('导热系数',200,.01,1000,.01,'W/(m·K)'),length:p('长度',1,.05,10,.01,'m'),area:p('截面积',.01,1e-6,10,1e-4,'m²'),heatCapacity:p('热容',100,.1,100000,.1,'J/K')}},
+  gas_piston:{name:'理想气体活塞缸',domain:'thermodynamics',icon:'cube',description:'可压缩理想气体模型（PV = nRT），支持调控摩尔数、体积、温度与绝热指数 γ，实时计算压强与内能',params:{moles:p('物质的量',1,.01,20,.01,'mol'),volume:p('气体体积',.024,.001,1,.001,'m³'),temperature:p('热力学温度',300,50,2000,1,'K'),gamma:p('绝热指数 γ',1.4,1.1,1.67,.01)}},
+  pulley:{name:'滑轮组',domain:'mechanics',icon:'anchor',description:'定滑轮与动滑轮组合模型，实时计算拉力 F = mg/(n·η)、机械利益与绳端位移比',params:{loadMass:p('重物质量',10,.1,200,.1,'kg'),strands:p('承重绳股数 n',2,1,8,1),efficiency:p('机械效率 η',.9,.2,1,.01),gravity:p('重力加速度',9.8,1,25,.1,'m/s²')}}
 });
 export const SOUND_KINDS=['speaker','directional_speaker'];
 export const THERMAL_KINDS=['thermometer','heat_source','conductor'];

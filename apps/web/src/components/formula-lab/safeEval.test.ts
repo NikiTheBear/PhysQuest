@@ -306,9 +306,9 @@ describe('safeEval · 边界一律 null', () => {
 describe('safeEval · 97 条真实数据', () => {
   const labs = Object.values(LABS).filter((l) => l.kind === 'formula');
 
-  it('数据规模没变（78 条 formula / 97 条 expr）', () => {
-    expect(labs).toHaveLength(78);
-    expect(labs.reduce((n, l) => n + l.outputs.length, 0)).toBe(97);
+  it('数据规模对得上（86 条 formula / 105 条 expr）', () => {
+    expect(labs).toHaveLength(86);
+    expect(labs.reduce((n, l) => n + l.outputs.length, 0)).toBe(105);
   });
 
   it('所有 formula 的 outputs[].expr 在默认输入下都能算出有限数', () => {

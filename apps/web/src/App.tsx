@@ -27,6 +27,7 @@ import ObservationPanel from './components/lab-workspace/ObservationPanel';
 import SatisfactionGate from './components/lab-workspace/SatisfactionGate';
 import PredictionPanel from './components/prediction/PredictionPanel';
 import ReportView, { LearnerBackupPanel } from './components/report/ReportView';
+import { TeacherSummaryPanel } from './components/report/TeacherSummaryPanel';
 import AITutor from './components/ai-tutor/AITutor';
 import AISettings from './components/ai-tutor/AISettings';
 import HelpGuide from './components/common/HelpGuide';
@@ -138,7 +139,9 @@ export default function App() {
       prediction: auto.prediction,
     };
   });
-  const [phase, setPhase] = useState<Phase>('explore');
+  const [phase, setPhase] = useState<Phase>(() =>
+    DEEP.challenge && !loadLearner().predictions[DEEP.challenge] ? 'predict' : 'explore',
+  );
   const [params, setParams] = useState<LensParams>(DEFAULT_LENS_PARAMS);
   const [activeSlider, setActiveSlider] = useState<keyof LensParams | null>(null);
   const [showRays, setShowRays] = useState(true);
@@ -719,12 +722,13 @@ export default function App() {
               <p>报告是根据你的探索记录生成的。先去做一次实验。</p>
             </div>
             <EmptyReport onGoMap={() => setView('map')} />
-            <div style={{ marginTop: 18 }}>
+            <div style={{ marginTop: 18, display: 'grid', gap: 16 }}>
               <LearnerBackupPanel
                 learner={learner}
                 onImported={handleImported}
                 onToast={setToast}
               />
+              <TeacherSummaryPanel onToast={setToast} />
             </div>
           </>
         )}

@@ -1,5 +1,5 @@
 import {RIGID_KINDS,LINK_KINDS,THERMAL_KINDS} from './catalog.js';
-const excluded=[...LINK_KINDS,...THERMAL_KINDS,'force','drag','expression_force','harmonic_force','field','electric_field','coil','distance_sensor','motion_sensor','refract_plane','pinhole_screen','eye_model'];
+const excluded=[...LINK_KINDS,...THERMAL_KINDS,'force','drag','expression_force','harmonic_force','field','electric_field','coil','distance_sensor','motion_sensor','refract_plane','pinhole_screen','eye_model','gas_piston','pulley'];
 export const supportsCollider=c=>!excluded.includes(c.kind);
 export function colliderRotation(c){
   if(c.kind==='bar_magnet')return c.params.axis===1?[0,0,Math.PI/2]:c.params.axis===2?[0,Math.PI/2,0]:[0,0,0];

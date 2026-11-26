@@ -21,11 +21,13 @@ const LENS_BENCH_CHALLENGES = [
 ];
 
 describe('rubric 覆盖与通道名真实性', () => {
-  it('13 个光具座关都有评分规则', () => {
+  it('13 个光具座关及全平台合并关都有评分规则', () => {
+    const covered = new Set(coveredChallengeIds());
     for (const id of LENS_BENCH_CHALLENGES) {
       expect(loadRubric(id), id).not.toBeNull();
+      expect(covered.has(id), id).toBe(true);
     }
-    expect(coveredChallengeIds().sort()).toEqual([...LENS_BENCH_CHALLENGES].sort());
+    expect(covered.size).toBeGreaterThanOrEqual(LENS_BENCH_CHALLENGES.length);
   });
 
   it('rubric 里写的通道后缀，引擎里真有这个通道', () => {
@@ -48,7 +50,7 @@ describe('rubric 覆盖与通道名真实性', () => {
   });
 
   it('没有评分标准的挑战返回 null（NO_RUBRIC 那条路）', () => {
-    expect(loadRubric('CH-K-O3-05')).toBeNull();
+    expect(loadRubric('CH-NO-RUBRIC-YET')).toBeNull();
     expect(loadRubric('')).toBeNull();
   });
 

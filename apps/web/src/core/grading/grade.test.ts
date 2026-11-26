@@ -513,9 +513,9 @@ describe('拒绝评分与降级', () => {
 
   it('没有 rubric 的挑战 → NO_RUBRIC，D1/D3 照常，D2 无法判断', async () => {
     const r = await gradeExperiment({
-      learner: learnerWith({ reflection: REFLECTION, challengeId: 'CH-K-O3-05' }),
-      challenge: { ...CH, id: 'CH-K-O3-05', title: '组合透镜' },
-      captures: EXAMPLE_A.map((p, i) => snap(p, { challengeId: 'CH-K-O3-05', time: i })),
+      learner: learnerWith({ reflection: REFLECTION, challengeId: 'CH-NO-RUBRIC-YET' }),
+      challenge: { ...CH, id: 'CH-NO-RUBRIC-YET', title: '未配置评分标准的挑战' },
+      captures: EXAMPLE_A.map((p, i) => snap(p, { challengeId: 'CH-NO-RUBRIC-YET', time: i })),
       seenObservations: ['m'],
       stage: 'junior',
       config: null,

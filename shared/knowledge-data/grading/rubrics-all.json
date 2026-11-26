@@ -1,4 +1,2060 @@
 {
   "version": 1,
-  "challenges": {}
+  "updatedAt": "2026-11-26T14:32:27.002Z",
+  "count": 103,
+  "challenges": {
+    "CH-AC-01": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "microphone-2"
+      ],
+      "optionalObservations": [
+        "speaker-1"
+      ],
+      "unmappableObservations": [
+        "将麦克风依次置于距点声源 1 m、2 m、4 m 的位置，并保持声源发声状态不变",
+        "随距离每翻一倍，麦克风测得声压幅值依次约为前一位置的 1/4（即约 1、1/4、1/16 的相对幅度），体现点声源声压按 1/r 衰减"
+      ]
+    },
+    "CH-AC-03": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "microphone-3"
+      ],
+      "optionalObservations": [
+        "speaker-1",
+        "speaker-2"
+      ],
+      "unmappableObservations": [
+        "麦克风沿两个声源中间横向移动时，声压强弱随空间位置交替起伏的现象",
+        "最响点与最静点的空间位置，以及改变两个声源间距后这些点的分布变化"
+      ]
+    },
+    "CH-AC-02": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "microphone-2"
+      ],
+      "optionalObservations": [
+        "speaker-1"
+      ],
+      "unmappableObservations": [
+        "麦克风位置保持不动，只改变声源频率（20–2000 Hz）",
+        "在同一时间窗内比较声压–时间曲线：频率升高时曲线周期数增多、波形变密；频率降低时周期数减少、波形变疏",
+        "声压–时间曲线的疏密变化应与频率调节方向一致，不能通过移动麦克风位置造成"
+      ]
+    },
+    "CH-AC-04": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "microphone-3"
+      ],
+      "optionalObservations": [
+        "speaker-1",
+        "speaker-2"
+      ],
+      "unmappableObservations": [
+        "同一段距离内强弱条纹周期数随频率升高而增多、条纹变密的定性现象",
+        "保持声源间距不变而只改变频率的操作与结果对比"
+      ]
+    },
+    "CH-AC-05": {
+      "requiredKinds": [
+        "directional_speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "microphone-2"
+      ],
+      "optionalObservations": [
+        "directional_speaker-1"
+      ],
+      "unmappableObservations": [
+        "麦克风绕声源旋转到正面、侧面、背面三个方位的角度设置，需从画面或参数面板确认",
+        "指向性声源正面朝向与麦克风所处背面位置的相对关系，需从搭建画面确认"
+      ]
+    },
+    "CH-K-A1-01": {
+      "requiredKinds": [
+        "body",
+        "spring",
+        "anchor",
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "body-1",
+        "microphone-5"
+      ],
+      "optionalObservations": [
+        "angular",
+        "spring-2",
+        "speaker-4",
+        "anchor-3"
+      ],
+      "unmappableObservations": []
+    },
+    "CH-K-A1-02": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "speaker-1",
+        "microphone-2"
+      ],
+      "optionalObservations": [],
+      "unmappableObservations": [
+        "确认扬声器与麦克风之间的介质/传播速度设置被实际改变，且两者距离保持不变（需观察画面设置）",
+        "传播介质设为真空/无介质时，应无声音到达（需结合场景状态与听觉判断）"
+      ]
+    },
+    "CH-K-A1-03": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "microphone-2"
+      ],
+      "optionalObservations": [
+        "speaker-1"
+      ],
+      "unmappableObservations": [
+        "改变声源频率时听到音调高低变化（主观听感）",
+        "改变声源幅度时听到响度大小变化（主观听感）"
+      ]
+    },
+    "CH-K-A2-01": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "microphone-2"
+      ],
+      "optionalObservations": [
+        "speaker-1"
+      ],
+      "unmappableObservations": [
+        "仅改变频率时，叠加后的声压波形周期/疏密发生相应变化，体现音调变化",
+        "波形幅度随驱动强度/增益变化而改变，体现响度变化",
+        "波形形状或谐波成分差异对应音色差异",
+        "若界面给出两个源频率比，则需读取或估计该比值；该量不能直接对应现有 realChannels 的单一通道读数"
+      ]
+    },
+    "CH-K-A2-02": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "speaker-1",
+        "microphone-2"
+      ],
+      "optionalObservations": [],
+      "unmappableObservations": [
+        "扬声器与麦克风的空间间距和相对位置需保持不变（需观察画面/布局确认）",
+        "传播速度/介质参数设置改变时，频率设置保持不变（需观察参数面板确认）"
+      ]
+    },
+    "CH-K-A2-03": {
+      "requiredKinds": [
+        "speaker",
+        "microphone",
+        "distance_sensor"
+      ],
+      "requiredObservations": [
+        "microphone-2",
+        "distance_sensor-3"
+      ],
+      "optionalObservations": [
+        "speaker-1"
+      ],
+      "unmappableObservations": [
+        "麦克风记录到的回声脉冲相对直达声或发射时刻出现滞后",
+        "增大到反射面的距离时，回声到达时间随之增大，且对应往返路程约为 2d"
+      ]
+    },
+    "CH-K-A2-04": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "microphone-2"
+      ],
+      "optionalObservations": [
+        "speaker-1"
+      ],
+      "unmappableObservations": [
+        "两只声源是否按搭建方案正对且同轴摆放",
+        "第二个声源的相位设置在0°与180°之间是否正确切换",
+        "0°与180°两种相位差条件下，合成声压是否出现明显减弱对比"
+      ]
+    },
+    "CH-K-A3-05": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "microphone-2"
+      ],
+      "optionalObservations": [
+        "speaker-1"
+      ],
+      "unmappableObservations": [
+        "点声源与测量麦克风之间的距离依次设置为 1、2、4、8 m，画面中器具间距应明显改变"
+      ]
+    },
+    "CH-K-A4-03": {
+      "requiredKinds": [
+        "speaker",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "microphone-2"
+      ],
+      "optionalObservations": [
+        "speaker-1"
+      ],
+      "unmappableObservations": [
+        "由麦克风声压按 SPL=20log10(p/p0) 换算出的分贝值（无独立 dB 通道）",
+        "声源幅度成倍变化时，麦克风声压按比例变化而 SPL 按对数等量增加的趋势"
+      ]
+    },
+    "CH-K-E1-01": {
+      "requiredKinds": [
+        "battery",
+        "switch",
+        "lamp"
+      ],
+      "requiredObservations": [
+        "I",
+        "P"
+      ],
+      "optionalObservations": [
+        "V"
+      ],
+      "unmappableObservations": [
+        "灯泡亮度变化"
+      ]
+    },
+    "CH-K-A4-04": {
+      "requiredKinds": [
+        "speaker",
+        "motion_sensor",
+        "microphone"
+      ],
+      "requiredObservations": [
+        "motion_sensor-2",
+        "microphone-3"
+      ],
+      "optionalObservations": [
+        "speaker-1",
+        "acceleration"
+      ],
+      "unmappableObservations": [
+        "通过画面判断声源是靠近还是远离麦克风，并观察该相对运动方向与接收频率变化方向的对应关系",
+        "声源靠近时接收音调相对升高、远离时接收音调相对降低的定性听感或频谱趋势"
+      ]
+    },
+    "CH-K-E1-04": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "ammeter",
+        "voltmeter"
+      ],
+      "requiredObservations": [
+        "V",
+        "I",
+        "P"
+      ],
+      "optionalObservations": [
+        "battery-1",
+        "resistor-2",
+        "ammeter-3"
+      ],
+      "unmappableObservations": [
+        "电池正负极标识/极性符号随电动势符号反转而反向",
+        "电路图中约定电流箭头方向随电源极性反转而反向"
+      ]
+    },
+    "CH-K-E1-03": {
+      "requiredKinds": [
+        "battery",
+        "lamp",
+        "switch"
+      ],
+      "requiredObservations": [
+        "P",
+        "I"
+      ],
+      "optionalObservations": [
+        "V"
+      ],
+      "unmappableObservations": [
+        "灯泡亮度"
+      ]
+    },
+    "CH-K-E2-01": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "ammeter",
+        "ground"
+      ],
+      "requiredObservations": [
+        "ammeter-3",
+        "resistor-2",
+        "I"
+      ],
+      "optionalObservations": [
+        "V",
+        "P",
+        "battery-1"
+      ],
+      "unmappableObservations": [
+        "电流表是否串联接入被测支路（观察接线关系）"
+      ]
+    },
+    "CH-K-E1-02": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "ammeter",
+        "ground"
+      ],
+      "requiredObservations": [
+        "meter"
+      ],
+      "optionalObservations": [
+        "material",
+        "cell"
+      ],
+      "unmappableObservations": [
+        "将待测材料电阻由 2 Ω 调到 10⁷ Ω 的操作过程",
+        "电流表读数从约 2.4 A 降至微安级（近似为零）的定性变化",
+        "电阻值处于 2 Ω 与 10⁷ Ω 两种状态时电流表指针/示数的明显对比"
+      ]
+    },
+    "CH-K-E2-03": {
+      "requiredKinds": [
+        "battery",
+        "rheostat",
+        "ammeter",
+        "voltmeter"
+      ],
+      "requiredObservations": [
+        "I",
+        "V"
+      ],
+      "optionalObservations": [
+        "P",
+        "battery-1",
+        "rheostat-2",
+        "ammeter-3"
+      ],
+      "unmappableObservations": [
+        "滑动变阻器有效接入电阻随最大阻值 resistance 改变而变化（无直接测量通道，需结合画面或参数设置判断）"
+      ]
+    },
+    "CH-K-E2-04": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "ammeter",
+        "voltmeter"
+      ],
+      "requiredObservations": [
+        "V",
+        "I"
+      ],
+      "optionalObservations": [
+        "P",
+        "battery-1"
+      ],
+      "unmappableObservations": [
+        "电压表与电阻并联、电流表与电阻串联的接线拓扑正确",
+        "改变电源电压后，成对读取的 U 与 I 满足 U/I 近似等于设定阻值",
+        "U-I 数据点近似落在过原点的直线上"
+      ]
+    },
+    "CH-K-E2-05": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "voltmeter",
+        "ground"
+      ],
+      "requiredObservations": [
+        "I",
+        "V"
+      ],
+      "optionalObservations": [
+        "P",
+        "battery-1",
+        "resistor-2",
+        "voltmeter-3"
+      ],
+      "unmappableObservations": [
+        "串联拓扑：电源、两个电阻首尾相接形成单一路径，电压表并联在待测电阻两端"
+      ]
+    },
+    "CH-K-E2-02": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "voltmeter",
+        "ground"
+      ],
+      "requiredObservations": [
+        "battery-1",
+        "voltmeter-3"
+      ],
+      "optionalObservations": [
+        "I",
+        "P"
+      ],
+      "unmappableObservations": [
+        "电压表指针偏转方向或读数正负号，用于判断待测两点间电压极性",
+        "电压表是否并联接在待测电阻两端，而非串联接入电路",
+        "错误接法下电压表读数异常、指针反向偏转或电路工作状态明显改变",
+        "改变电源电压时，电源端电压与电压表读数之间的差值变化趋势"
+      ]
+    },
+    "CH-K-E2-07": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "voltmeter",
+        "ammeter",
+        "ground"
+      ],
+      "requiredObservations": [
+        "P",
+        "V",
+        "I"
+      ],
+      "optionalObservations": [
+        "battery-1",
+        "resistor-2",
+        "voltmeter-3"
+      ],
+      "unmappableObservations": [
+        "只改负载电阻时，负载功率随阻值变化的趋势，以及由功率与时间推算电能的变化"
+      ]
+    },
+    "CH-K-E2-06": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "ammeter",
+        "ground"
+      ],
+      "requiredObservations": [
+        "V",
+        "I",
+        "resistor-2"
+      ],
+      "optionalObservations": [
+        "P",
+        "battery-1",
+        "ammeter-3"
+      ],
+      "unmappableObservations": [
+        "并联连接拓扑：各支路首端共接电源正极、尾端共接电源负极",
+        "电流表接入位置：总干路或支路串接是否正确"
+      ]
+    },
+    "CH-K-E2-08": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "ammeter",
+        "voltmeter"
+      ],
+      "requiredObservations": [
+        "V",
+        "I",
+        "P"
+      ],
+      "optionalObservations": [
+        "cell",
+        "amp",
+        "load"
+      ],
+      "unmappableObservations": []
+    },
+    "CH-K-E2-11": {
+      "requiredKinds": [
+        "bar_magnet",
+        "probe"
+      ],
+      "requiredObservations": [
+        "B"
+      ],
+      "optionalObservations": [
+        "bar_magnet-1"
+      ],
+      "unmappableObservations": [
+        "探针相对条形磁铁的位置变化（轴向/侧向及距离）需在画面中确认，用于解释磁场读数差异",
+        "磁感线疏密与方向（若画面显示）需定性观察，不能由B通道直接给出"
+      ]
+    },
+    "CH-K-E2-12": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "ammeter",
+        "cylinder"
+      ],
+      "requiredObservations": [
+        "amp"
+      ],
+      "optionalObservations": [
+        "cell",
+        "load"
+      ],
+      "unmappableObservations": [
+        "观察圆柱是否仅作为导线位置标记，未产生可测空间磁场",
+        "根据电流方向按右手螺旋定则判断圆柱周围环绕磁场方向",
+        "明确磁场大小 B 需用 B=μ₀I/(2πr) 计算，不使用平台探针或通道读数作为磁场测量值"
+      ]
+    },
+    "CH-K-E2-14": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "coil",
+        "field",
+        "ground"
+      ],
+      "requiredObservations": [
+        "coil",
+        "I",
+        "bField"
+      ],
+      "optionalObservations": [
+        "cell",
+        "limit"
+      ],
+      "unmappableObservations": [
+        "音圈被安培力推开并停在平衡位置，位移方向随电流方向反向而反向",
+        "导线有效长度从 2 m 增加到 4 m 时，稳定位移近似翻倍",
+        "电流、磁场与安培力方向满足互相垂直的定性关系"
+      ]
+    },
+    "CH-K-E2-09": {
+      "requiredKinds": [
+        "battery",
+        "switch",
+        "lamp"
+      ],
+      "requiredObservations": [
+        "I",
+        "lamp-a"
+      ],
+      "optionalObservations": [
+        "cell",
+        "V",
+        "P",
+        "sw-a"
+      ],
+      "unmappableObservations": [
+        "两路开关均闭合时，两盏灯应同时亮起",
+        "只断开B路开关时，灯B熄灭且灯A保持亮",
+        "只闭合B路且断开A路时，灯B亮且灯A熄灭",
+        "任意一路开关断开后，另一路灯的亮灭状态不受影响"
+      ]
+    },
+    "CH-K-E3-01": {
+      "requiredKinds": [
+        "charge",
+        "probe",
+        "electric_field"
+      ],
+      "requiredObservations": [
+        "probe-2",
+        "electric_field-3"
+      ],
+      "optionalObservations": [
+        "charge-1"
+      ],
+      "unmappableObservations": [
+        "观察试探粒子所受电场力方向与场强方向的关系，判断正负试探电荷受力方向是否相反",
+        "通过画面确认试探粒子加速度由电场力提供，并定性比较 F/q 与场强读数的关系"
+      ]
+    },
+    "CH-K-E3-02": {
+      "requiredKinds": [
+        "electric_field",
+        "anchor",
+        "probe",
+        "distance_sensor"
+      ],
+      "requiredObservations": [
+        "probe",
+        "ruler"
+      ],
+      "optionalObservations": [
+        "field",
+        "point-a",
+        "point-b"
+      ],
+      "unmappableObservations": [
+        "确认 A、B 两点沿匀强电场方向（+X）放置，d 取两点间沿场方向的距离",
+        "写出或说明 U=E·d 的计算过程，并能解释 E 改为 2000 V/m 时 U 按比例翻倍"
+      ]
+    },
+    "CH-K-E2-10": {
+      "requiredKinds": [
+        "battery",
+        "switch",
+        "lamp",
+        "box",
+        "ground"
+      ],
+      "requiredObservations": [
+        "I",
+        "P"
+      ],
+      "optionalObservations": [
+        "V",
+        "cell",
+        "lamp"
+      ],
+      "unmappableObservations": [
+        "标着「保护装置」的方块只是概念标记，没有真实漏电保护或断路器功能",
+        "断开总开关后用电器（灯）熄灭，回路电流变为零",
+        "保护装置位置没有可测量的保护动作或脱扣现象"
+      ]
+    },
+    "CH-K-E3-04": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "ammeter",
+        "voltmeter"
+      ],
+      "requiredObservations": [
+        "I",
+        "V",
+        "battery-1"
+      ],
+      "optionalObservations": [
+        "P",
+        "resistor-2",
+        "ammeter-3"
+      ],
+      "unmappableObservations": [
+        "观察电源内阻导致的内部电压降（ε − U）随电流增大而增大的定性趋势"
+      ]
+    },
+    "CH-K-E3-06": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "ground"
+      ],
+      "requiredObservations": [
+        "P",
+        "V"
+      ],
+      "optionalObservations": [
+        "I",
+        "battery-1",
+        "resistor-2"
+      ],
+      "unmappableObservations": [
+        "观察外电阻 R 在内阻 r 附近变化时，负载功率先增大后减小的趋势",
+        "观察匹配点两侧的功率变化，确认峰值出现在 R≈r 附近",
+        "观察 R=r 时端电压约为电源电动势的一半（或与电源电压对比明显下降）"
+      ]
+    },
+    "CH-K-E3-05": {
+      "requiredKinds": [
+        "battery",
+        "rheostat",
+        "voltmeter",
+        "ground"
+      ],
+      "requiredObservations": [
+        "V",
+        "I"
+      ],
+      "optionalObservations": [
+        "P",
+        "battery-1",
+        "rheostat-2",
+        "voltmeter-3"
+      ],
+      "unmappableObservations": [
+        "改变滑动变阻器有效外阻时，路端电压U与电流I呈近似线性变化，U−I图像为负斜率直线趋势",
+        "滑动变阻器滑片位置变化导致有效外阻改变"
+      ]
+    },
+    "CH-K-E3-07": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "ground"
+      ],
+      "requiredObservations": [
+        "P",
+        "I"
+      ],
+      "optionalObservations": [
+        "V",
+        "battery-1",
+        "resistor-2"
+      ],
+      "unmappableObservations": [
+        "负载电阻改变时，负载功率随电流或负载变化的趋势",
+        "效率随负载电阻改变而变化的趋势（需由负载功率与电源总功率比较得出）",
+        "输出功率与效率随负载改变呈现不同趋势的定性结论"
+      ]
+    },
+    "CH-K-E3-08": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "coil",
+        "field",
+        "ground"
+      ],
+      "requiredObservations": [
+        "V",
+        "b-field",
+        "coil"
+      ],
+      "optionalObservations": [
+        "I",
+        "P",
+        "limit"
+      ],
+      "unmappableObservations": [
+        "线圈在安培力作用下的位移方向与平衡位置：电流反向时位移应换到相反一侧，磁场方向反向时位移也应换到相反一侧",
+        "导线长度从2 m增加到4 m时，线圈位移（平衡位置偏离量）应近似翻倍"
+      ]
+    },
+    "CH-K-E3-10": {
+      "requiredKinds": [
+        "charge",
+        "field",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "angular",
+        "0",
+        "1"
+      ],
+      "optionalObservations": [
+        "charge-1",
+        "v0",
+        "v1",
+        "field-2",
+        "acceleration",
+        "2",
+        "v2",
+        "motion_sensor-3"
+      ],
+      "unmappableObservations": [
+        "观察画面中带电粒子的轨迹是否呈圆弧并发生弯曲",
+        "改变电荷量符号时，观察轨迹弯曲方向是否反转",
+        "改变电荷量大小后，观察轨迹曲率半径是否随电荷量绝对值增大而减小"
+      ]
+    },
+    "CH-K-E3-03": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "capacitor",
+        "voltmeter",
+        "ground"
+      ],
+      "requiredObservations": [
+        "V",
+        "I"
+      ],
+      "optionalObservations": [
+        "P",
+        "capacitor-3",
+        "resistor-2",
+        "battery-1"
+      ],
+      "unmappableObservations": [
+        "电容电压随时间上升的 RC 充电曲线形状（指数趋近）",
+        "充电电流随时间衰减到接近零的趋势",
+        "由电容电压终值和电容量计算的储能 E=1/2 C U^2"
+      ]
+    },
+    "CH-K-E3-09": {
+      "requiredKinds": [
+        "charge",
+        "field",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "v0",
+        "v1",
+        "acceleration"
+      ],
+      "optionalObservations": [
+        "field-2",
+        "charge-1",
+        "0",
+        "1",
+        "angular",
+        "motion_sensor-3"
+      ],
+      "unmappableObservations": [
+        "粒子轨迹初始偏转方向（向哪一侧弯曲）",
+        "改变电荷量符号后轨迹弯曲方向反转的定性现象"
+      ]
+    },
+    "CH-K-E3-13": {
+      "requiredKinds": [
+        "battery",
+        "resistor",
+        "inductor",
+        "ammeter",
+        "ground"
+      ],
+      "requiredObservations": [
+        "coilL"
+      ],
+      "optionalObservations": [
+        "V",
+        "I"
+      ],
+      "unmappableObservations": [
+        "通电后电流随时间逐渐上升而非瞬间达到最大值",
+        "将电感从 100 mH 改为 1000 mH 后，同样 20 ms 时刻电流明显更小、上升更慢"
+      ]
+    },
+    "CH-K-E3-11": {
+      "requiredKinds": [
+        "bar_magnet",
+        "cylinder",
+        "box"
+      ],
+      "requiredObservations": [
+        "magnet",
+        "angular"
+      ],
+      "optionalObservations": [
+        "coil",
+        "meter"
+      ],
+      "unmappableObservations": [
+        "磁铁与绕组之间的相对运动方向（靠近/远离）需通过画面判断",
+        "绕组包围面积或相对位置是否改变需通过画面判断",
+        "电表指针是否偏转仅为示意现象，不能作为真实感应电动势结论"
+      ]
+    },
+    "CH-K-E3-15": {
+      "requiredKinds": [
+        "cylinder",
+        "box",
+        "ac_source",
+        "resistor"
+      ],
+      "requiredObservations": [
+        "V",
+        "I"
+      ],
+      "optionalObservations": [
+        "P",
+        "src",
+        "secondary",
+        "core",
+        "angular"
+      ],
+      "unmappableObservations": [
+        "二次侧负载或二次绕组两端电压保持为 0，未出现由一次侧自动感应出的电压",
+        "两个圆柱只标出一次/二次绕组的位置，不能据此认为平台存在互感"
+      ]
+    },
+    "CH-K-M1-01": {
+      "requiredKinds": [
+        "box",
+        "force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "0",
+        "v0",
+        "acceleration"
+      ],
+      "optionalObservations": [
+        "force-2",
+        "box-1"
+      ],
+      "unmappableObservations": [
+        "观察推/拉方向与物体运动方向是否一致或相反（需画面判断）",
+        "观察物体在反向力作用下速度大小先减小后反向的趋势（如存在）"
+      ]
+    },
+    "CH-K-E3-14": {
+      "requiredKinds": [
+        "ac_source",
+        "resistor",
+        "ammeter",
+        "voltmeter",
+        "ground"
+      ],
+      "requiredObservations": [
+        "V",
+        "I"
+      ],
+      "optionalObservations": [
+        "P",
+        "ac_source-1",
+        "resistor-2",
+        "ammeter-3"
+      ],
+      "unmappableObservations": [
+        "波形画面中正弦交流瞬时值随时间的周期性起伏",
+        "整数周期 RMS 后处理结果与理论峰值、有效值关系的对照"
+      ]
+    },
+    "CH-K-M1-02": {
+      "requiredKinds": [
+        "body",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "1",
+        "v1",
+        "acceleration"
+      ],
+      "optionalObservations": [
+        "body-1",
+        "motion_sensor-2",
+        "0",
+        "v0",
+        "2",
+        "v2",
+        "angular"
+      ],
+      "unmappableObservations": [
+        "不同质量小球从同一高度释放时，画面中落地时刻是否基本相同",
+        "下落过程中两球的高度差是否始终很小（是否同步下落）",
+        "小球是否沿竖直方向下落、无明显偏转或与其他物体碰撞"
+      ]
+    },
+    "CH-K-M1-03": {
+      "requiredKinds": [
+        "box",
+        "ramp",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "box-1",
+        "0"
+      ],
+      "optionalObservations": [
+        "v0",
+        "acceleration",
+        "ramp-2"
+      ],
+      "unmappableObservations": [
+        "接触双方的 friction 参数设置与接触面材质变化（需在参数面板或画面中确认）",
+        "滑块滑行过程的目视减速与停止现象（用于辅助核对速度衰减和滑行距离）"
+      ]
+    },
+    "CH-K-M1-04": {
+      "requiredKinds": [
+        "box",
+        "body"
+      ],
+      "requiredObservations": [
+        "sink",
+        "float",
+        "hover"
+      ],
+      "optionalObservations": [
+        "surface"
+      ],
+      "unmappableObservations": [
+        "三个球相对液面横条的空间位置：A 在下、B 在上、C 与液面齐平（以画面标注为准）",
+        "球 A/B/C 的密度关系标注：A 密度大、B 密度小、C 密度相等",
+        "示意图中球体与液面的上下位置关系需目视判读，读数通道不参与结论"
+      ]
+    },
+    "CH-K-E3-16": {
+      "requiredKinds": [
+        "capacitor",
+        "inductor",
+        "resistor",
+        "ground"
+      ],
+      "requiredObservations": [
+        "capacitor-1",
+        "inductor-2"
+      ],
+      "optionalObservations": [
+        "resistor-3"
+      ],
+      "unmappableObservations": [
+        "电容电压与电感电流呈衰减振荡：幅度逐渐减小并周期性换向",
+        "电场能与磁场能交替转换（可由电容电压和电感电流计算验证）"
+      ]
+    },
+    "CH-K-M1-06": {
+      "requiredKinds": [
+        "ramp",
+        "box",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "0",
+        "v0",
+        "acceleration"
+      ],
+      "optionalObservations": [
+        "motion_sensor-3",
+        "box-2",
+        "angular"
+      ],
+      "unmappableObservations": [
+        "斜面倾角设置及不同倾斜程度的对比",
+        "滑块是否保持沿斜面直线下滑、是否出现离轨或翻倒",
+        "滑块与斜面接触状态是否稳定"
+      ]
+    },
+    "CH-K-M1-05": {
+      "requiredKinds": [
+        "anchor",
+        "body",
+        "distance_sensor"
+      ],
+      "requiredObservations": [
+        "arm-l",
+        "arm-r"
+      ],
+      "optionalObservations": [
+        "fulcrum",
+        "left",
+        "right"
+      ],
+      "unmappableObservations": [
+        "画面中支点标注位于杠杆固定转轴处，动力作用点与阻力作用点分别标在支点两侧",
+        "杠杆与支点全程保持固定示意状态，未发生真实转动或翘起",
+        "能说明测距仪读数（支点到作用点的直线距离）只有在力垂直于杆时才等于力臂，并用 F1l1 = F2l2 判断或计算平衡"
+      ]
+    },
+    "CH-K-M1-08": {
+      "requiredKinds": [
+        "anchor",
+        "body",
+        "dynamometer"
+      ],
+      "requiredObservations": [
+        "dynamometer-3"
+      ],
+      "optionalObservations": [
+        "body-2",
+        "anchor-1"
+      ],
+      "unmappableObservations": [
+        "弹簧长度与原长之差（伸长量）需通过画面刻度或形变观察，不能直接对应到现有 realChannels",
+        "弹簧被拉长后弹性作用增大的定性现象需结合画面判断"
+      ]
+    },
+    "CH-K-M2-01": {
+      "requiredKinds": [
+        "body",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "0",
+        "v0"
+      ],
+      "optionalObservations": [
+        "acceleration",
+        "motion_sensor-2"
+      ],
+      "unmappableObservations": [
+        "起止端点是否清晰标注且对应同一段运动过程",
+        "各采样点的时刻是否与位置、速度读数同步对应",
+        "运动方向是否沿所选的 X 轴方向"
+      ]
+    },
+    "CH-K-M2-02": {
+      "requiredKinds": [
+        "box"
+      ],
+      "requiredObservations": [
+        "a",
+        "b",
+        "c"
+      ],
+      "optionalObservations": [
+        "angular"
+      ],
+      "unmappableObservations": [
+        "读取并比较 A 与 B 的画面标注：二者尺寸相同、体积相同，但 B 的标注质量是 A 的 3 倍",
+        "读取并比较 A 与 C 的画面标注：二者标注质量相同，但 C 的尺寸更小、体积更小",
+        "根据标注尺寸计算体积并用质量除以体积得到密度：A 为 8 kg/m³、B 为 24 kg/m³、C 为 64 kg/m³，据此说明密度不能只看质量或体积，速度/角速度读数不参与密度结论"
+      ]
+    },
+    "CH-K-M2-03": {
+      "requiredKinds": [
+        "box",
+        "force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "push",
+        "crate",
+        "angular"
+      ],
+      "optionalObservations": [
+        "0",
+        "v0",
+        "1",
+        "v1",
+        "acceleration"
+      ],
+      "unmappableObservations": []
+    },
+    "CH-K-M2-04": {
+      "requiredKinds": [
+        "body",
+        "force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "v0",
+        "acceleration"
+      ],
+      "optionalObservations": [
+        "0",
+        "force-2",
+        "body-1"
+      ],
+      "unmappableObservations": [
+        "目视确认两个力方向相反且大小相等",
+        "目视确认同一刚体同时受到两个力的作用"
+      ]
+    },
+    "CH-K-M1-07": {
+      "requiredKinds": [
+        "floor_slab",
+        "box",
+        "cylinder",
+        "force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "slider",
+        "wheel"
+      ],
+      "optionalObservations": [
+        "push-slider",
+        "push-wheel",
+        "floor"
+      ],
+      "unmappableObservations": [
+        "推力为2 N时，左侧滑块保持静止，速度接近0",
+        "推力为2 N时，右侧滚轮已发生滚动并产生明显位移",
+        "逐步增大滑块推力至约12 N时，滑块才开始滑动",
+        "滑块与滚轮处于同一摩擦地面条件下进行比较"
+      ]
+    },
+    "CH-K-M2-06": {
+      "requiredKinds": [
+        "box"
+      ],
+      "requiredObservations": [
+        "wide",
+        "narrow"
+      ],
+      "optionalObservations": [
+        "angular"
+      ],
+      "unmappableObservations": [
+        "画面中两块箱体标注的质量相同（均为 1 kg）",
+        "画面中两块箱体标注的底面积不同：A 为 1.0×1.0 m，B 为 0.5×0.5 m",
+        "需根据标注自行计算 p = mg ÷ (宽×深)，得出 B 的平均压强更大、压得更狠的结论；平台读数不用于该结论"
+      ]
+    },
+    "CH-K-M2-10": {
+      "requiredKinds": [
+        "body",
+        "force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "force-2",
+        "v0"
+      ],
+      "optionalObservations": [
+        "acceleration",
+        "0",
+        "body-1"
+      ],
+      "unmappableObservations": [
+        "由恒力 F 与速度 v 计算得到的瞬时功率 P=Fv 及平均功率的数值记录与比较",
+        "相同恒力下，速度越大时做功越快的定性结论"
+      ]
+    },
+    "CH-K-M2-05": {
+      "requiredKinds": [
+        "floor_slab",
+        "box",
+        "anchor",
+        "body",
+        "dynamometer",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "scale",
+        "0"
+      ],
+      "optionalObservations": [
+        "crate",
+        "ball",
+        "v0"
+      ],
+      "unmappableObservations": [
+        "箱子放在地面上，位置保持不变，说明受到地面支持力托着",
+        "小球晃动几下后停住，此时测力计读数约为 mg",
+        "把小球质量改为 2 kg 后，测力计读数翻倍"
+      ]
+    },
+    "CH-K-M2-12": {
+      "requiredKinds": [
+        "body",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "1",
+        "v1"
+      ],
+      "optionalObservations": [
+        "acceleration",
+        "body-1"
+      ],
+      "unmappableObservations": []
+    },
+    "CH-K-M2-13": {
+      "requiredKinds": [
+        "body",
+        "anchor",
+        "box",
+        "distance_sensor"
+      ],
+      "requiredObservations": [
+        "arm-l",
+        "arm-r"
+      ],
+      "optionalObservations": [
+        "bar",
+        "fulcrum",
+        "load",
+        "effort"
+      ],
+      "unmappableObservations": [
+        "杠杆被固定不动的示意状态（不会发生真实转动或平衡）",
+        "左右两侧作用点到支点的位置标注及力的方向是否垂直于杠杆（若为斜向力，则测距值不等于力臂）",
+        "左侧已知力 10 N 与右侧待配重量的标注关系（仅用于列式计算，不依赖真实平衡读数）"
+      ]
+    },
+    "CH-K-M2-09": {
+      "requiredKinds": [
+        "body",
+        "force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "force-2",
+        "0",
+        "1"
+      ],
+      "optionalObservations": [
+        "v0",
+        "v1",
+        "acceleration",
+        "motion_sensor-3"
+      ],
+      "unmappableObservations": [
+        "恒力箭头方向与物体位移方向的夹角关系：平行、有夹角或垂直，用于判定正功、负功或零功",
+        "改变恒力方向后，物体是否仍沿同一水平直线运动，以排除转动或侧向漂移造成的伪位移"
+      ]
+    },
+    "CH-K-M2-11": {
+      "requiredKinds": [
+        "body",
+        "anchor",
+        "spring",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "body-1",
+        "1",
+        "spring-3"
+      ],
+      "optionalObservations": [
+        "v0",
+        "v1",
+        "v2",
+        "0",
+        "2",
+        "motion_sensor-4",
+        "acceleration",
+        "angular"
+      ],
+      "unmappableObservations": [
+        "机械能总读数（界面综合显示）",
+        "由参数分解显示的动能与势能读数",
+        "改变质量或初速度后机械能总读数及各分量的变化趋势",
+        "弹簧弹性伸长的方向与形变状态"
+      ]
+    },
+    "CH-K-M3-02": {
+      "requiredKinds": [
+        "body",
+        "force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "0",
+        "v0",
+        "acceleration"
+      ],
+      "optionalObservations": [
+        "force-2",
+        "body-1"
+      ],
+      "unmappableObservations": [
+        "物体沿轨道/直线方向运动，未发生偏转或脱离轨道",
+        "恒定合力方向与运动方向共线且保持稳定"
+      ]
+    },
+    "CH-K-M3-01": {
+      "requiredKinds": [
+        "body",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "0",
+        "1",
+        "v0"
+      ],
+      "optionalObservations": [
+        "v1",
+        "v2",
+        "2",
+        "acceleration"
+      ],
+      "unmappableObservations": [
+        "路程（轨迹弧长）需根据坐标序列或画面轨迹估算，不能由单一通道直接读出",
+        "改变初速度方向后，运动方向、端点相对位置与轨迹形状的定性比较",
+        "位移向量与路程在概念上的差异及其对运动描述的影响"
+      ]
+    },
+    "CH-K-M3-03": {
+      "requiredKinds": [
+        "body",
+        "motion_sensor",
+        "force"
+      ],
+      "requiredObservations": [
+        "v0",
+        "acceleration"
+      ],
+      "optionalObservations": [
+        "v1",
+        "0",
+        "1",
+        "force-3"
+      ],
+      "unmappableObservations": [
+        "观察物体是否保持直线运动、无侧向偏转或转弯"
+      ]
+    },
+    "CH-K-M3-04": {
+      "requiredKinds": [
+        "body",
+        "force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "force-2",
+        "acceleration",
+        "v0"
+      ],
+      "optionalObservations": [
+        "0",
+        "motion_sensor-3"
+      ],
+      "unmappableObservations": [
+        "改变恒力大小时，受力对象运动方向与恒力方向是否保持一致、无侧向偏移或碰撞",
+        "改变质量后，受力对象/刚体球是否稳定放置且运动路径在传感器测量范围内"
+      ]
+    },
+    "CH-K-M2-14": {
+      "requiredKinds": [
+        "ramp",
+        "box",
+        "distance_sensor"
+      ],
+      "requiredObservations": [
+        "ramp",
+        "ruler"
+      ],
+      "optionalObservations": [
+        "load",
+        "angular"
+      ],
+      "unmappableObservations": [
+        "斜面摩擦或能量损失的定性示意（如粗糙接触、阻力标注、发热等）",
+        "有用功与总功相对大小的定性判断（W有 < W总）"
+      ]
+    },
+    "CH-K-M3-06": {
+      "requiredKinds": [
+        "body",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "v0",
+        "v1",
+        "1"
+      ],
+      "optionalObservations": [
+        "0",
+        "acceleration"
+      ],
+      "unmappableObservations": [
+        "观察刚体球运动路径是否呈抛物线形"
+      ]
+    },
+    "CH-K-M3-05": {
+      "requiredKinds": [
+        "body",
+        "dynamometer",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "dynamometer-2",
+        "acceleration",
+        "body-1"
+      ],
+      "optionalObservations": [
+        "motion_sensor-3",
+        "v0",
+        "v1",
+        "v2",
+        "0",
+        "1",
+        "2",
+        "angular"
+      ],
+      "unmappableObservations": [
+        "弹簧伸长或压缩时，两物体同时受到方向相反的作用",
+        "两物体的运动方向相反，且加速度、速度变化同时发生",
+        "测力计示数反映弹簧对两物体的作用力大小相等、方向相反"
+      ]
+    },
+    "CH-K-M3-09": {
+      "requiredKinds": [
+        "body",
+        "distance_sensor"
+      ],
+      "requiredObservations": [
+        "r1",
+        "r2"
+      ],
+      "optionalObservations": [],
+      "unmappableObservations": [
+        "中心球代表地球、两个小球代表不同轨道半径卫星的示意布局",
+        "所有球固定不绕转，不能直接观测到真实轨道运动",
+        "逃逸速度总是圆轨道速度的√2倍，需要通过公式推导而非从画面读数直接得出"
+      ]
+    },
+    "CH-K-M3-07": {
+      "requiredKinds": [
+        "anchor",
+        "body",
+        "rod",
+        "distance_sensor",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "distance_sensor-4",
+        "v0",
+        "v1"
+      ],
+      "optionalObservations": [
+        "angular",
+        "rod-3",
+        "0",
+        "1",
+        "acceleration"
+      ],
+      "unmappableObservations": [
+        "刚体球绕固定支点做稳定的圆周运动而非偏离圆轨迹",
+        "改变连杆长度后，球到支点的距离与轨迹半径随之发生相应变化"
+      ]
+    },
+    "CH-K-M3-10": {
+      "requiredKinds": [
+        "body",
+        "force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "force-2",
+        "0",
+        "v0"
+      ],
+      "optionalObservations": [
+        "acceleration",
+        "body-1"
+      ],
+      "unmappableObservations": [
+        "观察刚体球运动方向与恒力方向是否一致",
+        "观察改变恒力大小后位移和速度的变化趋势",
+        "比较恒力做功与动能增量时检查数值误差是否在合理范围内"
+      ]
+    },
+    "CH-K-M3-13": {
+      "requiredKinds": [
+        "body",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "v0",
+        "body-1"
+      ],
+      "optionalObservations": [
+        "0",
+        "acceleration",
+        "motion_sensor-2"
+      ],
+      "unmappableObservations": [
+        "碰撞前后总 X 动量（需用两球质量分别乘以运动传感器速度 X 与刚体球速度后求和比较）",
+        "碰撞前后总动能（需用质量与速度平方计算后比较，判断是否为弹性/非弹性碰撞）",
+        "碰撞瞬间两球运动方向与快慢的定性变化（画面观察）"
+      ]
+    },
+    "CH-K-M3-12": {
+      "requiredKinds": [
+        "body",
+        "force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "force-2",
+        "v0"
+      ],
+      "optionalObservations": [
+        "body-1",
+        "acceleration",
+        "motion_sensor-3"
+      ],
+      "unmappableObservations": [
+        "恒力作用时间（用于计算理论冲量，需由实验计时或画面读数获得，无独立时间通道）",
+        "刚体质量与动量数值（需由器具参数或速度计算获得，无直接动量通道）"
+      ]
+    },
+    "CH-K-M3-11": {
+      "requiredKinds": [
+        "anchor",
+        "spring",
+        "body",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "spring-2",
+        "v0"
+      ],
+      "optionalObservations": [
+        "0",
+        "acceleration",
+        "v1",
+        "v2"
+      ],
+      "unmappableObservations": [
+        "机械能（动能+弹性势能）随时间近似保持恒定，曲线在数值误差范围内无持续单调变化",
+        "动能与弹性势能周期性相互转化，二者此消彼长而总机械能不变"
+      ]
+    },
+    "CH-K-M3-14": {
+      "requiredKinds": [
+        "anchor",
+        "spring",
+        "body",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "0",
+        "v0"
+      ],
+      "optionalObservations": [
+        "acceleration"
+      ],
+      "unmappableObservations": [
+        "观察弹簧振子是否沿传感器测量方向稳定振动，过程中无明显侧摆、扭转或碰撞干扰",
+        "确认更换质量后弹簧、支点和传感器设置保持可比，振幅与平衡位置无明显异常变化"
+      ]
+    },
+    "CH-K-M4-01": {
+      "requiredKinds": [
+        "box",
+        "force"
+      ],
+      "requiredObservations": [
+        "angular"
+      ],
+      "optionalObservations": [
+        "force-2",
+        "box-1"
+      ],
+      "unmappableObservations": [
+        "长方体尺寸与质量分布设置是否仅改变质量分布而保持转轴一致",
+        "长方体绕主轴旋转时是否出现明显偏心、摆动或姿态不稳定"
+      ]
+    },
+    "CH-K-M4-02": {
+      "requiredKinds": [
+        "box",
+        "force"
+      ],
+      "requiredObservations": [
+        "angular",
+        "force-2"
+      ],
+      "optionalObservations": [
+        "box-1"
+      ],
+      "unmappableObservations": [
+        "长方体绕主轴旋转的姿态与转轴是否保持稳定（画面观察）",
+        "有无外力矩时角速度变化趋势的差别（画面与现象对比）",
+        "由角速度与长方体转动惯量计算出的 Lz 是否近似恒定（公式量，无直接通道）"
+      ]
+    },
+    "CH-K-M4-06": {
+      "requiredKinds": [
+        "anchor",
+        "body",
+        "spring",
+        "damper",
+        "harmonic_force",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "0",
+        "harmonic_force-5"
+      ],
+      "optionalObservations": [
+        "v0",
+        "spring-3",
+        "damper-4"
+      ],
+      "unmappableObservations": []
+    },
+    "CH-K-M4-08": {
+      "requiredKinds": [
+        "body",
+        "drag",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "ball",
+        "fluid"
+      ],
+      "optionalObservations": [
+        "v0",
+        "sensor",
+        "acceleration"
+      ],
+      "unmappableObservations": [
+        "速度-时间曲线呈指数衰减趋势，且阻力系数越大速度衰减越快"
+      ]
+    },
+    "CH-K-O1-01": {
+      "requiredKinds": [
+        "laser",
+        "aperture",
+        "detector"
+      ],
+      "requiredObservations": [
+        "detector-3",
+        "aperture-2"
+      ],
+      "optionalObservations": [
+        "laser-1"
+      ],
+      "unmappableObservations": [
+        "目视确认光斑是否被光阑边缘切断",
+        "光阑偏离光轴后光路中是否出现明显无光/挡光现象"
+      ]
+    },
+    "CH-K-O1-03": {
+      "requiredKinds": [
+        "laser",
+        "mirror",
+        "detector"
+      ],
+      "requiredObservations": [
+        "detector-3",
+        "mirror-2"
+      ],
+      "optionalObservations": [
+        "laser-1"
+      ],
+      "unmappableObservations": [
+        "反射光斑在画面中的方向随平面镜法线角度转动而改变",
+        "改变平面镜法线角度后，反射光是否仍能落到光电探测器感光面上"
+      ]
+    },
+    "CH-K-M4-05": {
+      "requiredKinds": [
+        "anchor",
+        "body",
+        "spring",
+        "damper",
+        "motion_sensor"
+      ],
+      "requiredObservations": [
+        "0",
+        "v0"
+      ],
+      "optionalObservations": [
+        "acceleration"
+      ],
+      "unmappableObservations": [
+        "位移衰减包络随阻尼器系数增大的变化趋势",
+        "振子是否越过平衡位置，以及振荡与无振荡的定性差别",
+        "机械能随时间的下降快慢与衰减特征"
+      ]
+    },
+    "CH-K-O1-02": {
+      "requiredKinds": [
+        "pinhole_screen"
+      ],
+      "requiredObservations": [
+        "imageHeight",
+        "blur",
+        "brightness"
+      ],
+      "optionalObservations": [
+        "sharpness",
+        "pin"
+      ],
+      "unmappableObservations": []
+    },
+    "CH-K-O2-01": {
+      "requiredKinds": [
+        "laser",
+        "refract_plane",
+        "detector"
+      ],
+      "requiredObservations": [
+        "spot",
+        "glass"
+      ],
+      "optionalObservations": [
+        "beam"
+      ],
+      "unmappableObservations": [
+        "界面处光线发生偏折，且 n₂ 越大出射方向越偏向法线（出射偏低）",
+        "n₂ = 1 时光线不偏折并直接越过探测器位置"
+      ]
+    },
+    "CH-K-O1-04": {
+      "requiredKinds": [
+        "laser",
+        "lens",
+        "detector"
+      ],
+      "requiredObservations": [
+        "spot"
+      ],
+      "optionalObservations": [
+        "beam",
+        "lens"
+      ],
+      "unmappableObservations": [
+        "离轴平行光经凸透镜后可见地向光轴收拢并在焦点附近汇聚成光斑",
+        "换用凹透镜或把凸透镜焦距改为 0.8 m 时，光束不会在 1.5 m 处汇聚到轴上探测器位置"
+      ]
+    },
+    "CH-K-O2-02": {
+      "requiredKinds": [
+        "laser",
+        "lens",
+        "diverging_lens",
+        "detector"
+      ],
+      "requiredObservations": [
+        "detector-4",
+        "effectiveFocal",
+        "backFocal"
+      ],
+      "optionalObservations": [
+        "laser-1",
+        "lens-2",
+        "diverging_lens-3"
+      ],
+      "unmappableObservations": [
+        "出射光束包络相对光轴呈收拢还是会聚/扩散的定性形态",
+        "切换凸透镜与凹透镜后，光斑在探测器面上收缩或扩展的动态趋势",
+        "光路中是否存在可见的实焦点或明显的虚焦点趋势"
+      ]
+    },
+    "CH-K-O3-05": {
+      "requiredKinds": [
+        "laser",
+        "lens",
+        "detector"
+      ],
+      "requiredObservations": [
+        "detector-3"
+      ],
+      "optionalObservations": [
+        "laser-1",
+        "lens-2"
+      ],
+      "unmappableObservations": [
+        "出射光束在第二片透镜后是否会聚",
+        "会聚点相对第二片透镜的位置（第二片前、后或与其重合）",
+        "改变两片透镜间距时，会聚点位置与是否仍会聚的变化"
+      ]
+    },
+    "CH-K-O2-03": {
+      "requiredKinds": [
+        "laser",
+        "lens",
+        "detector"
+      ],
+      "requiredObservations": [
+        "detector-3",
+        "lens-2"
+      ],
+      "optionalObservations": [
+        "laser-1"
+      ],
+      "unmappableObservations": [
+        "平行光经薄透镜后会聚成最小光斑的焦点位置，需结合画面或位置读数判断",
+        "改变透镜焦距后，探测器功率峰值所对应的位置应随之改变，且该峰值位置到透镜的距离应与设定的焦距一致"
+      ]
+    },
+    "CH-K-O4-01": {
+      "requiredKinds": [
+        "laser",
+        "lens",
+        "detector"
+      ],
+      "requiredObservations": [
+        "lens-2",
+        "detector-3"
+      ],
+      "optionalObservations": [
+        "laser-1"
+      ],
+      "unmappableObservations": [
+        "改变薄透镜焦距后，出射光束的会聚/发散趋势或光斑变化趋势",
+        "按ABCD矩阵计算得到的理论像面位置，以及该位置随透镜焦距或系统间距变化的趋势",
+        "与矩阵预测对应的出射光线高度/倾角的定性变化趋势"
+      ]
+    },
+    "CH-K-T1-01": {
+      "requiredKinds": [
+        "heat_source",
+        "thermometer"
+      ],
+      "requiredObservations": [
+        "src-1",
+        "meter-1"
+      ],
+      "optionalObservations": [
+        "target"
+      ],
+      "unmappableObservations": [
+        "温度计读数从变化到稳定所需的时间（稳定时间，需按读数变化过程计时判断）",
+        "用手触摸或靠近时对冷热的主观感受（冷暖感觉）",
+        "同一读数在不同比较对象下被判断为“冷”或“热”的定性结论"
+      ]
+    },
+    "CH-K-T1-02": {
+      "requiredKinds": [
+        "heat_source",
+        "thermometer"
+      ],
+      "requiredObservations": [
+        "meter-1"
+      ],
+      "optionalObservations": [
+        "target",
+        "src-1"
+      ],
+      "unmappableObservations": [
+        "温度计读数随时间上升并逐渐趋于稳定的曲线形态",
+        "温度计的量程与分度值读取（画面刻度或数字显示）",
+        "摄氏温度与开尔文温度的单位区分及换算说明（定性表达）"
+      ]
+    },
+    "CH-K-T1-03": {
+      "requiredKinds": [
+        "heat_source",
+        "conductor"
+      ],
+      "requiredObservations": [
+        "heatFlow",
+        "Ta",
+        "Tb"
+      ],
+      "optionalObservations": [
+        "src-1",
+        "src-2"
+      ],
+      "unmappableObservations": [
+        "随时间观察，A、B 两端温度差逐渐减小并趋于稳定（趋近热平衡）",
+        "热流方向为 A→B，且随两端温差减小而减弱"
+      ]
+    },
+    "CH-K-T1-04": {
+      "requiredKinds": [
+        "heat_source",
+        "conductor",
+        "thermometer"
+      ],
+      "requiredObservations": [
+        "meter-1",
+        "target"
+      ],
+      "optionalObservations": [
+        "src-1",
+        "Ta",
+        "Tb",
+        "heatFlow",
+        "rod-1"
+      ],
+      "unmappableObservations": [
+        "通过画面确认装置连接、温度计与导热棒接触及保温包裹状态在改变导热棒热容前后保持一致",
+        "通过画面确认除导热棒热容外未改动热源设定和其他器具"
+      ]
+    },
+    "CH-K-T2-01": {
+      "requiredKinds": [
+        "heat_source",
+        "conductor",
+        "thermometer"
+      ],
+      "requiredObservations": [
+        "Ta",
+        "meter-1"
+      ],
+      "optionalObservations": [
+        "Tb",
+        "heatFlow",
+        "src-1",
+        "target"
+      ],
+      "unmappableObservations": [
+        "导热棒温度上升到指定值所需的时间（需借助计时器/秒表记录，无对应实时通道）",
+        "改变导热棒热容后，达到相同温度读数的快慢差异（定性比较）"
+      ]
+    },
+    "CH-K-T2-02": {
+      "requiredKinds": [
+        "heat_source",
+        "conductor",
+        "thermometer"
+      ],
+      "requiredObservations": [
+        "heatFlow",
+        "Ta",
+        "Tb"
+      ],
+      "optionalObservations": [
+        "src-1",
+        "target",
+        "meter-1"
+      ],
+      "unmappableObservations": [
+        "观察热源周围空气是否形成上升气流，以区分对流所需条件",
+        "观察热源与温度计之间无需介质时是否仍有热传递，以区分辐射所需条件"
+      ]
+    },
+    "CH-K-T3-07": {
+      "requiredKinds": [
+        "heat_source",
+        "conductor"
+      ],
+      "requiredObservations": [
+        "heatFlow",
+        "src-1",
+        "src-2"
+      ],
+      "optionalObservations": [
+        "Ta",
+        "Tb"
+      ],
+      "unmappableObservations": [
+        "根据热流方向与高、低温热源温差的变化判断循环净做功的正负及循环方向（无直接功通道）"
+      ]
+    },
+    "CH-K-T3-05": {
+      "requiredKinds": [
+        "heat_source",
+        "conductor",
+        "thermometer"
+      ],
+      "requiredObservations": [
+        "heatFlow",
+        "meter-1"
+      ],
+      "optionalObservations": [
+        "src-1",
+        "Ta",
+        "Tb",
+        "rod-1",
+        "target"
+      ],
+      "unmappableObservations": [
+        "热源的加热开关/功率档位在画面中的状态变化",
+        "导热棒连接方向及热流 A→B 的方向标识（若界面以箭头或颜色呈现）"
+      ]
+    },
+    "CH-K-T2-03": {
+      "requiredKinds": [
+        "heat_source",
+        "conductor",
+        "thermometer"
+      ],
+      "requiredObservations": [
+        "meter-1"
+      ],
+      "optionalObservations": [
+        "src-1",
+        "target",
+        "Ta",
+        "Tb",
+        "heatFlow",
+        "rod-1"
+      ],
+      "unmappableObservations": []
+    }
+  }
 }
